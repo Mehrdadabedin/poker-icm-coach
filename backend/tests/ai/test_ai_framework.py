@@ -67,6 +67,37 @@ def test_ai_returns_legal_actions() -> None:
     assert sum(p.stack for p in players) == 9 * 45000
 
 
+def test_full_nine_player_ai_hand_conserves_chips() -> None:
+    """Integration: 1 hero + 8 AI opponents play a full hand, chips conserved."""
+    players = [Player(name="Hero", stack=45000, seat=0, is_human=True)]
+    for i in range(1, 9):
+        players.append(Player(name=f"Bot{i}", stack=45000, seat=i))
+    t = Tournament(players=players, ante_mode="traditional")
+    rng = random.Random(42)
+    eng = HandEngine(tournament=t, provider=AIDecisionProvider(rng=rng), rng=rng)
+    eng.start_hand()
+    guard = 0
+    while not eng.is_complete and guard < 3000:
+        actor = eng.current_actor
+        if actor is None:
+            break
+        p = eng.tournament.players[actor]
+        if p.is_human:
+            street_contrib = eng._street.contributions.get(actor, 0)
+            to_call = max(0, eng._street.current_bet - street_contrib)
+            if to_call == 0:
+                eng.act(actor, Action(ActionType.CHECK))
+            elif to_call >= p.stack:
+                eng.act(actor, Action(ActionType.ALL_IN, amount=p.stack, is_all_in=True))
+            else:
+                eng.act(actor, Action(ActionType.CALL, amount=to_call))
+        else:
+            eng.advance_bot(actor)
+        guard += 1
+    assert eng.is_complete
+    assert sum(p.stack for p in players) == 9 * 45000
+
+
 def test_decide_for_seat_delegation() -> None:
     players = [Player(name=f"P{i}", stack=45000, seat=i) for i in range(3)]
     t = Tournament(players=players)

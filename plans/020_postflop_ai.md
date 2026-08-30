@@ -2,7 +2,7 @@
 id: 020
 title: Postflop AI
 phase: 2
-status: planned
+status: complete
 depends_on: [8, 17, 18]
 test_file: backend/tests/ai/test_postflop_ai.py
 implementation_files: [backend/app/ai/postflop_ai.py, backend/app/ai/board_texture.py]

@@ -78,7 +78,7 @@ def test_legal_actions_all_in_short_stack() -> None:
     types = {a.type for a in acted}
     assert ActionType.FOLD in types
     assert ActionType.ALL_IN in types
-    assert ActionType.CALL in types
+    assert ActionType.CALL not in types  # call beyond stack is an all-in
     assert ActionType.RAISE not in types
 
 

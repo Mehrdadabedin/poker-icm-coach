@@ -54,7 +54,8 @@ def legal_actions(
         if stack >= big_blind:
             actions.append(Action(ActionType.BET, min_amount=big_blind, max_amount=stack))
     else:
-        actions.append(Action(ActionType.CALL, amount=to_call, max_amount=stack))
+        if to_call < stack:  # a call that equals/exceeds stack is an all-in call
+            actions.append(Action(ActionType.CALL, amount=to_call, max_amount=stack))
         if stack > to_call and min_raise > 0:
             actions.append(
                 Action(ActionType.RAISE, min_amount=min_raise, max_amount=stack, amount=None)
