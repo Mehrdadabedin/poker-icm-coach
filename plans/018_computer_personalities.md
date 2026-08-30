@@ -2,7 +2,7 @@
 id: 018
 title: Computer Personalities
 phase: 2
-status: planned
+status: complete
 depends_on: [17]
 test_file: backend/tests/ai/test_personalities.py
 implementation_files: [backend/app/ai/personalities.py]
