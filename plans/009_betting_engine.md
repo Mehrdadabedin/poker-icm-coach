@@ -2,7 +2,7 @@
 id: 009
 title: Betting Engine
 phase: 1
-status: planned
+status: complete
 depends_on: [4]
 test_file: backend/tests/game/test_betting.py
 implementation_files: [backend/app/game/betting.py, backend/app/game/actions.py]

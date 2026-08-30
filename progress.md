@@ -12,7 +12,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 006 | Dealer Button Rotation | 1 | complete | PASS (8) | button rotation, skips eliminated |
 | 007 | Dealing Engine | 1 | complete | PASS (7) | hole cards, burn, flop/turn/river |
 | 008 | Hand Evaluator | 1 | complete | PASS (23) | all categories, wheels, kickers; brute-force validated |
-| 009 | Betting Engine | 1 | planned | | |
+| 009 | Betting Engine | 1 | complete | PASS (14) | legal actions, min-raise, validation |
 | 010 | Pot Engine | 1 | planned | | |
 | 011 | Side Pots | 1 | planned | | |
 | 012 | Tournament Engine | 1 | planned | | |
@@ -48,11 +48,11 @@ Phase 1 — Core Poker Game
 
 ## Current Atomic Task
 
-009 — Betting Engine
+010 — Pot Engine
 
 ## Completed Tasks
 
-- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
+- 009 Betting Engine (complete)- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
 
 ## In Progress
 
@@ -75,4 +75,4 @@ Phase 1 — Core Poker Game
 
 ## Next Step
 
-Begin 009 Betting Engine: test legal actions/min-raise math, implement actions.py + betting.py.
+Begin 010 Pot Engine: test pot accounting, implement pot.py.
