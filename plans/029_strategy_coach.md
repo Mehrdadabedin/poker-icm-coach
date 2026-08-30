@@ -2,7 +2,7 @@
 id: 029
 title: Strategy Coach
 phase: 3
-status: planned
+status: complete
 depends_on: [22, 23, 24, 25, 26, 27, 28]
 test_file: backend/tests/strategy/test_coach.py
 implementation_files: [backend/app/strategy/coach.py, backend/app/strategy/coach_modes.py]
