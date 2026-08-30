@@ -2,7 +2,7 @@
 id: 024
 title: Bubble Pressure
 phase: 3
-status: planned
+status: complete
 depends_on: [22, 23]
 test_file: backend/tests/strategy/test_bubble.py
 implementation_files: [backend/app/strategy/bubble.py]
