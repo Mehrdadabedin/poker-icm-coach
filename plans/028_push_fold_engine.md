@@ -2,7 +2,7 @@
 id: 028
 title: Push/Fold Engine
 phase: 3
-status: planned
+status: complete
 depends_on: [27, 24]
 test_file: backend/tests/strategy/test_push_fold.py
 implementation_files: [backend/app/strategy/push_fold.py]
