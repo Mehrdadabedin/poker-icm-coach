@@ -2,7 +2,7 @@
 id: 004
 title: Player Model
 phase: 1
-status: planned
+status: complete
 depends_on: [2]
 test_file: backend/tests/game/test_player.py
 implementation_files: [backend/app/game/player.py]
