@@ -39,7 +39,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 033 | Database (PostgreSQL + Alembic) | 3 | complete | PASS (4) | alembic migration + real PG round-trips |
 | 034 | FastAPI + WebSocket API | 3 | complete | PASS (13) | REST+WS, hidden-card security, flows |
 | 035 | Android (Capacitor) | 4 | planned | | |
-| 036 | GitHub Repository Preparation | 4 | planned | | |
+| 036 | GitHub Repository Preparation | 4 | complete | PASS (3) | README, CI, audit script |
 | 037 | Final Testing & E2E | 4 | planned | | |
 
 ## Current Phase
@@ -48,11 +48,11 @@ Phase 1 — Core Poker Game
 
 ## Current Atomic Task
 
-035 — Android (Capacitor)
+037 — Final Testing & E2E
 
 ## Completed Tasks
 
-- 034 FastAPI + WebSocket API (complete)- 033 Database (PostgreSQL + Alembic) (complete)- 032 Statistics (complete)- 031 Hand History (complete)- 030 Test Mode (complete)- 029 Strategy Coach (complete)- 028 Push/Fold Engine (complete)- 027 Range Matrix (complete)- 026 Equity Engine (complete)- 025 Risk Premium (complete)- 024 Bubble Pressure (complete)- 023 Stack Analysis (complete)- 022 ICM Engine (complete)- 021 Opponent Range Estimation (complete)- 020 Postflop AI (complete)- 019 Preflop AI (complete)- 018 Computer Personalities (complete)- 017 Computer AI Framework (complete)- 016 Hero Controls (complete)- 015 React Poker Table (complete)- 014 Hand Engine (complete)- 013 Tournament Timer (complete)- 012 Tournament Engine (complete)- 011 Side Pots (complete)- 010 Pot Engine (complete)- 009 Betting Engine (complete)- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
+- 036 GitHub Repository Preparation (complete)- 034 FastAPI + WebSocket API (complete)- 033 Database (PostgreSQL + Alembic) (complete)- 032 Statistics (complete)- 031 Hand History (complete)- 030 Test Mode (complete)- 029 Strategy Coach (complete)- 028 Push/Fold Engine (complete)- 027 Range Matrix (complete)- 026 Equity Engine (complete)- 025 Risk Premium (complete)- 024 Bubble Pressure (complete)- 023 Stack Analysis (complete)- 022 ICM Engine (complete)- 021 Opponent Range Estimation (complete)- 020 Postflop AI (complete)- 019 Preflop AI (complete)- 018 Computer Personalities (complete)- 017 Computer AI Framework (complete)- 016 Hero Controls (complete)- 015 React Poker Table (complete)- 014 Hand Engine (complete)- 013 Tournament Timer (complete)- 012 Tournament Engine (complete)- 011 Side Pots (complete)- 010 Pot Engine (complete)- 009 Betting Engine (complete)- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
 
 ## In Progress
 
@@ -75,4 +75,4 @@ Phase 1 — Core Poker Game
 
 ## Next Step
 
-Begin 035 Android: Capacitor config, web build, APK docs.
+Run full suites + build + audit; finalize progress.md.

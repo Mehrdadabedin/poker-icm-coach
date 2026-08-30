@@ -2,7 +2,7 @@
 id: 036
 title: GitHub Repository Preparation
 phase: 4
-status: planned
+status: complete
 depends_on: [1]
 test_file: scripts/check_github.py
 implementation_files: [README.md]
