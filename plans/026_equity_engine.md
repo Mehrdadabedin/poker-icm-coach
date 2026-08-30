@@ -2,7 +2,7 @@
 id: 026
 title: Equity Engine
 phase: 3
-status: planned
+status: complete
 depends_on: [2, 21]
 test_file: backend/tests/equity/test_equity.py
 implementation_files: [backend/app/equity/equity_engine.py]
