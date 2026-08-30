@@ -2,7 +2,7 @@
 id: 002
 title: Card Model
 phase: 1
-status: planned
+status: complete
 depends_on: [1]
 test_file: backend/tests/poker/test_card.py
 implementation_files: [backend/app/poker/card.py]

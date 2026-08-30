@@ -5,7 +5,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | ID | Task | Phase | Status | Tests | Notes |
 |----|------|-------|--------|-------|-------|
 | 001 | Project Setup | 1 | complete | PASS (9) | structure, tooling, git init |
-| 002 | Card Model | 1 | planned | | |
+| 002 | Card Model | 1 | complete | PASS (11) | card primitives |
 | 003 | Deck Engine | 1 | planned | | |
 | 004 | Player Model | 1 | planned | | |
 | 005 | Positions | 1 | planned | | |
@@ -48,11 +48,11 @@ Phase 1 — Core Poker Game
 
 ## Current Atomic Task
 
-002 — Card Model
+003 — Deck Engine
 
 ## Completed Tasks
 
-- 001 Project Setup (complete)
+- 002 Card Model (complete)- 001 Project Setup (complete)
 
 ## In Progress
 
@@ -75,4 +75,4 @@ Phase 1 — Core Poker Game
 
 ## Next Step
 
-Begin 002 Card Model: write card tests, implement card.py, run tests + ruff.
+Begin 003 Deck Engine: test deck, implement deck.py, run tests + ruff.
