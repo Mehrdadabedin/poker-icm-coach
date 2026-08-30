@@ -1,0 +1,68 @@
+/* Base layout and felt for the poker table. */
+
+:root {
+  --felt: #1c6b4f;
+  --felt-dark: #10422f;
+  --felt-rim: #8a5a2b;
+  --accent: #f2c14e;
+  --bg: #14181d;
+  --text: #e8e6e1;
+  --muted: #9aa0a6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+.screen-title {
+  font-size: 1.4rem;
+  letter-spacing: 2px;
+  text-align: center;
+  margin: 8px 0 4px;
+  color: var(--accent);
+}
+
+.table-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+}
+
+.table-wrap {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  background: #1d242c;
+  border-radius: 8px;
+  margin-bottom: 6px;
+}
+
+.table-felt {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  min-height: 260px;
+  background: radial-gradient(ellipse at center, var(--felt) 0%, var(--felt-dark) 85%);
+  border: 10px solid var(--felt-rim);
+  border-radius: 46% / 38%;
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.45);
+}

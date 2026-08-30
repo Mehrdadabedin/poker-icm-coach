@@ -2,7 +2,7 @@
 id: 015
 title: React Poker Table
 phase: 1
-status: planned
+status: complete
 depends_on: [37]
 test_file: frontend/tests/table.test.tsx
 implementation_files: [frontend/src/components/PokerTable.tsx, frontend/src/pages/TablePage.tsx]

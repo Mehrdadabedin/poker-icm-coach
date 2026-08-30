@@ -1,0 +1,41 @@
+/* Seat placement for 9 seats around the felt (percent coordinates). */
+
+.seat:nth-child(1) { left: 4%; top: 8%; }
+.seat:nth-child(2) { left: 4%; top: 50%; transform: translateY(-30%); }
+.seat:nth-child(3) { left: 15%; top: 82%; }
+.seat:nth-child(4) { left: 38%; top: 92%; }
+.seat:nth-child(5) { left: 60%; top: 92%; }
+.seat:nth-child(6) { left: 80%; top: 82%; }
+.seat:nth-child(7) { left: 92%; top: 50%; transform: translate(-100%, -30%); }
+.seat:nth-child(8) { left: 80%; top: 8%; }
+.seat:nth-child(9) { left: 55%; top: 0%; }
+
+@media (max-width: 640px) {
+  .seat {
+    width: 72px;
+    font-size: 0.6rem;
+    min-height: 46px;
+  }
+  .seat-bet {
+    font-size: 0.55rem;
+  }
+  .table-header {
+    font-size: 0.68rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+  .seat {
+    width: 84px;
+  }
+}
+
+@media (orientation: portrait) {
+  .table-felt {
+    aspect-ratio: 4 / 3;
+    min-height: 200px;
+  }
+  .board {
+    top: 44%;
+  }
+}

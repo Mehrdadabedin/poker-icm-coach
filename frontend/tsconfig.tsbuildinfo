@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/main.tsx","./src/sampleState.ts","./src/components/CardView.tsx","./src/components/PokerSeat.tsx","./src/components/PokerTable.tsx","./src/models/game.ts","./src/pages/TablePage.tsx","./tests/table.test.tsx","./vite.config.ts","./vitest.setup.ts"],"version":"5.9.3"}

@@ -1,0 +1,97 @@
+/* Card visuals, community board and 9-seat placement. */
+
+.card {
+  background: var(--card-white, #f7f4ec);
+  color: #111;
+  border-radius: 5px;
+  min-width: 34px;
+  height: 48px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  font-weight: 700;
+}
+
+.card-small {
+  min-width: 26px;
+  height: 36px;
+  font-size: 0.6rem;
+  border-radius: 4px;
+}
+
+.card-red {
+  color: #c62828;
+}
+
+.card-black {
+  color: #111;
+}
+
+.card-back {
+  background: repeating-linear-gradient(
+    45deg,
+    #2c3e50,
+    #2c3e50 4px,
+    #3f5a75 4px,
+    #3f5a75 8px
+  );
+}
+
+.card-rank,
+.card-suit {
+  line-height: 1;
+}
+
+.board {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  padding: 8px 12px;
+  border-radius: 10px;
+}
+
+.board-empty {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+}
+
+.hero-bar {
+  margin-top: 8px;
+  padding: 8px;
+  background: #1d242c;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.hero-hand-label {
+  font-weight: 700;
+  color: #4f9dff;
+}
+
+.btn {
+  min-height: 48px;
+  min-width: 96px;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  color: #241c05;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.waiting-label {
+  color: var(--muted);
+  font-size: 0.8rem;
+}

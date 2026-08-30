@@ -18,7 +18,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 012 | Tournament Engine | 1 | complete | PASS (15) | blind structure, payouts, 9-seat config |
 | 013 | Tournament Timer | 1 | complete | PASS (12) | timer, level-up, fast mode |
 | 014 | Hand Engine (Street Flow) | 1 | complete | PASS (7) | full hands; 300-trial conservation audit |
-| 015 | React Poker Table | 1 | planned | | |
+| 015 | React Poker Table | 1 | complete | PASS (8) | 9-seat table, cards, pot, dealer, active states |
 | 016 | Hero Controls | 1 | planned | | |
 | 017 | Computer AI Framework | 2 | planned | | |
 | 018 | Computer Personalities | 2 | planned | | |
@@ -48,11 +48,11 @@ Phase 1 — Core Poker Game
 
 ## Current Atomic Task
 
-015 — React Poker Table
+016 — Hero Controls
 
 ## Completed Tasks
 
-- 014 Hand Engine (complete)- 013 Tournament Timer (complete)- 012 Tournament Engine (complete)- 011 Side Pots (complete)- 010 Pot Engine (complete)- 009 Betting Engine (complete)- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
+- 015 React Poker Table (complete)- 014 Hand Engine (complete)- 013 Tournament Timer (complete)- 012 Tournament Engine (complete)- 011 Side Pots (complete)- 010 Pot Engine (complete)- 009 Betting Engine (complete)- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
 
 ## In Progress
 
@@ -75,4 +75,4 @@ Phase 1 — Core Poker Game
 
 ## Next Step
 
-Begin 015 React Poker Table: scaffold frontend tooling first (vite/ts/vitest), then TablePage.
+Begin 016 Hero Controls: legal action buttons + bet sizing, tests.
