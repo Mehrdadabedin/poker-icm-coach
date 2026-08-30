@@ -2,7 +2,7 @@
 id: 019
 title: Preflop AI
 phase: 2
-status: planned
+status: complete
 depends_on: [17, 18]
 test_file: backend/tests/ai/test_preflop_ai.py
 implementation_files: [backend/app/ai/preflop_ai.py, backend/app/ai/preflop_ranges.py]
