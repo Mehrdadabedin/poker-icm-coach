@@ -2,7 +2,7 @@
 id: 031
 title: Hand History
 phase: 3
-status: planned
+status: complete
 depends_on: [14, 29]
 test_file: backend/tests/services/test_hand_history.py
 implementation_files: [backend/app/services/hand_history.py]
