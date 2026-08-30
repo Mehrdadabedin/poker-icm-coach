@@ -2,7 +2,7 @@
 id: 013
 title: Tournament Timer
 phase: 1
-status: planned
+status: complete
 depends_on: [12]
 test_file: backend/tests/tournament/test_timer.py
 implementation_files: [backend/app/tournament/tournament_timer.py]
