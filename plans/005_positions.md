@@ -2,7 +2,7 @@
 id: 005
 title: Positions
 phase: 1
-status: planned
+status: complete
 depends_on: [1]
 test_file: backend/tests/game/test_positions.py
 implementation_files: [backend/app/game/positions.py]

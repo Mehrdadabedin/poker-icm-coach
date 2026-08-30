@@ -8,7 +8,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 002 | Card Model | 1 | complete | PASS (11) | card primitives |
 | 003 | Deck Engine | 1 | complete | PASS (10) | deck: 52 unique, shuffle, draw, reset |
 | 004 | Player Model | 1 | complete | PASS (11) | player state, chips, all-in vs elimination |
-| 005 | Positions | 1 | planned | | |
+| 005 | Positions | 1 | complete | PASS (8) | 9-max + 6-max seat->position mapping |
 | 006 | Dealer Button Rotation | 1 | planned | | |
 | 007 | Dealing Engine | 1 | planned | | |
 | 008 | Hand Evaluator | 1 | planned | | |
@@ -48,11 +48,11 @@ Phase 1 — Core Poker Game
 
 ## Current Atomic Task
 
-005 — Positions
+006 — Dealer Button Rotation
 
 ## Completed Tasks
 
-- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
+- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
 
 ## In Progress
 
@@ -75,4 +75,4 @@ Phase 1 — Core Poker Game
 
 ## Next Step
 
-Begin 005 Positions: test seat->position mapping, implement positions.py.
+Begin 006 Dealer Button Rotation: test rotation, implement dealer_button.py.
