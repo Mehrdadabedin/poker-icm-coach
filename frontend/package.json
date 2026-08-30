@@ -14,7 +14,8 @@
     "cap:android": "npx cap open android",
     "cap:add": "npx cap add android",
     "apk:debug": "cd android && ./gradlew assembleDebug",
-    "apk:release": "cd android && ./gradlew assembleRelease"
+    "apk:release": "cd android && ./gradlew assembleRelease",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
@@ -25,6 +26,7 @@
     "react-router-dom": "^7.18.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.5.2",
