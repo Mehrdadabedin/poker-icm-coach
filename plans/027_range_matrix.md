@@ -2,7 +2,7 @@
 id: 027
 title: Range Matrix
 phase: 3
-status: planned
+status: complete
 depends_on: [2, 19]
 test_file: backend/tests/strategy/test_range_matrix.py
 implementation_files: [backend/app/strategy/range_matrix.py, backend/app/strategy/baseline_ranges.py]

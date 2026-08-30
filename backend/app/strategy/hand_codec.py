@@ -10,6 +10,7 @@ from dataclasses import dataclass
 
 RANK_CHAR = {2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7", 8: "8", 9: "9",
              10: "T", 11: "J", 12: "Q", 13: "K", 14: "A"}
+HAND_RANK_CHARS = RANK_CHAR
 CHAR_RANK = {v: k for k, v in RANK_CHAR.items()}
 
 
