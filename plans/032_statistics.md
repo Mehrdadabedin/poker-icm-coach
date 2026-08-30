@@ -2,7 +2,7 @@
 id: 032
 title: Statistics
 phase: 3
-status: planned
+status: complete
 depends_on: [31]
 test_file: backend/tests/services/test_statistics.py
 implementation_files: [backend/app/services/statistics.py]
