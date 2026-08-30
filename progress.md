@@ -15,7 +15,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 009 | Betting Engine | 1 | complete | PASS (14) | legal actions, min-raise, validation |
 | 010 | Pot Engine | 1 | complete | PASS (7) | contributions, awards, splits |
 | 011 | Side Pots | 1 | complete | PASS (12) | multi-all-in side pots; 10k-trial conservation audit |
-| 012 | Tournament Engine | 1 | planned | | |
+| 012 | Tournament Engine | 1 | complete | PASS (15) | blind structure, payouts, 9-seat config |
 | 013 | Tournament Timer | 1 | planned | | |
 | 014 | Hand Engine (Street Flow) | 1 | planned | | |
 | 015 | React Poker Table | 1 | planned | | |
@@ -48,11 +48,11 @@ Phase 1 — Core Poker Game
 
 ## Current Atomic Task
 
-012 — Tournament Engine
+013 — Tournament Timer
 
 ## Completed Tasks
 
-- 011 Side Pots (complete)- 010 Pot Engine (complete)- 009 Betting Engine (complete)- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
+- 012 Tournament Engine (complete)- 011 Side Pots (complete)- 010 Pot Engine (complete)- 009 Betting Engine (complete)- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
 
 ## In Progress
 
@@ -75,4 +75,4 @@ Phase 1 — Core Poker Game
 
 ## Next Step
 
-Begin 012 Tournament Engine: blind structure + tournament config, test + implement.
+Begin 013 Tournament Timer: test countdown/level-up/fast mode, implement tournament_timer.py.

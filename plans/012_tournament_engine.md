@@ -2,7 +2,7 @@
 id: 012
 title: Tournament Engine
 phase: 1
-status: planned
+status: complete
 depends_on: [4, 5]
 test_file: backend/tests/tournament/test_tournament.py
 implementation_files: [backend/app/tournament/blind_structure.py, backend/app/tournament/tournament.py]
