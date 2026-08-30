@@ -2,7 +2,7 @@
 id: 025
 title: Risk Premium
 phase: 3
-status: planned
+status: complete
 depends_on: [22, 24]
 test_file: backend/tests/strategy/test_risk_premium.py
 implementation_files: [backend/app/strategy/risk_premium.py]

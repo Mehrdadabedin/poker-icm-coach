@@ -28,7 +28,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 022 | ICM Engine | 3 | complete | PASS (10) | exact ICM recursion, bubble effects, not-active |
 | 023 | Stack Analysis | 3 | complete | PASS (7) | BB/effective stack, snapshot, rank, bands |
 | 024 | Bubble Pressure | 3 | complete | PASS (13) | stage detection, bubble pressure heuristic |
-| 025 | Risk Premium | 3 | planned | | |
+| 025 | Risk Premium | 3 | complete | PASS (7) | risk premium bands, coverage, type labels |
 | 026 | Equity Engine | 3 | planned | | |
 | 027 | Range Matrix | 3 | planned | | |
 | 028 | Push/Fold Engine | 3 | planned | | |
@@ -48,11 +48,11 @@ Phase 1 — Core Poker Game
 
 ## Current Atomic Task
 
-025 — Risk Premium
+026 — Equity Engine
 
 ## Completed Tasks
 
-- 024 Bubble Pressure (complete)- 023 Stack Analysis (complete)- 022 ICM Engine (complete)- 021 Opponent Range Estimation (complete)- 020 Postflop AI (complete)- 019 Preflop AI (complete)- 018 Computer Personalities (complete)- 017 Computer AI Framework (complete)- 016 Hero Controls (complete)- 015 React Poker Table (complete)- 014 Hand Engine (complete)- 013 Tournament Timer (complete)- 012 Tournament Engine (complete)- 011 Side Pots (complete)- 010 Pot Engine (complete)- 009 Betting Engine (complete)- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
+- 025 Risk Premium (complete)- 024 Bubble Pressure (complete)- 023 Stack Analysis (complete)- 022 ICM Engine (complete)- 021 Opponent Range Estimation (complete)- 020 Postflop AI (complete)- 019 Preflop AI (complete)- 018 Computer Personalities (complete)- 017 Computer AI Framework (complete)- 016 Hero Controls (complete)- 015 React Poker Table (complete)- 014 Hand Engine (complete)- 013 Tournament Timer (complete)- 012 Tournament Engine (complete)- 011 Side Pots (complete)- 010 Pot Engine (complete)- 009 Betting Engine (complete)- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
 
 ## In Progress
 
@@ -75,4 +75,4 @@ Phase 1 — Core Poker Game
 
 ## Next Step
 
-Begin 025 Risk Premium: required-equity adjustment under ICM pressure.
+Begin 026 Equity Engine: enumeration + Monte Carlo (labeled estimates).
