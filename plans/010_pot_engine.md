@@ -2,7 +2,7 @@
 id: 010
 title: Pot Engine
 phase: 1
-status: planned
+status: complete
 depends_on: [4, 9]
 test_file: backend/tests/game/test_pot.py
 implementation_files: [backend/app/game/pot.py]
