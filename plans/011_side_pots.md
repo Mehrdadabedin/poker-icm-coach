@@ -2,7 +2,7 @@
 id: 011
 title: Side Pots
 phase: 1
-status: planned
+status: complete
 depends_on: [8, 9, 10]
 test_file: backend/tests/game/test_side_pots.py
 implementation_files: [backend/app/game/side_pot.py]
