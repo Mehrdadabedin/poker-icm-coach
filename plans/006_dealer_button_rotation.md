@@ -2,7 +2,7 @@
 id: 006
 title: Dealer Button Rotation
 phase: 1
-status: planned
+status: complete
 depends_on: [5]
 test_file: backend/tests/game/test_dealer_button.py
 implementation_files: [backend/app/game/dealer_button.py]
