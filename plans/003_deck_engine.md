@@ -2,7 +2,7 @@
 id: 003
 title: Deck Engine
 phase: 1
-status: planned
+status: complete
 depends_on: [2]
 test_file: backend/tests/poker/test_deck.py
 implementation_files: [backend/app/poker/deck.py]
