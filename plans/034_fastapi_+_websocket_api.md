@@ -2,7 +2,7 @@
 id: 034
 title: FastAPI + WebSocket API
 phase: 3
-status: planned
+status: complete
 depends_on: [14, 29, 33]
 test_file: backend/tests/test_api.py
 implementation_files: [backend/app/main.py, backend/app/api/routers.py, backend/app/schemas/game_schemas.py]

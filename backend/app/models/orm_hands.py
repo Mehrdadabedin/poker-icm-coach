@@ -1,7 +1,7 @@
 """ORM models for hands, actions, results, decisions and statistics."""
 from __future__ import annotations
 
-from sqlalchemy import Float, ForeignKey, Integer, JSON, String
+from sqlalchemy import JSON, Float, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database.session import Base
