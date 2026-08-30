@@ -2,7 +2,7 @@
 id: 030
 title: Test Mode
 phase: 3
-status: planned
+status: complete
 depends_on: [29]
 test_file: backend/tests/strategy/test_test_mode.py
 implementation_files: [backend/app/strategy/test_mode.py]
