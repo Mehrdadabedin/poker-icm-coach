@@ -2,7 +2,7 @@
 id: 033
 title: Database (PostgreSQL + Alembic)
 phase: 3
-status: planned
+status: complete
 depends_on: [12, 31]
 test_file: backend/tests/test_database.py
 implementation_files: [backend/app/database/session.py, backend/app/models/orm_models.py, backend/alembic.ini, backend/alembic/]
