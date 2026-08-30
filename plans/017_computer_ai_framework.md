@@ -2,7 +2,7 @@
 id: 017
 title: Computer AI Framework
 phase: 2
-status: planned
+status: complete
 depends_on: [14]
 test_file: backend/tests/ai/test_ai_framework.py
 implementation_files: [backend/app/ai/ai_framework.py]
