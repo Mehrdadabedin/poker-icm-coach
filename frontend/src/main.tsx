@@ -5,6 +5,7 @@ import "./styles/base.css";
 import "./styles/seats.css";
 import "./styles/felt.css";
 import "./styles/placement.css";
+import "./styles/controls.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

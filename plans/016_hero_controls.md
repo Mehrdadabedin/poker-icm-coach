@@ -2,7 +2,7 @@
 id: 016
 title: Hero Controls
 phase: 1
-status: planned
+status: complete
 depends_on: [15]
 test_file: frontend/tests/controls.test.tsx
 implementation_files: [frontend/src/components/HeroControls.tsx]

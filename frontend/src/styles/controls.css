@@ -1,0 +1,91 @@
+/* Hero action controls. */
+
+.hero-controls {
+  margin-top: 8px;
+  padding: 10px;
+  background: #1d242c;
+  border-radius: 10px;
+}
+
+.hero-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.raise-hint {
+  color: var(--accent);
+}
+
+.controls-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  flex: 1;
+  min-height: 52px;
+  min-width: 88px;
+  border-radius: 10px;
+  border: none;
+  background: var(--accent);
+  color: #241c05;
+  font-weight: 800;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-fold {
+  background: #c62828;
+  color: #fff;
+}
+
+.btn-call {
+  background: #2e7d32;
+  color: #fff;
+}
+
+.btn-allin {
+  background: #4f2683;
+  color: #fff;
+}
+
+.btn-small {
+  min-height: 40px;
+  min-width: 56px;
+  font-size: 0.75rem;
+  flex: 0 1 auto;
+}
+
+.btn-confirm {
+  background: #1565c0;
+  color: #fff;
+}
+
+.bet-sizing {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.bet-sizing input {
+  width: 110px;
+  min-height: 44px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #0f1318;
+  color: var(--text);
+  padding: 4px 8px;
+}
