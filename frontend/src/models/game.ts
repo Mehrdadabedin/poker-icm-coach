@@ -38,6 +38,8 @@ export interface TableState {
   heroSeat: number;
   waitingForHero: boolean;
   phase: "idle" | "playing" | "handOver";
+  legalActions: LegalAction[];
+  toCall: number;
 }
 
 export type ActionKind = "fold" | "check" | "call" | "bet" | "raise" | "all_in";

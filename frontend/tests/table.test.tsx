@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { PokerTable } from "../src/components/PokerTable";
-import { TablePage } from "../src/pages/TablePage";
 import { sampleTableState } from "../src/sampleState";
 
 describe("PokerTable", () => {
@@ -50,8 +50,28 @@ describe("PokerTable", () => {
 });
 
 describe("TablePage", () => {
-  it("renders the screen with title", () => {
-    render(<TablePage state={sampleTableState()} onAction={() => undefined} />);
-    expect(screen.getByText("POKER ICM COACH")).toBeInTheDocument();
+  it("renders the screen with title (API mock)", async () => {
+    vi.mock("../src/services/api", () => ({
+      getState: vi.fn(async () => sampleTableState()),
+      sendAction: vi.fn(async () => sampleTableState()),
+      nextHand: vi.fn(async () => sampleTableState()),
+      coachAdvice: vi.fn(async () => ({
+        recommendedAction: "RAISE",
+        confidence: 0.8,
+        reasoning: "AJs is in the open range.",
+        alternativeAction: "CALL",
+        detail: { POSITION: "BTN", "STACK": "30,000" },
+      })),
+      coachCompare: vi.fn(async () => null),
+    }));
+    const { TablePage: TablePageLive } = await import("../src/pages/TablePage");
+    render(
+      <MemoryRouter initialEntries={["/table/local-1"]}>
+        <Routes>
+          <Route path="/table/:tableId" element={<TablePageLive />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    expect(await screen.findByText("POKER ICM COACH")).toBeInTheDocument();
   });
 });

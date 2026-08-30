@@ -1,13 +1,27 @@
-import { useState } from "react";
+import { HashRouter, Route, Routes } from "react-router-dom";
+import { HomePage } from "./pages/HomePage";
 import { TablePage } from "./pages/TablePage";
-import { TableState, ActionKind } from "./models/game";
-import { sampleTableState } from "./sampleState";
+import { RangesPage } from "./pages/RangesPage";
+import { CoachPage } from "./pages/CoachPage";
+import { SettingsPage } from "./pages/SettingsPage";
+import { HistoryPage } from "./pages/HistoryPage";
+import { StatisticsPage } from "./pages/StatisticsPage";
+import { TrainingPage } from "./pages/TrainingPage";
 
-/** Root app: renders the practice table (more screens arrive in later parts). */
+/** Root router for the poker ICM coach application. */
 export function App() {
-  const [state] = useState<TableState>(() => sampleTableState());
-  const handleAction = (_kind: ActionKind, _amount?: number) => {
-    // Part 034 replaces this with a real API call; rendering stays local.
-  };
-  return <TablePage state={state} onAction={handleAction} />;
+  return (
+    <HashRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/table/:tableId" element={<TablePage />} />
+        <Route path="/training" element={<TrainingPage />} />
+        <Route path="/ranges" element={<RangesPage />} />
+        <Route path="/coach" element={<CoachPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/history" element={<HistoryPage />} />
+        <Route path="/statistics" element={<StatisticsPage />} />
+      </Routes>
+    </HashRouter>
+  );
 }

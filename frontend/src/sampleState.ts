@@ -48,5 +48,7 @@ export function sampleTableState(heroSeat = 0, dealerSeat = 8): TableState {
     heroSeat,
     waitingForHero: false,
     phase: "playing",
+    legalActions: [{ kind: "fold" }, { kind: "check" }, { kind: "bet", minAmount: 100, maxAmount: 45000 }],
+    toCall: 0,
   };
 }
