@@ -2,7 +2,7 @@
 id: 007
 title: Dealing Engine
 phase: 1
-status: planned
+status: complete
 depends_on: [2, 3, 4]
 test_file: backend/tests/game/test_dealing.py
 implementation_files: [backend/app/game/dealing.py]
