@@ -1,0 +1,44 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.local
+coverage/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+
+# Android / Capacitor
+frontend/android/.gradle/
+frontend/android/app/build/
+*.apk
+*.aab
+frontend/android/local.properties
+frontend/android/keystore.properties
+
+# Logs / runtime
+*.log
+backend/*.db
+backend/*.sqlite3
