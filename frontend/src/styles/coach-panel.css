@@ -1,0 +1,133 @@
+.coach-panel {
+  margin-top: 10px;
+  background: #1d242c;
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.coach-panel h3 {
+  margin: 0 0 6px;
+  color: var(--accent);
+}
+
+.coach-recommendation {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #4f9dff;
+}
+
+.confidence {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.coach-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid #2c3540;
+  padding: 4px 0;
+  font-size: 0.78rem;
+}
+
+.coach-row dt {
+  color: var(--muted);
+}
+
+.coach-row dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 600;
+}
+
+.coach-toggle {
+  margin-top: 8px;
+}
+
+.comparison-box {
+  margin-top: 8px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #10341f;
+  font-size: 0.85rem;
+}
+
+.error-box,
+.loading-box {
+  padding: 40px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.error-box {
+  color: #ff8f8f;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  margin-top: 8px;
+}
+
+.data-table td,
+.data-table th {
+  border: 1px solid #2c3540;
+  padding: 6px 8px;
+  text-align: left;
+}
+
+.pos { color: #81c784; }
+.neg { color: #e57373; }
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.stat-card {
+  background: #1d242c;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.mode-cards {
+  display: flex;
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.mode-card {
+  flex: 1;
+  background: #1d242c;
+  border: 2px solid #2c3540;
+  border-radius: 10px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.mode-card.active {
+  border-color: var(--accent);
+}
+
+.mode-card span {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
