@@ -2,7 +2,7 @@
 id: 008
 title: Hand Evaluator
 phase: 1
-status: planned
+status: complete
 depends_on: [2]
 test_file: backend/tests/poker/test_hand_evaluator.py
 implementation_files: [backend/app/poker/hand_evaluator.py, backend/app/poker/hand_rank.py]
