@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Poker ICM Coach</string>
+    <string name="title_activity_main">Poker ICM Coach</string>
+    <string name="package_name">com.pokericmcoach.app</string>
+    <string name="custom_url_scheme">com.pokericmcoach.app</string>
+</resources>

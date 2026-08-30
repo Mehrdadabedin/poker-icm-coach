@@ -69,11 +69,11 @@ def test_hero_actions_legal_flow() -> None:
             legal = [a["kind"] for a in state["legalActions"]]
             assert legal, "hero should have legal actions"
             if "check" in legal:
-                new_state = _act_hero(table_id, "check")
+                _act_hero(table_id, "check")
             elif "call" in legal:
-                new_state = _act_hero(table_id, "call")
+                _act_hero(table_id, "call")
             else:
-                new_state = _act_hero(table_id, "fold")
+                _act_hero(table_id, "fold")
             acted = True
     assert acted
 

@@ -9,13 +9,11 @@ from app.schemas.game_schemas import (
     CoachResponseModel,
     GameStateModel,
     RangeGridResponse,
-    RangeQuery,
     TournamentCreateRequest,
 )
 from app.services.game_session import GameSession
 from app.strategy.baseline_ranges import matrix_for_position
 from app.strategy.coach import Coach, CoachRequest
-from app.strategy.range_matrix import cell_name
 
 router = APIRouter(prefix="/api")
 _sessions: dict[str, GameSession] = {}

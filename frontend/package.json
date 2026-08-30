@@ -9,9 +9,17 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "cap:sync": "npm run build && npx cap sync android",
+    "cap:android": "npx cap open android",
+    "cap:add": "npx cap add android",
+    "apk:debug": "cd android && ./gradlew assembleDebug",
+    "apk:release": "cd android && ./gradlew assembleRelease"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/cli": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },

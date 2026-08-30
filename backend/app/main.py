@@ -1,13 +1,13 @@
 """FastAPI application entry point with REST + WebSocket."""
 from __future__ import annotations
 
-import asyncio
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes_game import _sessions, router as game_router
+from app.api.routes_game import _sessions
+from app.api.routes_game import router as game_router
 from app.api.routes_meta import router as meta_router
 from app.core.config import settings
 
@@ -47,7 +47,8 @@ async def table_ws(websocket: WebSocket, table_id: str) -> None:
             if message == "state":
                 await websocket.send_json(session.state())
             elif message.startswith("action:"):
-                _, _, kind, *rest = message.partition(":")
+                _prefix, _sep, kind = message.partition(":")
+                rest: list[str] = message.split(":", 2)[2:]
                 amount = int(rest[0]) if rest and rest[0].strip().isdigit() else None
                 session.hero_action(kind.strip(), amount)
                 await websocket.send_json(session.state())

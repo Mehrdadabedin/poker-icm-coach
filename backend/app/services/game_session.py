@@ -7,7 +7,6 @@ import uuid
 from app.ai.ai_framework import AIDecisionProvider
 from app.game.actions import Action, ActionType
 from app.game.hand_engine import HandEngine
-from app.game.hand_result import HandAction
 from app.game.positions import position_for
 from app.services.game_state_view import build_state_view
 from app.services.hand_history import HandHistoryRecord, HandHistoryStore
@@ -66,11 +65,13 @@ class GameSession:
         if actor is None or not self.tournament.players[actor].is_human:
             raise ValueError("hero is not the current actor")
         action = Action(ActionType(kind), amount=amount)
+        assert self.timer is not None
         self.timer.pause()
         self.engine.act(actor, action)
         self._last_hero_action = f"{kind.upper()}"
         self._advance_bots()
         if not self.engine.is_complete:
+            assert self.timer is not None
             self.timer.resume()
 
     def _advance_bots(self, guard: int = 5000) -> None:
@@ -84,6 +85,7 @@ class GameSession:
             if guard <= 0:
                 raise RuntimeError("bot loop guard exceeded")
         if self.engine.is_complete:
+            assert self.timer is not None
             self.timer.pause()
 
     # ---- views / coach ----

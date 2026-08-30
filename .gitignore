@@ -42,3 +42,6 @@ frontend/android/keystore.properties
 *.log
 backend/*.db
 backend/*.sqlite3
+
+# TypeScript
+*.tsbuildinfo
