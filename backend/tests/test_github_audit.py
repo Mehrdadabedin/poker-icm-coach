@@ -28,5 +28,4 @@ def test_progress_tracks_all_parts() -> None:
     text = (ROOT / "progress.md").read_text()
     for pid in range(1, 38):
         assert f"| {pid:03d} |" in text, f"progress.md missing row {pid:03d}"
-    for status in ("planned", "complete"):
-        assert status in text
+    assert "complete" in text

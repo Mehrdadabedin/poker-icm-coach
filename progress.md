@@ -38,17 +38,17 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 032 | Statistics | 3 | complete | PASS (7) | VPIP/PFR/AF, agreement, leaks, position perf |
 | 033 | Database (PostgreSQL + Alembic) | 3 | complete | PASS (4) | alembic migration + real PG round-trips |
 | 034 | FastAPI + WebSocket API | 3 | complete | PASS (13) | REST+WS, hidden-card security, flows |
-| 035 | Android (Capacitor) | 4 | planned | | |
+| 035 | Android (Capacitor) | 4 | complete | PASS (4) | capacitor platform + docs; SDK build documented |
 | 036 | GitHub Repository Preparation | 4 | complete | PASS (3) | README, CI, audit script |
-| 037 | Final Testing & E2E | 4 | planned | | |
+| 037 | Final Testing & E2E | 4 | complete | PASS (3 E2E) | playwright: tournament flow, ranges, coach |
 
 ## Current Phase
 
-Phase 1 — Core Poker Game
+ALL PHASES COMPLETE
 
 ## Current Atomic Task
 
-037 — Final Testing & E2E
+(none — all 37 parts complete)
 
 ## Completed Tasks
 
@@ -75,4 +75,4 @@ Phase 1 — Core Poker Game
 
 ## Next Step
 
-Run full suites + build + audit; finalize progress.md.
+Push to GitHub (see 036): `gh auth login` then the commands in the final report.

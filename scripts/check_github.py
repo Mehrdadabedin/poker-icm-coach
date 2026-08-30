@@ -34,7 +34,7 @@ def main() -> int:
     # line limit audit
     for ext in ("py", "ts", "tsx", "css"):
         for path in list((ROOT / "backend").rglob(f"*.{ext}")) + list((ROOT / "frontend").rglob(f"*.{ext}")):
-            if any(part in {".venv", "node_modules", "dist", ".git", "__pycache__", "android"}
+            if any(part in {".venv", ".venv-rooted", "node_modules", "dist", ".git", "__pycache__", "android"}
                    for part in path.parts):
                 continue
             lines = path.read_text().splitlines()

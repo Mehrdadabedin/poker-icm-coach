@@ -67,7 +67,7 @@ def test_docker_compose_services() -> None:
 
 
 def _ignored(parts: tuple[str, ...]) -> bool:
-    return any(p in {".venv", "node_modules", ".git", "__pycache__", "dist"} for p in parts)
+    return any(p in {".venv", ".venv-rooted", "node_modules", ".git", "__pycache__", "dist"} for p in parts)
 
 
 @pytest.mark.parametrize("extension", ["py"])

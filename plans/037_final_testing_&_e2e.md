@@ -2,7 +2,7 @@
 id: 037
 title: Final Testing & E2E
 phase: 4
-status: planned
+status: complete
 depends_on: [29, 34, 35]
 test_file: e2e/tournament.spec.ts
 implementation_files: [e2e/tournament.spec.ts]
