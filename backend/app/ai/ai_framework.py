@@ -10,7 +10,7 @@ from __future__ import annotations
 import random
 from collections.abc import Callable
 
-from app.ai.personalities import PersonalityProfile, tight_passive_profile
+from app.ai.personalities import PersonalityProfile, adaptive_profile
 from app.game.actions import Action, ActionType
 from app.game.decision_provider import DecisionContext
 
@@ -28,7 +28,7 @@ class AIDecisionProvider:
     ) -> None:
         self.rng = rng if rng is not None else random.Random()
         self.strategy = strategy if strategy is not None else self._fallback_strategy
-        self.personality = personality if personality is not None else tight_passive_profile()
+        self.personality = personality if personality is not None else adaptive_profile()
 
     def decide(self, ctx: DecisionContext) -> Action:
         suggested = self.strategy(ctx, self)
