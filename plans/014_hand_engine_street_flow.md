@@ -2,7 +2,7 @@
 id: 014
 title: Hand Engine (Street Flow)
 phase: 1
-status: planned
+status: complete
 depends_on: [3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
 test_file: backend/tests/game/test_hand_engine.py
 implementation_files: [backend/app/game/hand_engine.py]
