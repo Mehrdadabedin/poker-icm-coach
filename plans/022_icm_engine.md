@@ -2,7 +2,7 @@
 id: 022
 title: ICM Engine
 phase: 3
-status: planned
+status: complete
 depends_on: [12]
 test_file: backend/tests/icm/test_icm.py
 implementation_files: [backend/app/icm/icm_engine.py, backend/app/icm/payout.py]
