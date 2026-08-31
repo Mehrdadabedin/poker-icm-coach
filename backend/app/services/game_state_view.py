@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 from app.game.actions import legal_actions
+from app.game.hand_setup import in_hand_seats
 from app.game.positions import position_for
+from app.services.hand_review import build_review
 
 _RANK_CHAR = {2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7", 8: "8", 9: "9",
               10: "T", 11: "J", 12: "Q", 13: "K", 14: "A"}
@@ -43,10 +45,18 @@ def build_state_view(session) -> dict:
         hero_legal = legal_actions(
             eng._street.current_bet, hero_contrib, hero.stack, level.big, eng._street.last_raise,
         )
+    in_hand_count = len(in_hand_seats(tournament.players))
     return {
         "tableId": session.session_id,
         "handNumber": tournament.hand_number,
         "players": players,
+        "actionLog": [
+            {"seat": a.seat, "action": a.action, "amount": a.amount, "street": a.street}
+            for a in eng._log
+        ],
+        "review": build_review(session),
+        "playersRemaining": sum(1 for p in tournament.players if not p.is_eliminated),
+        "inHand": in_hand_count,
         "communityCards": [card_model(c) for c in eng._board],
         "pot": _pot_total(tournament),
         "smallBlind": level.small,

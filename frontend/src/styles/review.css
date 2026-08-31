@@ -1,0 +1,137 @@
+/* Hand review screen ("Poker Hand History") that replaces the table. */
+
+/* ---- layout ---- */
+.hand-review {
+  width: 100%;
+  max-width: 980px;
+  margin: 0 auto;
+  margin-top: 10px;
+  background: #1d242c;
+  border-radius: 12px;
+  padding: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
+}
+
+.review-heading-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.review-heading {
+  margin: 0;
+  color: var(--accent);
+  font-size: 1.15rem;
+  letter-spacing: 2px;
+}
+
+.review-hand-no {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* ---- result banner ---- */
+.result-banner {
+  border-radius: 10px;
+  padding: 14px 12px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.result-you-won { background: linear-gradient(180deg, #14532d, #1b5e20); border: 2px solid #2e7d32; }
+.result-you-lost { background: linear-gradient(180deg, #5c1216, #7f1d1d); border: 2px solid #c62828; }
+.result-chopped { background: linear-gradient(180deg, #4a3a0d, #664d00); border: 2px solid var(--accent); }
+.result-no-change { background: #232b34; border: 2px solid #3a4653; }
+
+.result-title {
+  font-size: 1.9rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #fff;
+}
+
+.result-you-won .result-title { color: #a5d6a7; }
+.result-you-lost .result-title { color: #ffab91; }
+.result-chopped .result-title { color: var(--accent); }
+
+.result-subtitle {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 2px;
+}
+
+/* ---- hand facts grid ---- */
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.result-cell { background: #141a21; border-radius: 8px; padding: 6px 8px; }
+.result-cell dt { color: var(--muted); font-size: 0.62rem; letter-spacing: 0.5px; }
+.result-cell dd { margin: 2px 0 0; font-weight: 700; font-size: 0.85rem; }
+
+.result-cards-cell dd,
+.result-board-cell dd {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.board-na { color: var(--muted); }
+
+/* ---- showdown reveals ---- */
+.reveal-section { margin-bottom: 12px; }
+
+.reveal-section h3,
+.bot-explanations h3,
+.review-history-block h3 {
+  margin: 0 0 6px;
+  color: var(--accent);
+  font-size: 0.82rem;
+  letter-spacing: 1px;
+}
+
+.reveal-list { display: flex; flex-wrap: wrap; gap: 8px; }
+.reveal-player { background: #141a21; border: 1px solid #2c3540; border-radius: 8px; padding: 6px 8px; min-width: 118px; text-align: center; }
+.reveal-hero { border-color: #4f9dff; box-shadow: 0 0 8px rgba(79, 157, 255, 0.35); }
+.reveal-won { border-color: #2e7d32; }
+.reveal-folded { opacity: 0.55; }
+.reveal-name { font-weight: 700; font-size: 0.75rem; margin-bottom: 3px; }
+.reveal-cards { display: flex; justify-content: center; gap: 3px; min-height: 36px; align-items: center; }
+.reveal-hidden { color: var(--muted); font-size: 0.62rem; font-style: italic; }
+.reveal-hand { font-size: 0.68rem; color: #d8f5e6; margin-top: 2px; }
+.reveal-empty { color: var(--muted); font-size: 0.8rem; }
+.reveal-result { font-size: 0.68rem; font-weight: 900; letter-spacing: 1px; margin-top: 3px; }
+.reveal-won-label { color: #81c784; }
+.reveal-lost-label { color: #ff8f8f; }
+
+/* ---- review flow / countdown ---- */
+.review-flow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-top: 1px solid #2c3540;
+  background: #141a21;
+  border-radius: 8px;
+}
+
+.flow-countdown { font-size: 1rem; font-weight: 800; color: var(--accent); }
+.flow-paused { color: #ffab91; font-weight: 700; font-size: 0.9rem; }
+.flow-hint { color: var(--muted); font-size: 0.72rem; margin-left: auto; }
+.review-coach { margin-top: 12px; }
+
+.review-history-block { margin: 14px 0 12px; }
+.review-history-block .action-history { background: #141a21; }
+
+@media (min-width: 960px) {
+  .hand-review { max-width: 720px; }
+}

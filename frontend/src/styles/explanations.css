@@ -1,0 +1,141 @@
+/* Structured hand history + bot decision explanations. */
+
+/* ---- structured action history ---- */
+.action-history {
+  background: #1d242c;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 0.8rem;
+}
+
+.history-title {
+  margin: 0 0 6px;
+  color: var(--accent);
+  font-size: 0.8rem;
+  letter-spacing: 1px;
+}
+
+.history-empty {
+  color: var(--muted);
+  padding: 6px 0;
+}
+
+.history-street {
+  margin-top: 6px;
+}
+
+.history-street-title {
+  color: #4f9dff;
+  font-weight: 800;
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  margin: 4px 0 2px;
+}
+
+.history-line {
+  display: flex;
+  gap: 6px;
+  padding: 1px 0;
+  align-items: baseline;
+}
+
+.history-blind {
+  color: var(--muted);
+}
+
+.history-street-dot {
+  color: var(--accent);
+  flex: 0 0 6px;
+}
+
+.history-hero {
+  color: #4f9dff;
+}
+
+.history-action {
+  font-weight: 600;
+}
+
+.history-action-fold { color: #ff8f8f; }
+.history-action-check { color: var(--muted); }
+.history-action-call { color: #81c784; }
+.history-action-bet, .history-action-raise { color: var(--accent); }
+.history-action-all_in { color: #b39ddb; }
+
+/* ---- bot explanations ---- */
+.bot-explanations h3 .hint {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 0.68rem;
+}
+
+.expl-item {
+  border-bottom: 1px solid #2c3540;
+}
+
+.expl-head {
+  width: 100%;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 0.85rem;
+  padding: 8px 4px;
+  cursor: pointer;
+  text-align: left;
+}
+
+.expl-arrow {
+  color: var(--accent);
+  font-size: 0.75rem;
+}
+
+.expl-street {
+  color: var(--muted);
+  font-size: 0.62rem;
+  margin-left: 8px;
+  letter-spacing: 0.5px;
+}
+
+.expl-body {
+  padding: 0 4px 10px;
+}
+
+.expl-factors {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 4px 10px;
+  margin: 0;
+}
+
+.expl-factors > div {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #232b34;
+  padding: 3px 0;
+  font-size: 0.75rem;
+}
+
+.expl-factors dt {
+  color: var(--muted);
+}
+
+.expl-factors dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.expl-hand {
+  font-size: 0.85rem;
+}
+
+.expl-decision {
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  color: #d8f5e6;
+  background: #10161d;
+  border-radius: 6px;
+  padding: 6px 8px;
+}

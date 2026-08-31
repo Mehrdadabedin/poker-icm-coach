@@ -21,10 +21,86 @@ export interface PlayerView {
   holeCards?: Card[]; // only present for the hero
 }
 
+export interface TableAction {
+  seat: number;
+  action: string;
+  amount: number | null;
+  street: string;
+}
+
+export interface ReviewCard {
+  rank: string;
+  suit: Suit;
+}
+
+export interface ReviewShowdown {
+  seat: number;
+  name: string;
+  cards: ReviewCard[];
+  handName: string | null;
+  isHero: boolean;
+  won: boolean;
+}
+
+export interface ReviewAction {
+  seat: number;
+  name: string;
+  action: string;
+  amount: number | null;
+  street: string;
+}
+
+export interface BotExplanation {
+  seat: number;
+  name: string;
+  action: string;
+  amount: number | null;
+  street: string;
+  position: string;
+  hand: string;
+  handCode: string;
+  stackBB: number;
+  potOdds: string;
+  equity: string;
+  icmPressure: string;
+  faced: string;
+  reason: string;
+}
+
+export interface HandReview {
+  handNumber: number;
+  pot: number;
+  board: ReviewCard[];
+  heroSeat: number;
+  heroCards: ReviewCard[];
+  heroStart: number;
+  heroEnd: number;
+  heroNet: number;
+  heroWon: boolean;
+  chop: boolean;
+  heroPosition: string;
+  heroRankBefore: number;
+  heroRankAfter: number;
+  winners: number[];
+  foldedSeats: number[];
+  allInSeats: number[];
+  showdown: ReviewShowdown[];
+  actions: ReviewAction[];
+  explanations: BotExplanation[];
+  winningHandName: string | null;
+  heroHandName: string | null;
+  losingHandName: string | null;
+  pressure: string;
+}
+
 export interface TableState {
   tableId: string;
   handNumber: number;
   players: PlayerView[];
+  actionLog?: TableAction[];
+  playersRemaining?: number;
+  inHand?: number;
+  review?: HandReview | null;
   communityCards: Card[];
   pot: number;
   smallBlind: number;

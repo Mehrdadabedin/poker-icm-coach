@@ -8,7 +8,7 @@ import { HistoryPage } from "./pages/HistoryPage";
 import { StatisticsPage } from "./pages/StatisticsPage";
 import { TrainingPage } from "./pages/TrainingPage";
 
-/** Root router for the poker ICM coach application. */
+/** Root router for the ICM Master application. */
 export function App() {
   return (
     <HashRouter>

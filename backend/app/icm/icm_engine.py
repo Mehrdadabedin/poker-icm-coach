@@ -45,7 +45,7 @@ def icm_equities(stacks: Sequence[int], payouts: Sequence[float]) -> list[float]
             return (prizes_t[0],)  # last survivor takes the top remaining prize
         results = [0.0] * n
         for i, stack in enumerate(stacks_t):
-            win = stack / total
+            win = stack / total if total > 0 else 0.0
             remaining = stacks_t[:i] + stacks_t[i + 1 :]
             sub = _eq(remaining, prizes_t[1:])
             results[i] += win * prizes_t[0]

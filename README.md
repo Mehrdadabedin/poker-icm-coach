@@ -1,4 +1,4 @@
-# Poker ICM Coach
+# ICM Master
 
 A professional full-stack **9-player Texas Hold'em tournament practice system** with an
 **ICM coaching engine**. Play as the Hero against 8 computer opponents with distinct
@@ -40,7 +40,7 @@ your sessions with statistics, hand history and ICM-aware feedback.
 ## Architecture
 
 ```
-Poker ICM Coach
+ICM Master
 ├── frontend/   React + TypeScript + Vite + Vitest + Playwright (Capacitor for Android)
 └── backend/    Python + FastAPI + Pydantic + SQLAlchemy + PostgreSQL (Alembic) + pytest
 ```

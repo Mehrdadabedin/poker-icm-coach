@@ -72,6 +72,6 @@ describe("TablePage", () => {
         </Routes>
       </MemoryRouter>,
     );
-    expect(await screen.findByText("POKER ICM COACH")).toBeInTheDocument();
+    expect(await screen.findByText("ICM MASTER")).toBeInTheDocument();
   });
 });

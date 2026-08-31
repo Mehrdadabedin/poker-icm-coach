@@ -2,7 +2,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
   appId: "com.pokericmcoach.app",
-  appName: "Poker ICM Coach",
+  appName: "ICM Master",
   webDir: "dist",
   server: {
     // The APK talks to the FastAPI backend over the network.

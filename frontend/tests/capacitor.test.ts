@@ -13,7 +13,7 @@ describe("Capacitor configuration", () => {
   it("defines the app id and name", () => {
     const text = readFileSync(resolve(__dirname, "../capacitor.config.ts"), "utf8");
     expect(text).toContain("com.pokericmcoach.app");
-    expect(text).toContain("Poker ICM Coach");
+    expect(text).toContain("ICM Master");
   });
 
   it("has android platform directory after cap add", () => {

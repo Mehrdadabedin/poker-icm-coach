@@ -78,6 +78,15 @@ def test_invalid_stacks_raise() -> None:
     with pytest.raises(ValueError):
         icm_equities([], [0.7, 0.3])
 
+def test_zero_stacks_do_not_divide_by_zero() -> None:
+    # Eliminated players remain in the stack list as 0 chips; the recursion
+    # must not divide by zero when a fold leaves the hero at 0 (all-in call).
+    eq = icm_equities([0, 0, 5000, 3000], [0.5, 0.3, 0.2])
+    assert len(eq) == 4
+    assert eq[0] == 0.0 and eq[1] == 0.0
+    assert all(v >= 0.0 for v in eq)
+    assert eq[2] > eq[3]  # bigger stack keeps more equity
+
 
 def test_nine_player_icm_completes() -> None:
     stacks = [45000, 38000, 32000, 29000, 21000, 18000, 12000, 8000, 5000]

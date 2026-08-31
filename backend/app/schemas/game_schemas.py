@@ -35,10 +35,86 @@ class LegalActionModel(BaseModel):
     maxAmount: int | None = None
 
 
+class TableActionModel(BaseModel):
+    seat: int
+    action: str
+    amount: int | None = None
+    street: str
+
+
+class ReviewCardModel(BaseModel):
+    rank: str
+    suit: str
+
+
+class ReviewShowdownModel(BaseModel):
+    seat: int
+    name: str
+    cards: list[ReviewCardModel]
+    handName: str | None = None
+    isHero: bool = False
+    won: bool = False
+
+
+class ReviewActionModel(BaseModel):
+    seat: int
+    name: str
+    action: str
+    amount: int | None = None
+    street: str
+
+
+class BotExplanationModel(BaseModel):
+    seat: int
+    name: str
+    action: str
+    amount: int | None = None
+    street: str
+    position: str
+    hand: str
+    handCode: str = ""
+    stackBB: float
+    potOdds: str
+    equity: str
+    icmPressure: str
+    faced: str
+    reason: str
+
+
+class HandReviewModel(BaseModel):
+    handNumber: int
+    pot: int
+    board: list[ReviewCardModel]
+    heroSeat: int
+    heroCards: list[ReviewCardModel] = []
+    heroStart: int
+    heroEnd: int
+    heroNet: int
+    heroWon: bool
+    chop: bool
+    heroPosition: str
+    heroRankBefore: int
+    heroRankAfter: int
+    winners: list[int]
+    foldedSeats: list[int]
+    allInSeats: list[int]
+    showdown: list[ReviewShowdownModel]
+    actions: list[ReviewActionModel]
+    explanations: list[BotExplanationModel]
+    winningHandName: str | None = None
+    heroHandName: str | None = None
+    losingHandName: str | None = None
+    pressure: str = "Low"
+
+
 class GameStateModel(BaseModel):
     tableId: str
     handNumber: int
     players: list[PlayerStateModel]
+    actionLog: list[TableActionModel] = []
+    playersRemaining: int | None = None
+    inHand: int | None = None
+    review: HandReviewModel | None = None
     communityCards: list[CardModel]
     pot: int
     smallBlind: int

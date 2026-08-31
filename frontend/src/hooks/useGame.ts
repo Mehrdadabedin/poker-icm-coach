@@ -26,12 +26,15 @@ export function useGame(tableId: string | null) {
   }, [refresh, tableId]);
 
   const act = useCallback(async (kind: string, amount?: number) => {
-    if (!tableIdRef.current) return;
+    if (!tableIdRef.current) return undefined;
     try {
-      setState(await api.sendAction(tableIdRef.current, kind as never, amount));
+      const next = await api.sendAction(tableIdRef.current, kind as never, amount);
+      setState(next);
       setError(null);
+      return next;
     } catch (e) {
       setError((e as Error).message);
+      return undefined;
     }
   }, []);
 

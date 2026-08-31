@@ -52,7 +52,7 @@ ALL PHASES COMPLETE
 
 ## Completed Tasks
 
-- 036 GitHub Repository Preparation (complete)- 034 FastAPI + WebSocket API (complete)- 033 Database (PostgreSQL + Alembic) (complete)- 032 Statistics (complete)- 031 Hand History (complete)- 030 Test Mode (complete)- 029 Strategy Coach (complete)- 028 Push/Fold Engine (complete)- 027 Range Matrix (complete)- 026 Equity Engine (complete)- 025 Risk Premium (complete)- 024 Bubble Pressure (complete)- 023 Stack Analysis (complete)- 022 ICM Engine (complete)- 021 Opponent Range Estimation (complete)- 020 Postflop AI (complete)- 019 Preflop AI (complete)- 018 Computer Personalities (complete)- 017 Computer AI Framework (complete)- 016 Hero Controls (complete)- 015 React Poker Table (complete)- 014 Hand Engine (complete)- 013 Tournament Timer (complete)- 012 Tournament Engine (complete)- 011 Side Pots (complete)- 010 Pot Engine (complete)- 009 Betting Engine (complete)- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
+- 041 Bottom-Row Seat Repositioning (complete)- 040 Hand Completion Review Screen (complete)- 039 Header Layout + Icon Pause/Play (complete)- 038 Application Rename to ICM Master (complete)- 036 GitHub Repository Preparation (complete)- 034 FastAPI + WebSocket API (complete)- 033 Database (PostgreSQL + Alembic) (complete)- 032 Statistics (complete)- 031 Hand History (complete)- 030 Test Mode (complete)- 029 Strategy Coach (complete)- 028 Push/Fold Engine (complete)- 027 Range Matrix (complete)- 026 Equity Engine (complete)- 025 Risk Premium (complete)- 024 Bubble Pressure (complete)- 023 Stack Analysis (complete)- 022 ICM Engine (complete)- 021 Opponent Range Estimation (complete)- 020 Postflop AI (complete)- 019 Preflop AI (complete)- 018 Computer Personalities (complete)- 017 Computer AI Framework (complete)- 016 Hero Controls (complete)- 015 React Poker Table (complete)- 014 Hand Engine (complete)- 013 Tournament Timer (complete)- 012 Tournament Engine (complete)- 011 Side Pots (complete)- 010 Pot Engine (complete)- 009 Betting Engine (complete)- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
 
 ## In Progress
 
@@ -64,8 +64,19 @@ ALL PHASES COMPLETE
 
 ## Tests
 
-- backend: pytest (configured)
-- frontend: Vitest (configured in part 015)
+- backend: pytest (configured) — 325 passed after 038-041
+- frontend: Vitest (configured in part 015) — 22 passed
+- e2e: Playwright (037) — 3 passed live (tournament flow, ranges, coach)
+- audit: scripts/check_github.py — PASSED (all files <= 200 lines)
+
+## 038-041 Verification
+
+- App renamed to ICM MASTER on Home, table header, browser title, Capacitor appName, FastAPI title.
+- Header = [HOME] [⏸/▶] left, ICM MASTER right; icon-only pause/play with tooltips; no NEXT HAND text buttons.
+- Hand completion hides the poker table and shows POKER HAND HISTORY (result banner at top, hand facts, showdown WON/LOST, bot actions by street, bot explanations, ICM coaching, auto-next countdown).
+- Pause freezes the countdown and keeps the review; resume continues; single timer, cleaned up per hand.
+- Seats 3-6 bottom-anchored; verified no overlap with FOLD/CHECK/CALL controls on desktop (1280) and mobile (390).
+- Mobile touch verified: pause/resume, explanation expand, auto-next; no console errors, no horizontal overflow.
 
 ## Known Issues
 

@@ -8,6 +8,8 @@ import "./styles/placement.css";
 import "./styles/controls.css";
 import "./styles/pages.css";
 import "./styles/coach-panel.css";
+import "./styles/review.css";
+import "./styles/explanations.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

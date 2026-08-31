@@ -72,7 +72,8 @@ class Coach:
         )
 
     def _decide(self, req: CoachRequest, a: Analyses) -> tuple[str, str, str]:
-        if req.street == "preflop":
+        # "complete" hands reuse preflop advice (empty board, e.g. preflop walk).
+        if len(req.board) < 3:
             return self._preflop(req, a)
         return self._postflop(req, a)
 

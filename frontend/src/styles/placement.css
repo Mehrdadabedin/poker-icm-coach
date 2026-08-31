@@ -2,10 +2,10 @@
 
 .seat:nth-child(1) { left: 4%; top: 8%; }
 .seat:nth-child(2) { left: 4%; top: 50%; transform: translateY(-30%); }
-.seat:nth-child(3) { left: 15%; top: 82%; }
-.seat:nth-child(4) { left: 38%; top: 92%; }
-.seat:nth-child(5) { left: 60%; top: 92%; }
-.seat:nth-child(6) { left: 80%; top: 82%; }
+.seat:nth-child(3) { left: 15%; bottom: 20%; }
+.seat:nth-child(4) { left: 38%; bottom: 10%; }
+.seat:nth-child(5) { left: 60%; bottom: 10%; }
+.seat:nth-child(6) { left: 80%; bottom: 20%; }
 .seat:nth-child(7) { left: 92%; top: 50%; transform: translate(-100%, -30%); }
 .seat:nth-child(8) { left: 80%; top: 8%; }
 .seat:nth-child(9) { left: 55%; top: 0%; }
@@ -37,5 +37,12 @@
   }
   .board {
     top: 44%;
+  }
+}
+
+@media (min-width: 960px) {
+  .seat {
+    width: 84px;
+    min-height: 52px;
   }
 }

@@ -9,7 +9,7 @@ import { expect, test } from "@playwright/test";
 test("full tournament hand flow", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByTestId("home-page")).toBeVisible();
-  await expect(page.getByRole("heading", { name: "POKER ICM COACH" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "ICM MASTER" })).toBeVisible();
 
   await page.getByTestId("start-practice").click();
   await expect(page.getByTestId("table-page")).toBeVisible({ timeout: 20_000 });
@@ -22,22 +22,33 @@ test("full tournament hand flow", async ({ page }) => {
     .toBe(2);
 
   const boardCounts = new Set<number>();
+  const reviewSeen = new Set<string>();
   let completedHands = 0;
   const sawAllStreets = () =>
     boardCounts.has(0) && boardCounts.has(3) && boardCounts.has(4) && boardCounts.has(5);
-  const deadline = Date.now() + 90_000;
+  const deadline = Date.now() + 150_000;
 
   while (Date.now() < deadline && (!sawAllStreets() || completedHands === 0)) {
-    boardCounts.add(await page.locator(".board .card").count());
+    // Poker table visible while the hand is active.
+    if (await page.getByTestId("poker-table").isVisible().catch(() => false)) {
+      boardCounts.add(await page.locator(".board .card").count());
+      if (await page.locator(".seat").count() !== 9) {
+        throw new Error("expected 9 seats while the table is active");
+      }
+    }
 
-    const nextHand = page.getByTestId("next-hand");
-    if (await nextHand.isVisible().catch(() => false)) {
-      completedHands += 1;
-      await nextHand.click();
-      // fresh hand: hero gets new cards
-      await expect
-        .poll(async () => page.locator(".seat-hero .card").count(), { timeout: 20_000 })
-        .toBe(2);
+    // Hand review replaces the table; wait for automatic next hand.
+    const review = page.getByTestId("hand-review");
+    if (await review.isVisible().catch(() => false)) {
+      const tag = await page.getByTestId("hand-history-title").textContent({ timeout: 1500 }).catch(() => "?");
+      if (!reviewSeen.has(tag)) {
+        reviewSeen.add(tag);
+        completedHands += 1;
+        // review must show a result banner at the top
+        await expect(page.getByTestId("result-banner")).toBeVisible();
+      }
+      // the review auto-advances after the countdown; no NEXT HAND click needed
+      await page.waitForTimeout(500);
       continue;
     }
 
@@ -56,7 +67,7 @@ test("full tournament hand flow", async ({ page }) => {
   }
 
   expect(sawAllStreets()).toBe(true); // flop, turn, river all appeared
-  expect(completedHands).toBeGreaterThanOrEqual(1); // at least one showdown/walk completed
+  expect(completedHands).toBeGreaterThanOrEqual(1); // at least one review/auto-next cycle
 });
 
 test("range matrix renders", async ({ page }) => {

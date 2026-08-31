@@ -91,7 +91,8 @@ class PushFoldEngine:
                 return PushFoldDecision("RESHOVE", "premium pair reshoves")
             return call_jam_decision(hero, position, stack_bb, to_call, pot, villain_range)
         jam = open_jam_range(position, stack_bb)
-        cell = HandCell(hero[0].rank.value, hero[1].rank.value,
+        lo, hi = sorted((hero[0].rank.value, hero[1].rank.value))
+        cell = HandCell(hi, lo,
                         None if hero[0].rank == hero[1].rank else hero[0].suit == hero[1].suit)
         if cell in jam:
             return PushFoldDecision("OPEN JAM", f"{cell.name()} is in the {position} jam range")

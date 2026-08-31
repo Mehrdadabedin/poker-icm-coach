@@ -19,7 +19,7 @@ export function HomePage() {
 
   return (
     <div className="page home-page" data-testid="home-page">
-      <h1 className="screen-title">POKER ICM COACH</h1>
+      <h1 className="screen-title" data-testid="app-title">ICM MASTER</h1>
       <p className="home-tagline">9-player tournament practice with an ICM coach</p>
       <div className="home-menu">
         <button className="btn btn-primary" onClick={startPractice} disabled={starting} data-testid="start-practice">
