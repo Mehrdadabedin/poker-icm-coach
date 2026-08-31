@@ -115,7 +115,8 @@ export function TablePage() {
   return (
     <div className="table-page" data-testid="table-page">
       <div className="top-bar app-header" data-testid="app-header">
-        <div className="header-left">
+        <h1 className="screen-title header-title" data-testid="app-title">ICM MASTER</h1>
+        <div className="header-right">
           <button className="btn btn-small header-btn" onClick={() => navigate("/")} data-testid="home-btn">
             HOME
           </button>
@@ -130,7 +131,6 @@ export function TablePage() {
             {paused ? "▶" : "⏸"}
           </button>
         </div>
-        <h1 className="screen-title header-title" data-testid="app-title">ICM MASTER</h1>
       </div>
       {isReview && state.review ? (
         <HandReview

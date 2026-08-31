@@ -132,7 +132,7 @@ body {
   padding: 6px 10px;
 }
 
-.header-left {
+.header-right {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -173,7 +173,7 @@ body {
 
 .header-title {
   flex: 1 1 auto;
-  text-align: right;
+  text-align: left;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
