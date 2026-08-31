@@ -46,18 +46,20 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 040 | Hand Completion Review Screen | 5 | complete | PASS (see session) | table hides -> POKER HAND HISTORY with result, showdown, auto-next |
 | 041 | Bottom-Row Seat Repositioning | 5 | complete | PASS (see session) | seats 3-6 bottom-anchored; no overlap with action controls |
 | 042 | GitHub Pages Deployment | 5 | in-progress | BLOCKED (billing) | deploy-pages.yml pushed; run blocked by GitHub account billing lock |
+| 043 | Folded-Player Action Eligibility + Showdown Reveal | 5 | complete | PASS (5 new + 330 total) | folded locked out of queue/action, hero-fold resolves with 5-card board, live-only winners |
+| 044 | Poker Table Header Alignment | 5 | complete | PASS (layout checks) | HOME+Pause balanced 48px left; ICM MASTER right; responsive |
 
 ## Current Phase
 
-5 — deployment (GitHub Pages)
+5 — targeted fixes (fold rules + header alignment)
 
 ## Current Atomic Task
 
-042 GitHub Pages Deployment (workflow committed; run verification pending)
+044 Poker Table Header Alignment (complete)
 
 ## Completed Tasks
 
-- 042 GitHub Pages Deployment (in-progress, blocked: Actions billing lock)- 041 Bottom-Row Seat Repositioning (complete)- 040 Hand Completion Review Screen (complete)- 039 Header Layout + Icon Pause/Play (complete)- 038 Application Rename to ICM Master (complete)- 036 GitHub Repository Preparation (complete)- 034 FastAPI + WebSocket API (complete)- 033 Database (PostgreSQL + Alembic) (complete)- 032 Statistics (complete)- 031 Hand History (complete)- 030 Test Mode (complete)- 029 Strategy Coach (complete)- 028 Push/Fold Engine (complete)- 027 Range Matrix (complete)- 026 Equity Engine (complete)- 025 Risk Premium (complete)- 024 Bubble Pressure (complete)- 023 Stack Analysis (complete)- 022 ICM Engine (complete)- 021 Opponent Range Estimation (complete)- 020 Postflop AI (complete)- 019 Preflop AI (complete)- 018 Computer Personalities (complete)- 017 Computer AI Framework (complete)- 016 Hero Controls (complete)- 015 React Poker Table (complete)- 014 Hand Engine (complete)- 013 Tournament Timer (complete)- 012 Tournament Engine (complete)- 011 Side Pots (complete)- 010 Pot Engine (complete)- 009 Betting Engine (complete)- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
+- 044 Poker Table Header Alignment (complete)- 043 Folded-Player Action Eligibility (complete)- 042 GitHub Pages Deployment (in-progress, blocked: Actions billing lock)- 041 Bottom-Row Seat Repositioning (complete)- 040 Hand Completion Review Screen (complete)- 039 Header Layout + Icon Pause/Play (complete)- 038 Application Rename to ICM Master (complete)- 036 GitHub Repository Preparation (complete)- 034 FastAPI + WebSocket API (complete)- 033 Database (PostgreSQL + Alembic) (complete)- 032 Statistics (complete)- 031 Hand History (complete)- 030 Test Mode (complete)- 029 Strategy Coach (complete)- 028 Push/Fold Engine (complete)- 027 Range Matrix (complete)- 026 Equity Engine (complete)- 025 Risk Premium (complete)- 024 Bubble Pressure (complete)- 023 Stack Analysis (complete)- 022 ICM Engine (complete)- 021 Opponent Range Estimation (complete)- 020 Postflop AI (complete)- 019 Preflop AI (complete)- 018 Computer Personalities (complete)- 017 Computer AI Framework (complete)- 016 Hero Controls (complete)- 015 React Poker Table (complete)- 014 Hand Engine (complete)- 013 Tournament Timer (complete)- 012 Tournament Engine (complete)- 011 Side Pots (complete)- 010 Pot Engine (complete)- 009 Betting Engine (complete)- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
 
 ## In Progress
 
@@ -105,3 +107,19 @@ Push to GitHub (see 036): `gh auth login` then the commands in the final report.
   Settings -> Pages -> Build and deployment -> Source -> "GitHub Actions",
   resolve the billing lock, then re-run the "Deploy to GitHub Pages" workflow
   (or push to main). Site NOT live until that run succeeds.
+
+## 043-044 Verification
+
+- Folded players can no longer re-enter the action queue: new streets are built
+  from in_hand_seats (excludes folded) and HandEngine.act() rejects any action
+  from an already-folded seat (authoritative lock, covers bots via advance_bot).
+- 5 new backend tests (tests/game/test_fold_rules.py): folded skipped on flop,
+  folded cannot CHECK/CALL/BET/RAISE/ALL-IN/FOLD again, folded cannot win,
+  hero-fold resolves among live bots with 5-card board + live showdown reveal,
+  folded state resets on the next hand. Backend suite: 330 passed.
+- Live browser run: 10 hands with 10 intentional hero folds — zero violations
+  (folded seats never act after folding, never winners; non-walk hands reveal
+  live showdown). UI unchanged; review payload already reflected real state.
+- Header: HOME and Pause/Play both 48px tall, left group, ICM MASTER right;
+  verified 390x844 / 760x500 / 1024x720 / 1280x900, no overflow, no overlap.
+- Frontend build + 22 vitest + 3 e2e all pass; repo audit passes.

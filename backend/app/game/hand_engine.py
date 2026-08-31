@@ -79,6 +79,8 @@ class HandEngine:
         if seat != self.current_actor:
             raise ValueError(f"seat {seat} is not the current actor")
         player = self.tournament.players[seat]
+        if player.folded:  # folded players are permanently out of the hand
+            raise ValueError(f"seat {seat} folded and cannot act again")
         street_contrib = self._street.contributions.get(seat, 0)
         validate_action(
             action, self._street.current_bet, street_contrib, player.stack,
@@ -123,7 +125,8 @@ class HandEngine:
             return
         self._deal_next_street()
         self._street = StreetState()
-        active = sorted(active_seats(self.tournament.players))
+        # New street: only in-hand (non-folded) players may act.
+        active = sorted(in_hand_seats(self.tournament.players))
         self._queue = deque(self._order(self.street, active))
 
     def _deal_next_street(self) -> None:
