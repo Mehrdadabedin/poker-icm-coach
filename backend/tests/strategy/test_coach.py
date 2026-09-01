@@ -117,3 +117,68 @@ def test_modes_filter_detail() -> None:
     # beginner output is a strict subset of advanced output
     assert set(beginner.recommendation_detail) <= set(advanced.recommendation_detail)
     assert beginner.recommended_action == advanced.recommended_action
+
+
+def test_raise_recommendation_icm_ev_matches_action() -> None:
+    """A RAISE recommendation must display a RAISE-vs-FOLD ICM EV, never a
+    CALL-vs-FOLD comparison that contradicts the recommendation."""
+    rec = recommend(
+        hero=[H("As"), H("Kh")], board=[H("Ac"), H("Kd"), H("7s")],
+        street="flop", to_call=2000, pot=6000, facing_raise=True,
+    )
+    assert rec.recommended_action == "RAISE"
+    icm_ev = rec.recommendation_detail.get("ICM EV", "")
+    assert "RAISE vs FOLD" in icm_ev, f"ICM EV must describe RAISE, got: {icm_ev}"
+    assert "call" not in icm_ev.lower(), f"ICM EV must not describe CALL: {icm_ev}"
+    assert rec.ev is not None and rec.ev["action"] == "RAISE"
+    assert rec.ev["chipRecommendation"] == "RAISE"
+
+
+def test_fold_recommendation_icm_ev_matches_action() -> None:
+    rec = recommend(
+        hero=[H("7h"), H("2d")], position="CO", stack=30000,
+        to_call=3000, pot=6000, facing_raise=True,
+    )
+    assert rec.recommended_action == "FOLD"
+    icm_ev = rec.recommendation_detail.get("ICM EV", "")
+    assert icm_ev.startswith("FOLD"), f"ICM EV must describe FOLD, got: {icm_ev}"
+    assert rec.ev is not None and rec.ev["action"] == "FOLD"
+    assert rec.ev["chipRecommendation"] == "FOLD"
+
+
+def test_threebet_recommendation_icm_ev_matches_action() -> None:
+    rec = recommend(
+        hero=[H("As"), H("Ah")], position="CO", stack=30000,
+        to_call=3000, pot=6000, facing_raise=True,
+    )
+    assert rec.recommended_action in ("3-BET", "RAISE", "RESHOVE", "ALL-IN")
+    icm_ev = rec.recommendation_detail.get("ICM EV", "")
+    action = rec.recommended_action
+    assert action in icm_ev, f"ICM EV must describe {action}, got: {icm_ev}"
+
+
+def test_icm_ev_fold_baseline_is_current_stack() -> None:
+    """Folding keeps the hero's current stack (correct baseline)."""
+    rec = recommend(
+        hero=[H("Qh"), H("Js")], position="BB", stack=18000, to_call=16000,
+        pot=34000, players_remaining=7, paid_positions=6, facing_raise=True,
+        stacks=[18000, 16000] + [22000] * 7,
+    )
+    # fold equity must be the ICM equity of the CURRENT stacks (hero 18000)
+    from app.icm.icm_engine import icm_equities
+
+    eq_fold = icm_equities([18000, 16000] + [22000] * 7, list(PAYOUT))[0]
+    shown = float(rec.recommendation_detail.get("TOURNAMENT EQUITY", "0"))
+    assert abs(shown - round(eq_fold, 3)) < 1e-9  # display uses 3 decimals
+
+
+def test_chip_ev_label_matches_recommendation() -> None:
+    """Chip EV action label and recommendation must match the decision."""
+    rec = recommend(
+        hero=[H("As"), H("Kh")], board=[H("Ac"), H("Kd"), H("7s")],
+        street="flop", to_call=2000, pot=6000, facing_raise=True,
+    )
+    assert rec.ev["action"] == rec.recommended_action
+    # positive EV -> the action itself is the chip recommendation
+    if rec.ev["evClass"] == "POSITIVE EV":
+        assert rec.ev["chipRecommendation"] == rec.recommended_action

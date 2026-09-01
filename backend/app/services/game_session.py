@@ -45,13 +45,18 @@ class GameSession:
     def start(self) -> None:
         self.engine = HandEngine(self.tournament, provider=self.provider, rng=self.rng)
         self.timer = TournamentTimer(self.tournament, fast_mode=self.fast_mode)
-        self._begin_hand()
+        self._begin_hand(first=True)
 
-    def _begin_hand(self) -> None:
+    def _begin_hand(self, first: bool = False) -> None:
         assert self.engine is not None and self.timer is not None
-        self.timer.reset()
         self.engine.start_hand()
-        self.timer.start()
+        # The tournament clock is a live blind-level clock: it starts once and
+        # resumes across hands (it was paused when the previous hand ended).
+        # It must NOT reset on a new hand.
+        if first:
+            self.timer.start()
+        else:
+            self.timer.resume()
         self._advance_bots()
 
     def next_hand(self) -> None:
@@ -59,7 +64,7 @@ class GameSession:
             raise ValueError("current hand is still in progress")
         self._record_and_persist()
         self._apply_reentry_or_eliminate()
-        self._begin_hand()
+        self._begin_hand(first=False)
 
     def phase(self) -> str:
         if self.engine is None:

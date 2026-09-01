@@ -100,6 +100,8 @@ export interface TableState {
   actionLog?: TableAction[];
   playersRemaining?: number;
   inHand?: number;
+  totalChips?: number;
+  averageStack?: number;
   review?: HandReview | null;
   communityCards: Card[];
   pot: number;

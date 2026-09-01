@@ -114,6 +114,8 @@ class GameStateModel(BaseModel):
     actionLog: list[TableActionModel] = []
     playersRemaining: int | None = None
     inHand: int | None = None
+    totalChips: int | None = None
+    averageStack: int | None = None
     review: HandReviewModel | None = None
     communityCards: list[CardModel]
     pot: int

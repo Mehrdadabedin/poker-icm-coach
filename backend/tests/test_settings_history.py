@@ -65,3 +65,59 @@ def test_settings_affect_tournament_creation() -> None:
         "startingStack": 45000, "startingSmallBlind": 100,
         "startingBigBlind": 100, "blindLevelMinutes": 20, "fastMode": False,
     })
+
+
+def test_total_chips_and_average_stack() -> None:
+    table_id = _create_table()
+    state = client.get(f"/api/game/{table_id}/state").json()
+    stacks = [p["stack"] for p in state["players"]]
+    assert state["totalChips"] == sum(stacks)
+    assert state["averageStack"] == sum(stacks) // 9
+
+
+def _play_to_completion(s) -> None:
+    from app.game.actions import Action, ActionType
+
+    while not s.engine.is_complete:
+        actor = s.engine.current_actor
+        if actor is None:
+            break
+        if s.tournament.players[actor].is_human:
+            s.engine.act(actor, Action(ActionType.FOLD))
+        else:
+            s.engine.advance_bot(actor)
+
+
+def test_total_chips_reflect_reentry() -> None:
+    """Bust a bot in level 1 -> re-entry gives it a fresh 45,000 stack."""
+    from app.services.game_session import GameSession
+
+    s = GameSession(starting_stack=45_000)
+    s.start()
+    _play_to_completion(s)
+    s.tournament.players[1].stack = 0  # force a bust in level 1
+    s.next_hand()  # re-entry applies, then the new hand starts
+    assert not s.tournament.players[1].is_eliminated
+    # re-entered to 45,000, minus a blind if it posted one this hand
+    assert s.tournament.players[1].stack in (45_000, 44_900, 44_800)
+    state = s.state()
+    assert state["totalChips"] == sum(p.stack for p in s.tournament.players)
+    assert state["averageStack"] == state["totalChips"] // 9
+
+
+def test_total_chips_reflect_elimination() -> None:
+    """Bust a bot at level 4+ -> eliminated, excluded from average stack."""
+    from app.services.game_session import GameSession
+
+    s = GameSession(starting_stack=45_000)
+    s.start()
+    _play_to_completion(s)
+    s.tournament.level_index = 3  # level 4
+    s.tournament.players[1].stack = 0
+    s.next_hand()  # elimination applies, then the new hand starts
+    assert s.tournament.players[1].is_eliminated
+    assert s.tournament.players[1].stack == 0
+    state = s.state()
+    assert state["totalChips"] == sum(p.stack for p in s.tournament.players)
+    active = sum(1 for p in s.tournament.players if not p.is_eliminated)
+    assert state["averageStack"] == state["totalChips"] // active

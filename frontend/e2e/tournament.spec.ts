@@ -84,5 +84,5 @@ test("coach advice renders on standalone screen", async ({ page }) => {
   await expect(page.getByTestId("coach-page")).toBeVisible();
   await page.getByRole("button", { name: "ANALYZE" }).click();
   await expect(page.getByTestId("advice-panel")).toBeVisible({ timeout: 20_000 });
-  await expect(page.getByText(/RECOMMENDATION:/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: /RECOMMENDATION:/ })).toBeVisible();
 });

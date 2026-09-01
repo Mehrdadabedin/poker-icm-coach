@@ -65,6 +65,16 @@ export function PokerTable({ state, children }: PokerTableProps) {
             {state.playersRemaining}/9 IN TOURNAMENT{state.inHand !== undefined ? ` · ${state.inHand} IN HAND` : ""}
           </span>
         )}
+        {state.totalChips !== undefined && (
+          <span className="tbl-info" data-testid="total-chips">
+            TOTAL CHIPS {formatChips(state.totalChips)}
+          </span>
+        )}
+        {state.averageStack !== undefined && (
+          <span className="tbl-info" data-testid="average-stack">
+            AVERAGE STACK {formatChips(state.averageStack)}
+          </span>
+        )}
         <span className="tbl-info">{isReview ? "HAND COMPLETE" : "LIVE HAND"}</span>
       </div>
       <div className="table-felt">

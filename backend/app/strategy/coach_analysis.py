@@ -40,6 +40,41 @@ def pot_odds(to_call: int, pot: int) -> float:
     return to_call / max(1, pot + to_call)
 
 
+def _cell_key(hero) -> str:
+    hi = max(hero[0].rank.value, hero[1].rank.value)
+    lo = min(hero[0].rank.value, hero[1].rank.value)
+    suited = None if hi == lo else hero[0].suit == hero[1].suit
+    return cell_name(hi, lo, suited)
+
+
+def _preflop_equity(name: str) -> float:
+    """Heuristic preflop equity vs a typical raise range."""
+    if name in ("AA", "KK"):
+        return 0.68
+    if name in ("QQ", "JJ", "AKs"):
+        return 0.55
+    if name in ("TT", "AQs", "AKo", "99", "AJs"):
+        return 0.47
+    if name[0] == name[1]:
+        return 0.42
+    if name[-1] == "s" and name[0] in ("A", "K"):
+        return 0.40
+    if name[-1] == "s":
+        return 0.35
+    if name[0] in ("A", "K"):
+        return 0.33
+    return 0.20
+
+
+def _win_probability(req) -> float:
+    """Best available win probability at analysis time."""
+    if len(req.board) >= 3:
+        from app.ai.postflop_ai import equity_estimate
+
+        return equity_estimate(req.hero, list(req.board), [])
+    return _preflop_equity(_cell_key(req.hero))
+
+
 def analyze_request(req) -> Analyses:
     """Compute all supporting numbers for a coach request."""
     bb = max(req.big_blind, 1)
@@ -84,7 +119,12 @@ def analyze_request(req) -> Analyses:
 
 
 def _icm_overlay(req, results: Analyses) -> Analyses:
-    """ICM EV of calling an all-in when payouts are known."""
+    """Preliminary ICM signal (fold vs call) for the decision logic.
+
+    The displayed ICM EV is computed decision-aware in coach_ev.icm_ev_for;
+    this only sets the class and fold equity for internal use. Folding keeps
+    the hero's current stack (correct baseline).
+    """
     hero = req.hero_seat
     stacks = list(req.stacks)
     try:
@@ -92,26 +132,33 @@ def _icm_overlay(req, results: Analyses) -> Analyses:
     except IndexError:
         return results
     payouts = list(req.payout)
-    # fold equity: hero keeps stack - to_call
-    fold_stack = hero_current - req.to_call
-    if fold_stack < 0:
+    if not payouts:
         return results
-    stacks_fold = [s if i != hero else fold_stack for i, s in enumerate(stacks)]
     try:
-        eq_fold = icm_equities(stacks_fold, payouts)[hero]
-        # call: win -> hero takes villain stack + pot; lose -> bust (0 left)
-        win_stack = hero_current + req.pot
-        stacks_win = [s if i != hero else win_stack for i, s in enumerate(stacks)]
-        # simplify: villain's stack absorbed; renormalize table
-        eq_win = icm_equities(stacks_win, payouts)[hero]
-        results.tournament_equity = round(eq_fold, 4)
-        margin = eq_fold - (results.equity * eq_win)
-        results.icm_ev = "NEGATIVE" if margin > 0.005 else ("POSITIVE" if margin < -0.005 else "NEUTRAL")
-        results.icm_ev = f"{results.icm_ev} (fold {eq_fold:.3f} vs call ~{results.equity * eq_win:.3f})"
-        results.extra["fold_equity"] = eq_fold
-        results.extra["win_equity"] = eq_win
+        eq_fold = icm_equities(stacks, payouts)[hero]
     except ValueError:
         return results
+    results.extra["fold_equity"] = eq_fold
+    results.tournament_equity = round(eq_fold, 4)
+    risk = min(req.to_call, hero_current)
+    if risk <= 0:
+        return results
+    win_stack = hero_current + req.pot
+    stacks_win = [s if i != hero else win_stack for i, s in enumerate(stacks)]
+    lose_stack = 0 if risk >= hero_current else hero_current - risk
+    stacks_lose = [s if i != hero else lose_stack for i, s in enumerate(stacks)]
+    try:
+        eq_win = icm_equities(stacks_win, payouts)[hero]
+        eq_lose = icm_equities(stacks_lose, payouts)[hero]
+    except ValueError:
+        return results
+    win = _win_probability(req)
+    ev = win * eq_win + (1 - win) * eq_lose
+    margin = eq_fold - ev
+    results.extra["icm_ev_class"] = (
+        "NEGATIVE" if margin > 0.005 else ("POSITIVE" if margin < -0.005 else "NEUTRAL")
+    )
+    results.extra["call_equity"] = ev
     return results
 
 

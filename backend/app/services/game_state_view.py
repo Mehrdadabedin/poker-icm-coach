@@ -46,10 +46,14 @@ def build_state_view(session) -> dict:
             eng._street.current_bet, hero_contrib, hero.stack, level.big, eng._street.last_raise,
         )
     in_hand_count = len(in_hand_seats(tournament.players))
+    total_chips = sum(p.stack for p in tournament.players)
+    active_count = sum(1 for p in tournament.players if not p.is_eliminated)
     return {
         "tableId": session.session_id,
         "handNumber": tournament.hand_number,
         "players": players,
+        "totalChips": total_chips,
+        "averageStack": total_chips // active_count if active_count else 0,
         "actionLog": [
             {"seat": a.seat, "action": a.action, "amount": a.amount, "street": a.street}
             for a in eng._log

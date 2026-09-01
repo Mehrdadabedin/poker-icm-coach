@@ -39,6 +39,7 @@ def test_invalid_current_raises() -> None:
         next_button(current=9, num_seats=9, active_seats=set(range(9)))
 
 
-def test_current_not_in_active_raises() -> None:
-    with pytest.raises(ValueError):
-        next_button(current=3, num_seats=9, active_seats={0, 1, 2})
+def test_current_not_in_active_skips_to_next() -> None:
+    # button seat eliminated: move to the next active seat clockwise
+    assert next_button(current=3, num_seats=9, active_seats={0, 1, 2}) == 0
+    assert next_button(current=8, num_seats=9, active_seats={0, 2, 4}) == 0

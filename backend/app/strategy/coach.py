@@ -10,10 +10,21 @@ from dataclasses import dataclass, field
 from app.ai.postflop_ai import equity_estimate
 from app.poker.card import Card
 from app.strategy.baseline_ranges import matrix_for_position
-from app.strategy.coach_analysis import Analyses, analyze_request, risk_premium_for
-from app.strategy.coach_ev import chip_ev_for, education_for, outs_for
+from app.strategy.coach_analysis import (
+    Analyses,
+    _cell_key,
+    _preflop_equity,
+    analyze_request,
+    risk_premium_for,
+)
+from app.strategy.coach_ev import (
+    action_risk,
+    chip_ev_for,
+    education_for,
+    icm_ev_for,
+    outs_for,
+)
 from app.strategy.push_fold import PushFoldEngine
-from app.strategy.range_matrix import cell_name
 
 PREMIUM = {"AA", "KK", "QQ", "JJ", "TT", "AKs", "AKo"}
 
@@ -64,14 +75,22 @@ class Coach:
         action, alt, reason = self._decide(req, analyses)
         if req.mode == "beginner":
             reason = reason.split(".")[0] + "."
+        # One consistent decision model: EV/ICM values are computed for the
+        # DECIDED action vs a FOLD baseline, so labels and recommendation
+        # always refer to the same action.
+        amount = action_risk(req, action)
+        analyses = icm_ev_for(req, analyses, action, amount)
+        ev = chip_ev_for(req, analyses, action, amount)
+        analyses.chip_ev = f"{ev['evClass']} ({ev['chipEv']:+,})" if ev else "n/a"
         detail = _build_detail(req, analyses, action, alt, reason)
         rp_label, _ = risk_premium_for(req, analyses)
         return CoachRecommendation(
             recommended_action=action, confidence=_confidence(analyses),
             reasoning=reason, alternative_action=alt,
             recommendation_detail=detail, icm_pressure=analyses.pressure,
-            risk_premium=rp_label, ev=chip_ev_for(req, analyses),
-            outs=outs_for(req), education=education_for(req, analyses, None, None),
+            risk_premium=rp_label, ev=ev,
+            outs=outs_for(req),
+            education=education_for(req, analyses, ev, None, action, amount),
         )
 
     def _decide(self, req: CoachRequest, a: Analyses) -> tuple[str, str, str]:
@@ -108,7 +127,7 @@ class Coach:
         est = _preflop_equity(name)
         if est >= a.pot_odds + 0.06:
             return "CALL", "FOLD", f"{name} equity ~{est:.0%} clears pot odds {a.pot_odds:.0%}."
-        icm_note = f" ICM pressure {a.pressure}." if a.icm_ev == "NEGATIVE" else ""
+        icm_note = f" ICM pressure {a.pressure}." if a.extra.get("icm_ev_class") == "NEGATIVE" else ""
         return "FOLD", "CALL", f"{name} equity ~{est:.0%} below required {a.pot_odds + 0.06:.0%}.{icm_note}"
 
     def _postflop(self, req: CoachRequest, a: Analyses) -> tuple[str, str, str]:
@@ -128,30 +147,6 @@ class Coach:
         if equity >= required:
             return "CALL", "FOLD", f"Equity {equity:.0%} about equal to pot odds {a.pot_odds:.0%}."
         return "FOLD", "CALL", f"Equity {equity:.0%} below required {required:.0%}."
-
-def _preflop_equity(name: str) -> float:
-    """Heuristic preflop all-in equity vs a typical raise range."""
-    if name in ("AA", "KK"):
-        return 0.68
-    if name in ("QQ", "JJ", "AKs"):
-        return 0.55
-    if name in ("TT", "AQs", "AKo", "99", "AJs"):
-        return 0.47
-    if name[0] == name[1]:
-        return 0.42
-    if name[-1] == "s" and name[0] in ("A", "K"):
-        return 0.40
-    if name[-1] == "s":
-        return 0.35
-    if name[0] in ("A", "K"):
-        return 0.33
-    return 0.20
-
-def _cell_key(hero: list[Card]) -> str:
-    hi = max(hero[0].rank.value, hero[1].rank.value)
-    lo = min(hero[0].rank.value, hero[1].rank.value)
-    suited = None if hi == lo else hero[0].suit == hero[1].suit
-    return cell_name(hi, lo, suited)
 
 def _confidence(a: Analyses) -> float:
     margin = abs(a.equity - a.pot_odds) if a.pot_odds > 0 else abs(a.equity - 0.5)

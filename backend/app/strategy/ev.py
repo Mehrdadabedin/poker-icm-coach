@@ -19,6 +19,7 @@ class ChipEV:
     to_call: int
     value: float  # chips
     classification: str  # POSITIVE EV | NEGATIVE EV | NEUTRAL
+    action: str = "CALL"  # the action whose EV this is (CALL/RAISE/3-BET/...)
 
     def to_dict(self) -> dict:
         return {
@@ -28,17 +29,18 @@ class ChipEV:
             "toCall": self.to_call,
             "chipEv": round(self.value),
             "evClass": self.classification,
+            "action": self.action,
             "chipRecommendation": self.chip_recommendation(),
         }
 
     def chip_recommendation(self) -> str:
         if self.to_call <= 0:
             return "CHECK/BET"
-        return "CALL" if self.value >= 0 else "FOLD"
+        return self.action if self.value >= 0 else "FOLD"
 
 
-def chip_ev(win_prob: float, pot: int, to_call: int) -> ChipEV:
-    """EV of calling `to_call` to win `pot`.
+def chip_ev(win_prob: float, pot: int, to_call: int, action: str = "CALL") -> ChipEV:
+    """EV of the hero's action (default CALL) to win `pot`.
 
     With no call (to_call <= 0) there is no call decision; value is computed
     as the expected share of the pot when checked down for information only.
@@ -55,4 +57,4 @@ def chip_ev(win_prob: float, pot: int, to_call: int) -> ChipEV:
         classification = "POSITIVE EV" if value > 0 else ("NEGATIVE EV" if value < 0 else "NEUTRAL")
     return ChipEV(win_prob=win_prob, lose_prob=1.0 - win_prob,
                   pot=pot, to_call=to_call, value=value,
-                  classification=classification)
+                  classification=classification, action=action)
