@@ -11,11 +11,11 @@ from app.ai.postflop_ai import equity_estimate
 from app.poker.card import Card
 from app.strategy.baseline_ranges import matrix_for_position
 from app.strategy.coach_analysis import Analyses, analyze_request, risk_premium_for
+from app.strategy.coach_ev import chip_ev_for, education_for, outs_for
 from app.strategy.push_fold import PushFoldEngine
 from app.strategy.range_matrix import cell_name
 
 PREMIUM = {"AA", "KK", "QQ", "JJ", "TT", "AKs", "AKo"}
-
 
 @dataclass(slots=True)
 class CoachRequest:
@@ -39,7 +39,7 @@ class CoachRequest:
     hero_seat: int = 0
     level_index: int = 1
     mode: str = "advanced"
-
+    exact_cards: bool = False
 
 @dataclass(slots=True)
 class CoachRecommendation:
@@ -50,7 +50,9 @@ class CoachRecommendation:
     recommendation_detail: dict[str, str] = field(default_factory=dict)
     icm_pressure: str = "LOW"
     risk_premium: str = "LOW"
-
+    ev: dict | None = None
+    outs: dict | None = None
+    education: str = ""
 
 class Coach:
     """Produces a recommendation for any hero decision point."""
@@ -63,12 +65,13 @@ class Coach:
         if req.mode == "beginner":
             reason = reason.split(".")[0] + "."
         detail = _build_detail(req, analyses, action, alt, reason)
-        rp_label, _label_type = risk_premium_for(req, analyses)
+        rp_label, _ = risk_premium_for(req, analyses)
         return CoachRecommendation(
             recommended_action=action, confidence=_confidence(analyses),
             reasoning=reason, alternative_action=alt,
             recommendation_detail=detail, icm_pressure=analyses.pressure,
-            risk_premium=rp_label,
+            risk_premium=rp_label, ev=chip_ev_for(req, analyses),
+            outs=outs_for(req), education=education_for(req, analyses, None, None),
         )
 
     def _decide(self, req: CoachRequest, a: Analyses) -> tuple[str, str, str]:
@@ -126,7 +129,6 @@ class Coach:
             return "CALL", "FOLD", f"Equity {equity:.0%} about equal to pot odds {a.pot_odds:.0%}."
         return "FOLD", "CALL", f"Equity {equity:.0%} below required {required:.0%}."
 
-
 def _preflop_equity(name: str) -> float:
     """Heuristic preflop all-in equity vs a typical raise range."""
     if name in ("AA", "KK"):
@@ -145,18 +147,15 @@ def _preflop_equity(name: str) -> float:
         return 0.33
     return 0.20
 
-
 def _cell_key(hero: list[Card]) -> str:
     hi = max(hero[0].rank.value, hero[1].rank.value)
     lo = min(hero[0].rank.value, hero[1].rank.value)
     suited = None if hi == lo else hero[0].suit == hero[1].suit
     return cell_name(hi, lo, suited)
 
-
 def _confidence(a: Analyses) -> float:
     margin = abs(a.equity - a.pot_odds) if a.pot_odds > 0 else abs(a.equity - 0.5)
     return round(min(0.95, 0.5 + margin), 2)
-
 
 def _build_detail(req: CoachRequest, a: Analyses, action: str, alt: str,
                   reason: str) -> dict[str, str]:
@@ -183,17 +182,12 @@ def _build_detail(req: CoachRequest, a: Analyses, action: str, alt: str,
         detail["TOURNAMENT EQUITY"] = f"{a.tournament_equity:.3f}"
     return detail
 
-
 def _texture_label(a: Analyses) -> str:
     if a.board_texture is None:
         return "n/a"
     t = a.board_texture
-    if t.paired:
-        return "PAIRED"
-    if t.monotone:
-        return "MONOTONE"
-    if t.wet:
-        return "WET"
-    if t.connected:
-        return "CONNECTED"
+    for label, flag in (("PAIRED", t.paired), ("MONOTONE", t.monotone),
+                        ("WET", t.wet), ("CONNECTED", t.connected)):
+        if flag:
+            return label
     return "DRY"

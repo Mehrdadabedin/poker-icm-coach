@@ -131,3 +131,8 @@
   color: var(--muted);
   font-size: 0.78rem;
 }
+
+.mode-card b {
+  color: #fff;
+  font-weight: 800;
+}

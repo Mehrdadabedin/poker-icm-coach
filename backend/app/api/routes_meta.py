@@ -25,6 +25,8 @@ def list_hands(table_id: str, stage: str | None = None) -> dict:
             "heroDecision": r.hero_decision,
             "coachRecommendation": r.coach_recommendation,
             "grade": r.grade,
+            "level": r.level_index + 1,
+            "blindLevel": r.blind_level,
         } for r in records
     ]}
 
@@ -65,16 +67,38 @@ def icm_calculate(stacks: str, payouts: str) -> dict:
 
 
 @router.get("/settings")
-def settings() -> dict:
-    from app.core.config import settings as config
+def get_settings() -> dict:
+    from app.core.tournament_settings import settings as tournament_settings
 
-    return {
-        "startingStack": config.starting_stack,
-        "startingSmallBlind": config.starting_small_blind,
-        "startingBigBlind": config.starting_big_blind,
-        "blindLevelMinutes": config.blind_level_minutes,
-        "fastMode": config.fast_mode,
+    return tournament_settings.to_dict()
+
+
+@router.put("/settings")
+def put_settings(request: dict) -> dict:
+    from app.core.tournament_settings import settings as tournament_settings
+
+    allowed = {
+        "startingStack": ("starting_stack", int),
+        "startingSmallBlind": ("starting_small_blind", int),
+        "startingBigBlind": ("starting_big_blind", int),
+        "blindLevelMinutes": ("blind_level_minutes", int),
+        "fastMode": ("fast_mode", bool),
     }
+    for key, (attr, caster) in allowed.items():
+        if key in request and hasattr(tournament_settings, attr):
+            setattr(tournament_settings, attr, caster(request[key]))
+    return tournament_settings.to_dict()
+
+
+@router.get("/active-table")
+def active_table() -> dict:
+    """The single active tournament table (most recent session)."""
+    from app.api.routes_game import _sessions
+
+    if not _sessions:
+        return {"tableId": None}
+    last = list(_sessions.values())[-1]
+    return {"tableId": last.session_id}
 
 
 def _session_or_404(table_id: str) -> GameSession:

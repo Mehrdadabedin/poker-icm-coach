@@ -51,6 +51,7 @@ export function PokerTable({ state, children }: PokerTableProps) {
           LEVEL {state.level} — {state.smallBlind}/{state.bigBlind}
         </span>
         <span className="tbl-info">
+          {state.inBreak ? "BREAK · " : ""}
           {state.ante > 0 ? `ANTE ${formatChips(state.ante)} · ` : ""}TIME {formatClock(state.secondsLeft)}
         </span>
         <span className="tbl-info" data-testid="pot-amount">

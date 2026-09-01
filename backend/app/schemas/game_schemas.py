@@ -122,6 +122,7 @@ class GameStateModel(BaseModel):
     ante: int
     level: int
     secondsLeft: int
+    inBreak: bool = False
     street: str
     currentActor: int | None
     dealerSeat: int
@@ -134,9 +135,9 @@ class GameStateModel(BaseModel):
 
 class TournamentCreateRequest(BaseModel):
     players: int = Field(default=9, ge=2, le=9)
-    starting_stack: int = Field(default=45000, ge=100)
-    blind_level_minutes: int = Field(default=20, ge=1)
-    ante_mode: str = "none"
+    starting_stack: int | None = Field(default=None, ge=100)
+    blind_level_minutes: int | None = Field(default=None, ge=1)
+    ante_mode: str = "bba"
     fast_mode: float = Field(default=1.0, ge=1.0)
 
 
@@ -158,6 +159,7 @@ class CoachAdviceRequest(BaseModel):
     facingRaise: bool = False
     heroSeat: int = 0
     mode: str = "advanced"
+    exactCards: bool = False
 
 
 class CoachResponseModel(BaseModel):
@@ -166,6 +168,9 @@ class CoachResponseModel(BaseModel):
     reasoning: str
     alternativeAction: str
     detail: dict[str, str]
+    ev: dict | None = None
+    outs: dict | None = None
+    education: str = ""
 
 
 class RangeQuery(BaseModel):

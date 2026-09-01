@@ -20,9 +20,16 @@ class GameSession:
     """Owns one tournament table; drives bots; exposes safe state snapshots."""
 
     def __init__(self, session_id: str | None = None, fast_mode: float = 1.0,
-                 rng: random.Random | None = None) -> None:
+                 rng: random.Random | None = None,
+                 starting_stack: int = 45_000,
+                 small_blind: int = 100, big_blind: int = 100,
+                 level_minutes: int = 20) -> None:
         self.session_id = session_id or uuid.uuid4().hex[:12]
-        self.tournament = build_default_tournament()
+        self.tournament_starting_stack = starting_stack
+        self.tournament = build_default_tournament(
+            starting_stack=starting_stack, small_blind=small_blind,
+            big_blind=big_blind, level_minutes=level_minutes,
+        )
         self.hero_seat = 0
         self.rng = rng if rng is not None else random.Random()
         self.provider = AIDecisionProvider(rng=self.rng)
@@ -51,6 +58,7 @@ class GameSession:
         if self.phase() != "handOver":
             raise ValueError("current hand is still in progress")
         self._record_and_persist()
+        self._apply_reentry_or_eliminate()
         self._begin_hand()
 
     def phase(self) -> str:
@@ -91,6 +99,7 @@ class GameSession:
     # ---- views / coach ----
     def state(self) -> dict:
         assert self.engine is not None and self.timer is not None
+        self.timer.tick()  # advance expired blind levels / breaks on every view
         return build_state_view(self)
 
     def coach_advice(self) -> dict:
@@ -119,6 +128,9 @@ class GameSession:
             "reasoning": rec.reasoning,
             "alternativeAction": rec.alternative_action,
             "detail": rec.recommendation_detail,
+            "ev": rec.ev,
+            "outs": rec.outs,
+            "education": rec.education,
         }
 
     def grade_hero(self) -> dict | None:
@@ -137,6 +149,20 @@ class GameSession:
         }
 
     # ---- persistence ----
+    REENTRY_LEVELS = 3  # levels 1-3 get a fresh stack on bust
+
+    def _apply_reentry_or_eliminate(self) -> None:
+        """Bust-out rule: 45k reset during levels 1-3, elimination from level 4."""
+        assert self.tournament is not None
+        level = self.tournament.level_index
+        for player in self.tournament.players:
+            if player.is_eliminated or player.stack > 0:
+                continue
+            if level < self.REENTRY_LEVELS:
+                player.stack = self.tournament_starting_stack
+            else:
+                player.eliminate()
+
     def _record_and_persist(self) -> None:
         assert self.engine is not None
         result = self.engine.result
@@ -152,6 +178,7 @@ class GameSession:
             community_cards=list(result.community_cards),
             starting_stack=start, ending_stack=hero.stack,
             blind_level=f"{level.small}/{level.big}",
+            level_index=self.tournament.level_index,
             actions=list(result.actions), pot_total=result.pot_total,
             winner_seats=result.winner_seats(),
         )

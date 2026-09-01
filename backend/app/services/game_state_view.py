@@ -64,6 +64,7 @@ def build_state_view(session) -> dict:
         "ante": tournament.structure.ante_for(tournament.ante_mode, level),
         "level": session.timer.level,
         "secondsLeft": session.timer.seconds_left,
+        "inBreak": session.timer.in_break,
         "street": eng.street,
         "currentActor": actor,
         "dealerSeat": button,

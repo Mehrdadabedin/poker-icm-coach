@@ -108,6 +108,7 @@ export interface TableState {
   ante: number;
   level: number;
   secondsLeft: number;
+  inBreak?: boolean;
   street: "preflop" | "flop" | "turn" | "river" | "showdown" | "complete";
   currentActor: number | null;
   dealerSeat: number;

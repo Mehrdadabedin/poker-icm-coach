@@ -2,32 +2,81 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { request } from "../services/api";
 
-type Settings = { startingStack: number; startingSmallBlind: number; startingBigBlind: number; blindLevelMinutes: number; fastMode: boolean };
+type Settings = {
+  startingStack: number; startingSmallBlind: number; startingBigBlind: number;
+  blindLevelMinutes: number; fastMode: boolean;
+};
 
-/** SETTINGS screen: tournament defaults from the backend. */
+/** SETTINGS screen: editable tournament defaults that affect new tournaments. */
 export function SettingsPage() {
   const navigate = useNavigate();
   const [settings, setSettings] = useState<Settings | null>(null);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     request<Settings>("/api/settings").then(setSettings).catch(() => undefined);
   }, []);
 
+  const patch = (key: keyof Settings, value: number | boolean) => {
+    setSettings((prev) => (prev ? { ...prev, [key]: value } : prev));
+    setSaved(false);
+  };
+
+  const save = async () => {
+    if (!settings) return;
+    try {
+      await request<Settings>("/api/settings", {
+        method: "PUT",
+        body: JSON.stringify(settings),
+      });
+      setSaved(true);
+    } catch {
+      setSaved(false);
+    }
+  };
+
   return (
     <div className="page" data-testid="settings-page">
       <h1 className="screen-title">TOURNAMENT SETTINGS</h1>
-      <button className="btn btn-small" onClick={() => navigate("/")}>HOME</button>
-      {settings && (
-        <table className="data-table">
-          <tbody>
-            <tr><td>Starting stack</td><td>{settings.startingStack.toLocaleString()}</td></tr>
-            <tr><td>Starting blinds</td><td>{settings.startingSmallBlind} / {settings.startingBigBlind}</td></tr>
-            <tr><td>Blind level duration</td><td>{settings.blindLevelMinutes} minutes</td></tr>
-            <tr><td>Fast mode</td><td>{settings.fastMode ? "on" : "off"}</td></tr>
-          </tbody>
-        </table>
+      <div className="toolbar">
+        <button className="btn btn-small" onClick={() => navigate("/")}>HOME</button>
+      </div>
+      {settings ? (
+        <div className="settings-grid">
+          <label>
+            STARTING STACK
+            <input type="number" min={100} value={settings.startingStack}
+              onChange={(e) => patch("startingStack", Number(e.target.value))} data-testid="settings-stack" />
+          </label>
+          <label>
+            STARTING SMALL BLIND
+            <input type="number" min={10} value={settings.startingSmallBlind}
+              onChange={(e) => patch("startingSmallBlind", Number(e.target.value))} data-testid="settings-sb" />
+          </label>
+          <label>
+            STARTING BIG BLIND
+            <input type="number" min={10} value={settings.startingBigBlind}
+              onChange={(e) => patch("startingBigBlind", Number(e.target.value))} data-testid="settings-bb" />
+          </label>
+          <label>
+            BLIND LEVEL DURATION (MINUTES)
+            <input type="number" min={1} value={settings.blindLevelMinutes}
+              onChange={(e) => patch("blindLevelMinutes", Number(e.target.value))} data-testid="settings-minutes" />
+          </label>
+          <label className="settings-check">
+            <input type="checkbox" checked={settings.fastMode}
+              onChange={(e) => patch("fastMode", e.target.checked)} data-testid="settings-fast" />
+            FAST MODE
+          </label>
+          <div className="settings-actions">
+            <button className="btn btn-primary" onClick={save} data-testid="settings-save">SAVE SETTINGS</button>
+            <span className="note">{saved ? "Saved — next practice session uses these values." : "Defaults shown; SAVE to apply."}</span>
+          </div>
+        </div>
+      ) : (
+        <p className="note">Loading settings…</p>
       )}
-      <p className="note">Defaults live in .env / backend settings. Payouts: 40/25/15/10/6/4.</p>
+      <p className="note">Payouts: 40/25/15/10/6/4. Blind schedule: 21 levels with BB ante from level 6 and three breaks.</p>
     </div>
   );
 }

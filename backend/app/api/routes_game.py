@@ -29,8 +29,19 @@ def get_session(table_id: str) -> GameSession:
 
 @router.post("/tournament", response_model=GameStateModel)
 def create_tournament(request: TournamentCreateRequest) -> dict:
-    session = GameSession(fast_mode=request.fast_mode)
-    session.tournament.structure.level_duration = request.blind_level_minutes * 60
+    from app.core.tournament_settings import settings as tournament_settings
+
+    starting_stack = request.starting_stack or tournament_settings.starting_stack
+    small = tournament_settings.starting_small_blind
+    big = tournament_settings.starting_big_blind
+    minutes = request.blind_level_minutes or tournament_settings.blind_level_minutes
+    fast = request.fast_mode
+    session = GameSession(
+        fast_mode=fast,
+        starting_stack=starting_stack,
+        small_blind=small, big_blind=big,
+        level_minutes=minutes,
+    )
     session.start()
     _sessions[session.session_id] = session
     return session.state()
@@ -99,6 +110,7 @@ def standalone_coach_advice(request: CoachAdviceRequest) -> dict:
         paid_positions=request.paidPositions, stacks=request.stacks,
         payout=request.payout, facing_raise=request.facingRaise,
         hero_seat=request.heroSeat, mode=request.mode,
+        exact_cards=request.exactCards,
     )
     rec = _coach.recommend(req)
     return {
@@ -107,7 +119,18 @@ def standalone_coach_advice(request: CoachAdviceRequest) -> dict:
         "reasoning": rec.reasoning,
         "alternativeAction": rec.alternative_action,
         "detail": rec.recommendation_detail,
+        "ev": rec.ev,
+        "outs": rec.outs,
+        "education": rec.education,
     }
+
+
+@router.get("/coach/hands")
+def coach_hands() -> dict:
+    """All 169 starting-hand classes with a representative exact combo each."""
+    from app.strategy.hand_classes import all_starting_hands
+
+    return {"hands": all_starting_hands()}
 
 
 @router.get("/ranges", response_model=RangeGridResponse)

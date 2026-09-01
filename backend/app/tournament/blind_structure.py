@@ -6,32 +6,45 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True, slots=True)
 class BlindLevel:
-    """One blind level: small blind, big blind, and ante amount."""
+    """One blind level: small blind, big blind, ante amount, break after."""
 
     small: int
     big: int
     ante: int = 0
+    break_after: int = 0  # seconds of break after this level (0 = none)
 
 
-def default_structure(level_minutes: int = 20, max_levels: int = 24) -> BlindStructure:
-    """Default 100/100 structure (spec: exact first seven levels, doubling after).
+def default_structure(
+    level_minutes: int = 20,
+    small_blind: int = 100,
+    big_blind: int = 100,
+) -> BlindStructure:
+    """Exact 21-level schedule with BB ante from level 6 and three breaks.
 
-    All level values flow through this single definition point so blinds
-    are never hard-coded elsewhere in the application.
+    Level format: (SB, BB, BB-ante, break_seconds).
     """
-    pairs = [
-        (100, 100), (100, 200), (200, 300), (200, 400),
-        (300, 600), (400, 800), (500, 1000), (600, 1200),
-        (800, 1600), (1000, 2000), (1200, 2400), (1600, 3200),
-        (2000, 4000), (2500, 5000), (3000, 6000), (4000, 8000),
+    schedule = [
+        (100, 100, 0, 0), (100, 200, 0, 0), (100, 300, 0, 0),
+        (200, 400, 0, 0), (200, 500, 0, 5 * 60),
+        (300, 600, 600, 0), (400, 800, 800, 0), (500, 1000, 1000, 0),
+        (600, 1200, 1200, 0), (800, 1600, 1600, 0), (1000, 2000, 2000, 15 * 60),
+        (1500, 3000, 3000, 0), (2000, 4000, 4000, 0), (3000, 6000, 6000, 0),
+        (4000, 8000, 8000, 0), (5000, 10000, 10000, 0), (6000, 12000, 12000, 15 * 60),
+        (8000, 16000, 16000, 0), (10000, 20000, 20000, 0),
+        (15000, 30000, 30000, 0), (20000, 40000, 40000, 0),
     ]
-    levels = [BlindLevel(small=s, big=b) for s, b in pairs]
-    # Extend the doubling trend for longer tournaments.
-    while len(levels) < max_levels:
-        prev_small, prev_big = levels[-1].small, levels[-1].big
-        small = prev_small + prev_big // 4
-        levels.append(BlindLevel(small=small, big=small * 2))
-    return BlindStructure(levels=levels[:max_levels], level_duration=level_minutes * 60)
+    # Honor the configured starting blinds exactly at level 1; scale the
+    # schedule per-axis so later levels keep the same relative shape.
+    sb_scale = small_blind / max(1, 100)
+    bb_scale = big_blind / max(1, 100)
+    levels = [
+        BlindLevel(
+            small=int(s * sb_scale), big=int(b * bb_scale),
+            ante=int(a * bb_scale) if a else 0, break_after=br,
+        )
+        for s, b, a, br in schedule
+    ]
+    return BlindStructure(levels=levels, level_duration=level_minutes * 60)
 
 
 @dataclass(slots=True)
@@ -55,5 +68,5 @@ class BlindStructure:
         if mode == "traditional":
             return max(0, level.big // 10)  # 10% of BB is a common default
         if mode == "bba":
-            return level.big  # single big blind ante
+            return level.ante  # per-level big blind ante (0 for early levels)
         raise ValueError(f"unknown ante mode: {mode}")

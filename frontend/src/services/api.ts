@@ -16,15 +16,11 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 }
 
 export function createTournament(fastMode = 10): Promise<TableState> {
+  // Stack/blinds/duration come from the runtime tournament settings
+  // (editable on the Tournament Settings screen); fast mode may be passed.
   return request<TableState>("/api/tournament", {
     method: "POST",
-    body: JSON.stringify({
-      players: 9,
-      starting_stack: 45000,
-      blind_level_minutes: 20,
-      ante_mode: "none",
-      fast_mode: fastMode,
-    }),
+    body: JSON.stringify({ players: 9, fast_mode: fastMode }),
   });
 }
 

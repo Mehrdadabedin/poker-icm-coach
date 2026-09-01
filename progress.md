@@ -49,18 +49,28 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 043 | Folded-Player Action Eligibility + Showdown Reveal | 5 | complete | PASS (5 new + 330 total) | folded locked out of queue/action, hero-fold resolves with 5-card board, live-only winners |
 | 044 | Poker Table Header Alignment | 5 | complete | PASS (layout checks) | HOME+Pause balanced 48px left; ICM MASTER right; responsive |
 | 045 | Swap Table Header Position | 5 | complete | PASS (22 vitest, layout checks) | ICM MASTER left; HOME + Pause/Play right; positioning only |
+| 046 | Tournament Blind Structure (21 Levels + Breaks) | 5 | complete | PASS (358 BE) | exact 21-level schedule, BB ante L6+, 3 breaks, auto progression |
+| 047 | Re-Entry / Bust-Out Rule (Levels 1-3) | 5 | complete | PASS (reentry tests) | 45k reset L1-3, elimination L4+, no negative stacks |
+| 048 | Training Mode Text (White Bold) | 5 | complete | PASS (UI check) | COACH MODE / TEST MODE white+bold, visual only |
+| 049 | ICM Coach Card Analysis (169 + Exact) | 5 | complete | PASS (169 endpoint + UI) | 169 classes + exact combos, duplicate prevention |
+| 050 | ICM Coach Postflop / Board Analysis | 5 | complete | PASS (flop/turn/river) | 0-5 board cards, street derived, dup guard |
+| 051 | Expected Value Engine | 5 | complete | PASS (EV tests) | chip EV + POSITIVE/NEGATIVE + CALL/FOLD, ICM distinct |
+| 052 | Probability / Outs | 5 | complete | PASS (outs tests) | real-deck outs, improve prob, win prob |
+| 053 | Hand History Fix | 5 | complete | PASS (auto-table + grouping) | auto table id, blind-level groups |
+| 054 | Configurable Tournament Settings | 5 | complete | PASS (settings tests) | stack/blinds/duration/fast affect engine |
+| 055 | Swayne-Based Card/EV Explanations | 5 | complete | PASS (education tests) | concise concept notes, no book text |
 
 ## Current Phase
 
-5 — targeted fixes (fold rules + header alignment)
+5 — Swayne-based coach expansion + tournament rules
 
 ## Current Atomic Task
 
-044 Poker Table Header Alignment (complete)
+055 Swayne-Based Card/EV Explanations (complete)
 
 ## Completed Tasks
 
-- 045 Swap Table Header Position (complete)- 044 Poker Table Header Alignment (complete)- 043 Folded-Player Action Eligibility (complete)- 042 GitHub Pages Deployment (in-progress, blocked: Actions billing lock)- 041 Bottom-Row Seat Repositioning (complete)- 040 Hand Completion Review Screen (complete)- 039 Header Layout + Icon Pause/Play (complete)- 038 Application Rename to ICM Master (complete)- 036 GitHub Repository Preparation (complete)- 034 FastAPI + WebSocket API (complete)- 033 Database (PostgreSQL + Alembic) (complete)- 032 Statistics (complete)- 031 Hand History (complete)- 030 Test Mode (complete)- 029 Strategy Coach (complete)- 028 Push/Fold Engine (complete)- 027 Range Matrix (complete)- 026 Equity Engine (complete)- 025 Risk Premium (complete)- 024 Bubble Pressure (complete)- 023 Stack Analysis (complete)- 022 ICM Engine (complete)- 021 Opponent Range Estimation (complete)- 020 Postflop AI (complete)- 019 Preflop AI (complete)- 018 Computer Personalities (complete)- 017 Computer AI Framework (complete)- 016 Hero Controls (complete)- 015 React Poker Table (complete)- 014 Hand Engine (complete)- 013 Tournament Timer (complete)- 012 Tournament Engine (complete)- 011 Side Pots (complete)- 010 Pot Engine (complete)- 009 Betting Engine (complete)- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
+- 055 Swayne-Based Card/EV Explanations (complete)- 054 Configurable Tournament Settings (complete)- 053 Hand History Fix (complete)- 052 Probability / Outs (complete)- 051 Expected Value Engine (complete)- 050 ICM Coach Postflop / Board Analysis (complete)- 049 ICM Coach Card Analysis (complete)- 048 Training Mode Text (complete)- 047 Re-Entry / Bust-Out Rule (complete)- 046 Tournament Blind Structure (complete)- 045 Swap Table Header Position (complete)- 044 Poker Table Header Alignment (complete)- 043 Folded-Player Action Eligibility (complete)- 042 GitHub Pages Deployment (in-progress, blocked: Actions billing lock)- 041 Bottom-Row Seat Repositioning (complete)- 040 Hand Completion Review Screen (complete)- 039 Header Layout + Icon Pause/Play (complete)- 038 Application Rename to ICM Master (complete)- 036 GitHub Repository Preparation (complete)- 034 FastAPI + WebSocket API (complete)- 033 Database (PostgreSQL + Alembic) (complete)- 032 Statistics (complete)- 031 Hand History (complete)- 030 Test Mode (complete)- 029 Strategy Coach (complete)- 028 Push/Fold Engine (complete)- 027 Range Matrix (complete)- 026 Equity Engine (complete)- 025 Risk Premium (complete)- 024 Bubble Pressure (complete)- 023 Stack Analysis (complete)- 022 ICM Engine (complete)- 021 Opponent Range Estimation (complete)- 020 Postflop AI (complete)- 019 Preflop AI (complete)- 018 Computer Personalities (complete)- 017 Computer AI Framework (complete)- 016 Hero Controls (complete)- 015 React Poker Table (complete)- 014 Hand Engine (complete)- 013 Tournament Timer (complete)- 012 Tournament Engine (complete)- 011 Side Pots (complete)- 010 Pot Engine (complete)- 009 Betting Engine (complete)- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
 
 ## In Progress
 
@@ -133,3 +143,25 @@ Push to GitHub (see 036): `gh auth login` then the commands in the final report.
 - Pause toggles ⏸->▶, HOME navigates; no console errors.
 - Only files changed: TablePage.tsx + base.css (4 lines each). Frontend build +
   22 vitest pass; repo audit passes.
+
+## 046-055 Verification
+
+- Blind structure: exact 21 levels (100/100 .. 20000/40000), BB ante from
+  level 6, breaks 5m/15m/15m; timer advances levels AND breaks automatically
+  (tick() now called on every state view); fast mode scales; verified L1->L2
+  and L5->break->L6 with ante 600.
+- Re-entry: bust in L1-3 -> fresh 45,000; L4+ -> eliminated; no negative
+  stacks; integration test covers next_hand flow.
+- Training mode: COACH MODE / TEST MODE white (rgb 255,255,255) + bold 800.
+- Coach analyzer: 169 starting-hand classes (AA..32o) + exact two-card mode
+  with duplicate prevention (same physical card blocked); board picker 0-5
+  cards with street auto-derived (FLOP/TURN/RIVER); EV panel (CHIP EV,
+  POSITIVE/NEGATIVE, CALL/FOLD) with explicit TOURNAMENT/ICM distinction;
+  outs from the real remaining deck (47/46 unknown) + improve/win probability;
+  concise Swayne-concept education notes.
+- Hand history: auto-detects the single active table; rows grouped by blind
+  level; no manual table-id guessing.
+- Settings: editable stack/blinds/duration/fast mode; PUT /api/settings;
+  new tournaments use the stored values (verified 30000/150-300/15min).
+- Tests: backend 358 passed; frontend 22 vitest + 3 e2e passed; build clean;
+  repo audit passed.

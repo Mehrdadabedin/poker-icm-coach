@@ -49,7 +49,7 @@ def post_blinds_and_antes(tournament: Tournament, street: StreetState) -> None:
         if seat == bb_seat:
             amount += level.big
         if mode == "bba" and seat == bb_seat:
-            amount += level.big  # big blind ante equals one big blind
+            amount += ante  # big blind ante (per-level; 0 before level 6)
         if amount:
             player = tournament.players[seat]
             amount = min(amount, player.stack)  # short stacks post all-in

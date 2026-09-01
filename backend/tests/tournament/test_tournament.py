@@ -10,20 +10,28 @@ from app.tournament.tournament import PayoutStructure, Tournament, build_default
 
 def test_default_structure_start() -> None:
     s = default_structure()
-    assert s.level_at(0) == BlindLevel(small=100, big=100, ante=0)
-    assert s.level_at(1) == BlindLevel(small=100, big=200, ante=0)
-    assert s.level_at(2) == BlindLevel(small=200, big=300, ante=0)
-    assert s.level_at(3) == BlindLevel(small=200, big=400, ante=0)
-    assert s.level_at(4) == BlindLevel(small=300, big=600, ante=0)
-    assert s.level_at(5) == BlindLevel(small=400, big=800, ante=0)
-    assert s.level_at(6) == BlindLevel(small=500, big=1000, ante=0)
+    assert s.level_at(0) == BlindLevel(small=100, big=100, ante=0, break_after=0)
+    assert s.level_at(1) == BlindLevel(small=100, big=200, ante=0, break_after=0)
+    assert s.level_at(2) == BlindLevel(small=100, big=300, ante=0, break_after=0)
+    assert s.level_at(3) == BlindLevel(small=200, big=400, ante=0, break_after=0)
+    assert s.level_at(4) == BlindLevel(small=200, big=500, ante=0, break_after=300)
+    assert s.level_at(5) == BlindLevel(small=300, big=600, ante=600, break_after=0)
+    assert s.level_at(6) == BlindLevel(small=400, big=800, ante=800, break_after=0)
 
 
 def test_default_structure_continues() -> None:
     s = default_structure()
-    assert s.level_at(7).small == 600
-    assert s.level_at(8).small == 800
-    assert len(s) >= 20
+    assert s.level_at(7).small == 500
+    assert s.level_at(8).small == 600
+    assert len(s) == 21
+
+
+def test_structure_breaks() -> None:
+    s = default_structure()
+    assert s.level_at(4).break_after == 5 * 60      # break 1 after level 5
+    assert s.level_at(10).break_after == 15 * 60    # break 2 after level 11
+    assert s.level_at(16).break_after == 15 * 60    # break 3 after level 17
+    assert s.level_at(0).break_after == 0 and s.level_at(20).break_after == 0
 
 
 def test_level_duration_default() -> None:
@@ -48,7 +56,8 @@ def test_ante_modes() -> None:
     s = default_structure()
     assert s.ante_for("none", level=BlindLevel(200, 400)) == 0
     assert s.ante_for("traditional", level=BlindLevel(200, 400)) == 40
-    assert s.ante_for("bba", level=BlindLevel(200, 400)) == 400
+    assert s.ante_for("bba", level=BlindLevel(200, 400, 400)) == 400
+    assert s.ante_for("bba", level=BlindLevel(200, 400)) == 0  # early level, no ante
 
 
 def test_invalid_ante_mode_raises() -> None:

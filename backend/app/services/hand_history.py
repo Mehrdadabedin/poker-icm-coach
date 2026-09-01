@@ -24,6 +24,7 @@ class HandHistoryRecord:
     actions: list[HandAction]
     pot_total: int
     winner_seats: list[int]
+    level_index: int = 1
     coach_recommendation: str | None = None
     hero_decision: str | None = None
     icm_pressure: str = "LOW"

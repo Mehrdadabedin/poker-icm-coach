@@ -61,7 +61,7 @@ class Tournament:
     structure: BlindStructure = field(default_factory=default_structure)
     level_index: int = 0
     button: int = 0
-    ante_mode: str = "none"  # none | traditional | bba
+    ante_mode: str = "bba"  # none | traditional | bba
     payout: PayoutStructure = field(default_factory=PayoutStructure.nine_player)
     hand_number: int = 0
 
@@ -84,13 +84,27 @@ class Tournament:
             p.new_hand()
 
 
-def build_default_tournament() -> Tournament:
-    """Nine seats: one human hero and eight computer opponents."""
+def build_default_tournament(
+    starting_stack: int = STARTING_STACK,
+    small_blind: int = 100,
+    big_blind: int = 100,
+    level_minutes: int = 20,
+) -> Tournament:
+    """Nine seats: one human hero and eight computer opponents.
+
+    Accepts configurable stack/blinds/duration so tournament settings affect
+    the actual engine. The blind structure scales from the configured blinds.
+    """
     players = [
-        Player(name="Hero", stack=STARTING_STACK, seat=0, is_human=True),
+        Player(name="Hero", stack=starting_stack, seat=0, is_human=True),
         *[
-            Player(name=f"Bot {i}", stack=STARTING_STACK, seat=i, is_human=False)
+            Player(name=f"Bot {i}", stack=starting_stack, seat=i, is_human=False)
             for i in range(1, 9)
         ],
     ]
-    return Tournament(players=players)
+    structure = default_structure(
+        level_minutes=level_minutes,
+        small_blind=small_blind,
+        big_blind=big_blind,
+    )
+    return Tournament(players=players, structure=structure)

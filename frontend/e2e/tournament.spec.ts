@@ -75,7 +75,7 @@ test("range matrix renders", async ({ page }) => {
   await page.getByRole("button", { name: "RANGES" }).click();
   await expect(page.getByTestId("ranges-page")).toBeVisible();
   await expect(page.getByTestId("range-matrix")).toBeVisible({ timeout: 20_000 });
-  expect(await page.locator(".range-matrix tbody tr").count()).toBe(13);
+  await expect(page.locator(".range-matrix tbody tr")).toHaveCount(13, { timeout: 20_000 });
 });
 
 test("coach advice renders on standalone screen", async ({ page }) => {

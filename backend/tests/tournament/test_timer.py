@@ -53,6 +53,35 @@ def test_multiple_level_ups() -> None:
     assert t.current_blinds == (200, 400)
 
 
+def test_break_after_level_5() -> None:
+    t = make_timer()
+    t.start()
+    t.clock.now += 1200 * 5  # levels 1..5 complete
+    t.tick()
+    # enter the 5-minute break; blinds stay at level 5
+    assert t.level == 5
+    assert t.in_break
+    assert t.seconds_left == 300
+    t.clock.now += 300  # break ends
+    t.tick()
+    assert not t.in_break
+    assert t.level == 6
+    assert t.current_blinds == (300, 600)
+    assert t.seconds_left == 1200
+
+
+def test_reset_clears_break() -> None:
+    t = make_timer()
+    t.start()
+    t.clock.now += 1200 * 5
+    t.tick()
+    assert t.in_break
+    t.reset()
+    assert not t.in_break
+    assert t.level == 1
+    assert t.seconds_left == 1200
+
+
 def test_pause_freezes_countdown() -> None:
     t = make_timer()
     t.start()
