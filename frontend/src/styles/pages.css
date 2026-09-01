@@ -174,7 +174,7 @@
   border-top: 1px solid rgba(21, 101, 192, 0.25);
   text-align: right;
   font-size: 0.72rem;
-  color: #1565c0; /* matches the Home (.btn-primary) background */
+  color: var(--accent); /* existing gold/yellow accent used by the buttons */
   letter-spacing: 0.3px;
   width: 100%;
   flex: 0 0 auto;
