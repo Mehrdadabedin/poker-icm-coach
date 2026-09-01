@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createTournament } from "../services/api";
+import { Copyright } from "../components/Copyright";
 
 /** HOME screen: start a practice tournament or visit the tools. */
 export function HomePage() {
@@ -32,6 +33,7 @@ export function HomePage() {
         <button className="btn" onClick={() => navigate("/history")}>HAND HISTORY</button>
         <button className="btn" onClick={() => navigate("/statistics")}>STATISTICS</button>
       </div>
+      <Copyright />
     </div>
   );
 }

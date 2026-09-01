@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createTournament } from "../services/api";
+import { Copyright } from "../components/Copyright";
 
 /** TRAINING screen: choose COACH MODE or TEST MODE for a practice run. */
 export function TrainingPage() {
@@ -27,6 +28,7 @@ export function TrainingPage() {
       </div>
       <button className="btn btn-primary" onClick={start} data-testid="training-start">START TRAINING</button>
       <button className="btn btn-small" onClick={() => navigate("/")}>HOME</button>
+      <Copyright />
     </div>
   );
 }

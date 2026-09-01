@@ -166,3 +166,25 @@
   letter-spacing: 1px;
   margin: 0 0 6px;
 }
+
+/* ---- app copyright footer ---- */
+.app-footer {
+  margin-top: 18px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(21, 101, 192, 0.25);
+  text-align: right;
+  font-size: 0.72rem;
+  color: #1565c0; /* matches the Home (.btn-primary) background */
+  letter-spacing: 0.3px;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 640px) {
+  .app-footer {
+    text-align: right;
+    font-size: 0.66rem;
+    margin-top: 12px;
+    padding-top: 8px;
+  }
+}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { request } from "../services/api";
+import { Copyright } from "../components/Copyright";
 
 type HandRow = {
   handNumber: number; heroPosition: string; pot: number; winnerSeats: number[];
@@ -78,6 +79,7 @@ export function HistoryPage() {
         </div>
       ))}
       {hands.length === 0 && loaded && <p className="note">No completed hands recorded yet.</p>}
+      <Copyright />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { rangeGrid } from "../services/api";
+import { Copyright } from "../components/Copyright";
 
 const COLUMNS = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"];
 const POSITIONS = ["UTG", "UTG+1", "MP", "LJ", "HJ", "CO", "BTN", "SB", "BB"];
@@ -52,6 +53,7 @@ export function RangesPage() {
         </table>
       </div>
       <div className="legend">OPEN RAISE · CALL · 3-BET · OPEN JAM · FOLD</div>
+      <Copyright />
     </div>
   );
 }

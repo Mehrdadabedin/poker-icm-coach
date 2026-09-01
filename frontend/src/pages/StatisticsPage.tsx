@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { request } from "../services/api";
+import { Copyright } from "../components/Copyright";
 
 type Stats = { handsPlayed: number; handsWon: number; vpip: number; pfr: number; aggression: number; averagePot: number; bbWonLost: number; chipProfit: number; coachAgreement: number; icmMistakes: number; positionPerformance: Record<string, number> };
 
@@ -57,6 +58,7 @@ export function StatisticsPage() {
         </>
       )}
       {!stats && <p className="note">Enter a table id to load statistics.</p>}
+      <Copyright />
     </div>
   );
 }

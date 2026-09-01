@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { request } from "../services/api";
+import { Copyright } from "../components/Copyright";
 
 type Settings = {
   startingStack: number; startingSmallBlind: number; startingBigBlind: number;
@@ -77,6 +78,7 @@ export function SettingsPage() {
         <p className="note">Loading settings…</p>
       )}
       <p className="note">Payouts: 40/25/15/10/6/4. Blind schedule: 21 levels with BB ante from level 6 and three breaks.</p>
+      <Copyright />
     </div>
   );
 }

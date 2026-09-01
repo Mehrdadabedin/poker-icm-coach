@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { request } from "../services/api";
+import { Copyright } from "../components/Copyright";
 import { Card } from "../models/game";
 import { CardPicker, SUIT_SYMBOL, cardKey } from "../components/CoachCardPicker";
 
@@ -191,6 +192,7 @@ export function CoachPage() {
           </dl>
         </div>
       )}
+      <Copyright />
     </div>
   );
 }
