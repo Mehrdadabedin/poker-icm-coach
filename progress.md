@@ -64,18 +64,19 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 058 | ICM Coach Decision/EV Consistency | 5 | complete | PASS (coach tests) | one decision model: ICM EV/chip EV labeled for the decided action vs FOLD |
 | 059 | Copyright Footer | 5 | complete | PASS (22 vitest, 3 e2e, layout) | © 2026 NEXORA — Created by Mehrdad Abedin on all nav pages |
 | 060 | Copyright Text Color (Gold Accent) | 5 | complete | PASS (build, layout) | footer color uses existing --accent (#f2c14e) gold; wording/layout unchanged |
+| 061 | Production CORS Origin (Render) | 5 | complete | PASS (preflight + 370 BE) | icm-master-frontend.onrender.com allowed; localhost 5173/4173/8080 preserved |
 
 ## Current Phase
 
-5 — UI polish (copyright color)
+5 — deployment CORS fix
 
 ## Current Atomic Task
 
-060 Copyright Text Color (complete)
+061 Production CORS Origin (complete)
 
 ## Completed Tasks
 
-- 060 Copyright Text Color (complete)- 059 Copyright Footer (complete)- 058 ICM Coach Decision/EV Consistency (complete)- 057 Total Chips + Average Stack (complete)- 056 Live Tournament Timer (complete)- 055 Swayne-Based Card/EV Explanations (complete)- 054 Configurable Tournament Settings (complete)- 053 Hand History Fix (complete)- 052 Probability / Outs (complete)- 051 Expected Value Engine (complete)- 050 ICM Coach Postflop / Board Analysis (complete)- 049 ICM Coach Card Analysis (complete)- 048 Training Mode Text (complete)- 047 Re-Entry / Bust-Out Rule (complete)- 046 Tournament Blind Structure (complete)- 045 Swap Table Header Position (complete)- 044 Poker Table Header Alignment (complete)- 043 Folded-Player Action Eligibility (complete)- 042 GitHub Pages Deployment (in-progress, blocked: Actions billing lock)- 041 Bottom-Row Seat Repositioning (complete)- 040 Hand Completion Review Screen (complete)- 039 Header Layout + Icon Pause/Play (complete)- 038 Application Rename to ICM Master (complete)- 036 GitHub Repository Preparation (complete)- 034 FastAPI + WebSocket API (complete)- 033 Database (PostgreSQL + Alembic) (complete)- 032 Statistics (complete)- 031 Hand History (complete)- 030 Test Mode (complete)- 029 Strategy Coach (complete)- 028 Push/Fold Engine (complete)- 027 Range Matrix (complete)- 026 Equity Engine (complete)- 025 Risk Premium (complete)- 024 Bubble Pressure (complete)- 023 Stack Analysis (complete)- 022 ICM Engine (complete)- 021 Opponent Range Estimation (complete)- 020 Postflop AI (complete)- 019 Preflop AI (complete)- 018 Computer Personalities (complete)- 017 Computer AI Framework (complete)- 016 Hero Controls (complete)- 015 React Poker Table (complete)- 014 Hand Engine (complete)- 013 Tournament Timer (complete)- 012 Tournament Engine (complete)- 011 Side Pots (complete)- 010 Pot Engine (complete)- 009 Betting Engine (complete)- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
+- 061 Production CORS Origin (complete)- 060 Copyright Text Color (complete)- 059 Copyright Footer (complete)- 058 ICM Coach Decision/EV Consistency (complete)- 057 Total Chips + Average Stack (complete)- 056 Live Tournament Timer (complete)- 055 Swayne-Based Card/EV Explanations (complete)- 054 Configurable Tournament Settings (complete)- 053 Hand History Fix (complete)- 052 Probability / Outs (complete)- 051 Expected Value Engine (complete)- 050 ICM Coach Postflop / Board Analysis (complete)- 049 ICM Coach Card Analysis (complete)- 048 Training Mode Text (complete)- 047 Re-Entry / Bust-Out Rule (complete)- 046 Tournament Blind Structure (complete)- 045 Swap Table Header Position (complete)- 044 Poker Table Header Alignment (complete)- 043 Folded-Player Action Eligibility (complete)- 042 GitHub Pages Deployment (in-progress, blocked: Actions billing lock)- 041 Bottom-Row Seat Repositioning (complete)- 040 Hand Completion Review Screen (complete)- 039 Header Layout + Icon Pause/Play (complete)- 038 Application Rename to ICM Master (complete)- 036 GitHub Repository Preparation (complete)- 034 FastAPI + WebSocket API (complete)- 033 Database (PostgreSQL + Alembic) (complete)- 032 Statistics (complete)- 031 Hand History (complete)- 030 Test Mode (complete)- 029 Strategy Coach (complete)- 028 Push/Fold Engine (complete)- 027 Range Matrix (complete)- 026 Equity Engine (complete)- 025 Risk Premium (complete)- 024 Bubble Pressure (complete)- 023 Stack Analysis (complete)- 022 ICM Engine (complete)- 021 Opponent Range Estimation (complete)- 020 Postflop AI (complete)- 019 Preflop AI (complete)- 018 Computer Personalities (complete)- 017 Computer AI Framework (complete)- 016 Hero Controls (complete)- 015 React Poker Table (complete)- 014 Hand Engine (complete)- 013 Tournament Timer (complete)- 012 Tournament Engine (complete)- 011 Side Pots (complete)- 010 Pot Engine (complete)- 009 Betting Engine (complete)- 008 Hand Evaluator (complete)- 007 Dealing Engine (complete)- 006 Dealer Button Rotation (complete)- 005 Positions (complete)- 004 Player Model (complete)- 003 Deck Engine (complete)- 002 Card Model (complete)- 001 Project Setup (complete)
 
 ## In Progress
 
@@ -208,3 +209,15 @@ Push to GitHub (see 036): `gh auth login` then the commands in the final report.
   --accent variable (#f2c14e). Verified build clean; footer renders
   rgb(242,193,78) on desktop and mobile; wording, position, size, alignment,
   border, spacing and layout unchanged; no other code modified.
+
+## 061 Verification
+
+- config.py default CORS_ORIGINS now includes
+  https://icm-master-frontend.onrender.com (plus localhost 5173/4173/8080).
+- Verified via TestClient and a live uvicorn server: OPTIONS preflight from
+  the production origin returns 200 with Access-Control-Allow-Origin:
+  https://icm-master-frontend.onrender.com; POST /api/coach/advice with that
+  Origin returns 200 + ACAO header; localhost dev origins still allowed;
+  unallowed origins still rejected (400).
+- backend/.env updated locally (untracked). Backend suite 370 passed; audit
+  passed. No API/model/poker/UI changes.

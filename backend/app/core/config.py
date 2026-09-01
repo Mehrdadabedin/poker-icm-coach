@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     database_url: str = "postgresql+psycopg://poker:poker@localhost:5433/poker_icm_coach"
-    cors_origins: str = "http://localhost:5173,http://localhost:4173"
+    cors_origins: str = "http://localhost:5173,http://localhost:4173,http://localhost:8080,https://icm-master-frontend.onrender.com"
     api_host: str = "0.0.0.0"
     api_port: int = 8000
 
