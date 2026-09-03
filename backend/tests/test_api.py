@@ -1,11 +1,9 @@
 """FastAPI + WebSocket API tests (Atomic Part 034)."""
 from __future__ import annotations
 
-from fastapi.testclient import TestClient
+from tests.api_helpers import login_client, ws_url
 
-from app.main import app
-
-client = TestClient(app)
+client = login_client()
 
 
 def _create_table() -> str:
@@ -152,7 +150,7 @@ def test_unknown_table_404() -> None:
 
 def test_websocket_streams_state() -> None:
     table_id = _create_table()
-    with client.websocket_connect(f"/ws/table/{table_id}") as ws:
+    with client.websocket_connect(ws_url(table_id, client)) as ws:
         ws.send_text("state")
         state = ws.receive_json()
         assert state["tableId"] == table_id

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 420" width="300" height="420">
+  <defs>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#f4f1ea"/>
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="292" height="412" rx="18" fill="url(#face)" stroke="#cfc9bc" stroke-width="3"/>
+  <rect x="10" y="10" width="280" height="400" rx="14" fill="none" stroke="#e3ddd0" stroke-width="1.5"/>
+  <g transform="rotate(180 270 390)">
+  <text x="36" y="52" font-family="Georgia, serif" font-size="44" font-weight="bold" fill="#c62828" text-anchor="middle">T</text>
+  <text x="36" y="96" font-family="Georgia, serif" font-size="40" fill="#c62828" text-anchor="middle">♥</text>
+</g>
+<g>
+  <text x="36" y="52" font-family="Georgia, serif" font-size="44" font-weight="bold" fill="#c62828" text-anchor="middle">T</text>
+  <text x="36" y="96" font-family="Georgia, serif" font-size="40" fill="#c62828" text-anchor="middle">♥</text>
+</g>
+  <text x="150" y="268" font-family="Georgia, serif" font-size="150" fill="#c62828" text-anchor="middle">♥</text>
+</svg>

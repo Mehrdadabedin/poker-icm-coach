@@ -1,11 +1,9 @@
 """Settings / active-table / coach-hands API tests (Atomic 049/053/054)."""
 from __future__ import annotations
 
-from fastapi.testclient import TestClient
+from tests.api_helpers import login_client
 
-from app.main import app
-
-client = TestClient(app)
+client = login_client()
 
 
 def _create_table() -> str:

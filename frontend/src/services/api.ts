@@ -1,18 +1,56 @@
-// API client for the FastAPI backend (part 034 endpoints).
+// API client for the FastAPI backend (part 034 endpoints + A03 auth).
 import { ActionKind, TableState } from "../models/game";
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "";
+const TOKEN_KEY = "icm_auth_token";
+const USERNAME_KEY = "icm_username";
+
+export class AuthError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "AuthError";
+  }
+}
+
+export const getToken = (): string | null => localStorage.getItem(TOKEN_KEY);
+export const getUsername = (): string | null => localStorage.getItem(USERNAME_KEY);
+export const saveAuth = (token: string, username: string): void => {
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(USERNAME_KEY, username);
+};
+export const clearAuth = (): void => {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USERNAME_KEY);
+};
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
-    headers: { "Content-Type": "application/json" },
-    ...options,
-  });
+  const token = getToken();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
   if (!response.ok) {
     const body = await response.text();
+    if (response.status === 401) {
+      throw new AuthError(`Authentication required (API ${response.status})`);
+    }
     throw new Error(`API ${response.status}: ${body}`);
   }
   return response.json() as Promise<T>;
+}
+
+export function login(username: string): Promise<{ token: string; username: string }> {
+  return request<{ token: string; username: string }>("/api/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ username }),
+  });
+}
+
+export function logout(): Promise<{ ok: boolean }> {
+  return request<{ ok: boolean }>("/api/auth/logout", { method: "POST" });
+}
+
+export function me(): Promise<{ username: string }> {
+  return request<{ username: string }>("/api/auth/me");
 }
 
 export function createTournament(fastMode = 10): Promise<TableState> {

@@ -2,19 +2,20 @@
 from __future__ import annotations
 
 import random
+import time
 import uuid
 
 from app.ai.ai_framework import AIDecisionProvider
 from app.game.actions import Action, ActionType
 from app.game.hand_engine import HandEngine
 from app.game.positions import position_for
+from app.services import hand_history
 from app.services.game_state_view import build_state_view
 from app.services.hand_history import HandHistoryRecord, HandHistoryStore
 from app.strategy.coach import Coach, CoachRequest
 from app.strategy.test_mode import compare_decisions
 from app.tournament.tournament import build_default_tournament
 from app.tournament.tournament_timer import TournamentTimer
-
 
 class GameSession:
     """Owns one tournament table; drives bots; exposes safe state snapshots."""
@@ -23,13 +24,21 @@ class GameSession:
                  rng: random.Random | None = None,
                  starting_stack: int = 45_000,
                  small_blind: int = 100, big_blind: int = 100,
-                 level_minutes: int = 20) -> None:
+                 level_minutes: int = 20,
+                 owner: str | None = None,
+                 table_label: str | None = None,
+                 hero_name: str = "Hero",
+                 history_dir: str | None = None) -> None:
         self.session_id = session_id or uuid.uuid4().hex[:12]
+        self.owner = owner  # authenticated username that owns this tournament
+        self.table_label = table_label or self.session_id
+        self.created_at = time.time()
+        self.status = "active"
+        self.history_dir = history_dir or ""
         self.tournament_starting_stack = starting_stack
         self.tournament = build_default_tournament(
             starting_stack=starting_stack, small_blind=small_blind,
-            big_blind=big_blind, level_minutes=level_minutes,
-        )
+            big_blind=big_blind, level_minutes=level_minutes, hero_name=hero_name)
         self.hero_seat = 0
         self.rng = rng if rng is not None else random.Random()
         self.provider = AIDecisionProvider(rng=self.rng)
@@ -40,8 +49,10 @@ class GameSession:
         self.coach = Coach()
         self.coach_mode = "advanced"
         self._last_hero_action: str | None = None
+        self._history_file: hand_history.HistoryFileStore = hand_history.HistoryFileStore(
+            self.history_dir, self.session_id
+        )
 
-    # ---- lifecycle ----
     def start(self) -> None:
         self.engine = HandEngine(self.tournament, provider=self.provider, rng=self.rng)
         self.timer = TournamentTimer(self.tournament, fast_mode=self.fast_mode)
@@ -50,9 +61,6 @@ class GameSession:
     def _begin_hand(self, first: bool = False) -> None:
         assert self.engine is not None and self.timer is not None
         self.engine.start_hand()
-        # The tournament clock is a live blind-level clock: it starts once and
-        # resumes across hands (it was paused when the previous hand ended).
-        # It must NOT reset on a new hand.
         if first:
             self.timer.start()
         else:
@@ -71,7 +79,6 @@ class GameSession:
             return "idle"
         return "handOver" if self.engine.is_complete else "playing"
 
-    # ---- actions ----
     def hero_action(self, kind: str, amount: int | None = None) -> None:
         assert self.engine is not None
         actor = self.engine.current_actor
@@ -101,7 +108,6 @@ class GameSession:
             assert self.timer is not None
             self.timer.pause()
 
-    # ---- views / coach ----
     def state(self) -> dict:
         assert self.engine is not None and self.timer is not None
         self.timer.tick()  # advance expired blind levels / breaks on every view
@@ -153,7 +159,6 @@ class GameSession:
             "rangeNote": comparison.range_note,
         }
 
-    # ---- persistence ----
     REENTRY_LEVELS = 3  # levels 1-3 get a fresh stack on bust
 
     def _apply_reentry_or_eliminate(self) -> None:
@@ -186,5 +191,9 @@ class GameSession:
             level_index=self.tournament.level_index,
             actions=list(result.actions), pot_total=result.pot_total,
             winner_seats=result.winner_seats(),
+            username=self.owner or "",
+            table_label=self.table_label,
+            timestamp=time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         )
         self.history.append(record)
+        self._history_file.append(record)

@@ -221,3 +221,42 @@ Push to GitHub (see 036): `gh auth login` then the commands in the final report.
   unallowed origins still rejected (400).
 - backend/.env updated locally (untracked). Backend suite 370 passed; audit
   passed. No API/model/poker/UI changes.
+
+
+---
+
+## A-series: multi-user authentication, isolation, cards, review UX (prime-agent-spec)
+
+Implemented incrementally on the existing working system (poker/ICM/tournament
+logic untouched). Status: A01-A15 done; A14 deployment steps that require the
+owner to redeploy are listed as remaining.
+
+| Task | Result |
+|---|---|
+| A01 audit | Endpoints, state model, Hero hard-coding, no auth, CSS-only cards, 400 root causes documented |
+| A02 HTTP 400/CORS | Root cause = validation 400s fired by frontend races; CORS already correct. Frontend hardened (double-submit guard, error-safe nextHand, swallowed coach/compare); tests/test_http400_paths.py |
+| A03 auth | Bearer-token username login/logout/me; app/services/auth.py, app/api/routes_auth.py, app/api/deps.py |
+| A04 username | Seat-0 player named from username; no user-facing hard-coded Hero |
+| A05 isolation | GameSession.owner; ownership enforced on all game routes + WS; cross-user 404 |
+| A06 table IDs | A..Z, AA.. allocator; internal session_id remains the data key |
+| A07 history | Records + username/table_label/timestamp; best-effort JSONL (HISTORY_DIR) |
+| A08 cards | 53 SVG assets (scripts/generate_cards.py) + PlayingCard component |
+| A09 sizes | Larger proportional hero/board/review cards (cards.css) |
+| A10 result/review | Compact result stays on table; Review the Hand opens history only on click |
+| A11 pause | Pause/resume only affects client auto-next; server clock untouched |
+| A12 consistency | 401 gate + ownership; new tournament -> new session+label |
+| A13 tests | Backend 394 passed / 4 skipped; frontend 32 passed |
+| A14 deploy | Deployed preflight/CORS verified live; redeploy this branch for auth endpoints; two-browser verification pending owner deployment |
+| A15 docs | This file + prime-agent-spec/progress.md |
+
+Files changed (backend): app/api/routes_auth.py (new), app/api/deps.py (new),
+app/api/routes_game.py, app/api/routes_meta.py, app/main.py,
+app/services/auth.py (new), app/services/game_session.py,
+app/services/hand_history.py, app/services/game_state_view.py,
+app/schemas/game_schemas.py, app/tournament/tournament.py,
+app/core/config.py, tests/* (auth/isolation/400 suites, updated helpers).
+Files changed (frontend): src/services/api.ts, src/pages/*, src/components/*
+(LoginForm, PlayingCard, HandResult, TableHeader, TableSidebar, CardView,
+HeroControls, HandReview, ActionHistory, PokerSeat, PokerTable),
+src/hooks/useAutoNext.ts (new), src/styles/cards.css (new),
+public/cards/* (53 generated SVGs), tests/* (features, login), scripts/generate_cards.py (new).

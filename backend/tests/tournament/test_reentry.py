@@ -1,9 +1,6 @@
 """Re-entry / bust-out rule tests (Atomic Part 047)."""
 from __future__ import annotations
 
-import random
-
-from app.game.player import Player
 from app.services.game_session import GameSession
 
 
@@ -55,10 +52,9 @@ def test_no_negative_stacks() -> None:
 
 def test_next_hand_applies_reentry_then_elimination() -> None:
     """Bust a bot in level 1 -> reset; advance to level 4 -> eliminate."""
-    from fastapi.testclient import TestClient
-    from app.main import app
-    client = TestClient(app)
-    tid = client.post("/api/tournament", json={"players": 9}).json()["tableId"]
+    from tests.api_helpers import login_client
+    client = login_client()
+    client.post("/api/tournament", json={"players": 9}).json()["tableId"]
 
     s = GameSession(starting_stack=45_000)
     s.start()

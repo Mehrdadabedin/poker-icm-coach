@@ -1,11 +1,9 @@
 """Hand-review payload tests: showdown reveals, results, bot explanations."""
 from __future__ import annotations
 
-from fastapi.testclient import TestClient
+from tests.api_helpers import login_client
 
-from app.main import app
-
-client = TestClient(app)
+client = login_client()
 
 
 def _create_table() -> str:

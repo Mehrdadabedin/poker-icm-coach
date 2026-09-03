@@ -41,14 +41,14 @@ export function PokerSeat({ player, active, lastAction, status, revealCards, rev
           <div className="seat-stack">
             {formatChips(player.stack)} <span className="seat-bb">({player.stackInBB} BB)</span>
           </div>
-          <div className="seat-cards">
+          <div className={`seat-cards ${player.isHero ? "hero-cards" : ""}`}>
             {(revealCards && revealCards.length === 2
               ? revealCards
               : player.holeCards && player.holeCards.length === 2
                 ? player.holeCards
                 : []
             ).map((c, i) => (
-              <CardView key={i} card={c} small />
+              <CardView key={i} card={c} />
             ))}
             {revealCards?.length === 0 && <span className="seat-hidden-cards">? ?</span>}
           </div>

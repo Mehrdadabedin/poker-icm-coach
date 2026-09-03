@@ -1,10 +1,15 @@
 """Hand history: records, store, and readable replay."""
 from __future__ import annotations
 
+import json
+import logging
 from dataclasses import dataclass
+from pathlib import Path
 
 from app.game.hand_result import HandAction
 from app.poker.card import Card
+
+logger = logging.getLogger(__name__)
 
 POSITION_LABEL = {"UTG": "UTG", "UTG+1": "UTG+1", "MP": "MP", "LJ": "LJ", "HJ": "HJ",
                   "CO": "CO", "BTN": "BTN", "SB": "SB", "BB": "BB"}
@@ -30,6 +35,9 @@ class HandHistoryRecord:
     icm_pressure: str = "LOW"
     tournament_stage: str = ""
     grade: str | None = None
+    username: str = ""
+    table_label: str = ""
+    timestamp: str = ""
 
     def net_chips(self) -> int:
         return self.ending_stack - self.starting_stack
@@ -63,6 +71,55 @@ class HandHistoryStore:
         if hero_decision:
             records = [r for r in records if r.hero_decision == hero_decision]
         return records
+
+
+class HistoryFileStore:
+    """Best-effort JSONL persistence of hand records to the filesystem (A07).
+
+    Writes are append-only and never fatal: a read-only or missing directory
+    only logs a warning so gameplay is never affected.
+    """
+
+    def __init__(self, directory: str = "", session_id: str = "") -> None:
+        self._path: Path | None = None
+        if directory:
+            self._path = Path(directory) / f"{session_id}.jsonl"
+            try:
+                self._path.parent.mkdir(parents=True, exist_ok=True)
+            except OSError as exc:  # pragma: no cover - env dependent
+                logger.warning("history persistence unavailable: %s", exc)
+                self._path = None
+
+    def append(self, record: HandHistoryRecord) -> None:
+        if self._path is None:
+            return
+        try:
+            with self._path.open("a", encoding="utf-8") as fh:
+                fh.write(json.dumps(_record_to_dict(record), default=str) + "\n")
+        except OSError:  # pragma: no cover - env dependent
+            logger.warning("could not persist hand %s", record.hand_number)
+
+
+def _record_to_dict(record: HandHistoryRecord) -> dict:
+    return {
+        "hand_number": record.hand_number,
+        "username": record.username,
+        "table_label": record.table_label,
+        "timestamp": record.timestamp,
+        "hero_cards": [c.ascii() for c in record.hero_cards],
+        "hero_position": record.hero_position,
+        "community_cards": [c.ascii() for c in record.community_cards],
+        "starting_stack": record.starting_stack,
+        "ending_stack": record.ending_stack,
+        "blind_level": record.blind_level,
+        "level_index": record.level_index,
+        "pot_total": record.pot_total,
+        "winner_seats": record.winner_seats,
+        "actions": [
+            {"seat": a.seat, "action": a.action, "amount": a.amount, "street": a.street}
+            for a in record.actions
+        ],
+    }
 
 
 def replay(record: HandHistoryRecord) -> str:

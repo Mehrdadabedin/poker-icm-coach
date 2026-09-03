@@ -46,3 +46,6 @@ backend/*.sqlite3
 
 # TypeScript
 *.tsbuildinfo
+
+# Runtime hand-history files (A07 best-effort persistence)
+backend/data/

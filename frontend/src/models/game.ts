@@ -95,6 +95,8 @@ export interface HandReview {
 
 export interface TableState {
   tableId: string;
+  tableLabel?: string;
+  username?: string | null;
   handNumber: number;
   players: PlayerView[];
   actionLog?: TableAction[];

@@ -1,4 +1,5 @@
-import { Card, cardColor, cardFace, cardSymbol } from "../models/game";
+import { Card } from "../models/game";
+import { PlayingCard } from "./PlayingCard";
 
 interface CardViewProps {
   card: Card;
@@ -6,21 +7,15 @@ interface CardViewProps {
   small?: boolean;
 }
 
-/** A single playing card; faceDown renders the card back. */
+/** Backwards-compatible wrapper around the real playing-card assets.
+ * `small` keeps the existing seat-size variants; hero/board cards use the
+ * new larger sizing (A09). */
 export function CardView({ card, faceDown = false, small = false }: CardViewProps) {
-  if (faceDown) {
-    return (
-      <div className={`card card-back ${small ? "card-small" : ""}`} aria-label="face down card" />
-    );
-  }
   return (
-    <div
-      className={`card card-${cardColor(card.suit)} ${small ? "card-small" : ""}`}
-      data-testid={`card-${card.rank}${card.suit}`}
-      aria-label={cardFace(card)}
-    >
-      <span className="card-rank">{card.rank}</span>
-      <span className="card-suit">{cardSymbol[card.suit]}</span>
-    </div>
+    <PlayingCard
+      card={faceDown ? undefined : card}
+      faceDown={faceDown}
+      className={small ? "card-small" : ""}
+    />
   );
 }

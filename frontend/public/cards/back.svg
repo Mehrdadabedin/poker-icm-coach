@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 420" width="300" height="420">
+  <defs>
+    <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="30" height="30" fill="#2563eb"/>
+      <rect x="0" y="0" width="15" height="15" fill="#1d4ed8"/>
+      <rect x="15" y="15" width="15" height="15" fill="#1d4ed8"/>
+    </pattern>
+  </defs>
+  <rect x="4" y="4" width="292" height="412" rx="18" fill="url(#grid)" stroke="#f8fafc" stroke-width="6"/>
+  <rect x="18" y="18" width="264" height="384" rx="12" fill="none" stroke="#f8fafc" stroke-width="2"/>
+  <text x="150" y="250" font-family="Georgia, serif" font-size="56" fill="#f8fafc" text-anchor="middle" font-weight="bold">ICM</text>
+</svg>

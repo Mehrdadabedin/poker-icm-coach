@@ -52,6 +52,14 @@ describe("PokerTable", () => {
 describe("TablePage", () => {
   it("renders the screen with title (API mock)", async () => {
     vi.mock("../src/services/api", () => ({
+      getToken: vi.fn(() => "token"),
+      getUsername: vi.fn(() => "Alice"),
+      saveAuth: vi.fn(),
+      clearAuth: vi.fn(),
+      login: vi.fn(async () => ({ token: "token", username: "Alice" })),
+      logout: vi.fn(async () => ({ ok: true })),
+      me: vi.fn(async () => ({ username: "Alice" })),
+      AuthError: class AuthError extends Error {},
       getState: vi.fn(async () => sampleTableState()),
       sendAction: vi.fn(async () => sampleTableState()),
       nextHand: vi.fn(async () => sampleTableState()),

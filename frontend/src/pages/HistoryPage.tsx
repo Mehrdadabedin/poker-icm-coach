@@ -17,8 +17,8 @@ export function HistoryPage() {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    // the app has a single active tournament table - auto-detect it
-    request<{ tableId: string | null }>("/api/active-table")
+    // auto-detect the caller's most recent tournament table (per-user)
+    request<{ tableId: string | null; tableLabel: string | null }>("/api/active-table")
       .then((d) => {
         if (d.tableId) {
           setTableId(d.tableId);
@@ -62,7 +62,7 @@ export function HistoryPage() {
           <h3 className="history-group-title">LEVEL {level} ({rows[0].blindLevel} blinds)</h3>
           <table className="data-table">
             <thead>
-              <tr><th>#</th><th>Pos</th><th>Pot</th><th>Winners</th><th>Net</th><th>Hero</th><th>Coach</th><th>Grade</th></tr>
+              <tr><th>#</th><th>Pos</th><th>Pot</th><th>Winners</th><th>Net</th><th>You</th><th>Coach</th><th>Grade</th></tr>
             </thead>
             <tbody>
               {rows.map((h) => (

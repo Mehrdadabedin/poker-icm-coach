@@ -89,14 +89,16 @@ def build_default_tournament(
     small_blind: int = 100,
     big_blind: int = 100,
     level_minutes: int = 20,
+    hero_name: str = "Hero",
 ) -> Tournament:
     """Nine seats: one human hero and eight computer opponents.
 
     Accepts configurable stack/blinds/duration so tournament settings affect
     the actual engine. The blind structure scales from the configured blinds.
+    The seat-0 player is named after the authenticated username (A04).
     """
     players = [
-        Player(name="Hero", stack=starting_stack, seat=0, is_human=True),
+        Player(name=hero_name, stack=starting_stack, seat=0, is_human=True),
         *[
             Player(name=f"Bot {i}", stack=starting_stack, seat=i, is_human=False)
             for i in range(1, 9)

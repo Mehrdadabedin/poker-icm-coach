@@ -8,6 +8,7 @@ interface HeroControlsProps {
   stack: number;
   bigBlind: number;
   disabled: boolean;
+  submitting?: boolean;
   onAction: (kind: ActionKind, amount?: number) => void;
 }
 
@@ -19,6 +20,7 @@ export function HeroControls({
   stack,
   bigBlind,
   disabled,
+  submitting = false,
   onAction,
 }: HeroControlsProps) {
   const [sizing, setSizing] = useState<ActionKind | null>(null);
@@ -26,7 +28,9 @@ export function HeroControls({
 
   const has = (kind: ActionKind) => legalActions.some((a) => a.kind === kind);
   const meta = (kind: ActionKind) => legalActions.find((a) => a.kind === kind);
-  const acting = disabled || legalActions.length === 0;
+  // Blocks double-submits (a second click arrives after the polled state
+  // still shows "waiting for hero" and would produce an HTTP 400).
+  const acting = disabled || legalActions.length === 0 || submitting;
 
   const callKind: ActionKind = toCall > 0 ? "call" : "check";
   const callLabel =

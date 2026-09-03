@@ -8,7 +8,7 @@ export function sampleTableState(heroSeat = 0, dealerSeat = 8): TableState {
   const players: PlayerView[] = POSITIONS.map((position, i) => {
     const base: PlayerView = {
       seat: i,
-      name: i === heroSeat ? "Hero" : `Bot ${i}`,
+      name: i === heroSeat ? "Alice" : `Bot ${i}`,
       stack: CHIPS[i],
       stackInBB: chipsInBB(CHIPS[i], 100),
       position,
@@ -50,5 +50,41 @@ export function sampleTableState(heroSeat = 0, dealerSeat = 8): TableState {
     phase: "playing",
     legalActions: [{ kind: "fold" }, { kind: "check" }, { kind: "bet", minAmount: 100, maxAmount: 45000 }],
     toCall: 0,
+  };
+}
+
+/** Sample completed-hand review (A10 tests). */
+export function sampleReview(): import("./models/game").HandReview {
+  return {
+    handNumber: 7,
+    pot: 3400,
+    board: [
+      { rank: "9", suit: "c" }, { rank: "J", suit: "d" },
+      { rank: "2", suit: "s" }, { rank: "Q", suit: "h" }, { rank: "3", suit: "c" },
+    ],
+    heroSeat: 0,
+    heroCards: [{ rank: "A", suit: "s" }, { rank: "K", suit: "h" }],
+    heroStart: 32100,
+    heroEnd: 35500,
+    heroNet: 3400,
+    heroWon: true,
+    chop: false,
+    heroPosition: "BTN",
+    heroRankBefore: 3,
+    heroRankAfter: 1,
+    winners: [0],
+    foldedSeats: [1, 2, 4, 6, 7, 8],
+    allInSeats: [],
+    showdown: [{
+      seat: 0, name: "Alice",
+      cards: [{ rank: "A", suit: "s" }, { rank: "K", suit: "h" }],
+      handName: "Pair of Aces", isHero: true, won: true,
+    }],
+    actions: [],
+    explanations: [],
+    winningHandName: "Pair of Aces",
+    heroHandName: "Pair of Aces",
+    losingHandName: null,
+    pressure: "LOW",
   };
 }

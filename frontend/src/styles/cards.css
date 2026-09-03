@@ -1,0 +1,54 @@
+/* Real playing-card image assets (A08/A09).
+   SVG cards keep exact 300x420 proportions (aspect 0.714). */
+
+.playing-card {
+  width: 44px;
+  height: auto;
+  aspect-ratio: 300 / 420;
+  border-radius: 6px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.55);
+  display: inline-block;
+  object-fit: contain;
+  background: #fff;
+  user-select: none;
+}
+
+/* Small variant: bot seats / action history inline cards */
+.playing-card.card-small {
+  width: 28px;
+}
+
+/* Seat cards: hero hole cards are the visual priority (A09) */
+.seat-cards .playing-card {
+  width: 42px;
+}
+
+.seat-cards.hero-cards .playing-card {
+  width: 52px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.7), 0 0 0 2px var(--accent, #d4af37);
+}
+
+/* Community board cards: clearly larger than the old mini cards */
+.board .playing-card {
+  width: 58px;
+}
+
+/* Inline cards inside the hand-review result grid */
+.result-cards-cell .playing-card,
+.result-board-cell .playing-card {
+  width: 56px;
+}
+
+/* Review screen hero/board cards */
+.review-grid .playing-card {
+  width: 60px;
+}
+
+/* Responsive: shrink on narrow screens without breaking proportions */
+@media (max-width: 640px) {
+  .playing-card { width: 34px; }
+  .seat-cards.hero-cards .playing-card { width: 42px; }
+  .board .playing-card { width: 40px; }
+  .result-cards-cell .playing-card,
+  .result-board-cell .playing-card { width: 42px; }
+}

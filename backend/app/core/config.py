@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     starting_big_blind: int = 100
     blind_level_minutes: int = 20
     fast_mode: bool = False
+    history_dir: str = "data/history"
 
     @property
     def cors_origin_list(self) -> list[str]:

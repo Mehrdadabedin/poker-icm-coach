@@ -95,7 +95,7 @@ export function PokerTable({ state, children }: PokerTableProps) {
         <div className="board">
           {state.communityCards.length === 0 && <span className="board-empty">DEALING…</span>}
           {state.communityCards.map((c, i) => (
-            <CardView key={i} card={c} small />
+            <CardView key={i} card={c} />
           ))}
         </div>
       </div>

@@ -109,6 +109,8 @@ class HandReviewModel(BaseModel):
 
 class GameStateModel(BaseModel):
     tableId: str
+    tableLabel: str = ""
+    username: str | None = None
     handNumber: int
     players: list[PlayerStateModel]
     actionLog: list[TableActionModel] = []

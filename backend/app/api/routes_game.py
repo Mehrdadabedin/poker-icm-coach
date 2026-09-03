@@ -1,8 +1,10 @@
 """REST routes for tournament/game/coach operations."""
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from app.api.deps import require_user
+from app.core.config import settings
 from app.schemas.game_schemas import (
     ActionRequest,
     CoachAdviceRequest,
@@ -20,15 +22,48 @@ _sessions: dict[str, GameSession] = {}
 _coach = Coach()
 
 
-def get_session(table_id: str) -> GameSession:
+class TableLabelAllocator:
+    """Human-readable table IDs: A..Z, AA, AB ... (A06).
+
+    Labels are never reused while a session is active. The internal
+    session_id (the real data key) stays unique and is what URLs use.
+    """
+
+    def __init__(self) -> None:
+        self._counter = 0
+
+    def allocate(self) -> str:
+        label = _label_for_index(self._counter)
+        self._counter += 1
+        return label
+
+
+def _label_for_index(index: int) -> str:
+    """0 -> A ... 25 -> Z, 26 -> AA, 27 -> AB ... (spreadsheet style)."""
+    letters = ""
+    index += 1
+    while index > 0:
+        index, rem = divmod(index - 1, 26)
+        letters = chr(65 + rem) + letters
+    return letters
+
+
+_table_labels = TableLabelAllocator()
+
+
+def get_session(table_id: str, user: str) -> GameSession:
     try:
-        return _sessions[table_id]
+        session = _sessions[table_id]
     except KeyError as exc:
         raise HTTPException(status_code=404, detail="table not found") from exc
+    if session.owner != user:
+        raise HTTPException(status_code=404, detail="table not found")
+    return session
 
 
 @router.post("/tournament", response_model=GameStateModel)
-def create_tournament(request: TournamentCreateRequest) -> dict:
+def create_tournament(request: TournamentCreateRequest,
+                      user: str = Depends(require_user)) -> dict:
     from app.core.tournament_settings import settings as tournament_settings
 
     starting_stack = request.starting_stack or tournament_settings.starting_stack
@@ -41,6 +76,10 @@ def create_tournament(request: TournamentCreateRequest) -> dict:
         starting_stack=starting_stack,
         small_blind=small, big_blind=big,
         level_minutes=minutes,
+        owner=user,
+        hero_name=user,
+        table_label=_table_labels.allocate(),
+        history_dir=settings.history_dir,
     )
     session.start()
     _sessions[session.session_id] = session
@@ -48,13 +87,14 @@ def create_tournament(request: TournamentCreateRequest) -> dict:
 
 
 @router.get("/game/{table_id}/state", response_model=GameStateModel)
-def game_state(table_id: str) -> dict:
-    return get_session(table_id).state()
+def game_state(table_id: str, user: str = Depends(require_user)) -> dict:
+    return get_session(table_id, user).state()
 
 
 @router.post("/game/{table_id}/action", response_model=GameStateModel)
-def game_action(table_id: str, request: ActionRequest) -> dict:
-    session = get_session(table_id)
+def game_action(table_id: str, request: ActionRequest,
+                user: str = Depends(require_user)) -> dict:
+    session = get_session(table_id, user)
     try:
         session.hero_action(request.kind, request.amount)
     except ValueError as exc:
@@ -63,8 +103,8 @@ def game_action(table_id: str, request: ActionRequest) -> dict:
 
 
 @router.post("/game/{table_id}/next-hand", response_model=GameStateModel)
-def next_hand(table_id: str) -> dict:
-    session = get_session(table_id)
+def next_hand(table_id: str, user: str = Depends(require_user)) -> dict:
+    session = get_session(table_id, user)
     try:
         session.next_hand()
     except ValueError as exc:
@@ -73,8 +113,8 @@ def next_hand(table_id: str) -> dict:
 
 
 @router.post("/game/{table_id}/coach", response_model=CoachResponseModel)
-def coach_advice(table_id: str) -> dict:
-    session = get_session(table_id)
+def coach_advice(table_id: str, user: str = Depends(require_user)) -> dict:
+    session = get_session(table_id, user)
     try:
         return session.coach_advice()
     except ValueError as exc:
@@ -82,8 +122,8 @@ def coach_advice(table_id: str) -> dict:
 
 
 @router.post("/game/{table_id}/coach/compare")
-def coach_compare(table_id: str) -> dict:
-    result = get_session(table_id).grade_hero()
+def coach_compare(table_id: str, user: str = Depends(require_user)) -> dict:
+    result = get_session(table_id, user).grade_hero()
     if result is None:
         raise HTTPException(status_code=400, detail="hero has not acted yet")
     return result

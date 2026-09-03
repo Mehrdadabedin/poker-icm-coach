@@ -1,12 +1,16 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ActionHistory } from "../components/ActionHistory";
+import { HandResult } from "../components/HandResult";
 import { HandReview } from "../components/HandReview";
 import { HeroControls } from "../components/HeroControls";
+import { LoginForm } from "../components/LoginForm";
 import { PokerTable } from "../components/PokerTable";
+import { TableHeader } from "../components/TableHeader";
+import { TableSidebar } from "../components/TableSidebar";
+import { useAutoNext } from "../hooks/useAutoNext";
 import { useGame } from "../hooks/useGame";
 import { ActionKind, LegalAction } from "../models/game";
-import { coachAdvice, coachCompare } from "../services/api";
+import { clearAuth, coachAdvice, coachCompare, getToken, getUsername, logout } from "../services/api";
 
 interface CoachPanel {
   recommendedAction: string;
@@ -14,66 +18,19 @@ interface CoachPanel {
   detail: Record<string, string>;
 }
 
-const REVIEW_SECONDS = 7;
+const REVIEW_SECONDS = 30;
 
-/** Live table screen: backend state + hero controls + hand review flow. */
+/** Live table: compact result + optional Review the Hand (A10/A11/A16). */
 export function TablePage() {
   const { tableId = "" } = useParams();
   const navigate = useNavigate();
-  const { state, error, act, nextHand } = useGame(tableId);
+  const [authed, setAuthed] = useState<boolean>(() => !!getToken());
+  const [showReview, setShowReview] = useState(false);
+  const { state, error, act, nextHand, acting, refresh: refreshTable } = useGame(tableId);
+  const { countdown, paused, start, stop, pause, resume } = useAutoNext(nextHand, REVIEW_SECONDS);
   const [coach, setCoach] = useState<CoachPanel | null>(null);
   const [comparison, setComparison] = useState<Record<string, string> | null>(null);
-  const [countdown, setCountdown] = useState<number | null>(null);
-  const [paused, setPaused] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const nextHandRef = useRef(nextHand);
-  nextHandRef.current = nextHand;
 
-  const clearCountdown = useCallback(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    setCountdown(null);
-    setPaused(false);
-  }, []);
-
-  const startCountdown = useCallback(
-    (from = REVIEW_SECONDS) => {
-      if (timerRef.current) clearInterval(timerRef.current); // never two timers
-      let remaining = from;
-      setCountdown(remaining);
-      setPaused(false);
-      timerRef.current = setInterval(() => {
-        remaining -= 1;
-        if (remaining <= 0) {
-          if (timerRef.current) {
-            clearInterval(timerRef.current);
-            timerRef.current = null;
-          }
-          setCountdown(null);
-          void nextHandRef.current();
-        } else {
-          setCountdown(remaining);
-        }
-      }, 1000);
-    },
-    [],
-  );
-
-  const pauseNext = useCallback(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
-    setPaused(true);
-  }, []);
-
-  const continueNext = useCallback(() => {
-    startCountdown(countdown ?? REVIEW_SECONDS);
-  }, [countdown, startCountdown]);
-
-  // coach advice at hero decision points; keep it visible during hand review
   useEffect(() => {
     if (state?.waitingForHero) {
       coachAdvice(tableId)
@@ -84,15 +41,16 @@ export function TablePage() {
     }
   }, [state?.waitingForHero, state?.handNumber, state?.phase, tableId]);
 
-  // automatic next hand: start the review countdown when a hand completes
+  // Auto-next only on the table result state; review suspends it (A10/A16).
   useEffect(() => {
-    if (state?.phase === "handOver") {
-      startCountdown(REVIEW_SECONDS);
-    } else if (state?.phase === "playing") {
-      clearCountdown();
+    if (state?.phase === "handOver" && !showReview) {
+      start();
+    } else if (state?.phase !== "handOver") {
+      stop();
+      setShowReview(false);
     }
-    return () => clearCountdown();
-  }, [state?.phase, state?.handNumber, startCountdown, clearCountdown]);
+    return () => stop();
+  }, [state?.phase, state?.handNumber, showReview, start, stop]);
 
   const onAction = async (kind: string, amount?: number) => {
     const next = await act(kind, amount);
@@ -102,7 +60,34 @@ export function TablePage() {
     }
   };
 
+  const signOut = async () => {
+    try {
+      await logout();
+    } catch {
+      // token may already be revoked server-side; clear locally regardless
+    }
+    clearAuth();
+    navigate("/");
+  };
+
+  if (!authed) {
+    return (
+      <div className="page" data-testid="auth-gate">
+        <h1 className="screen-title">ICM MASTER</h1>
+        <LoginForm
+          onLogin={() => {
+            setAuthed(true);
+            void refreshTable();
+          }}
+        />
+      </div>
+    );
+  }
   if (error) {
+    if (error.startsWith("Authentication required")) {
+      clearAuth();
+      setAuthed(false);
+    }
     return <div className="error-box">API ERROR: {error}</div>;
   }
   if (!state) {
@@ -110,78 +95,69 @@ export function TablePage() {
   }
 
   const hero = state.players.find((p) => p.isHero);
-  const isReview = state.phase === "handOver" && !!state.review;
+  const handOver = state.phase === "handOver" && !!state.review;
+  const isReview = handOver && showReview;
+  const nameBySeat = new Map(state.players.map((pl) => [pl.seat, pl.name]));
 
   return (
     <div className="table-page" data-testid="table-page">
-      <div className="top-bar app-header" data-testid="app-header">
-        <h1 className="screen-title header-title" data-testid="app-title">ICM MASTER</h1>
-        <div className="header-right">
-          <button className="btn btn-small header-btn" onClick={() => navigate("/")} data-testid="home-btn">
-            HOME
-          </button>
-          <button
-            className={`btn btn-small header-icon-btn ${paused ? "header-icon-play" : ""}`}
-            onClick={paused ? continueNext : pauseNext}
-            disabled={!isReview}
-            title={paused ? "Resume automatic next hand" : "Pause automatic next hand"}
-            aria-label={paused ? "Resume automatic next hand" : "Pause automatic next hand"}
-            data-testid="pause-play"
-          >
-            {paused ? "▶" : "⏸"}
-          </button>
-        </div>
-      </div>
+      <TableHeader
+        state={state}
+        username={getUsername()}
+        paused={paused}
+        handOver={handOver}
+        isReview={isReview}
+        onHome={() => navigate("/")}
+        onLogout={() => void signOut()}
+        onTogglePause={paused ? resume : pause}
+      />
       {isReview && state.review ? (
         <HandReview
           review={state.review}
           coach={coach}
           comparison={comparison}
-          countdown={countdown}
-          paused={paused}
           totalPlayers={state.players.length}
-          nameBySeat={new Map(state.players.map((pl) => [pl.seat, pl.name]))}
+          nameBySeat={nameBySeat}
+          onBack={() => setShowReview(false)}
         />
       ) : (
         <>
           <PokerTable state={state}>
-            <HeroControls
-              legalActions={(state.legalActions ?? []) as LegalAction[]}
-              toCall={state.toCall}
-              pot={state.pot}
-              stack={hero?.stack ?? 0}
-              bigBlind={state.bigBlind}
-              disabled={!state.waitingForHero}
-              onAction={(kind: ActionKind, amount?: number) => void onAction(kind, amount)}
-            />
-            {comparison && (
+            {handOver && state.review ? (
+              <HandResult
+                review={state.review}
+                username={state.username}
+                onReview={() => setShowReview(true)}
+                onNext={() => void nextHand()}
+                countdown={countdown}
+                paused={paused}
+              />
+            ) : (
+              <HeroControls
+                legalActions={(state.legalActions ?? []) as LegalAction[]}
+                toCall={state.toCall}
+                pot={state.pot}
+                stack={hero?.stack ?? 0}
+                bigBlind={state.bigBlind}
+                disabled={!state.waitingForHero}
+                submitting={acting}
+                onAction={(kind: ActionKind, amount?: number) => void onAction(kind, amount)}
+              />
+            )}
+            {comparison && !handOver && (
               <div className="comparison-box" data-testid="comparison">
                 <b>{comparison.grade}</b> — {comparison.explanation}
               </div>
             )}
           </PokerTable>
-          <div className="table-cols">
-            <ActionHistory
+          {!handOver && (
+            <TableSidebar
               actions={state.actionLog ?? []}
               heroSeat={state.heroSeat}
-              nameBySeat={new Map(state.players.map((pl) => [pl.seat, pl.name]))}
+              nameBySeat={nameBySeat}
+              coach={coach}
             />
-            {coach && (
-              <div className="coach-panel table-side" data-testid="coach-panel">
-                <h3>ICM COACH</h3>
-                <div className="coach-recommendation">{coach.recommendedAction}</div>
-                <p>{coach.reasoning}</p>
-                <dl>
-                  {Object.entries(coach.detail).slice(0, 14).map(([k, v]) => (
-                    <div key={k} className="coach-row">
-                      <dt>{k}</dt>
-                      <dd>{v}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-            )}
-          </div>
+          )}
         </>
       )}
     </div>

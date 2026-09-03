@@ -3,13 +3,16 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.deps import bearer_token
+from app.api.routes_auth import router as auth_router
 from app.api.routes_game import _sessions
 from app.api.routes_game import router as game_router
 from app.api.routes_meta import router as meta_router
 from app.core.config import settings
+from app.services.auth import auth_store
 
 
 @asynccontextmanager
@@ -24,6 +27,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(auth_router)
 app.include_router(game_router)
 app.include_router(meta_router)
 
@@ -34,12 +38,21 @@ def health() -> dict:
 
 
 @app.websocket("/ws/table/{table_id}")
-async def table_ws(websocket: WebSocket, table_id: str) -> None:
-    """Push a fresh game-state snapshot after every state change."""
+async def table_ws(websocket: WebSocket, table_id: str,
+                   token: str | None = Query(default=None)) -> None:
+    """Push a fresh game-state snapshot after every state change.
+
+    Ownership check (A12): when the session is owned by a user, the caller
+    must present that user's bearer token (`?token=...`).
+    """
     await websocket.accept()
     session = _sessions.get(table_id)
     try:
         if session is None:
+            await websocket.send_json({"error": "table not found"})
+            return
+        owner = session.owner
+        if owner and auth_store.user_for_token(bearer_token(f"Bearer {token}")) != owner:
             await websocket.send_json({"error": "table not found"})
             return
         while True:

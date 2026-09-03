@@ -63,7 +63,7 @@ export function ActionHistory({ actions, heroSeat, nameBySeat }: ActionHistoryPr
                 <div key={i} className="history-line" data-testid={`history-${g.street}-${i}`}>
                   <span className="history-street-dot" />
                   <span className="history-actor">
-                    {a.seat === heroSeat ? <b className="history-hero">Hero</b> : <b>{seatName(a)}</b>}
+                    {a.seat === heroSeat ? <b className="history-hero">{nameBySeat.get(heroSeat) ?? "Hero"}</b> : <b>{seatName(a)}</b>}
                     {" — "}
                     <span className={`history-action history-action-${a.action}`}>
                       {ACTION_LABEL[a.action] ?? a.action}

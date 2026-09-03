@@ -1,8 +1,9 @@
 """Meta routes: hands, icm, statistics, settings."""
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 
+from app.api.deps import require_user
 from app.icm.icm_engine import ICMEngine
 from app.services.game_session import GameSession
 from app.services.statistics import aggregate
@@ -11,12 +12,16 @@ router = APIRouter(prefix="/api")
 
 
 @router.get("/game/{table_id}/hands")
-def list_hands(table_id: str, stage: str | None = None) -> dict:
-    session = _session_or_404(table_id)
+def list_hands(table_id: str, stage: str | None = None,
+               user: str = Depends(require_user)) -> dict:
+    session = _session_or_404(table_id, user)
     records = session.history.filter(stage=stage) if stage else session.history.all()
     return {"hands": [
         {
             "handNumber": r.hand_number,
+            "username": r.username,
+            "tableLabel": r.table_label,
+            "timestamp": r.timestamp,
             "heroPosition": r.hero_position,
             "pot": r.pot_total,
             "winnerSeats": r.winner_seats,
@@ -32,8 +37,8 @@ def list_hands(table_id: str, stage: str | None = None) -> dict:
 
 
 @router.get("/game/{table_id}/statistics")
-def session_statistics(table_id: str) -> dict:
-    session = _session_or_404(table_id)
+def session_statistics(table_id: str, user: str = Depends(require_user)) -> dict:
+    session = _session_or_404(table_id, user)
     stats = aggregate(session.history.all())
     return {
         "handsPlayed": stats.hands_played,
@@ -74,7 +79,7 @@ def get_settings() -> dict:
 
 
 @router.put("/settings")
-def put_settings(request: dict) -> dict:
+def put_settings(request: dict, _user: str = Depends(require_user)) -> dict:
     from app.core.tournament_settings import settings as tournament_settings
 
     allowed = {
@@ -91,20 +96,24 @@ def put_settings(request: dict) -> dict:
 
 
 @router.get("/active-table")
-def active_table() -> dict:
-    """The single active tournament table (most recent session)."""
+def active_table(user: str = Depends(require_user)) -> dict:
+    """The caller's most recent active tournament table (A05/A12)."""
     from app.api.routes_game import _sessions
 
-    if not _sessions:
-        return {"tableId": None}
-    last = list(_sessions.values())[-1]
-    return {"tableId": last.session_id}
+    owned = [s for s in _sessions.values() if s.owner == user and s.status == "active"]
+    if not owned:
+        return {"tableId": None, "tableLabel": None}
+    last = owned[-1]
+    return {"tableId": last.session_id, "tableLabel": last.table_label}
 
 
-def _session_or_404(table_id: str) -> GameSession:
+def _session_or_404(table_id: str, user: str) -> GameSession:
     from app.api.routes_game import _sessions
 
     try:
-        return _sessions[table_id]
+        session = _sessions[table_id]
     except KeyError as exc:
         raise HTTPException(status_code=404, detail="table not found") from exc
+    if session.owner != user:
+        raise HTTPException(status_code=404, detail="table not found")
+    return session

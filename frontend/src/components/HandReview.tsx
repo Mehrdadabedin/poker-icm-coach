@@ -15,15 +15,16 @@ interface HandReviewProps {
   review: ReviewData;
   coach: CoachPanel | null;
   comparison: Record<string, string> | null;
-  countdown: number | null;
-  paused: boolean;
   totalPlayers: number;
   nameBySeat: Map<number, string>;
+  onBack?: () => void;
 }
 
 /** Post-hand review ("Poker Hand History"): result, facts, showdown, actions,
- * bot explanations, coaching and auto-next countdown. Replaces the table. */
-export function HandReview({ review, coach, comparison, countdown, paused, totalPlayers, nameBySeat }: HandReviewProps) {
+ * bot explanations and coaching. Opens ONLY via "Review the Hand" (A10/A16);
+ * read-only — never mutates game state. Back to Table returns to the live
+ * table without advancing the hand. */
+export function HandReview({ review, coach, comparison, totalPlayers, nameBySeat, onBack }: HandReviewProps) {
   const [showCoach, setShowCoach] = useState(true);
   const net = review.heroNet;
 
@@ -161,14 +162,12 @@ export function HandReview({ review, coach, comparison, countdown, paused, total
       )}
 
       <div className="review-flow" data-testid="review-flow">
-        {paused ? (
-          <span className="flow-paused">PAUSED — study the hand</span>
-        ) : (
-          <span className="flow-countdown" data-testid="countdown">
-            NEXT HAND IN {countdown ?? "…"}
-          </span>
+        {onBack && (
+          <button className="btn btn-primary" onClick={onBack} data-testid="back-to-table-btn">
+            BACK TO TABLE
+          </button>
         )}
-        <span className="flow-hint">Use ⏸ / ▶ in the header to pause or resume</span>
+        <span className="flow-hint">Review is read-only — it never advances the hand or the clock.</span>
       </div>
     </div>
   );
