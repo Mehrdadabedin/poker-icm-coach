@@ -1,4 +1,4 @@
-import { Card, cardFace } from "../models/game";
+import { Card, cardAlt } from "../models/game";
 
 interface PlayingCardProps {
   card?: Card | null;
@@ -29,7 +29,7 @@ export function PlayingCard({ card, faceDown = false, className = "" }: PlayingC
   return (
     <img
       src={cardAssetUrl(card)}
-      alt={cardFace(card)}
+      alt={cardAlt(card)}
       className={`playing-card ${className}`.trim()}
       data-testid={`card-${card.rank}${card.suit}`}
       draggable={false}

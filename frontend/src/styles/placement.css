@@ -16,6 +16,9 @@
     font-size: 0.6rem;
     min-height: 46px;
   }
+  .seat.seat-hero {
+    width: 100px;
+  }
   .seat-bet {
     font-size: 0.55rem;
   }

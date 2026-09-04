@@ -10,18 +10,51 @@ import { sampleReview } from "../src/sampleState";
 
 const review = sampleReview();
 
-describe("A08 real card assets", () => {
-  it("maps every representative card to the correct local asset", () => {
-    const cases: Array<[string, string, string]> = [
-      ["A", "h", "Ah"], ["4", "c", "4c"], ["5", "c", "5c"],
-      ["J", "h", "Jh"], ["Q", "h", "Qh"], ["K", "h", "Kh"],
-      ["A", "s", "As"], ["9", "d", "9d"], ["T", "s", "Ts"],
+const ALL_RANKS = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"];
+const ALL_SUITS = ["s", "h", "d", "c"];
+
+describe("A08/A17 real card assets", () => {
+  const SUIT_WORDS: Record<string, string> = { s: "Spades", h: "Hearts", d: "Diamonds", c: "Clubs" };
+
+  it("maps every one of the 52 cards to the correct local asset", () => {
+    for (const rank of ALL_RANKS) {
+      for (const suit of ALL_SUITS) {
+        const { container } = render(<PlayingCard card={{ rank, suit } as never} />);
+        const img = container.querySelector("img");
+        expect(img?.getAttribute("src")).toMatch(new RegExp(`cards/${rank}${suit}\.svg$`));
+        expect(img?.getAttribute("alt")).toContain(SUIT_WORDS[suit]);
+        expect(img?.getAttribute("alt")).toBeTruthy();
+      }
+    }
+  });
+
+  it("all 52 card assets exist on disk (A17 asset-completeness)", async () => {
+    const fs = await import("node:fs");
+    const path = await import("node:path");
+    const dir = path.resolve(__dirname, "../public/cards");
+    for (const rank of ALL_RANKS) {
+      for (const suit of ALL_SUITS) {
+        const file = path.join(dir, `${rank}${suit}.svg`);
+        expect(fs.existsSync(file), `missing asset ${rank}${suit}.svg`).toBe(true);
+      }
+    }
+    expect(fs.existsSync(path.join(dir, "back.svg"))).toBe(true);
+  });
+
+  it("verifies the required A17 mapping cases: AS KH 8H 10D QC 2C", () => {
+    const cases: Array<[string, string, string, string]> = [
+      ["A", "s", "As", "Ace of Spades"],
+      ["K", "h", "Kh", "King of Hearts"],
+      ["8", "h", "8h", "8 of Hearts"],
+      ["T", "d", "Td", "10 of Diamonds"],
+      ["Q", "c", "Qc", "Queen of Clubs"],
+      ["2", "c", "2c", "2 of Clubs"],
     ];
-    for (const [rank, suit, file] of cases) {
+    for (const [rank, suit, file, expectedAlt] of cases) {
       const { container } = render(<PlayingCard card={{ rank, suit } as never} />);
       const img = container.querySelector("img");
       expect(img?.getAttribute("src")).toMatch(new RegExp(`cards/${file}\.svg$`));
-      expect(img?.getAttribute("alt")).toContain(rank);
+      expect(img?.getAttribute("alt")).toBe(expectedAlt);
     }
   });
 

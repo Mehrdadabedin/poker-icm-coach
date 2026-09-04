@@ -41,6 +41,16 @@ Main requested changes:
 | A13 | Regression tests | 🟢 | Backend 394 passed / 4 skipped; frontend 32 passed; new auth/isolation/label/history + card/result/review/login suites. |
 | A14 | Deployment verification | 🟢 | Deployed frontend reachable; deployed backend preflight 200 + ACAO on errors for Render origin (verified live). Redeploy of this branch required for auth endpoints; multi-browser check listed as remaining step. |
 | A15 | Documentation | 🟢 | progress.md (this file) + repo progress.md updated; .env.example/.gitignore updated. |
+| A16 | Optional hand review must not interrupt the live game | 🟢 | Implemented with A10: compact result stays on table; review opens only on click; return to table; pause/play intact. |
+| A17 | Professional playing-card assets (OpenDecks CC0) | 🟢 | Replaced generated placeholders with the 52-card OpenDecks CC0 deck (docs/card-assets.md, license bundled). Mapping layer scripts/import_opendecks_cards.py; hero seat container widened so 2×52px hole cards fit (no clip/overlap, desktop+tablet+mobile verified); semantic alt text; backend test_card_assets.py + frontend card tests. |
+| A18 | User registration | 🟡 | PLANNED — NOT IMPLEMENTED |
+| A19 | WebAuthn / passkey / biometric authentication | 🟡 | PLANNED — NOT IMPLEMENTED |
+| A20 | Header / user display refinement | 🟡 | PLANNED — NOT IMPLEMENTED |
+| A21 | Fixed player-card container refinement | 🟡 | PLANNED — NOT IMPLEMENTED |
+| A22 | Human-readable TABLE labels in Hand History | 🟡 | PLANNED — NOT IMPLEMENTED |
+| A23 | Hand History table dropdown | 🟡 | PLANNED — NOT IMPLEMENTED |
+| A24 | Hand History / review UX refinement | 🟡 | PLANNED — NOT IMPLEMENTED |
+| A25 | Regression/acceptance tests for future features | 🟡 | PLANNED — NOT IMPLEMENTED |
 
 ## Known evidence from the supplied screenshots
 
@@ -52,6 +62,24 @@ The current application shows a large `YOU WON`/`YOU LOST` result and then expos
 
 ### Current API error
 The browser console/network screenshots show a POST action request returning HTTP 400 and a CORS-related message around the compare endpoint. The implementation must inspect the actual response body and backend logs to identify the root cause instead of assuming the browser message alone is the complete diagnosis.
+
+### 2026-09-04 (A17 — professional playing-card assets)
+- Source verified: OpenDecks Public-Domain/CC0 deck (CC0 1.0 Universal, accredited
+  third-party sources all CC0/public domain); no PNGWing/unverified sources.
+- Installed all 52 standard cards (no jokers) + card back as local SVGs under
+  frontend/public/cards/; CC0 license text bundled (OPEN_DECKS_LICENSE.txt).
+- Created clean mapping layer app-id (rank+suit) -> OpenDecks file in
+  scripts/import_opendecks_cards.py; deterministic; validated 52/52.
+- Verified rendering pixel-level: hearts/diamonds red, spades/clubs black, court
+  cards render; aspect ratio preserved (1500x2100) via object-fit:contain.
+- Fixed player-card container: widened hero seat (120px desktop/tablet, 100px
+  mobile) so 2x52px hole cards fit; bot revealed cards 38px fit 92px seat;
+  measured desktop/tablet/mobile - no clipping, no overlap with name/chips.
+- Semantic alt text (e.g. "8 of Hearts", "Ace of Spades") added.
+- Tests: backend test_card_assets.py (4) + frontend A08/A17 suite (34 total)
+  + full backend/frontend regression (see notes below).
+- All future tasks (A18-A25) remain PLANNED / NOT IMPLEMENTED; no Google/
+  Facebook OAuth anywhere.
 
 ## Verification log
 

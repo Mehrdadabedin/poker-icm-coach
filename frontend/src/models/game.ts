@@ -144,6 +144,19 @@ export const cardColor = (suit: Suit): "red" | "black" =>
 
 export const cardFace = (card: Card): string => `${card.rank}${cardSymbol[card.suit]}`;
 
+// Semantic full-word names for accessibility (A17 professional cards).
+// 8 + h => "8 of Hearts"; A + s => "Ace of Spades"; T + d => "10 of Diamonds".
+export const RANK_WORD: Record<string, string> = {
+  A: "Ace", K: "King", Q: "Queen", J: "Jack", T: "10",
+  "9": "9", "8": "8", "7": "7", "6": "6", "5": "5", "4": "4", "3": "3", "2": "2",
+};
+export const SUIT_WORD: Record<Suit, string> = {
+  s: "Spades", h: "Hearts", d: "Diamonds", c: "Clubs",
+};
+
+export const cardAlt = (card: Card): string =>
+  `${RANK_WORD[card.rank] ?? card.rank} of ${SUIT_WORD[card.suit]}`;
+
 export function formatChips(value: number): string {
   return value.toLocaleString("en-US");
 }

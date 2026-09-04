@@ -22,6 +22,12 @@
   outline: 2px solid #4f9dff;
 }
 
+/* A17: widen the hero seat so two professional 52px hole cards fit without
+   overflowing into neighbours (placement.css .seat rules are lower specificity). */
+.seat.seat-hero {
+  width: 120px;
+}
+
 .seat-folded {
   opacity: 0.45;
 }

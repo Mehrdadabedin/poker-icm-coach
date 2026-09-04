@@ -18,9 +18,10 @@
   width: 28px;
 }
 
-/* Seat cards: hero hole cards are the visual priority (A09) */
+/* Seat cards: hero hole cards are the visual priority (A09/A17).
+   Bot revealed cards are 38px so two always fit the 92px seat. */
 .seat-cards .playing-card {
-  width: 42px;
+  width: 38px;
 }
 
 .seat-cards.hero-cards .playing-card {

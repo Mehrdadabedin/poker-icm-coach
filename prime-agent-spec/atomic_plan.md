@@ -306,3 +306,70 @@ Make this an incremental modification of the existing project. Before coding, ma
 - [ ] Test WON, LOST, and CHOPPED outcomes.
 - [ ] Test several consecutive hands without opening review.
 - [ ] Test review → return to table → continue playing.
+
+
+## A17 — Professional playing-card assets (OpenDecks CC0)
+- Replace the generated placeholder card SVGs with the professional 52-card
+  OpenDecks deck (public domain / CC0).
+- Source: `https://github.com/AustinGabriel/OpenDecks-Public-Domain-and-CC0-Playing-Cards`
+- Verify and document the CC0 license.
+- Install all 52 standard cards as local SVG assets (no jokers) plus the card back.
+- Create a small, clean mapping layer: app card identifier (rank+suit) -> OpenDecks asset.
+- Do NOT change card identifiers, deck/shuffle/dealing logic, poker rules, game
+  state, authentication, session isolation, ICM, hand history, review, or pause/play.
+- Display the cards at the existing table size: professional + clear + correctly
+  fitted; do NOT enlarge cards unnecessarily.
+- Ensure the two player hole cards fit their container: no clipping/distortion/
+  overlap; desktop and responsive/mobile both work.
+- Test all 52 assets exist; explicitly verify AS, KH, 8H, 10D, QC, 2C map to the
+  correct local assets.
+- Run the full backend + frontend regression suites.
+
+## A18 — User registration (PLANNED — NOT IMPLEMENTED)
+- Clear REGISTER option for first-time users; registration with username, email,
+  password; registered users log in with those credentials.
+- Existing A02-A15 login/logout stays intact; username continues to replace
+  "Hero"; credentials stored securely; logout clears the session; users stay
+  isolated. DO NOT IMPLEMENT NOW.
+
+## A19 — WebAuthn / passkey / biometric authentication (PLANNED — NOT IMPLEMENTED)
+- Optional passkey/WebAuthn auth on supported mobile/desktop platforms.
+- Raw biometric data (fingerprint / Face ID) is never accessed or stored; the
+  platform credential authenticates the user.
+- Existing username/password login remains available; secure session persistence
+  remains. DO NOT IMPLEMENT NOW.
+
+## A20 — Header / user display refinement (PLANNED — NOT IMPLEMENTED)
+- "ICM MASTER" stays top-left; "Playing as [username]" moves to the right side of
+  the header; LOG OUT stays beside the username; user/logout controls become
+  smaller compact rectangular buttons; responsive layout preserved.
+  DO NOT IMPLEMENT NOW.
+
+## A21 — Fixed player-card container refinement (PLANNED — NOT IMPLEMENTED)
+- Follow-up polish of the player hole-card container beyond the A17 minimum fit
+  guarantee (sizing/spacing/responsive refinement). DO NOT IMPLEMENT NOW.
+
+## A22 — Human-readable TABLE labels in Hand History (PLANNED — NOT IMPLEMENTED)
+- Display human-readable labels (TABLE A, TABLE B, TABLE C) instead of raw
+  internal session ids; the unique internal id stays the source of truth and is
+  not replaced. DO NOT IMPLEMENT NOW.
+
+## A23 — Hand History table dropdown (PLANNED — NOT IMPLEMENTED)
+- Table selector/dropdown letting the user pick TABLE A/B/C; shows only that
+  user's hands from that table; tables and users stay isolated; internal ids
+  intact. DO NOT IMPLEMENT NOW.
+
+## A24 — Hand History / review UX refinement (PLANNED — NOT IMPLEMENTED)
+- Show authenticated username and selected table label; easy switching between
+  the user's own tables; correct hands; no cross-user history; Review the Hand
+  opens the correct hand; Back to Table returns to the same session; gameplay
+  continues; pause/play correct. DO NOT IMPLEMENT NOW.
+
+## A25 — Regression/acceptance tests for future features (PLANNED — NOT IMPLEMENTED)
+- Tests for registration, passkey auth, header refinement, table labels,
+  Hand History dropdown, and review UX once those features are implemented.
+  DO NOT IMPLEMENT NOW.
+
+---
+NOTE: Google authentication, Facebook authentication, and Google/Facebook OAuth
+are intentionally OUT OF SCOPE and must not be added to this plan or the app.
