@@ -6,19 +6,20 @@ interface PlayingCardProps {
   className?: string;
 }
 
-/** Renders a real playing-card image asset (A08). 52 SVG cards + a card
- * back are bundled locally in /public/cards — no remote URLs, no emoji, no
- * plain-text cards. The card identity comes from {rank,suit} in game state,
- * mapped deterministically to the matching asset file. */
+/** Renders a real playing-card image asset (A17, OpenDecks CC0). The full
+ * 52-card deck is bundled locally in /public/cards in PNG and SVG; the
+ * production renderer uses the PNG assets (crisp at any display size) —
+ * no remote URLs, no emoji, no plain-text cards. The card identity comes
+ * from {rank,suit} in game state, mapped deterministically to the file. */
 export function cardAssetUrl(card: Card): string {
-  return `${import.meta.env.BASE_URL}cards/${card.rank}${card.suit}.svg`;
+  return `${import.meta.env.BASE_URL}cards/${card.rank}${card.suit}.png`;
 }
 
 export function PlayingCard({ card, faceDown = false, className = "" }: PlayingCardProps) {
   if (faceDown || !card) {
     return (
       <img
-        src={`${import.meta.env.BASE_URL}cards/back.svg`}
+        src={`${import.meta.env.BASE_URL}cards/back.png`}
         alt="face down card"
         className={`playing-card ${className}`.trim()}
         data-testid="card-back"

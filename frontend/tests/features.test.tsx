@@ -16,29 +16,31 @@ const ALL_SUITS = ["s", "h", "d", "c"];
 describe("A08/A17 real card assets", () => {
   const SUIT_WORDS: Record<string, string> = { s: "Spades", h: "Hearts", d: "Diamonds", c: "Clubs" };
 
-  it("maps every one of the 52 cards to the correct local asset", () => {
+  it("maps every one of the 52 cards to the correct local PNG asset (renderer)", () => {
     for (const rank of ALL_RANKS) {
       for (const suit of ALL_SUITS) {
         const { container } = render(<PlayingCard card={{ rank, suit } as never} />);
         const img = container.querySelector("img");
-        expect(img?.getAttribute("src")).toMatch(new RegExp(`cards/${rank}${suit}\.svg$`));
+        expect(img?.getAttribute("src")).toMatch(new RegExp(`cards/${rank}${suit}\.png$`));
         expect(img?.getAttribute("alt")).toContain(SUIT_WORDS[suit]);
         expect(img?.getAttribute("alt")).toBeTruthy();
       }
     }
   });
 
-  it("all 52 card assets exist on disk (A17 asset-completeness)", async () => {
+  it("all 52 PNG + 52 SVG card assets exist on disk (A17)", async () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
     const dir = path.resolve(__dirname, "../public/cards");
-    for (const rank of ALL_RANKS) {
-      for (const suit of ALL_SUITS) {
-        const file = path.join(dir, `${rank}${suit}.svg`);
-        expect(fs.existsSync(file), `missing asset ${rank}${suit}.svg`).toBe(true);
+    for (const format of ["png", "svg"]) {
+      for (const rank of ALL_RANKS) {
+        for (const suit of ALL_SUITS) {
+          const file = path.join(dir, `${rank}${suit}.${format}`);
+          expect(fs.existsSync(file), `missing asset ${rank}${suit}.${format}`).toBe(true);
+        }
       }
+      expect(fs.existsSync(path.join(dir, `back.${format}`))).toBe(true);
     }
-    expect(fs.existsSync(path.join(dir, "back.svg"))).toBe(true);
   });
 
   it("verifies the required A17 mapping cases: AS KH 8H 10D QC 2C", () => {
@@ -53,14 +55,14 @@ describe("A08/A17 real card assets", () => {
     for (const [rank, suit, file, expectedAlt] of cases) {
       const { container } = render(<PlayingCard card={{ rank, suit } as never} />);
       const img = container.querySelector("img");
-      expect(img?.getAttribute("src")).toMatch(new RegExp(`cards/${file}\.svg$`));
+      expect(img?.getAttribute("src")).toMatch(new RegExp(`cards/${file}\.png$`));
       expect(img?.getAttribute("alt")).toBe(expectedAlt);
     }
   });
 
-  it("renders the card back for face-down cards", () => {
+  it("renders the card back for face-down cards (PNG)", () => {
     const { container } = render(<PlayingCard faceDown />);
-    expect(container.querySelector("img")?.getAttribute("src")).toMatch(/back\.svg$/);
+    expect(container.querySelector("img")?.getAttribute("src")).toMatch(/back\.png$/);
   });
 });
 

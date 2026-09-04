@@ -8,9 +8,15 @@ The card face artwork is the **Public Domain Deck / OpenDecks** set:
 - Contains all 52 standard poker cards + 2 jokers + card backs, as SVG and PNG.
 
 This project installs only the **52 standard poker cards** (Ace through King in
-Spades, Hearts, Diamonds, Clubs) and one card back, as **local SVG files** under
-`frontend/public/cards/`. No jokers are installed; the poker game does not use
-jokers.
+Spades, Hearts, Diamonds, Clubs) and one card back, in BOTH local formats
+(**PNG** and **SVG**) under `frontend/public/cards/`. No jokers are installed;
+the poker game does not use jokers.
+
+The production frontend renderer uses the **PNG** set
+(`PlayingCard` resolves `cards/<rank><suit>.png` and `cards/back.png`); the SVG
+set is retained in the same asset directory as the source-of-truth vector
+form. Both sets are served locally by the built application — no runtime URL
+or CDN dependency.
 
 ## License verification (CC0 / public domain)
 
@@ -36,27 +42,31 @@ The application already identifies a card by `rank` + `suit`:
 | rank: 2-9, T, J, Q, K, A | 2-9, Ten, Jack, Queen, King, Ace |
 | suit: c, d, h, s | Clubs, Diamonds, Hearts, Spades |
 
-OpenDecks files use the form `<rank> of <suit>.svg`, e.g. `8 of hearts.svg`.
-The mapping layer in `scripts/import_opendecks_cards.py` converts every app
-identifier to the correct OpenDecks asset and copies it into
-`frontend/public/cards/<rank><suit>.svg`, e.g.:
+OpenDecks files use the form `<rank> of <suit>.svg` / `.png`, e.g.
+`8 of hearts.png`. The mapping layer in
+`scripts/import_opendecks_cards.py` converts every app identifier to the correct
+OpenDecks asset and copies it into `frontend/public/cards/<rank><suit>.<ext>`
+for both `svg` and `png`, e.g.:
 
-| App id | OpenDecks source | Installed file |
+| App id | OpenDecks source | Installed file (PNG, same base-name SVG also installed) |
 |---|---|---|
-| 8H | `hearts/8 of hearts.svg` | `frontend/public/cards/8h.svg` |
-| AS | `spades/ace of spades.svg` | `frontend/public/cards/As.svg` |
-| KH | `hearts/king of hearts.svg` | `frontend/public/cards/Kh.svg` |
-| 10D | `diamonds/10 of diamonds.svg` | `frontend/public/cards/Td.svg` |
-| QC | `clubs/queen of clubs.svg` | `frontend/public/cards/Qc.svg` |
-| 2C | `clubs/2 of clubs.svg` | `frontend/public/cards/2c.svg` |
+| 8H | `hearts/8 of hearts.png` | `frontend/public/cards/8h.png` |
+| AS | `spades/ace of spades.png` | `frontend/public/cards/As.png` |
+| KH | `hearts/king of hearts.png` | `frontend/public/cards/Kh.png` |
+| 10D | `diamonds/10 of diamonds.png` | `frontend/public/cards/Td.png` |
+| QC | `clubs/queen of clubs.png` | `frontend/public/cards/Qc.png` |
+| 2C | `clubs/2 of clubs.png` | `frontend/public/cards/2c.png` |
 
-The mapping is deterministic and complete: all 52 ranks x suits. The runtime
-component (`PlayingCard`) continues to resolve `cards/<rank><suit>.svg`; no
-runtime URL or remote dependency is used.
+The mapping is deterministic and complete: all 52 ranks x suits for both
+formats. The runtime component (`PlayingCard`) resolves `cards/<rank><suit>.png`;
+no runtime URL or remote dependency is used.
 
 ## Installed assets
 
-- 52 card-face SVGs + 1 card back (`back.svg`, from OpenDecks `card back blue.svg`).
+- 52 card-face PNGs + 1 card back PNG (`back.png`, from OpenDecks
+  `card back blue.png`) — used by the production renderer.
+- 52 card-face SVGs + 1 card back SVG (`back.svg`, same OpenDecks source) —
+  retained as the vector source of truth in the same asset directory.
 - Assets are served locally by the built frontend (`vite` copies `public/` into
   `dist/`).
 

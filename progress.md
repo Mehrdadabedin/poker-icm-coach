@@ -260,3 +260,14 @@ Files changed (frontend): src/services/api.ts, src/pages/*, src/components/*
 HeroControls, HandReview, ActionHistory, PokerSeat, PokerTable),
 src/hooks/useAutoNext.ts (new), src/styles/cards.css (new),
 public/cards/* (53 generated SVGs), tests/* (features, login), scripts/generate_cards.py (new).
+
+
+### A17 follow-up — OpenDecks PNG card bundle (committed locally)
+- Complete OpenDecks PNG deck added: 52 card faces + back.png in
+  frontend/public/cards/ (1500x2100, unmodified CC0 source, no resampling).
+- PlayingCard renderer now serves PNG assets; SVG set retained alongside.
+- Deck + mapping verified (backend test_card_assets 6 tests; frontend A08/A17
+  suite; pixel render checks for all four suits, low/10/face/ace, 8H, back).
+- Full regression: backend 400 passed / 4 skipped; frontend 34 passed; tsc,
+  build, GitHub audit green.
+- Only card-asset/presentation/docs changed; poker/ICM/auth/session untouched.

@@ -42,7 +42,7 @@ Main requested changes:
 | A14 | Deployment verification | 🟢 | Deployed frontend reachable; deployed backend preflight 200 + ACAO on errors for Render origin (verified live). Redeploy of this branch required for auth endpoints; multi-browser check listed as remaining step. |
 | A15 | Documentation | 🟢 | progress.md (this file) + repo progress.md updated; .env.example/.gitignore updated. |
 | A16 | Optional hand review must not interrupt the live game | 🟢 | Implemented with A10: compact result stays on table; review opens only on click; return to table; pause/play intact. |
-| A17 | Professional playing-card assets (OpenDecks CC0) | 🟢 | Replaced generated placeholders with the 52-card OpenDecks CC0 deck (docs/card-assets.md, license bundled). Mapping layer scripts/import_opendecks_cards.py; hero seat container widened so 2×52px hole cards fit (no clip/overlap, desktop+tablet+mobile verified); semantic alt text; backend test_card_assets.py + frontend card tests. |
+| A17 | Professional playing-card assets (OpenDecks CC0) | 🟢 | OpenDecks 52-card deck installed locally in BOTH PNG and SVG (frontend/public/cards/); production renderer now uses the PNG set (cards/<rank><suit>.png + back.png); CC0 license bundled; mapping layer scripts/import_opendecks_cards.py (validates 52/52 per format); hero seat container fit verified (no clip/overlap, desktop/tablet/mobile); semantic alt text; backend test_card_assets.py (6) + frontend A08/A17 suite. |
 | A18 | User registration | 🟡 | PLANNED — NOT IMPLEMENTED |
 | A19 | WebAuthn / passkey / biometric authentication | 🟡 | PLANNED — NOT IMPLEMENTED |
 | A20 | Header / user display refinement | 🟡 | PLANNED — NOT IMPLEMENTED |
@@ -80,6 +80,22 @@ The browser console/network screenshots show a POST action request returning HTT
   + full backend/frontend regression (see notes below).
 - All future tasks (A18-A25) remain PLANNED / NOT IMPLEMENTED; no Google/
   Facebook OAuth anywhere.
+
+### 2026-09-04 (A17 follow-up — PNG asset bundle)
+- Bundled the complete OpenDecks PNG deck locally: 52 card faces (AS..2C x s/h/d/c)
+  + back.png, unmodified 1500x2100 from the CC0 source (no resampling), into the
+  existing frontend/public/cards/ asset directory. SVG set retained as the vector
+  source of truth (no second card system).
+- Production renderer (PlayingCard) now serves the PNG assets for every card and
+  the card back; deterministic rank+suit mapping unchanged.
+- Pixel-verified rendered artwork: hearts/diamonds red (exact OpenDecks red
+  205,32,38 present on 8H/KH/TD/AH), spades/clubs black; 21/21 images loaded with
+  zero broken URLs in the felt replica; hero hole cards fit container on
+  desktop/tablet/mobile; card proportions 1500x2100 preserved (PNG IHDR test).
+- Full regression green: backend 400 passed / 4 skipped (incl. test_card_assets 6);
+  frontend 34 passed; tsc/build/audit clean; dist contains 53 PNG + 53 SVG.
+- No poker/ICM/game/auth/session logic touched. A18-A25 remain PLANNED / NOT
+  IMPLEMENTED; no OAuth anywhere.
 
 ## Verification log
 
