@@ -4,7 +4,7 @@ from __future__ import annotations
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.services.auth import auth_registry
+from app.services.auth import auth_registry, auth_store
 
 TEST_PASSWORD = "test-pass-1234"
 
@@ -12,6 +12,7 @@ TEST_PASSWORD = "test-pass-1234"
 # collection time, before the autouse conftest fixture resets paths. Force the
 # user registry to pure in-memory mode as soon as the helpers are imported.
 auth_registry.bind_path("")
+auth_store.bind_path("")
 
 
 def register_user(username: str, password: str = TEST_PASSWORD) -> None:

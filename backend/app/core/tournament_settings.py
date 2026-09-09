@@ -15,6 +15,9 @@ class TournamentSettings:
     starting_big_blind: int = 100
     blind_level_minutes: int = 20
     fast_mode: bool = False
+    # A18/Phase 7: reusable button/result label enable-disable preference
+    show_action_labels: bool = True
+    show_result_labels: bool = True
 
     def to_dict(self) -> dict:
         return {
@@ -23,6 +26,8 @@ class TournamentSettings:
             "startingBigBlind": self.starting_big_blind,
             "blindLevelMinutes": self.blind_level_minutes,
             "fastMode": self.fast_mode,
+            "showActionLabels": self.show_action_labels,
+            "showResultLabels": self.show_result_labels,
         }
 
     def update(self, **kwargs) -> None:

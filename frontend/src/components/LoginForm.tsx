@@ -78,14 +78,13 @@ export function LoginForm({ onLogin }: LoginFormProps) {
     }
     setBusy(true);
     try {
-      await register(name, password);
-      setNotice(
-        `Account "${name.trim()}" created. You can now sign in with your username and password.`,
-      );
-      setName(name.trim());
-      setPassword("");
-      setConfirm("");
-      setMode("signin");
+      const created = await register(name, password);
+      // A18: signup authorizes the new account immediately (backend returns a
+      // session token), so the user enters the app without a second sign-in.
+      const normalized = created.username.length ? created.username : name.trim();
+      saveAuth(created.token, normalized);
+      setNotice(`Account "${normalized}" created. You are now signed in.`);
+      onLogin(normalized);
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -117,11 +116,11 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         </button>
       </div>
 
-      <h2>{mode === "signin" ? "SIGN IN" : "CREATE ACCOUNT"}</h2>
+      <h2>{mode === "signin" ? "WELCOME BACK" : "CREATE YOUR ACCOUNT"}</h2>
       <p className="note">
         {mode === "signin"
           ? "Sign in to continue to your private practice table."
-          : "New here? Create an account, then sign in."}
+          : "Register once, then you are signed in automatically."}
       </p>
 
       <input

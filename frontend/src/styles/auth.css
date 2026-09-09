@@ -1,5 +1,4 @@
 /* A18 authentication entry (SIGN IN / SIGN UP) — used only by LoginForm. */
-
 .login-panel {
   display: flex;
   flex-direction: column;
@@ -30,27 +29,43 @@
   font-size: 0.95rem;
 }
 
-/* SIGN IN / SIGN UP switch — gold compact rectangular buttons */
+/* Phase 2: SIGN IN / SIGN UP as two compact rectangular controls.
+   Blue (project .btn-primary tone) instead of the gold used before, matching
+   the app's primary button colour; small and consistent. */
 .auth-mode-switch {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
 .auth-mode-switch .btn {
-  min-height: 36px;
-  font-size: 0.85rem;
-  padding: 4px 18px;
+  min-height: 32px;
+  min-width: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 6px;
+  flex: 1 1 auto;
+  background: #1565c0;
+  color: #fff;
 }
 
 .auth-mode-switch .btn.active {
-  outline: 2px solid var(--accent);
-  box-shadow: 0 0 0 2px rgba(242, 193, 78, 0.35);
+  background: #0d47a1;
+  outline: 2px solid #90caf9;
+  box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.35);
 }
 
-/* Keep the auth primary button gold like the rest of the app's buttons */
+/* Accessible focus for the keyboard */
+.auth-mode-switch .btn:focus-visible,
+.login-panel button:focus-visible {
+  outline: 2px solid #90caf9;
+  outline-offset: 1px;
+}
+
+/* Primary submit uses the same blue family as the mode controls */
 .login-panel .btn-primary {
-  background: var(--accent);
-  color: #241c05;
+  background: #1565c0;
+  color: #fff;
 }
 
 .auth-switch-link {
@@ -61,7 +76,7 @@
 
 .auth-switch-link:hover {
   color: var(--text);
-  border-color: var(--accent);
+  border-color: #90caf9;
 }
 
 .success-box {

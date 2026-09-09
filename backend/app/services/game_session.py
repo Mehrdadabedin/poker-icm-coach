@@ -119,7 +119,7 @@ class GameSession:
         level = self.tournament.current_blind_level()
         req = CoachRequest(
             hero=list(hero.hole_cards),
-            position=position_for(self.tournament.button, self.hero_seat, 9),
+            position=position_for(self.tournament.button, self.hero_seat, len(self.tournament.players)),
             stack=hero.stack, big_blind=level.big, small_blind=level.small,
             ante=self.tournament.structure.ante_for(self.tournament.ante_mode, level),
             pot=sum(p.bet_total for p in self.tournament.players),
@@ -184,7 +184,7 @@ class GameSession:
         record = HandHistoryRecord(
             hand_number=result.hand_number,
             hero_cards=list(hero.hole_cards),
-            hero_position=position_for(self.tournament.button, self.hero_seat, 9),
+            hero_position=position_for(self.tournament.button, self.hero_seat, len(self.tournament.players)),
             community_cards=list(result.community_cards),
             starting_stack=start, ending_stack=hero.stack,
             blind_level=f"{level.small}/{level.big}",

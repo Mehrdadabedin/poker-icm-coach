@@ -9,6 +9,9 @@ interface HeroControlsProps {
   bigBlind: number;
   disabled: boolean;
   submitting?: boolean;
+  /** Phase 7: when false, action buttons show a glyph instead of the text
+   * label (always accessible via aria-label/title). */
+  showLabels?: boolean;
   onAction: (kind: ActionKind, amount?: number) => void;
 }
 
@@ -21,6 +24,7 @@ export function HeroControls({
   bigBlind,
   disabled,
   submitting = false,
+  showLabels = true,
   onAction,
 }: HeroControlsProps) {
   const [sizing, setSizing] = useState<ActionKind | null>(null);
@@ -35,6 +39,12 @@ export function HeroControls({
   const callKind: ActionKind = toCall > 0 ? "call" : "check";
   const callLabel =
     callKind === "call" ? `CALL ${formatChips(toCall)}` : "CHECK";
+
+  // Phase 7: single reusable label mechanism — glyphs with accessible text.
+  const GLYPH: Record<string, string> = {
+    fold: "\u2715", check: "\u2713", call: "\u25b2",
+    bet: "\u25cf", raise: "\u2b08", all_in: "\u2605",
+  };
 
   const openSizing = (kind: ActionKind) => {
     const m = meta(kind);
@@ -66,32 +76,54 @@ export function HeroControls({
         )}
       </div>
       <div className="controls-row">
-        <button className="btn btn-fold" disabled={acting} onClick={() => onAction("fold")}>
-          FOLD
+        <button
+          className="btn btn-fold"
+          disabled={acting}
+          aria-label="Fold"
+          title="Fold"
+          onClick={() => onAction("fold")}
+        >
+          {showLabels ? "FOLD" : GLYPH.fold}
         </button>
         <button
           className="btn btn-call"
           disabled={acting || !has(callKind)}
+          aria-label={callKind === "call" ? `Call ${formatChips(toCall)}` : "Check"}
+          title={callKind === "call" ? `Call ${formatChips(toCall)}` : "Check"}
           onClick={() => onAction(callKind, callKind === "call" ? toCall : undefined)}
         >
-          {callLabel}
+          {showLabels ? callLabel : GLYPH[callKind]}
         </button>
         {has("bet") && (
-          <button className="btn" disabled={acting} onClick={() => openSizing("bet")}>
-            BET
+          <button
+            className="btn"
+            disabled={acting}
+            aria-label="Bet"
+            title="Bet"
+            onClick={() => openSizing("bet")}
+          >
+            {showLabels ? "BET" : GLYPH.bet}
           </button>
         )}
         {has("raise") && (
-          <button className="btn" disabled={acting} onClick={() => openSizing("raise")}>
-            RAISE
+          <button
+            className="btn"
+            disabled={acting}
+            aria-label="Raise"
+            title="Raise"
+            onClick={() => openSizing("raise")}
+          >
+            {showLabels ? "RAISE" : GLYPH.raise}
           </button>
         )}
         <button
           className="btn btn-allin"
           disabled={acting}
+          aria-label="All-in"
+          title="All-in"
           onClick={() => onAction("all_in", stack)}
         >
-          ALL-IN
+          {showLabels ? "ALL-IN" : GLYPH.all_in}
         </button>
       </div>
       {sizing && (

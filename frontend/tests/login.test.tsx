@@ -19,7 +19,11 @@ vi.mock("../src/services/api", () => ({
     localStorage.removeItem("icm_auth_token");
     localStorage.removeItem("icm_username");
   }),
-  register: vi.fn(async (username: string) => ({ username, registered: true })),
+  register: vi.fn(async (username: string) => ({
+    username,
+    registered: true,
+    token: "reg-token-1",
+  })),
   login: vi.fn(async (username: string) => {
     if (username === "baduser") {
       throw new Error("invalid username or password");
@@ -57,12 +61,12 @@ describe("A18 registration-first authentication", () => {
     expect(screen.getByTestId("mode-signin")).toHaveTextContent("SIGN IN");
     expect(screen.getByTestId("mode-signup")).toHaveTextContent("SIGN UP");
     // sign-in mode is default, with username + password fields
-    expect(screen.getByRole("heading", { name: /sign in/i })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /welcome back/i })).toBeInTheDocument();
     expect(screen.getByTestId("username-input")).toBeInTheDocument();
     expect(screen.getByTestId("password-input")).toBeInTheDocument();
   });
 
-  it("registers a new user with validation, then allows sign in", async () => {
+  it("registers a new user with validation and authorizes the account", async () => {
     await openForm();
     // switch to SIGN UP
     fireEvent.click(screen.getByTestId("mode-signup"));
@@ -89,14 +93,15 @@ describe("A18 registration-first authentication", () => {
     fireEvent.click(screen.getByTestId("auth-submit"));
     expect(screen.getByTestId("auth-error")).toHaveTextContent("Passwords do not match.");
 
-    // 4) valid registration -> success message + switch to SIGN IN
+    // 4) valid registration -> success + immediately authorized (Phase 1 fix)
     fireEvent.change(screen.getByTestId("confirm-password-input"), { target: { value: "abcdef12" } });
     fireEvent.click(screen.getByTestId("auth-submit"));
     await waitFor(() => {
       expect(screen.getByTestId("auth-success")).toHaveTextContent("Account \"Jane\" created");
     });
-    // back on the sign-in screen with the username filled in
-    expect(screen.getByTestId("mode-signin")).toBeInTheDocument();
+    // the new account is authorized right away: token stored + onLogin fired
+    expect(localStorage.getItem("icm_auth_token")).toBe("reg-token-1");
+    expect(localStorage.getItem("icm_username")).toBe("Jane");
   });
 
   it("signs in a registered user and stores token + username", async () => {

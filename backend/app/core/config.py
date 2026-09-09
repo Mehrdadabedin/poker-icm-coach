@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     fast_mode: bool = False
     history_dir: str = "data/history"
     auth_users_file: str = "data/users.json"
+    auth_sessions_file: str = "data/sessions.json"
 
     @property
     def cors_origin_list(self) -> list[str]:

@@ -113,7 +113,7 @@ def build_review(session) -> dict | None:
         "heroSeat": hero, "heroCards": [card_model(c) for c in result.hole_cards.get(hero, [])],
         "heroStart": hero_start, "heroEnd": hero_end,
         "heroNet": hero_end - hero_start, "heroWon": hero_won, "chop": chop,
-        "heroPosition": position_for(result.button, hero, 9),
+        "heroPosition": position_for(result.button, hero, len(players)),
         "heroRankBefore": rb.index(hero_start) + 1, "heroRankAfter": ra.index(hero_end) + 1,
         "winners": winners, "foldedSeats": list(result.folded), "allInSeats": all_in,
         "showdown": showdown, "actions": actions,

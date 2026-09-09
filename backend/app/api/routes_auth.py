@@ -25,20 +25,24 @@ class LoginRequest(BaseModel):
     password: str = Field(min_length=1, max_length=128)
 
 
-# Bind the shared user registry to the configured persistence file (blank
-# disables file persistence, e.g. in the hermetic test suite).
+# Bind the shared user registry + session store to the configured persistence
+# files (blank disables file persistence, e.g. in the hermetic test suite).
 auth_registry.bind_path(settings.auth_users_file)
+auth_store.bind_path(settings.auth_sessions_file)
 
 
 @router.post("/register")
 def register(request: RegisterRequest) -> dict:
-    """Register a new user (A18). Passwords are hashed, never stored/logged in
-    plaintext. The user must then sign in with their credentials."""
+    """Register a new user and authorize them immediately (A18).
+    Passwords are hashed, never stored/logged in plaintext. The returned token
+    is a valid session for the new account, so the user can enter the private
+    table right away without a second sign-in."""
     try:
         username = auth_registry.register(request.username, request.password)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
-    return {"username": username, "registered": True}
+    token = auth_store.login(username)
+    return {"username": username, "registered": True, "token": token}
 
 
 @router.post("/login")

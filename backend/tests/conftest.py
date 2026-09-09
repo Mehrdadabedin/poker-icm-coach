@@ -4,7 +4,7 @@ from __future__ import annotations
 import pytest
 
 from app.core.config import settings
-from app.services.auth import auth_registry
+from app.services.auth import auth_registry, auth_store
 
 
 @pytest.fixture(autouse=True)
@@ -17,5 +17,7 @@ def _disable_runtime_files_for_tests() -> None:
     """
     settings.history_dir = ""
     settings.auth_users_file = ""
+    settings.auth_sessions_file = ""
     auth_registry.bind_path("")
+    auth_store.bind_path("")
     yield

@@ -36,7 +36,6 @@ USERNAME_RE = re.compile(r"^[A-Za-z0-9_\- ]{2,24}$")
 MIN_PASSWORD_LENGTH = 8
 _PBKDF2_ROUNDS = 200_000
 
-
 def normalize_username(raw: str) -> str:
     """Trim, collapse spaces and validate a username."""
     name = " ".join((raw or "").strip().split())
@@ -46,20 +45,59 @@ def normalize_username(raw: str) -> str:
         )
     return name
 
-
 class AuthStore:
-    """In-memory token -> username registry (single-worker deployment)."""
+    """Token -> username session registry (single-worker deployment).
+
+    Sessions are persisted best-effort to a JSON file (bind_path) so a process
+    restart does not invalidate valid sessions; expired sessions are dropped on
+    load and lazily on lookup. Blank path disables persistence (tests).
+    """
 
     def __init__(self, ttl: float = TOKEN_TTL_SECONDS) -> None:
         self._ttl = ttl
         self._tokens: dict[str, tuple[str, float]] = {}  # token -> (username, expires_at)
         self._lock = threading.Lock()
+        self._path: Path | None = None
+
+    def bind_path(self, sessions_file: str) -> None:
+        """(Re)bind the persistence path (blank disables file persistence)."""
+        self._path = Path(sessions_file) if sessions_file else None
+        if self._path is not None:
+            self._load()
+
+    def _load(self) -> None:
+        try:
+            if self._path is not None and self._path.is_file():
+                rows = json.loads(self._path.read_text(encoding="utf-8"))
+                now = time.monotonic()
+                with self._lock:
+                    self._tokens = {
+                        tok: (name, exp)
+                        for tok, (name, exp) in rows.items()
+                        if exp > now
+                    }
+        except (OSError, ValueError, TypeError, AttributeError):
+            logger.warning("could not load sessions file; starting empty")
+
+    def _save(self) -> None:
+        if self._path is None:
+            return
+        try:
+            self._path.parent.mkdir(parents=True, exist_ok=True)
+            with self._lock:
+                rows = dict(self._tokens)
+            self._path.write_text(
+                json.dumps(rows, indent=2, sort_keys=True), encoding="utf-8"
+            )
+        except OSError:
+            logger.warning("could not persist sessions file")
 
     def login(self, username: str) -> str:
         name = normalize_username(username)
         token = secrets.token_urlsafe(32)
         with self._lock:
             self._tokens[token] = (name, time.monotonic() + self._ttl)
+        self._save()
         return token
 
     def user_for_token(self, token: str | None) -> str | None:
@@ -72,6 +110,7 @@ class AuthStore:
             username, expires = entry
             if time.monotonic() > expires:
                 del self._tokens[token]
+                self._save()
                 return None
         return username
 
@@ -80,10 +119,9 @@ class AuthStore:
             return
         with self._lock:
             self._tokens.pop(token, None)
-
+        self._save()
 
 auth_store = AuthStore()
-
 
 class UserRegistry:
     """Registered users: username -> salted PBKDF2-SHA256 password hash.
@@ -154,7 +192,6 @@ class UserRegistry:
             expected = base64.b64decode(entry["hash"])
         actual = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, _PBKDF2_ROUNDS)
         return hmac.compare_digest(actual, expected)
-
 
 auth_store = AuthStore()
 auth_registry = UserRegistry()

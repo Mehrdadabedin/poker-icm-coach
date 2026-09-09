@@ -282,3 +282,101 @@ public/cards/* (53 generated SVGs), tests/* (features, login), scripts/generate_
 - Verified: backend 400 passed / 4 skipped; frontend 37 passed; tsc/build/audit
   clean; live smoke (register -> duplicate/weak rejection -> invalid 401 ->
   login -> tournament -> logout -> 401). A02-A17 and OpenDecks cards untouched.
+
+
+## Session continuation — auth signup authorization, rotation, mobile, labels, header
+
+### Phase 1 — Authentication signup authorization (root cause fixed)
+- Root cause: POST /api/auth/register returned only {username, registered:true}
+  with NO session token, so a freshly registered user was left unauthenticated
+  ("not properly authorized/logged in").
+- Fix (backend, root): register now issues a bearer token via auth_store.login
+  and returns it; the new account is authorized immediately and can enter the
+  private table without a second sign-in. Login/logout/me unchanged; passwords
+  remain salted PBKDF2-SHA256 (never plaintext); accounts persist best-effort.
+- Session persistence: AuthStore sessions now bind to data/sessions.json
+  (best-effort) so a process restart does not invalidate valid sessions
+  (tokens survive; expired sessions dropped on load).
+- Frontend: api.register returns token; LoginForm saves it and calls onLogin
+  after a successful signup.
+- Tests: backend test_auth_and_isolation asserts signup token authorizes /me;
+  frontend login.test asserts token stored on signup. Full flows verified live
+  (register -> duplicate/weak rejection -> invalid 401 -> login -> tournament
+  -> logout -> 401).
+
+### Phase 2 — Login UI (blue compact SIGN IN / SIGN UP)
+- .auth-mode-switch buttons: smaller rectangular, blue (#1565c0) with white text
+  instead of gold; active state blue-dark with focus ring; keyboard focus
+  visible; no duplicated SIGN IN heading (mode-appropriate heading
+  "WELCOME BACK"/"CREATE YOUR ACCOUNT"). Desktop + mobile layout clean.
+
+### Poker-table seat rotation (dynamic, both 9- and 6-handed)
+- app/game/positions.py: rotation_order(num_seats) helper is the single source
+  of truth; 9-handed ring BTN->SB->BB->UTG->UTG+1->MP->LJ->HJ->CO, 6-handed
+  BTN->SB->BB->UTG->HJ->CO; SB always immediately to the left of the button, BB
+  immediately to the left of SB (offset 1/2 in the ring). No hard-coded jump
+  after UTG; the ring is dynamic by button offset + seat count.
+- Removed hard-coded position_for(..., 9) at call sites: game_session.py
+  (coach + history), hand_review.py, bot_review.py now pass the actual player
+  count (len(players)) so short-handed tables rotate correctly.
+- dealer_button.next_button already advances the button +1 clockwise after each
+  hand, skipping eliminated/inactive seats (unchanged).
+- Tests: test_positions.py extended — full ring rotation walks vs
+  position_for for dealers 0..8 (9-handed) and 0..5 (6-handed), SB/BB adjacency
+  for every dealer, and no-harcoded-jump assertions.
+
+### Phases 3-6, 9 — Responsive mobile poker table
+- New frontend/src/styles/mobile.css: <=767px switches .table-felt to a
+  centered flex column: community board row first, then all 9 players wrapped
+  at 3 per row (hero seat wider, larger hole cards). Neutralizes desktop
+  absolute nth-child coords so seats never overlap; no horizontal page
+  scrolling. Action controls (.hero-controls) sit compact at the bottom-center
+  below the felt (never covering players). Hand-complete compact result and
+  full review stay responsive with no horizontal scroll.
+- Breakpoints verified locally (Playwright, faithful live markup — bots have no
+  hole-card row): 320/360/375/390/412/768/900/1024/1280 px all show
+  horizontal-overflow:false, seat-overlaps:0, controls below felt.
+- Orientation: portrait-first layout works without requiring rotation; manual
+  rotate is intentionally not forced (browsers cannot reliably lock
+  orientation) — document as remaining optional work.
+
+### Phase 7 — Reusable enable/disable labels
+- New frontend/src/services/preferences.ts: single cached source of truth
+  (actionLabels / resultLabels) loaded from the existing /api/settings
+  architecture (showActionLabels / showResultLabels persisted via
+  TournamentSettings + PUT /api/settings).
+- HeroControls: showLabels prop; when false, buttons show a glyph instead of
+  text but keep aria-label/title (accessible, not color-only). Applied to
+  FOLD/CHECK/CALL/BET/RAISE/ALL-IN consistently on desktop and mobile.
+- HandResult: showResultLabels prop; when false the YOU WON/YOU LOST/CHOPPED
+  text is replaced by a glyph + chips delta, banner colour plus aria-label/
+  role=status keep it accessible.
+- SettingsPage: two toggles (SHOW ACTION BUTTON LABELS / SHOW RESULT LABELS)
+  integrated into the existing settings screen.
+- Tests: controls.test.tsx covers label-hidden (accessible) and visible-default.
+
+### Phase 8 — Compact REVIEW HAND
+- HandResult: REVIEW HAND + NEXT HAND use shared .btn-compact sizing
+  (controls.css) consistent with the action-button control group; small,
+  readable, touch friendly, gold/blue theme.
+
+### Home-page header (ICM MASTER left, user + LOG OUT right)
+- Authenticated HomePage now uses the shared .top-bar.app-header row: "ICM
+  MASTER" left; "Playing as <user>" + LOG OUT at the top-right on the same
+  row. LOG OUT is a .btn-logout: smaller blue rectangular button with white
+  text (controls.css). TableHeader logout switched to the same style for
+  consistency.
+
+## Verification (this session)
+- Backend: 403 passed / 4 skipped (incl. new rotation + signup-authorization
+  tests); ruff clean on changed files (2 pre-existing I001 in game_session/
+  hand_review untouched); GitHub audit AUDIT PASSED.
+- Frontend: tsc clean; 39 tests passed; npm build clean; audit clean.
+- Local geometry (Playwright): no overflow / no overlap 320px-1280px.
+
+## Remaining
+- (Optional) auto-rotate landscape mode: browsers cannot reliably lock device
+  orientation; portrait-first layout already fits, so rotation is not forced.
+  If desired later, add an enabled/disabled user setting that toggles a
+  landscape class (no reliable browser lock guarantee).
+- Deploy to Render (owner action) and re-verify on the live site once requested.

@@ -105,3 +105,40 @@ describe("HeroControls", () => {
     expect(screen.getByText("MIN RAISE 1,200")).toBeInTheDocument();
   });
 });
+
+
+describe("Phase 7 label preference", () => {
+  it("hides action button text but keeps accessible labels when showLabels=false", () => {
+    const { container } = render(
+      <HeroControls
+        legalActions={[{ kind: "fold" }, { kind: "check" }] as LegalAction[]}
+        toCall={0}
+        pot={100}
+        stack={1000}
+        bigBlind={100}
+        disabled={false}
+        showLabels={false}
+        onAction={() => undefined}
+      />,
+    );
+    const fold = [...container.querySelectorAll("button")].find((b) => b.getAttribute("aria-label") === "Fold");
+    expect(fold).toBeDefined();
+    expect(fold?.textContent).not.toContain("FOLD");
+  });
+
+  it("shows action button text by default", () => {
+    const { container } = render(
+      <HeroControls
+        legalActions={[{ kind: "fold" }, { kind: "check" }] as LegalAction[]}
+        toCall={0}
+        pot={100}
+        stack={1000}
+        bigBlind={100}
+        disabled={false}
+        onAction={() => undefined}
+      />,
+    );
+    expect(container.textContent).toContain("FOLD");
+    expect(container.textContent).toContain("CHECK");
+  });
+});

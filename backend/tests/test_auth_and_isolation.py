@@ -37,8 +37,6 @@ def _play_hand(client: TestClient, tid: str) -> None:
     assert r.status_code == 200, r.text
 
 # ---------------------------------------------------------------------------
-# A03 authentication
-# ---------------------------------------------------------------------------
 def test_game_endpoints_require_authentication() -> None:
     anon = TestClient(app)
     assert anon.post("/api/tournament", json={"players": 9}).status_code == 401
@@ -57,17 +55,20 @@ def test_register_then_login_and_me() -> None:
     assert reg("Jane Doe", "short").status_code == 400        # short password
     ok = reg("  Jane Doe  ", "abcdef12")
     assert ok.status_code == 200 and ok.json()["username"] == "Jane Doe"
-    assert reg("Jane Doe", "abcdef12").status_code == 400     # duplicate
+    signup_token = ok.json()["token"]
+    assert signup_token
+    me_signup = c.get("/api/auth/me", headers={"Authorization": f"Bearer {signup_token}"})
+    assert me_signup.status_code == 200 and me_signup.json()["username"] == "Jane Doe"
+    assert reg("Jane Doe", "abcdef12").status_code == 400
     login_ok = lg("Jane Doe", "abcdef12")
     assert login_ok.status_code == 200 and login_ok.json()["username"] == "Jane Doe"
     token = login_ok.json()["token"]
     me = c.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
     assert me.json() == {"username": "Jane Doe"}
-    assert lg("Jane Doe", "wrongpw").status_code == 401       # wrong password
-    assert lg("Nobody", "abcdef12").status_code == 401        # unknown user
+    assert lg("Jane Doe", "wrongpw").status_code == 401  # wrong password
+    assert lg("Nobody", "abcdef12").status_code == 401   # unknown user
     assert lg("Nobody", "xyz").status_code == 401
-    assert c.get("/api/auth/me").status_code == 401           # no token
-
+    assert c.get("/api/auth/me").status_code == 401      # no token
 def test_logout_revokes_token() -> None:
     c = login_client("LogoutUser")
     assert c.get("/api/auth/me").status_code == 200
@@ -78,7 +79,6 @@ def test_invalid_or_expired_token_rejected() -> None:
     c = TestClient(app)
     assert c.get("/api/auth/me", headers={"Authorization": "Bearer not-a-token"}).status_code == 401
     assert c.get("/api/auth/me", headers={"Authorization": "Bearer "}).status_code == 401
-    # expiry: expire ONLY the token created here
     register_user("ExpiryUser")
     login = c.post("/api/auth/login", json={"username": "ExpiryUser", "password": TEST_PASSWORD}).json()
     token = login["token"]

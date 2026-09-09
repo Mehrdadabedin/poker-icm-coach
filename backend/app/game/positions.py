@@ -22,6 +22,26 @@ ROTATION_TABLES = {
 }
 
 
+def rotation_order(num_seats: int) -> list[str]:
+    """Full clockwise ring from the button, for the given seat count.
+
+    9-handed:  BTN -> SB -> BB -> UTG -> UTG+1 -> MP -> LJ -> HJ -> CO
+    6-handed:  BTN -> SB -> BB -> UTG -> HJ -> CO
+    Short tables derive the ring dynamically from the seat count. Nothing
+    here hard-codes a position jump: every label follows the previous one in
+    the ring (SB is always immediately to the left of the button, BB to the
+    left of SB).
+    """
+    if num_seats == 9:
+        return list(ROTATION_ORDER_9)
+    if num_seats == 6:
+        return list(ROTATION_ORDER_6)
+    table = ROTATION_TABLES.get(num_seats)
+    if table is None:
+        raise ValueError(f"unsupported table size: {num_seats}")
+    return list(table)
+
+
 def all_positions(num_seats: int) -> list[str]:
     if num_seats == 9:
         return list(POSITION_ORDER)
@@ -42,11 +62,4 @@ def position_for(dealer_seat: int, seat: int, num_seats: int = 9) -> str:
         raise ValueError(f"seat out of range: {seat}")
     # offset 0 = BTN (dealer), 1 = SB, 2 = BB, 3 = UTG ...
     offset = (seat - dealer_seat) % num_seats
-    if num_seats == 9:
-        return ROTATION_ORDER_9[offset]
-    if num_seats == 6:
-        return ROTATION_ORDER_6[offset]
-    table = ROTATION_TABLES.get(num_seats)
-    if table is not None:
-        return table[offset]
-    raise ValueError(f"unsupported table size: {num_seats}")
+    return rotation_order(num_seats)[offset]

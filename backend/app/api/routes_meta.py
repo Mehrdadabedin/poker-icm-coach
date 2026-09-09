@@ -88,6 +88,8 @@ def put_settings(request: dict, _user: str = Depends(require_user)) -> dict:
         "startingBigBlind": ("starting_big_blind", int),
         "blindLevelMinutes": ("blind_level_minutes", int),
         "fastMode": ("fast_mode", bool),
+        "showActionLabels": ("show_action_labels", bool),
+        "showResultLabels": ("show_result_labels", bool),
     }
     for key, (attr, caster) in allowed.items():
         if key in request and hasattr(tournament_settings, attr):

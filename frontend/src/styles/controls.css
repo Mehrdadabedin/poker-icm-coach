@@ -89,3 +89,28 @@
   color: var(--text);
   padding: 4px 8px;
 }
+
+
+/* Home/table header LOG OUT — smaller blue rectangular button, white text */
+.btn-logout {
+  background: #1565c0;
+  color: #fff;
+  min-height: 30px;
+  min-width: 0;
+  padding: 2px 12px;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  font-weight: 700;
+}
+
+/* Phase 8: shared compact button sizing for control groups.
+   Used by REVIEW HAND / NEXT HAND and (via media queries) mobile action
+   buttons so every button in one control group is the same size. */
+.btn-compact {
+  min-height: 38px;
+  min-width: 56px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  border-radius: 7px;
+  font-weight: 700;
+}

@@ -25,7 +25,7 @@ export function TableHeader({ state, username, paused, handOver, isReview, onHom
         <button className="btn btn-small header-btn" onClick={onHome} data-testid="home-btn">
           HOME
         </button>
-        <button className="btn btn-small header-btn" onClick={onLogout} data-testid="logout-btn">
+        <button className="btn btn-logout" onClick={onLogout} data-testid="logout-btn">
           LOG OUT
         </button>
         <button

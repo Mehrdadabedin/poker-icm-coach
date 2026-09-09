@@ -62,11 +62,11 @@ async function authRequest<T>(path: string, body: unknown): Promise<T> {
 export function register(
   username: string,
   password: string,
-): Promise<{ username: string; registered: boolean }> {
-  return authRequest<{ username: string; registered: boolean }>("/api/auth/register", {
-    username,
-    password,
-  });
+): Promise<{ username: string; registered: boolean; token: string }> {
+  return authRequest<{ username: string; registered: boolean; token: string }>(
+    "/api/auth/register",
+    { username, password },
+  );
 }
 
 export function login(

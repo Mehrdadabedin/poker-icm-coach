@@ -72,6 +72,11 @@ describe("TablePage", () => {
         detail: { POSITION: "BTN", "STACK": "30,000" },
       })),
       coachCompare: vi.fn(async () => null),
+      request: vi.fn(async () => ({
+        startingStack: 45000, startingSmallBlind: 100, startingBigBlind: 100,
+        blindLevelMinutes: 20, fastMode: false,
+        showActionLabels: true, showResultLabels: true,
+      })),
     }));
     const { TablePage: TablePageLive } = await import("../src/pages/TablePage");
     render(

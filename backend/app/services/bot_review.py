@@ -104,7 +104,7 @@ def build_explanations(session, result, level, pressure: str) -> list[dict]:
         hole = list(result.hole_cards.get(a.seat, []))
         equity = _equity(hole, street, board) if len(hole) == 2 else 0.0
         stack_bb = round(max(0, start.get(a.seat, 0) - cum.get(a.seat, 0)) / max(1, level.big), 1)
-        pos = position_for(result.button, a.seat, 9)
+        pos = position_for(result.button, a.seat, len(players))
         out.append({
             "seat": a.seat, "name": players[a.seat].name, "action": a.action,
             "amount": a.amount, "street": street, "position": pos,

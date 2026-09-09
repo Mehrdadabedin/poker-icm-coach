@@ -68,3 +68,41 @@ def test_six_max_supported() -> None:
     assert position_for(0, 3, 6) == "UTG"
     assert position_for(0, 4, 6) == "HJ"
     assert position_for(0, 5, 6) == "CO"
+
+
+def test_ring_rotation_advances_with_button_9_handed() -> None:
+    """As the button moves one seat clockwise each hand, every other seat
+    advances one step through the ring; SB stays immediately to the left of
+    the button and BB immediately to the left of SB."""
+    ring = ["BTN", "SB", "BB", "UTG", "UTG+1", "MP", "LJ", "HJ", "CO"]
+    for dealer in range(9):
+        for seat in range(9):
+            offset = (seat - dealer) % 9
+            assert position_for(dealer, seat, 9) == ring[offset], (dealer, seat)
+    # after one hand the button moves +1; labels advance by one ring step
+    for dealer in range(9):
+        assert position_for(dealer, dealer, 9) == "BTN"
+        assert position_for(dealer, (dealer + 1) % 9, 9) == "SB"   # left of button
+        assert position_for(dealer, (dealer + 2) % 9, 9) == "BB"   # left of SB
+
+
+def test_ring_rotation_advances_with_button_6_handed() -> None:
+    ring = ["BTN", "SB", "BB", "UTG", "HJ", "CO"]
+    for dealer in range(6):
+        for seat in range(6):
+            offset = (seat - dealer) % 6
+            assert position_for(dealer, seat, 6) == ring[offset], (dealer, seat)
+    for dealer in range(6):
+        assert position_for(dealer, dealer, 6) == "BTN"
+        assert position_for(dealer, (dealer + 1) % 6, 6) == "SB"
+        assert position_for(dealer, (dealer + 2) % 6, 6) == "BB"
+
+
+def test_no_hardcoded_jump_after_utg_in_9_handed() -> None:
+    """HJ must be preceded by LJ in the 9-handed ring (UTG+1 -> MP -> LJ -> HJ)."""
+    from app.game.positions import ROTATION_ORDER_9, rotation_order
+
+    assert ROTATION_ORDER_9.index("UTG") + 1 == ROTATION_ORDER_9.index("UTG+1")
+    assert ROTATION_ORDER_9.index("LJ") + 1 == ROTATION_ORDER_9.index("HJ")
+    assert rotation_order(9) == ["BTN", "SB", "BB", "UTG", "UTG+1", "MP", "LJ", "HJ", "CO"]
+    assert rotation_order(6) == ["BTN", "SB", "BB", "UTG", "HJ", "CO"]

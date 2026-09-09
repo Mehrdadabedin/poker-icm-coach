@@ -6,6 +6,7 @@ import { Copyright } from "../components/Copyright";
 type Settings = {
   startingStack: number; startingSmallBlind: number; startingBigBlind: number;
   blindLevelMinutes: number; fastMode: boolean;
+  showActionLabels: boolean; showResultLabels: boolean;
 };
 
 /** SETTINGS screen: editable tournament defaults that affect new tournaments. */
@@ -69,7 +70,19 @@ export function SettingsPage() {
               onChange={(e) => patch("fastMode", e.target.checked)} data-testid="settings-fast" />
             FAST MODE
           </label>
-          <div className="settings-actions">
+          <label className="settings-check">
+    <input type="checkbox" checked={settings.showActionLabels !== false}
+      onChange={(e) => patch("showActionLabels", e.target.checked)}
+      data-testid="settings-show-action-labels" />
+    SHOW ACTION BUTTON LABELS
+  </label>
+  <label className="settings-check">
+    <input type="checkbox" checked={settings.showResultLabels !== false}
+      onChange={(e) => patch("showResultLabels", e.target.checked)}
+      data-testid="settings-show-result-labels" />
+    SHOW RESULT LABELS
+  </label>
+  <div className="settings-actions">
             <button className="btn btn-primary" onClick={save} data-testid="settings-save">SAVE SETTINGS</button>
             <span className="note">{saved ? "Saved — next practice session uses these values." : "Defaults shown; SAVE to apply."}</span>
           </div>

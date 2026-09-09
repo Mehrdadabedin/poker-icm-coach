@@ -44,14 +44,16 @@ export function HomePage() {
 
   return (
     <div className="page home-page" data-testid="home-page">
-      <h1 className="screen-title" data-testid="app-title">ICM MASTER</h1>
-      <p className="home-tagline">9-player tournament practice with an ICM coach</p>
-      <div className="session-bar" data-testid="session-bar">
-        <span>Playing as <b data-testid="session-username">{user}</b></span>
-        <button className="btn btn-small" onClick={() => void signOut()} data-testid="logout-btn">
-          LOG OUT
-        </button>
+      <div className="top-bar app-header" data-testid="session-bar">
+        <h1 className="screen-title header-title" data-testid="app-title">ICM MASTER</h1>
+        <div className="header-right">
+          <span className="header-user">Playing as <b data-testid="session-username">{user}</b></span>
+          <button className="btn btn-logout" onClick={() => void signOut()} data-testid="logout-btn">
+            LOG OUT
+          </button>
+        </div>
       </div>
+      <p className="home-tagline">9-player tournament practice with an ICM coach</p>
       <div className="home-menu">
         <button className="btn btn-primary" onClick={startPractice} disabled={starting} data-testid="start-practice">
           {starting ? "STARTING…" : "START PRACTICE"}

@@ -10,6 +10,7 @@ import { TableSidebar } from "../components/TableSidebar";
 import { useAutoNext } from "../hooks/useAutoNext";
 import { useGame } from "../hooks/useGame";
 import { ActionKind, LegalAction } from "../models/game";
+import { useLabelPreferences } from "../services/preferences";
 import { clearAuth, coachAdvice, coachCompare, getToken, getUsername, logout } from "../services/api";
 
 interface CoachPanel {
@@ -30,6 +31,7 @@ export function TablePage() {
   const { countdown, paused, start, stop, pause, resume } = useAutoNext(nextHand, REVIEW_SECONDS);
   const [coach, setCoach] = useState<CoachPanel | null>(null);
   const [comparison, setComparison] = useState<Record<string, string> | null>(null);
+  const { actionLabels, resultLabels } = useLabelPreferences();
 
   useEffect(() => {
     if (state?.waitingForHero) {
@@ -131,6 +133,7 @@ export function TablePage() {
                 onNext={() => void nextHand()}
                 countdown={countdown}
                 paused={paused}
+                showResultLabels={resultLabels}
               />
             ) : (
               <HeroControls
@@ -141,6 +144,7 @@ export function TablePage() {
                 bigBlind={state.bigBlind}
                 disabled={!state.waitingForHero}
                 submitting={acting}
+                showLabels={actionLabels}
                 onAction={(kind: ActionKind, amount?: number) => void onAction(kind, amount)}
               />
             )}
