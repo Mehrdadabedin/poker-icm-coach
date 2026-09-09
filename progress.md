@@ -608,3 +608,37 @@ RAISE/ALL-IN strip were pushed below the visible area (matches the screenshots).
 - Tablet portrait 768x1024 and desktop 1280x800: unchanged, 0 overlaps.
 - Frontend build clean; tsc clean; 41 tests passed; GitHub audit PASSED.
 - No poker/game/rotation/backend/API/auth logic changed.
+
+
+## Mobile Landscape Table Size Adjustment (CSS-only, mobile-landscape only)
+
+### Change
+- Increased the mobile-landscape poker table size by using the smallest safe
+  vertical reserve for the header/status/action strip.
+- Previous sizing: `width: calc((100vh - 116px) * 16 / 9)` capped at
+  `max-width: 100%`.
+- New sizing: `width: min(92vw, calc((100vh - 102px) * 16 / 9))`, still
+  `aspect-ratio: 16 / 9` and centred. The 92vw cap satisfies the "~90-95% of
+  available width" target without letting the table overflow; the height term
+  keeps header/status/action buttons fully visible on short landscape phones.
+- The 16:9 horizontal composition, all nth-child seat positions, hero seat,
+  rotation, action-button functionality and portrait/desktop layouts are
+  untouched.
+
+### Validation (rendered measurement)
+- 740x360: felt 433 -> 459px (buttons bottom 355 <= 360, visible), 0 seat
+  overlaps, no horizontal overflow.
+- 568x320: felt 363 -> 388px (buttons bottom 315 <= 320, visible), 0 overlaps,
+  no overflow.
+- 667x375 -> 485px and 640x400 -> 530px also verified visible, 0 overlaps.
+- Note: on short 16:9 phones the table is height-limited (a 16:9 table cannot
+  exceed ~62-83% of viewport width while keeping header/status/buttons on
+  screen); the 92vw cap prevents it ever exceeding the width target.
+
+### Files changed
+- frontend/src/styles/mobile.css (landscape block only)
+- progress.md (this entry)
+
+### Checks
+- tsc clean; frontend 41 tests passed; npm build clean; GitHub audit PASSED.
+- Desktop and portrait untouched; no poker/game logic changed.

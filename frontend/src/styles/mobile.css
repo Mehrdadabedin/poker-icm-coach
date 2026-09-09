@@ -117,9 +117,12 @@ detected with the standard `min-aspect-ratio` media query.
   .table-felt {
     display: block;
     position: relative;
-    /* available height = viewport - header/status (~36px) - buttons (~80px) */
-    width: calc((100vh - 116px) * 16 / 9);
-    max-width: 100%;
+    /* Largest 16:9 table that fits the landscape viewport:
+       height budget = viewport minus header/status (~40px) minus the action
+       strip (~56px); width is capped at 92vw so the table never exceeds the
+       target ~90-95% of the available width. */
+    width: min(92vw, calc((100vh - 102px) * 16 / 9));
+    max-width: 92vw;
     aspect-ratio: 16 / 9;
     min-height: 0;
     margin: 0 auto;
