@@ -56,7 +56,13 @@ def test_settings_affect_tournament_creation() -> None:
         "startingBigBlind": 240, "blindLevelMinutes": 7, "fastMode": False,
     })
     state = client.post("/api/tournament", json={"players": 9}).json()
-    assert state["players"][0]["stack"] == 20000
+    # hero seat may post the small blind at hand start (hole-card-free slots
+    # depend on the clockwise dealer rotation), so verify the configured stack
+    # through the table total rather than one seat's post-blind value.
+    total = sum(p["stack"] for p in state["players"])
+    bets = sum(p["bet"] for p in state["players"])
+    assert total + bets == 20000 * 9
+    assert next(p for p in state["players"] if p["isHero"])["stack"] >= 20000 - 240
     assert state["smallBlind"] == 120 and state["bigBlind"] == 240
     assert state["secondsLeft"] == 7 * 60
     client.put("/api/settings", json={

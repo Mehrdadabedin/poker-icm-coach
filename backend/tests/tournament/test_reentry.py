@@ -39,8 +39,11 @@ def test_elimination_from_level_4() -> None:
 
 def test_players_with_stack_untouched() -> None:
     s = session_with()
+    before = s.tournament.players[0].stack
     s._apply_reentry_or_eliminate()
-    assert s.tournament.players[0].stack == 45_000
+    # re-entry must never reset or eliminate a player with a stack (their
+    # current stack depends on blinds posted at hand start, not on re-entry)
+    assert s.tournament.players[0].stack == before
     assert not s.tournament.players[0].is_eliminated
 
 
@@ -72,7 +75,11 @@ def test_next_hand_applies_reentry_then_elimination() -> None:
     bot = s.tournament.players[2]
     bot.stack = 0
     s.next_hand()  # applies re-entry
-    assert not bot.is_eliminated and bot.stack == 45_000
+    # re-entry reset the stack to the starting amount; the new hand may then
+    # post a blind (100) on this seat if it rotates into SB/BB, so assert the
+    # reset happened without coupling to the next hand's blind seats.
+    assert not bot.is_eliminated
+    assert 45_000 - 100 <= bot.stack <= 45_000, bot.stack
 
     # level 4 bust -> eliminated
     bot2 = s.tournament.players[3]

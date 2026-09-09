@@ -426,3 +426,72 @@ future work if accounts must survive redeploys.
 - backend: 403 passed / 4 skipped; ruff clean on changed files; audit PASSED.
 - E2E (local, real backend+UI): all acceptance steps + desktop/mobile geometry
   (no overflow, clickable submit at 320/375/390px).
+
+
+## ICM Master — Poker Table Position Fix
+
+### Atomic Task
+Fix player seating geometry and clockwise rotation.
+
+### Inspection
+- [x] Table component identified: frontend/src/components/PokerTable.tsx (+PokerSeat)
+- [x] Seat data identified: 9 fixed seats (0..8) rendered by PokerTable in seat order
+- [x] Position assignment identified: backend app/game/positions.py position_for (ring
+      BTN->SB->BB->UTG->UTG+1->MP->LJ->HJ->CO; 6-max ring too)
+- [x] Physical seat coordinates identified: frontend/src/styles/placement.css (nth-child)
+- [x] Rotation logic identified: app/game/dealer_button.py next_button (seat +1 per hand)
+- [x] Root cause identified (measured, not guessed): see below
+
+### Implementation
+- [x] Seat geometry corrected: placement.css now evenly distributes all 9 seats around the
+      oval (centered via translate(-50%,-50%)) using a single centralized ruleset
+- [x] BOT5/BOT6 overlap fixed (were stacked at x=850); every adjacent seat chord >= ~100px
+- [x] BOT8/Hero spacing balanced (were 350px apart; now evenly spaced arcs)
+- [x] Physical seat order corrected: measured clockwise order 0->8->7->6->5->4->3->2->1
+- [x] Clockwise Button rotation corrected: dealer_button now advances seat index -1
+      (= one physical seat clockwise on the measured layout)
+- [x] Hero rotation verified: hero ring position advances +1 ring step every hand
+      (SB->BB->UTG->UTG+1->MP->LJ->HJ->CO->BTN->SB ...), matching the required pattern
+- [x] Mobile unaffected: mobile.css flex layout neutralizes the desktop nth-child
+      coordinates + transform; verified no overlap/overflow/clipping
+
+### Validation
+- [x] Desktop verified: Playwright geometry (720x405 felt): 0 overlaps, 0 overflow,
+      0 clipping at 320/360/375/390/412/768/900/1024/1280/1440 px
+- [x] Mobile verified: same widths, no overflow / no overlap / no clipping
+- [x] Multi-hand rotation verified: live backend run — dealer 8->7->6->5->4->3->2
+      (cw#1->cw#7 on the physical ring) and hero SB->BB->UTG->UTG+1->MP->LJ->HJ
+- [x] Build passed: frontend npm build clean
+- [x] Tests passed: backend 407 passed / 4 skipped; frontend 41 passed
+- [x] Lint passed if configured: GitHub audit (check_github.py) PASSED; ruff clean on changed files
+- [x] Type checks passed if configured: tsc --noEmit clean
+
+### Files Changed
+- backend/app/game/dealer_button.py (clockwise seat index -1 rotation)
+- backend/tests/game/test_dealer_button.py (clockwise expectations + ring test)
+- backend/tests/game/test_positions.py (multi-hand hero rotation + button-clockwise tests)
+- backend/tests/game/test_fold_rules.py (rotation-agnostic role-driven helpers)
+- backend/tests/tournament/test_reentry.py (rotation-agnostic reentry assertions)
+- backend/tests/test_auth_and_isolation.py, test_concurrent_isolation.py,
+  test_multi_table_isolation.py, test_settings_history.py (hero-stack assertions made
+  rotation-agnostic: hero may post a blind at hand start)
+- frontend/src/styles/placement.css (centralized even 9-seat oval geometry)
+- frontend/src/styles/mobile.css (transform:none added to mobile seat reset)
+- progress.md (this entry)
+
+### Root Cause
+- Physical layout: seats were hand-placed with scattered nth-child coordinates; seats 5,6,7
+  collapsed into one right-edge column (x=850) causing the BOT5/BOT6 overlap, while seats 8
+  and 0 were ~350px apart (the BOT8/Hero gap).
+- Visual rotation: measured screen coordinates show decreasing seat index = clockwise
+  (0->8->7->6->5->4->3->2->1). dealer_button advanced +1, so the Button physically moved
+  COUNTER-clockwise; the logical rings (position_for) were fine.
+
+### Final Result
+- All nine seats are evenly distributed around the oval with no overlaps, balanced spacing,
+  and nothing clipped (verified by rendered measurement, desktop + mobile).
+- The Button now moves one physical seat CLOCKWISE after every completed hand, SB is always
+  immediately to the left of the Button (the seat that was just the Button), BB next left,
+  and the remaining positions rotate correctly around the ring for both 9- and 6-handed
+  tables. Hero follows the same logical rotation and was verified over multiple consecutive
+  hands.

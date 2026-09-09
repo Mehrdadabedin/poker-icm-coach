@@ -91,6 +91,7 @@ screen with no horizontal scrolling.
     right: auto;
     top: auto;
     bottom: auto;
+    transform: none;
     flex: 0 1 calc(33.333% - 8px);
     min-width: 0;
     min-height: 62px;

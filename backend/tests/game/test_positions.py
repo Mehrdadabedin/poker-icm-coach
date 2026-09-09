@@ -106,3 +106,38 @@ def test_no_hardcoded_jump_after_utg_in_9_handed() -> None:
     assert ROTATION_ORDER_9.index("LJ") + 1 == ROTATION_ORDER_9.index("HJ")
     assert rotation_order(9) == ["BTN", "SB", "BB", "UTG", "UTG+1", "MP", "LJ", "HJ", "CO"]
     assert rotation_order(6) == ["BTN", "SB", "BB", "UTG", "HJ", "CO"]
+
+
+def test_multi_hand_hero_rotation_advances_clockwise() -> None:
+    """Across 9 consecutive hands the hero position advances one ring step per
+    hand (BB -> UTG -> UTG+1 -> MP -> LJ -> HJ -> CO -> BTN -> SB -> BB)."""
+    from app.game.dealer_button import next_button
+
+    ring = ["BTN", "SB", "BB", "UTG", "UTG+1", "MP", "LJ", "HJ", "CO"]
+    hero_seat = 0
+    dealer = 0
+    # First hand rotates once to start play (tournament.start semantics).
+    dealer = next_button(dealer, 9, set(range(9)))
+    seen = []
+    for _ in range(9):
+        seen.append(position_for(dealer, hero_seat, 9))
+        # next hand: button moves one physical seat clockwise (= index - 1)
+        dealer = next_button(dealer, 9, set(range(9)))
+    # Hero advances one ring step each hand (mod 9): +1 every hand.
+    for a, b in zip(seen, seen[1:], strict=False):
+        assert (ring.index(b) - ring.index(a)) % 9 == 1, (seen, a, b)
+    assert len(set(seen)) == 9, seen
+    # Consecutive hands also step the seller (button) by one physical seat.
+    assert seen[0] == "SB"  # dealer starts at 8 (clockwise from seat 0)
+
+
+def test_button_moves_clockwise_physically_each_hand() -> None:
+    """The dealer's seat index must follow the measured clockwise physical
+    order 0 -> 8 -> 7 -> 6 -> 5 -> 4 -> 3 -> 2 -> 1 -> 0."""
+    from app.game.dealer_button import next_button
+
+    expected = [0, 8, 7, 6, 5, 4, 3, 2, 1, 0]
+    dealer = 0
+    for exp in expected:
+        assert dealer == exp
+        dealer = next_button(dealer, 9, set(range(9)))

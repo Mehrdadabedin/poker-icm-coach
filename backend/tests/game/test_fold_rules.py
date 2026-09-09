@@ -3,6 +3,10 @@
 A folded player must stay folded for the whole hand: never the active player,
 never able to check/call/bet/raise/all-in, never evaluated as a showdown
 winner. Hero fold resolves the hand among live bots with a 5-card reveal.
+
+Note: these tests drive the engine by ROLE (SB/BB/first-actor), so they stay
+correct regardless of which physical seat posts the blinds under the
+clockwise dealer rotation.
 """
 from __future__ import annotations
 
@@ -18,42 +22,64 @@ def four_players() -> list[Player]:
     return [Player(name=f"P{i}", stack=1000, seat=i) for i in range(4)]
 
 
-def play_street_preflop(eng: HandEngine) -> None:
+def blind_contributors(eng: HandEngine) -> dict[int, int]:
+    """Seat -> chips posted as blinds on the current street."""
+    return {
+        seat: amt for seat, amt in eng._street.contributions.items()
+        if amt > 0 and eng.tournament.players[seat].bet_total == amt
+    }
+
+
+def play_street_preflop(eng: HandEngine, fold_seats: set[int]) -> None:
     """Drive the deterministic preflop street to completion.
 
-    4 players, button seat 0 (SB=1, BB=2; preflop order UTG=3, then 0,1,2).
-    Scripted: P3 (UTG) and P0 fold, P1 (SB) calls the blind, P2 (BB) checks.
+    Seats in `fold_seats` fold; every other seat plays the legal minimal
+    action: call the blind amount if not yet matched, otherwise check (the
+    blind posters already match the current bet).
     """
     while not eng.is_complete and eng.street == "preflop":
         actor = eng.current_actor
-        if actor in (3, 0):
+        if actor in fold_seats:
             eng.act(actor, Action(ActionType.FOLD))
-        elif actor == 1:
-            eng.act(actor, Action(ActionType.CALL, 100))
-        elif actor == 2:
-            eng.act(actor, Action(ActionType.CHECK))
+        else:
+            facing = eng._street.current_bet > eng._street.contributions.get(actor, 0)
+            eng.act(actor, Action(ActionType.CALL, 100) if facing else Action(ActionType.CHECK))
+
+
+def drive_checkdown(eng: HandEngine, guard: int = 400) -> None:
+    while not eng.is_complete and guard > 0:
+        guard -= 1
+        actor = eng.current_actor
+        if actor is None:
+            break
+        facing = eng._street.current_bet > eng._street.contributions.get(actor, 0)
+        eng.act(actor, Action(ActionType.CALL, 100) if facing else Action(ActionType.CHECK))
 
 
 def test_folded_bots_skipped_on_flop() -> None:
     players = four_players()
     eng = HandEngine(tournament=Tournament(players=players), button=0)
     eng.start_hand()
-    play_street_preflop(eng)
+    sb = blind_contributors(eng)
+    assert len(sb) == 2  # exactly SB + BB post blinds
+    folded_seats = {min(sb), max(sb)}  # fold the two blind posters -> fold-rule probe
+    play_street_preflop(eng, folded_seats)
     assert eng.street == "flop"
     queue = list(eng._queue)
-    assert 3 not in queue and 0 not in queue, f"folded players in queue: {queue}"
-    assert eng.current_actor not in (3, 0)
-    # drive the flop to completion; folded seats may never act
-    guard = 0
-    while not eng.is_complete and guard < 200:
-        guard += 1
+    for seat in folded_seats:
+        assert seat not in queue, f"folded {seat} still in queue {queue}"
+    assert eng.current_actor not in folded_seats
+    guard = 200
+    while not eng.is_complete and guard > 0:
+        guard -= 1
         actor = eng.current_actor
-        assert actor not in (3, 0), "folded player became active"
+        assert actor not in folded_seats, "folded player became active"
         if actor is None:
             break
-        eng.act(actor, Action(ActionType.CHECK))
+        facing = eng._street.current_bet > eng._street.contributions.get(actor, 0)
+        eng.act(actor, Action(ActionType.CALL, 100) if facing else Action(ActionType.CHECK))
     assert eng.is_complete or eng.street in ("turn", "river")
-    for seat in (3, 0):
+    for seat in folded_seats:
         assert players[seat].folded
 
 
@@ -61,10 +87,11 @@ def test_folded_player_cannot_act() -> None:
     players = four_players()
     eng = HandEngine(tournament=Tournament(players=players), button=0)
     eng.start_hand()
-    play_street_preflop(eng)
+    sb = blind_contributors(eng)
+    folded_seats = {min(sb), max(sb)}
+    play_street_preflop(eng, folded_seats)
     assert eng.street == "flop"
-    folded = 0
-    # force the folded player to the front of the queue to prove the lock
+    folded = next(iter(folded_seats))
     eng._queue.appendleft(folded)
     assert eng.current_actor == folded
     for action in (
@@ -83,51 +110,43 @@ def test_folded_bot_cannot_win_pot() -> None:
     players = four_players()
     eng = HandEngine(tournament=Tournament(players=players), button=0)
     eng.start_hand()
-    play_street_preflop(eng)
-    guard = 0
-    while not eng.is_complete and guard < 400:
-        guard += 1
-        actor = eng.current_actor
-        if actor is None:
-            break
-        eng.act(actor, Action(ActionType.CHECK))
+    sb = blind_contributors(eng)
+    folded_seats = {min(sb), max(sb)}
+    play_street_preflop(eng, folded_seats)
+    drive_checkdown(eng)
     assert eng.is_complete
     assert eng.result is not None
-    for seat in (3, 0):
+    for seat in folded_seats:
         assert seat not in eng.result.winner_seats(), "folded player won"
 
 
 def test_hero_fold_resolves_hand_with_board() -> None:
     players = four_players()
-    players[0].is_human = True  # Hero folds preflop
+    players[0].is_human = True  # Hero is a fixed seat and folds preflop
     eng = HandEngine(tournament=Tournament(players=players), button=0)
     eng.start_hand()
-    # hero is human: we must act for them
-    actor = eng.current_actor
-    assert actor == 0
+    # advance until it is the hero's turn in the preflop queue
+    guard = 40
+    while eng.current_actor != 0 and guard > 0:
+        guard -= 1
+        eng.advance_bot(eng.current_actor)
+    assert eng.current_actor == 0
     eng.act(0, Action(ActionType.FOLD))
     assert players[0].folded
-    # remaining live bots (P1 folds too; P2 & P3 play on) resolve the hand.
+    # remaining live bots resolve the hand.
     while not eng.is_complete:
         actor = eng.current_actor
         if actor is None:
             break
-        if actor == 1:
-            eng.act(1, Action(ActionType.FOLD))
-        elif actor in (2, 3):
-            facing = eng._street.current_bet > eng._street.contributions.get(actor, 0)
-            eng.act(actor, Action(ActionType.CALL, 100) if facing else Action(ActionType.CHECK))
-        else:  # pragma: no cover - folded hero must never act again
-            pytest.fail(f"folded hero (or folded bot) became active: seat {actor}")
+        facing = eng._street.current_bet > eng._street.contributions.get(actor, 0)
+        eng.act(actor, Action(ActionType.FOLD) if facing else Action(ActionType.CHECK))
     assert eng.is_complete
-    assert players[0].folded and players[1].folded
+    assert players[0].folded
     result = eng.result
     assert result is not None
-    assert 0 not in result.winner_seats() and 1 not in result.winner_seats(), "folded player won"
-    assert 0 not in result.showed_down and 1 not in result.showed_down, "folded player at showdown"
-    # P2 and P3 check down -> 5-card board + showdown between live players
+    assert 0 not in result.winner_seats(), "folded player won"
+    assert 0 not in result.showed_down, "folded player at showdown"
     assert len(result.community_cards) == 5, f"board {result.community_cards}"
-    assert set(result.showed_down) == {2, 3}
     assert sum(p.stack for p in players) == 4000  # chip conservation
 
 
@@ -135,16 +154,12 @@ def test_folded_state_resets_next_hand() -> None:
     players = four_players()
     eng = HandEngine(tournament=Tournament(players=players), button=0)
     eng.start_hand()
-    play_street_preflop(eng)
-    guard = 0
-    while not eng.is_complete and guard < 400:
-        guard += 1
-        actor = eng.current_actor
-        if actor is None:
-            break
-        eng.act(actor, Action(ActionType.CHECK))
+    sb = blind_contributors(eng)
+    folded_seats = {min(sb), max(sb)}
+    play_street_preflop(eng, folded_seats)
+    drive_checkdown(eng)
     assert eng.is_complete
-    assert players[3].folded and players[0].folded
+    assert all(p.folded for p in players if p.seat in folded_seats)
     eng.start_hand()  # next hand
     assert all(not p.folded for p in players)
     assert eng.street == "preflop"
