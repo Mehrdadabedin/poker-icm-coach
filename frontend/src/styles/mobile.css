@@ -1,11 +1,14 @@
 /* Phase 3-6, 9 — responsive mobile / tablet table layout.
 
-The desktop table uses absolute seat placement on a 16:9 felt. On small
-screens that layout overflows the viewport and players overlap. Below we
-switch the felt to a compact centered flex column: the community board on
-top, then all 9 players as a 3-column wrap — every seat keeps its position
-label, name, stack and (hero) cards, so all players stay identifiable on one
-screen with no horizontal scrolling.
+Desktop uses absolute nth-child seat placement on a 16:9 oval felt
+(placement.css). On PORTRAIT phones and tablets we keep the compact centered
+flex layout (board row + players wrap). In LANDSCAPE we reuse the exact
+DESKTOP composition — the same 16:9 oval felt with its percentage-based
+nth-child seats — and simply size/centre it for the short rotated viewport,
+scaling the seat boxes proportionally so nothing overlaps.
+
+`orientation: landscape` is not reliable in browsers, so landscape is
+detected with the standard `min-aspect-ratio` media query.
 */
 
 /* ---- compact post-hand result panel (base styles, Phase 8) ---- */
@@ -34,8 +37,8 @@ screen with no horizontal scrolling.
   font-size: 0.72rem; color: var(--muted); margin-top: 8px;
 }
 
-/* ---- phones & small tablets: no horizontal scroll, everything on one screen ---- */
-@media (max-width: 767px) {
+/* ---- phones & small tablets PORTRAIT: no horizontal scroll, one screen ---- */
+@media (max-width: 767px) and (max-aspect-ratio: 4/3) {
   .table-wrap { width: 100%; }
 
   /* One centered column; the board takes the first full row, then players
@@ -88,77 +91,71 @@ screen with no horizontal scrolling.
     padding: 2px 4px; font-size: 0.8rem;
   }
 
-  /* Phase 5: hand-complete result uses the same compact button sizing */
   .result-actions .btn { min-height: 38px; font-size: 0.8rem; }
   .result-meta { font-size: 0.7rem; }
-
-  /* Full review is a separate screen so nothing needs horizontal scrolling */
   .hand-review { padding: 8px; }
   .result-grid { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
 }
 
-/* ---- tablets (768-959): slightly compact, still roomy ---- */
-@media (min-width: 768px) and (max-width: 959px) {
+/* ---- tablets PORTRAIT (768-959): slightly compact, still roomy ---- */
+@media (min-width: 768px) and (max-width: 959px) and (max-aspect-ratio: 4/3) {
   .table-felt .seat { width: 78px; min-height: 50px; }
   .table-felt .seat.seat-hero { width: 112px; }
   .table-felt .board .playing-card { width: 48px; }
 }
 
-/* ---- short landscape: fit the whole table + action strip in the viewport.
-
-Rotated phones have a short vertical viewport (typically 320-420px). The
-flex-column table (board row + players) plus the action strip can exceed it,
-pushing the table bottom and FOLD/CALL/RAISE/ALL-IN out of view. Here we keep
-the same mobile flex layout but lay players out 5-per-row so the felt is only
-two rows tall and tighten spacing so everything stays visible without
-scrolling. Scoped to <=959px (phones + small tablets) when the viewport is
-wider than tall; portrait and desktop (>=960px) are untouched.
-
-NOTE: `orientation: landscape` is not reliably supported, so we use the
-standard `min-aspect-ratio` media query (understandable by every browser).
-*/
+/* ---- LANDSCAPE phones & small tablets (<=959px, wider than tall) ----
+   Reuse the DESKTOP table composition: the 16:9 oval felt with its
+   percentage-based nth-child seat positions, sized from the available
+   landscape height (100vh minus the header/status and the action strip) and
+   centered. Seat/card sizes are scaled proportionally so all 9 players and
+   the hero hole cards stay visible without overlapping, and the action
+   buttons sit directly below the table. Desktop (>=960px) is untouched. */
 @media (max-width: 959px) and (min-aspect-ratio: 5/4) {
   .table-wrap { width: 100%; }
 
   .table-felt {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-start;
-    align-content: flex-start;
-    gap: 4px;
-    aspect-ratio: auto;
+    display: block;
+    position: relative;
+    /* available height = viewport - header/status (~36px) - buttons (~80px) */
+    width: calc((100vh - 116px) * 16 / 9);
+    max-width: 100%;
+    aspect-ratio: 16 / 9;
     min-height: 0;
-    padding: 4px;
+    margin: 0 auto;
+    padding: 0;
   }
 
   .table-felt .board {
-    position: static; order: -1; flex: 0 0 100%;
-    margin: 0 0 2px; justify-content: center;
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
   }
-  .table-felt .board .playing-card { width: 28px; }
+  .table-felt .board .playing-card { width: 30px; }
 
+  /* nth-child seat positions are percentage-based and scale with the felt;
+     only the seat boxes are reduced so neighbours never touch. */
   .table-felt .seat {
-    position: relative;
-    left: auto; right: auto; top: auto; bottom: auto;
-    transform: none;
-    flex: 0 1 calc(20% - 8px);
-    min-width: 0;
+    position: absolute;
+    width: 11%;
     min-height: 0;
-    padding: 1px 2px;
-    font-size: 0.54rem;
+    padding: 0 2px;
+    font-size: 0.46rem;
+    line-height: 1.1;
   }
-  .table-felt .seat .seat-cards .playing-card { width: 28px; }
-  .table-felt .seat.seat-hero .seat-cards .playing-card { width: 32px; }
-  .table-felt .seat.seat-hero { width: 92px; }
-  .table-felt .seat .seat-stack { font-size: 0.5rem; }
-  .table-felt .seat .dealer-button { width: 14px; height: 14px; font-size: 0.5rem; }
+  .table-felt .seat.seat-hero { width: 16%; }
+  .table-felt .seat .seat-cards .playing-card { width: 17px; }
+  .table-felt .seat.seat-hero .seat-cards .playing-card { width: 16px; }
+  .table-felt .seat .seat-stack { font-size: 0.44rem; }
+  .table-felt .seat .dealer-button { width: 13px; height: 13px; font-size: 0.48rem; }
 
   .table-header,
   .table-status { font-size: 0.6rem; padding: 2px 6px; margin-bottom: 2px; }
 
-  .hero-controls { padding: 2px; margin-top: 0; }
+  .hero-controls { padding: 2px; margin-top: 2px; }
   .hero-controls .hero-info { font-size: 0.6rem; margin-bottom: 2px; }
-  .hero-controls .controls-row .btn { min-height: 32px; font-size: 0.7rem; }
+  .hero-controls .controls-row .btn {
+    min-height: 34px; min-width: 0; flex: 1 1 0;
+    padding: 2px 4px; font-size: 0.72rem;
+  }
 }

@@ -563,3 +563,48 @@ RAISE/ALL-IN strip were pushed below the visible area (matches the screenshots).
   action buttons now fit inside a rotated phone viewport with no horizontal
   scrolling and no cropping. Portrait and desktop are pixel-identical to
   before. No poker/rotation/backend/API/auth behavior was modified.
+
+
+## Mobile Landscape Poker Table — Desktop-Style Scaling (CSS-only)
+
+### Atomic Plan
+- [x] Inspect existing table responsive CSS (mobile.css: portrait flex layout, landscape 5-per-row)
+- [x] Identify mobile-landscape breakpoint (max-width:959px + min-aspect-ratio:5/4; orientation is unreliable)
+- [x] Scale and center the existing horizontal oval poker table
+- [x] Preserve existing seat positions and poker logic (percentage-based nth-child positions reused)
+- [x] Fit action buttons below the table (compact strip directly under the felt)
+- [x] Prevent mobile landscape overflow (no horizontal scroll, no clipping)
+- [x] Verify mobile landscape (all 9 seats visible, no overlap, centered, buttons visible)
+- [x] Verify desktop remains unchanged (>=960px untouched)
+- [x] Update progress.md
+
+### Files changed
+- frontend/src/styles/mobile.css only (no component/JS/backend/desktop changes)
+
+### Changes made
+- LANDSCAPE media query (max-width:959px and min-aspect-ratio:5/4) now reuses the
+  DESKTOP composition: the same 16:9 oval felt with the same percentage-based
+  nth-child seat positions (placement.css), sized from the available landscape
+  height (calc((100vh - 116px) * 16 / 9), capped at 100% width) and centered
+  horizontally. Seat boxes / cards / fonts are scaled down proportionally so
+  all 9 players and the hero hole cards stay visible without overlapping, and
+  the action buttons sit in a compact strip directly below the table.
+- The prior landscape flex 5-per-row layout was replaced by this desktop-style
+  layout (portrait flex layout and the 768-959 tablet portrait block are
+  unchanged).
+- Portrait media queries are now scoped with max-aspect-ratio:4/3 so a rotated
+  landscape phone no longer receives the portrait layout.
+
+### Desktop preservation
+- base.css / felt.css / seats.css / placement.css / controls.css untouched;
+  all changes live inside mobile-only media queries. Desktop (>=960px) renders
+  identically (verified: felt 405px, controls below, 0 overlaps).
+
+### Validation (rendered measurement)
+- Mobile landscape 740x360, 667x375, 640x400, 568x320: table visible, centered,
+  all 9 seats inside, 0 seat overlaps, all action buttons visible, no horizontal
+  overflow.
+- Mobile portrait 360x740, 390x844: unchanged flex layout, all visible.
+- Tablet portrait 768x1024 and desktop 1280x800: unchanged, 0 overlaps.
+- Frontend build clean; tsc clean; 41 tests passed; GitHub audit PASSED.
+- No poker/game/rotation/backend/API/auth logic changed.
