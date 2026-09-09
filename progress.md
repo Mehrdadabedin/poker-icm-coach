@@ -495,3 +495,71 @@ Fix player seating geometry and clockwise rotation.
   and the remaining positions rotate correctly around the ring for both 9- and 6-handed
   tables. Hero follows the same logical rotation and was verified over multiple consecutive
   hands.
+
+
+## Mobile Poker Table Responsive Scaling
+
+### Atomic Plan — Mobile Table Scaling
+- [x] 1. Inspect existing poker table responsive structure
+- [x] 2. Identify mobile landscape breakpoint/layout
+- [x] 3. Identify table sizing constraints
+- [x] 4. Identify action-button sizing/positioning
+- [x] 5. Implement mobile-only proportional table scaling
+- [x] 6. Ensure complete table fits mobile landscape viewport
+- [x] 7. Ensure action buttons remain visible and touchable
+- [x] 8. Verify mobile portrait
+- [x] 9. Verify mobile landscape
+- [x] 10. Verify desktop has no visual changes
+- [x] 11. Run build/tests
+- [x] 12. Update progress.md
+- [x] 13. Report changed files and results
+
+### Problem
+Rotated-phone landscape viewports (e.g. 667x375, 740x360) are short in height.
+The previous mobile layout (3-seat-per-row felt built from the <=767px block
+plus a non-standard `orientation: landscape` media query that real browsers
+don't honour) produced a ~344px-tall felt + 75px action strip + header that
+together exceeded the 320-420px viewport: the table bottom and the FOLD/CALL/
+RAISE/ALL-IN strip were pushed below the visible area (matches the screenshots).
+
+### Affected mobile layouts
+- Mobile landscape (phones rotated): felt + action buttons overflowed the
+  short vertical viewport.
+- Mobile portrait was usable; it is preserved as-is.
+
+### Files Changed
+- frontend/src/styles/mobile.css (only). No component, backend, game, or
+  desktop/tablet CSS changed.
+
+### Responsive Approach Used
+- Rebuilt mobile.css cleanly (removed duplicate/broken blocks leftover from a
+  prior edit; brace-balanced, single block per breakpoint).
+- Replaced the unsupported `(orientation: landscape)` media query with the
+  standard `(min-aspect-ratio: 5/4)`, scoped to `max-width: 959px` (phones +
+  small tablets), so landscape phones/tablets are detected reliably.
+- Mobile landscape-specific overrides (same flex layout, no redesign):
+  players laid out 5-per-row (felt = board row + 2 seat rows -> ~264px tall),
+  smaller seat/card/hero card sizing, compact header/status and compact
+  action buttons (min-height 32px, still touch-friendly), action strip
+  immediately below the felt.
+- Portrait (<=767px taller-than-wide) and desktop (>=960px) are untouched.
+
+### Validation
+- Playwright rendered measurement at mobile landscape 568x320, 640x400,
+  667x375, 740x360/420, 812x375, 900x400, 959x500: felt fully visible,
+  all 5 action buttons visible & inside viewport, all 9 seats inside the felt,
+  0 seat overlaps, 0 horizontal overflow.
+- Mobile portrait 360x740 / 390x844: unchanged and fully visible.
+- Tablet portrait 768x1024: unchanged. Desktop 1024x700 / 1280x800: exactly
+  the same geometry as before the change (felt bottom 470, controls bottom
+  575).
+- Build/test: tsc clean; frontend 41 passed; npm build clean; GitHub audit
+  PASSED; backend 407 passed / 4 skipped (untouched).
+- Desktop intentionally left unchanged (git diff: only frontend/src/styles/
+  mobile.css (+ regenerated tsconfig.tsbuildinfo) modified).
+
+### Final Result
+- On mobile landscape the complete poker table + hero + all players + the
+  action buttons now fit inside a rotated phone viewport with no horizontal
+  scrolling and no cropping. Portrait and desktop are pixel-identical to
+  before. No poker/rotation/backend/API/auth behavior was modified.

@@ -20,43 +20,23 @@ screen with no horizontal scrolling.
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
-.hand-result .result-banner {
-  margin-bottom: 8px;
-}
-
-.hand-result .result-title {
-  font-size: 1.5rem;
-}
-
+.hand-result .result-banner { margin-bottom: 8px; }
+.hand-result .result-title { font-size: 1.5rem; }
 .result-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  font-size: 0.78rem;
-  color: var(--muted);
-  margin-bottom: 10px;
+  display: flex; flex-wrap: wrap; gap: 8px;
+  font-size: 0.78rem; color: var(--muted); margin-bottom: 10px;
 }
-
 .result-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  justify-content: center;
+  display: flex; gap: 8px; align-items: center; justify-content: center;
 }
-
 .result-flow {
-  display: flex;
-  justify-content: center;
-  font-size: 0.72rem;
-  color: var(--muted);
-  margin-top: 8px;
+  display: flex; justify-content: center;
+  font-size: 0.72rem; color: var(--muted); margin-top: 8px;
 }
 
 /* ---- phones & small tablets: no horizontal scroll, everything on one screen ---- */
 @media (max-width: 767px) {
-  .table-wrap {
-    width: 100%;
-  }
+  .table-wrap { width: 100%; }
 
   /* One centered column; the board takes the first full row, then players
      wrap 3-per-row. Neutralize the desktop nth-child absolute coordinates. */
@@ -74,23 +54,14 @@ screen with no horizontal scrolling.
   }
 
   .table-felt .board {
-    position: static;
-    order: -1;
-    flex: 0 0 100%;
-    margin: 0 0 2px;
-    justify-content: center;
+    position: static; order: -1; flex: 0 0 100%;
+    margin: 0 0 2px; justify-content: center;
   }
-
-  .table-felt .board .playing-card {
-    width: 32px;
-  }
+  .table-felt .board .playing-card { width: 32px; }
 
   .table-felt .seat {
     position: relative;
-    left: auto;
-    right: auto;
-    top: auto;
-    bottom: auto;
+    left: auto; right: auto; top: auto; bottom: auto;
     transform: none;
     flex: 0 1 calc(33.333% - 8px);
     min-width: 0;
@@ -98,101 +69,96 @@ screen with no horizontal scrolling.
     padding: 3px 4px;
     font-size: 0.62rem;
   }
-
-  .table-felt .seat .seat-cards .playing-card {
-    width: 34px;
-  }
-
-  /* Hero keeps larger cards; two 40px fit a ~100px cell */
-  .table-felt .seat.seat-hero {
-    width: 104px;
-  }
-
-  .table-felt .seat.seat-hero .seat-cards .playing-card {
-    width: 40px;
-  }
-
-  .table-felt .seat .seat-stack {
-    font-size: 0.58rem;
-  }
-
-  .table-felt .seat .dealer-button {
-    width: 16px;
-    height: 16px;
-    font-size: 0.55rem;
-  }
+  .table-felt .seat .seat-cards .playing-card { width: 34px; }
+  .table-felt .seat.seat-hero { width: 104px; }
+  .table-felt .seat.seat-hero .seat-cards .playing-card { width: 40px; }
+  .table-felt .seat .seat-stack { font-size: 0.58rem; }
+  .table-felt .seat .dealer-button { width: 16px; height: 16px; font-size: 0.55rem; }
 
   .table-header,
-  .table-status {
-    font-size: 0.66rem;
-    flex-wrap: wrap;
-  }
+  .table-status { font-size: 0.66rem; flex-wrap: wrap; }
 
   /* Phase 4: action controls compact at the bottom-center, below the felt
      (never covering player information); buttons share width evenly. */
-  .hero-controls {
-    width: 100%;
-    padding: 6px;
-    margin-top: 2px;
-  }
-
-  .hero-controls .hero-info {
-    font-size: 0.68rem;
-    gap: 6px;
-  }
-
-  .hero-controls .controls-row {
-    gap: 5px;
-    justify-content: center;
-  }
-
+  .hero-controls { width: 100%; padding: 6px; margin-top: 2px; }
+  .hero-controls .hero-info { font-size: 0.68rem; gap: 6px; }
+  .hero-controls .controls-row { gap: 5px; justify-content: center; }
   .hero-controls .controls-row .btn {
-    min-height: 40px;
-    min-width: 0;
-    flex: 1 1 0;
-    padding: 2px 4px;
-    font-size: 0.8rem;
+    min-height: 40px; min-width: 0; flex: 1 1 0;
+    padding: 2px 4px; font-size: 0.8rem;
   }
 
   /* Phase 5: hand-complete result uses the same compact button sizing */
-  .result-actions .btn {
-    min-height: 38px;
-    font-size: 0.8rem;
-  }
-
-  .result-meta {
-    font-size: 0.7rem;
-  }
+  .result-actions .btn { min-height: 38px; font-size: 0.8rem; }
+  .result-meta { font-size: 0.7rem; }
 
   /* Full review is a separate screen so nothing needs horizontal scrolling */
-  .hand-review {
-    padding: 8px;
-  }
-
-  .result-grid {
-    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  }
+  .hand-review { padding: 8px; }
+  .result-grid { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
 }
 
 /* ---- tablets (768-959): slightly compact, still roomy ---- */
 @media (min-width: 768px) and (max-width: 959px) {
-  .table-felt .seat {
-    width: 78px;
-    min-height: 50px;
-  }
-
-  .table-felt .seat.seat-hero {
-    width: 112px;
-  }
-
-  .table-felt .board .playing-card {
-    width: 48px;
-  }
+  .table-felt .seat { width: 78px; min-height: 50px; }
+  .table-felt .seat.seat-hero { width: 112px; }
+  .table-felt .board .playing-card { width: 48px; }
 }
 
-/* ---- mobile landscape (orientation hint) stays portrait-capable ---- */
-@media (max-width: 767px) and (orientation: landscape) {
-  .table-felt .seat {
-    flex: 0 1 calc(25% - 8px);
+/* ---- short landscape: fit the whole table + action strip in the viewport.
+
+Rotated phones have a short vertical viewport (typically 320-420px). The
+flex-column table (board row + players) plus the action strip can exceed it,
+pushing the table bottom and FOLD/CALL/RAISE/ALL-IN out of view. Here we keep
+the same mobile flex layout but lay players out 5-per-row so the felt is only
+two rows tall and tighten spacing so everything stays visible without
+scrolling. Scoped to <=959px (phones + small tablets) when the viewport is
+wider than tall; portrait and desktop (>=960px) are untouched.
+
+NOTE: `orientation: landscape` is not reliably supported, so we use the
+standard `min-aspect-ratio` media query (understandable by every browser).
+*/
+@media (max-width: 959px) and (min-aspect-ratio: 5/4) {
+  .table-wrap { width: 100%; }
+
+  .table-felt {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: flex-start;
+    gap: 4px;
+    aspect-ratio: auto;
+    min-height: 0;
+    padding: 4px;
   }
+
+  .table-felt .board {
+    position: static; order: -1; flex: 0 0 100%;
+    margin: 0 0 2px; justify-content: center;
+  }
+  .table-felt .board .playing-card { width: 28px; }
+
+  .table-felt .seat {
+    position: relative;
+    left: auto; right: auto; top: auto; bottom: auto;
+    transform: none;
+    flex: 0 1 calc(20% - 8px);
+    min-width: 0;
+    min-height: 0;
+    padding: 1px 2px;
+    font-size: 0.54rem;
+  }
+  .table-felt .seat .seat-cards .playing-card { width: 28px; }
+  .table-felt .seat.seat-hero .seat-cards .playing-card { width: 32px; }
+  .table-felt .seat.seat-hero { width: 92px; }
+  .table-felt .seat .seat-stack { font-size: 0.5rem; }
+  .table-felt .seat .dealer-button { width: 14px; height: 14px; font-size: 0.5rem; }
+
+  .table-header,
+  .table-status { font-size: 0.6rem; padding: 2px 6px; margin-bottom: 2px; }
+
+  .hero-controls { padding: 2px; margin-top: 0; }
+  .hero-controls .hero-info { font-size: 0.6rem; margin-bottom: 2px; }
+  .hero-controls .controls-row .btn { min-height: 32px; font-size: 0.7rem; }
 }
