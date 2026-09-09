@@ -271,3 +271,14 @@ public/cards/* (53 generated SVGs), tests/* (features, login), scripts/generate_
 - Full regression: backend 400 passed / 4 skipped; frontend 34 passed; tsc,
   build, GitHub audit green.
 - Only card-asset/presentation/docs changed; poker/ICM/auth/session untouched.
+
+### A18 — registration-first authentication flow
+- Backend: POST /api/auth/register (username + password), login now requires
+  registered credentials; UserRegistry with salted PBKDF2-SHA256 hashing and
+  best-effort data/users.json persistence; generic 401 for invalid sign-in.
+- Frontend: LoginForm SIGN IN / SIGN UP modes with required-field, min-length
+  and confirm-password validation; success message then sign-in; scoped
+  auth.css preserving the dark/gold visual identity.
+- Verified: backend 400 passed / 4 skipped; frontend 37 passed; tsc/build/audit
+  clean; live smoke (register -> duplicate/weak rejection -> invalid 401 ->
+  login -> tournament -> logout -> 401). A02-A17 and OpenDecks cards untouched.

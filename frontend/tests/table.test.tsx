@@ -57,6 +57,7 @@ describe("TablePage", () => {
       saveAuth: vi.fn(),
       clearAuth: vi.fn(),
       login: vi.fn(async () => ({ token: "token", username: "Alice" })),
+      register: vi.fn(async () => ({ username: "Alice", registered: true })),
       logout: vi.fn(async () => ({ ok: true })),
       me: vi.fn(async () => ({ username: "Alice" })),
       AuthError: class AuthError extends Error {},

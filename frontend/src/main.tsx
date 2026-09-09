@@ -12,6 +12,7 @@ import "./styles/review.css";
 import "./styles/explanations.css";
 import "./styles/coach-analyzer.css";
 import "./styles/cards.css";
+import "./styles/auth.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

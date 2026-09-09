@@ -38,10 +38,44 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-export function login(username: string): Promise<{ token: string; username: string }> {
-  return request<{ token: string; username: string }>("/api/auth/login", {
+// Auth requests surface the server's detail (e.g. "invalid username or
+// password") as a clear, user-facing message instead of the generic 401 text.
+async function authRequest<T>(path: string, body: unknown): Promise<T> {
+  const response = await fetch(`${API_BASE}${path}`, {
     method: "POST",
-    body: JSON.stringify({ username }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!response.ok) {
+    let msg = `API ${response.status}`;
+    try {
+      const data = (await response.json()) as { detail?: string };
+      if (data.detail) msg = data.detail;
+    } catch {
+      // keep the generic message if the body is not JSON
+    }
+    throw new Error(msg);
+  }
+  return response.json() as Promise<T>;
+}
+
+export function register(
+  username: string,
+  password: string,
+): Promise<{ username: string; registered: boolean }> {
+  return authRequest<{ username: string; registered: boolean }>("/api/auth/register", {
+    username,
+    password,
+  });
+}
+
+export function login(
+  username: string,
+  password: string,
+): Promise<{ token: string; username: string }> {
+  return authRequest<{ token: string; username: string }>("/api/auth/login", {
+    username,
+    password,
   });
 }
 

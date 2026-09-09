@@ -20,6 +20,7 @@ class Settings(BaseSettings):
     blind_level_minutes: int = 20
     fast_mode: bool = False
     history_dir: str = "data/history"
+    auth_users_file: str = "data/users.json"
 
     @property
     def cors_origin_list(self) -> list[str]:

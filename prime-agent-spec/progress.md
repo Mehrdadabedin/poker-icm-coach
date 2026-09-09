@@ -43,7 +43,7 @@ Main requested changes:
 | A15 | Documentation | 🟢 | progress.md (this file) + repo progress.md updated; .env.example/.gitignore updated. |
 | A16 | Optional hand review must not interrupt the live game | 🟢 | Implemented with A10: compact result stays on table; review opens only on click; return to table; pause/play intact. |
 | A17 | Professional playing-card assets (OpenDecks CC0) | 🟢 | OpenDecks 52-card deck installed locally in BOTH PNG and SVG (frontend/public/cards/); production renderer now uses the PNG set (cards/<rank><suit>.png + back.png); CC0 license bundled; mapping layer scripts/import_opendecks_cards.py (validates 52/52 per format); hero seat container fit verified (no clip/overlap, desktop/tablet/mobile); semantic alt text; backend test_card_assets.py (6) + frontend A08/A17 suite. |
-| A18 | User registration | 🟡 | PLANNED — NOT IMPLEMENTED |
+| A18 | Registration-first authentication flow | 🟢 | SIGN IN / SIGN UP entry; username + password + confirm registration with validation; salted PBKDF2 password hashes; duplicate/short rejected; invalid sign-in 401; bearer-token session preserved; users.json best-effort persistence; login.test.tsx + backend auth tests; 400 backend / 37 frontend tests pass. |
 | A19 | WebAuthn / passkey / biometric authentication | 🟡 | PLANNED — NOT IMPLEMENTED |
 | A20 | Header / user display refinement | 🟡 | PLANNED — NOT IMPLEMENTED |
 | A21 | Fixed player-card container refinement | 🟡 | PLANNED — NOT IMPLEMENTED |
@@ -96,6 +96,27 @@ The browser console/network screenshots show a POST action request returning HTT
   frontend 34 passed; tsc/build/audit clean; dist contains 53 PNG + 53 SVG.
 - No poker/ICM/game/auth/session logic touched. A18-A25 remain PLANNED / NOT
   IMPLEMENTED; no OAuth anywhere.
+
+### 2026-09-04 (A18 — registration-first authentication flow)
+- Backend: app/services/auth.py adds UserRegistry (username -> salted
+  PBKDF2-SHA256 hash, constant-time verify, best-effort data/users.json
+  persistence); app/api/routes_auth.py adds POST /api/auth/register and makes
+  POST /api/auth/login require a registered password (401 generic on invalid);
+  config adds auth_users_file.
+- Frontend: LoginForm now shows SIGN IN and SIGN UP modes; registration validates
+  required fields, min 8-char password, password confirmation; inline errors;
+  clear success then returns to SIGN IN; sign-in with credentials; api.ts add
+  register() + password login() with server-detail error surfacing; scoped
+  auth.css keeps the dark/gold visual identity.
+- Tests: login.test.tsx rewritten for the A18 flow (choices, validation,
+  success, sign-in, invalid sign-in, logout); table.test mock updated; backend
+  test_auth_and_isolation.py covers register/duplicate/weak-password/invalid
+  sign-in/me. Test helpers hardened so the suite stays hermetic (registry bound
+  in-memory; no data/users.json written by collection).
+- Verified: backend 400 passed / 4 skipped; frontend 37 passed; tsc/build/audit
+  clean; live smoke: sign-in-required, register, duplicate + weak-password
+  rejection, invalid-login 401, valid login -> tournament -> logout -> 401.
+- No Google/Facebook/OAuth; no poker/ICM/card changes; A19-A25 stay PLANNED.
 
 ## Verification log
 

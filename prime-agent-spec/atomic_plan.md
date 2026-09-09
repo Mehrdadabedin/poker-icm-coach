@@ -325,12 +325,27 @@ Make this an incremental modification of the existing project. Before coding, ma
   correct local assets.
 - Run the full backend + frontend regression suites.
 
-## A18 — User registration (PLANNED — NOT IMPLEMENTED)
-- Clear REGISTER option for first-time users; registration with username, email,
-  password; registered users log in with those credentials.
-- Existing A02-A15 login/logout stays intact; username continues to replace
-  "Hero"; credentials stored securely; logout clears the session; users stay
-  isolated. DO NOT IMPLEMENT NOW.
+## A18 — Registration-first authentication flow (IMPLEMENTED)
+- First-time users choose SIGN UP; existing users choose SIGN IN.
+- Registration collects username + password + confirm (the existing auth model
+  is username-based; no email is required by the backend).
+- Validation: required fields, password length (>= 8), password confirmation;
+  clear inline errors; no API call for invalid data; duplicate usernames and
+  short passwords rejected server-side; clear success message after sign-up,
+  then the user proceeds to SIGN IN.
+- Sign-in validates registered credentials (constant-time compare); invalid
+  credentials yield one generic error (no account hint); valid sign-in issues
+  the existing bearer token and continues to the unchanged ICM home screen.
+- Passwords are hashed with salted PBKDF2-SHA256 (never stored/logged in
+  plaintext); users persist best-effort to data/users.json (blank disables).
+- Existing user/session isolation, table IDs, hand histories, logout,
+  A02-A17 functionality and OpenDecks cards remain unchanged.
+- Backend: app/services/auth.py (UserRegistry), app/api/routes_auth.py
+  (/register, /login), app/core/config.py (auth_users_file), tests.
+- Frontend: LoginForm SIGN IN / SIGN UP modes with validation, api.ts register/
+  password login, scoped auth.css, tests. Verified: backend 400 passed / 4
+  skipped; frontend 37 passed; tsc/build/audit clean; live register->login->
+  game->logout smoke test passed.
 
 ## A19 — WebAuthn / passkey / biometric authentication (PLANNED — NOT IMPLEMENTED)
 - Optional passkey/WebAuthn auth on supported mobile/desktop platforms.
