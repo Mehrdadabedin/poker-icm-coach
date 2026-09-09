@@ -693,3 +693,36 @@ landscape phone has. 16:9 physically cannot reach ~90-95% width on a
 ### Checks
 - tsc clean; frontend 41 tests passed; npm build clean; GitHub audit PASSED.
 - Desktop, portrait, poker/game logic unchanged (CSS-only).
+
+
+## Mobile Landscape Poker Table Reduced to ~82% Viewport Width (CSS-only)
+
+### Date
+2026-09-10
+
+### Change
+- frontend/src/styles/mobile.css, landscape media block only:
+  `width: 92vw / max-width: 92vw` -> `width: 82vw / max-width: 82vw`.
+- Height (`calc(100vh - 102px)`) and all other landscape rules unchanged.
+- nth-child seat positions, rotation, cards, game logic, desktop and portrait
+  untouched (scaling only).
+
+### Rendered measurements (actual)
+| Viewport | table width | table height | % viewport width | centered | overlap | buttons | h-scroll |
+|---|---|---|---|---|---|---|---|
+| 740x360  | 607 | 258 | 82% | yes | 0 | visible | none |
+| 568x320  | 466 | 218 | 82% | yes | 0 | visible | none |
+| 844x390  | 692 | 288 | 82% | yes | 0 | visible | none |
+| 667x375  | 547 | 273 | 82% | yes | 0 | visible | none |
+
+- All 9 seats visible, hero cards visible, table border visible, action
+  buttons fully in viewport, no horizontal scrolling, no clipping.
+- Old width was ~92%; new width ~82% as required.
+
+### Desktop / portrait
+- Desktop 1280x800: table 720x405 (unchanged). Portrait 360x740: 360x344
+  (unchanged). Desktop/portrait CSS untouched.
+
+### Checks
+- tsc clean; frontend 41 tests passed; npm build clean; GitHub audit PASSED.
+- Poker/game logic unchanged (CSS-only).

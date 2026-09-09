@@ -117,15 +117,15 @@ detected with the standard `min-aspect-ratio` media query.
   .table-felt {
     display: block;
     position: relative;
-    /* Use the full available LANDSCAPE width: the viewport is wider than it
-       is tall, and the nth-child seat positions are percentage-based, so the
-       table may be a wider horizontal oval instead of being capped by a
-       strict 16:9 ratio (which would limit a 360px-tall viewport to ~460px).
-       Height uses the same measured chrome reserve (~102px for header, status
-       and the action strip) so all UI stays on screen. */
-    width: 92vw;
+    /* Balanced LANDSCAPE width: the table uses ~82% of the viewport width,
+       leaving comfortable space around the complete playable interface while
+       keeping the wide horizontal oval. nth-child seat positions are
+       percentage-based and scale with the container. Height uses the same
+       measured chrome reserve (~102px for header, status and the action
+       strip) so all UI stays on screen. */
+    width: 82vw;
     height: calc(100vh - 102px);
-    max-width: 92vw;
+    max-width: 82vw;
     aspect-ratio: auto;
     min-height: 0;
     margin: 0 auto;
