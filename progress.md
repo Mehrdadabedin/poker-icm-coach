@@ -642,3 +642,54 @@ RAISE/ALL-IN strip were pushed below the visible area (matches the screenshots).
 ### Checks
 - tsc clean; frontend 41 tests passed; npm build clean; GitHub audit PASSED.
 - Desktop and portrait untouched; no poker/game logic changed.
+
+
+## Mobile Landscape Table Size Correction — Use Full Landscape Width (CSS-only)
+
+### Date
+2026-09-10
+
+### Problem
+Previous landscape sizing `width: min(92vw, calc((100vh - 102px) * 16 / 9))`
+kept a strict 16:9 aspect ratio. On a real landscape phone (e.g. 740x360 CSS
+px) the vertical budget left after header/status/action buttons is only
+~258px, so the 16:9 multiplier capped the table at ~459px (~62% of viewport
+width) regardless of the 92vw cap.
+
+### Root cause
+The strict `aspect-ratio: 16 / 9` combined with the fixed vertical chrome
+reserve is the constraint: a wider table would need more height than a
+landscape phone has. 16:9 physically cannot reach ~90-95% width on a
+320-390px-tall rotated viewport.
+
+### Change (frontend/src/styles/mobile.css, landscape media block only)
+- `.table-felt` width changed from `min(92vw, calc((100vh-102px)*16/9))` to
+  `92vw`
+- height stays `calc(100vh - 102px)` (same measured reserve for header/status/
+  action strip) with `aspect-ratio: auto` (wider horizontal oval, nth-child
+  seat coordinates untouched — they are percentage-based and scale with the
+  container)
+- seat/card sizes bumped for the larger table (seat 10%, hero 14%, seat cards
+  22px, hero cards 24px, board cards 38px)
+
+### Validation (actual rendered measurements)
+| viewport | table width | table height | % of viewport width | seats-overlap | buttons | h-scroll |
+|---|---|---|---|---|---|---|
+| 740x360  | 681 | 258 | 92% | 0 | visible | none |
+| 568x320  | 523 | 218 | 92% | 0 | visible | none |
+| 844x390  | 776 | 288 | 92% | 0 | visible | none |
+| 667x375  | 614 | 273 | 92% | 0 | visible | none |
+
+- All 9 seats visible, hero cards visible, table border (felt) visible,
+  action buttons fully inside viewport, no horizontal scrolling, no vertical
+  clipping.
+- Portrait (360x740) and desktop (1280x800 -> table 720x405, unchanged)
+  verified unaffected.
+
+### Files
+- frontend/src/styles/mobile.css (landscape block only)
+- progress.md (this entry)
+
+### Checks
+- tsc clean; frontend 41 tests passed; npm build clean; GitHub audit PASSED.
+- Desktop, portrait, poker/game logic unchanged (CSS-only).

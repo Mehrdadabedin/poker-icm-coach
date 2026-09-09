@@ -117,13 +117,16 @@ detected with the standard `min-aspect-ratio` media query.
   .table-felt {
     display: block;
     position: relative;
-    /* Largest 16:9 table that fits the landscape viewport:
-       height budget = viewport minus header/status (~40px) minus the action
-       strip (~56px); width is capped at 92vw so the table never exceeds the
-       target ~90-95% of the available width. */
-    width: min(92vw, calc((100vh - 102px) * 16 / 9));
+    /* Use the full available LANDSCAPE width: the viewport is wider than it
+       is tall, and the nth-child seat positions are percentage-based, so the
+       table may be a wider horizontal oval instead of being capped by a
+       strict 16:9 ratio (which would limit a 360px-tall viewport to ~460px).
+       Height uses the same measured chrome reserve (~102px for header, status
+       and the action strip) so all UI stays on screen. */
+    width: 92vw;
+    height: calc(100vh - 102px);
     max-width: 92vw;
-    aspect-ratio: 16 / 9;
+    aspect-ratio: auto;
     min-height: 0;
     margin: 0 auto;
     padding: 0;
@@ -134,22 +137,22 @@ detected with the standard `min-aspect-ratio` media query.
     left: 50%; top: 50%;
     transform: translate(-50%, -50%);
   }
-  .table-felt .board .playing-card { width: 30px; }
+  .table-felt .board .playing-card { width: 38px; }
 
   /* nth-child seat positions are percentage-based and scale with the felt;
-     only the seat boxes are reduced so neighbours never touch. */
+     only the seat boxes are scaled so neighbours never touch. */
   .table-felt .seat {
     position: absolute;
-    width: 11%;
+    width: 10%;
     min-height: 0;
     padding: 0 2px;
-    font-size: 0.46rem;
-    line-height: 1.1;
+    font-size: 0.5rem;
+    line-height: 1.15;
   }
-  .table-felt .seat.seat-hero { width: 16%; }
-  .table-felt .seat .seat-cards .playing-card { width: 17px; }
-  .table-felt .seat.seat-hero .seat-cards .playing-card { width: 16px; }
-  .table-felt .seat .seat-stack { font-size: 0.44rem; }
+  .table-felt .seat.seat-hero { width: 14%; }
+  .table-felt .seat .seat-cards .playing-card { width: 22px; }
+  .table-felt .seat.seat-hero .seat-cards .playing-card { width: 24px; }
+  .table-felt .seat .seat-stack { font-size: 0.48rem; }
   .table-felt .seat .dealer-button { width: 13px; height: 13px; font-size: 0.48rem; }
 
   .table-header,
