@@ -726,3 +726,44 @@ landscape phone has. 16:9 physically cannot reach ~90-95% width on a
 ### Checks
 - tsc clean; frontend 41 tests passed; npm build clean; GitHub audit PASSED.
 - Poker/game logic unchanged (CSS-only).
+
+
+## Mobile Landscape Table Size — Diagnostic Confirmation (82vw is applied)
+
+### Date
+2026-09-10
+
+### Summary
+The previous commit (b64e06a) already sets the mobile-landscape table to
+`width: 82vw; max-width: 82vw` (aspect-ratio: auto, centered). This entry
+documents the diagnosis that the CSS is correct and rendering at ~82% of the
+viewport — the "still too large" report on a real phone is a deployment
+staleness issue (the phone was still serving the earlier 92vw build), not a
+CSS override.
+
+### Evidence (actual rendered bounding boxes with the shipped CSS)
+| Viewport | Table W | Table H | % of width | Left gap | Right gap | Overlap | Buttons |
+|---|---|---|---|---|---|---|---|
+| 740x360 | 607 | 258 | 82% | 67 | 67 | 0 | visible |
+| 568x320 | 466 | 218 | 82% | 51 | 51 | 0 | visible |
+| 844x390 | 692 | 288 | 82% | 76 | 76 | 0 | visible |
+| 667x375 | 547 | 273 | 82% | 60 | 60 | 0 | visible |
+
+Computed styles: `width: 82vw`, `max-width: 82vw`, `aspect-ratio: auto`,
+`display: block`, `margin: 0 auto` — symmetric gaps confirm centering.
+No other CSS rule sets width on .table-felt (desktop sets only aspect-ratio/
+min-height; portrait flex block does not apply in landscape).
+
+Built artifact check: `dist/assets/*.css` contains `82vw` (verified before
+and after a clean rebuild), so a fresh frontend deploy will render at 82%.
+
+### Files changed
+- None (diagnosis only). progress.md appended.
+
+### Checks
+- tsc clean; frontend 41 tests passed; GitHub audit PASSED.
+- Desktop/portrait/poker logic untouched; CSS-only, mobile-landscape-only.
+
+### Required action
+- Redeploy the frontend (main @ b64e06a) and hard-refresh the phone. The
+  landscape table will then render at ~82% of the viewport width.
