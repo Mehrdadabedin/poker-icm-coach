@@ -1,6 +1,8 @@
 """Authentication routes (A03/A04/A18)."""
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi import APIRouter, Depends, Header, HTTPException
 from pydantic import BaseModel, Field
 
@@ -13,6 +15,18 @@ from app.services.auth import (
 )
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
+
+# Resolve relative persistence paths against the backend root so registered
+# users/sessions survive restarts regardless of the process working directory
+# (e.g. uvicorn started from a different folder in deployment).
+_BACKEND_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _abs(path_str: str) -> str:
+    if not path_str:
+        return ""
+    p = Path(path_str)
+    return str(_BACKEND_ROOT / p) if not p.is_absolute() else str(p)
 
 
 class RegisterRequest(BaseModel):
@@ -27,8 +41,8 @@ class LoginRequest(BaseModel):
 
 # Bind the shared user registry + session store to the configured persistence
 # files (blank disables file persistence, e.g. in the hermetic test suite).
-auth_registry.bind_path(settings.auth_users_file)
-auth_store.bind_path(settings.auth_sessions_file)
+auth_registry.bind_path(_abs(settings.auth_users_file))
+auth_store.bind_path(_abs(settings.auth_sessions_file))
 
 
 @router.post("/register")

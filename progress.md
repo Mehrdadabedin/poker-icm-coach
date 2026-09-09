@@ -380,3 +380,49 @@ public/cards/* (53 generated SVGs), tests/* (features, login), scripts/generate_
   If desired later, add an enabled/disabled user setting that toggles a
   landscape class (no reliable browser lock guarantee).
 - Deploy to Render (owner action) and re-verify on the live site once requested.
+
+
+## Login UI + login functionality fixes (bug 1-3)
+
+### Bug 1 — duplicate "WELCOME BACK" removed
+- LoginForm no longer renders any heading in login mode (the target layout
+  [LOGIN] [SIGN UP] / explanatory text / fields / [LOGIN] has no heading).
+  The signup mode keeps its "CREATE YOUR ACCOUNT" heading. Verified on desktop
+  and mobile (320/375/390px): no "WELCOME BACK" anywhere.
+
+### Bug 3 — "SIGN IN" -> "LOGIN"
+- Login-mode toggle button, main submit button, and "Already registered?"
+  switch link now read LOGIN. Explanatory text "Sign in to continue to your
+  private practice table." unchanged (non-action label). Backend endpoints,
+  api.ts function names, test ids untouched.
+
+### Bug 2 — login does not proceed (trace + fixes)
+Traced the full flow: LoginForm.submit -> api.login -> POST /api/auth/login
+(username+password) -> auth_registry.verify (salted PBKDF2 compare) -> token ->
+saveAuth -> HomePage onLogin(setUser) -> authenticated menu -> private table.
+Verified end-to-end (Playwright against the real backend + built frontend):
+signup -> token -> logout -> LOGIN with same user -> menu -> private table ->
+refresh stays authenticated -> wrong password shows "invalid username or
+password" and stays on login. Zero console errors.
+Root-cause hardening for the reported "stays on login" behaviour:
+- Enter key now submits the login form (username + password fields) - real gap.
+- HomePage validates a stored token via /api/auth/me on load; stale/invalid
+  tokens (backend restart, expiry, deploy data loss) are cleared so the user is
+  returned to a clean LOGIN screen instead of a broken half-authenticated state
+  (was: menu shown but every action silently 401).
+- Backend auth persistence paths are now resolved relative to the backend root
+  (routes_auth `_abs`), so data/users.json + data/sessions.json are written and
+  read from the same absolute location regardless of the process CWD; verified:
+  register -> server restart -> login still 200.
+Note: account data still lives in best-effort JSON files on the server; on
+Render's ephemeral filesystem data is wiped by a fresh redeploy - in that case
+previously registered accounts 401 and the UI now shows the clear error (and a
+fresh signup re-creates the account). A durable database-backed user store is
+future work if accounts must survive redeploys.
+
+### Tests
+- frontend: 41 passed (added: Enter-key submit, no-WELCOME-BACK, stale-token
+  clear; updated LOGIN wording); tsc clean; build clean.
+- backend: 403 passed / 4 skipped; ruff clean on changed files; audit PASSED.
+- E2E (local, real backend+UI): all acceptance steps + desktop/mobile geometry
+  (no overflow, clickable submit at 320/375/390px).

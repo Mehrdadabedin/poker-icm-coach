@@ -10,8 +10,8 @@ const MIN_PASSWORD_LENGTH = 8;
 type Mode = "signin" | "signup";
 
 /** Registration-first authentication entry (A18).
- * First screen offers SIGN IN / SIGN UP. New users register (username +
- * password + confirm), then sign in. Existing users sign in with credentials.
+ * First screen offers LOGIN / SIGN UP. New users register (username +
+ * password + confirm); existing users log in with credentials.
  * Matches the existing dark/gold compact ICM visual identity. */
 export function LoginForm({ onLogin }: LoginFormProps) {
   const [mode, setMode] = useState<Mode>("signin");
@@ -105,7 +105,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
           onClick={() => resetForm("signin")}
           data-testid="mode-signin"
         >
-          SIGN IN
+          LOGIN
         </button>
         <button
           className={`btn auth-mode-btn ${mode === "signup" ? "active" : ""}`}
@@ -116,7 +116,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         </button>
       </div>
 
-      <h2>{mode === "signin" ? "WELCOME BACK" : "CREATE YOUR ACCOUNT"}</h2>
+      {mode === "signup" && <h2>CREATE YOUR ACCOUNT</h2>}
       <p className="note">
         {mode === "signin"
           ? "Sign in to continue to your private practice table."
@@ -132,6 +132,9 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         aria-label="username"
         data-testid="username-input"
         onChange={(e) => setName(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") submit();
+        }}
         autoComplete="username"
       />
       <input
@@ -143,6 +146,9 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         data-testid="password-input"
         autoComplete={mode === "signin" ? "current-password" : "new-password"}
         onChange={(e) => setPassword(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") submit();
+        }}
       />
       {mode === "signup" && (
         <input
@@ -165,7 +171,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         disabled={busy}
         data-testid="auth-submit"
       >
-        {busy ? "PLEASE WAIT…" : mode === "signin" ? "SIGN IN" : "SIGN UP"}
+        {busy ? "PLEASE WAIT…" : mode === "signin" ? "LOGIN" : "SIGN UP"}
       </button>
 
       {mode === "signin" ? (
@@ -174,7 +180,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         </button>
       ) : (
         <button className="btn btn-small auth-switch-link" onClick={() => resetForm("signin")} data-testid="go-signin">
-          Already registered? SIGN IN
+          Already registered? LOGIN
         </button>
       )}
 

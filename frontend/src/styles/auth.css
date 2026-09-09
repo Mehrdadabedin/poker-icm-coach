@@ -1,4 +1,4 @@
-/* A18 authentication entry (SIGN IN / SIGN UP) — used only by LoginForm. */
+/* A18 authentication entry (LOGIN / SIGN UP) — used only by LoginForm. */
 .login-panel {
   display: flex;
   flex-direction: column;
@@ -29,7 +29,7 @@
   font-size: 0.95rem;
 }
 
-/* Phase 2: SIGN IN / SIGN UP as two compact rectangular controls.
+/* Phase 2: LOGIN / SIGN UP as two compact rectangular controls.
    Blue (project .btn-primary tone) instead of the gold used before, matching
    the app's primary button colour; small and consistent. */
 .auth-mode-switch {

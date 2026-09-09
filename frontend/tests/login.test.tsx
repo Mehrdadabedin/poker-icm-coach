@@ -1,8 +1,9 @@
 /* A03/A18 frontend tests: registration-first auth entry.
- * - initial screen shows SIGN IN and SIGN UP
+ * - initial screen shows LOGIN and SIGN UP
+ * - no "WELCOME BACK" heading; Enter submits the login form
  * - new users register (validation + success) then sign in
- * - existing users sign in with credentials
- * - invalid registration and invalid sign-in show clear errors
+ * - existing users log in with credentials; invalid sign-in shows clear error
+ * - stale/invalid stored token is cleared (shows login again)
  * - home page shows login when unauthenticated, logout clears the session. */
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
@@ -31,7 +32,12 @@ vi.mock("../src/services/api", () => ({
     return { token: "t-123", username };
   }),
   logout: vi.fn(async () => ({ ok: true })),
-  me: vi.fn(async () => ({ username: "Mehrdad" })),
+  me: vi.fn(async () => {
+    if (localStorage.getItem("icm_me_fails")) {
+      throw new Error("Authentication required (API 401)");
+    }
+    return { username: "Mehrdad" };
+  }),
   AuthError: class AuthError extends Error {},
   createTournament: vi.fn(),
   getState: vi.fn(),
@@ -56,14 +62,28 @@ describe("A18 registration-first authentication", () => {
     return screen;
   }
 
-  it("shows SIGN IN and SIGN UP choices on the first screen", async () => {
+  it("shows LOGIN and SIGN UP choices, no WELCOME BACK heading", async () => {
     await openForm();
-    expect(screen.getByTestId("mode-signin")).toHaveTextContent("SIGN IN");
+    expect(screen.getByTestId("mode-signin")).toHaveTextContent("LOGIN");
     expect(screen.getByTestId("mode-signup")).toHaveTextContent("SIGN UP");
-    // sign-in mode is default, with username + password fields
-    expect(screen.getByRole("heading", { name: /welcome back/i })).toBeInTheDocument();
+    // bug 1: an empty login heading must NOT be present (no WELCOME BACK)
+    expect(screen.queryByText(/welcome back/i)).toBeNull();
+    expect(screen.queryByTestId("login-heading")).toBeNull();
+    // login mode is default, with username + password fields + explanatory text
+    expect(screen.getByText(/Sign in to continue to your private practice table/)).toBeInTheDocument();
     expect(screen.getByTestId("username-input")).toBeInTheDocument();
     expect(screen.getByTestId("password-input")).toBeInTheDocument();
+  });
+
+  it("submits the login form with the Enter key (bug 2)", async () => {
+    await openForm();
+    fireEvent.change(screen.getByTestId("username-input"), { target: { value: "Mehrdad" } });
+    fireEvent.change(screen.getByTestId("password-input"), { target: { value: "abcdef12" } });
+    fireEvent.keyDown(screen.getByTestId("password-input"), { key: "Enter" });
+    await waitFor(() => {
+      expect(localStorage.getItem("icm_auth_token")).toBe("t-123");
+      expect(localStorage.getItem("icm_username")).toBe("Mehrdad");
+    });
   });
 
   it("registers a new user with validation and authorizes the account", async () => {
@@ -149,5 +169,22 @@ describe("A18 registration-first authentication", () => {
     await waitFor(() => {
       expect(localStorage.getItem("icm_auth_token")).toBeNull();
     });
+  });
+
+  it("clears a stale/invalid stored token and shows login again", async () => {
+    const { HomePage } = await import("../src/pages/HomePage");
+    localStorage.setItem("icm_username", "Ghost");
+    localStorage.setItem("icm_auth_token", "stale-token");
+    localStorage.setItem("icm_me_fails", "1");
+    const first = render(
+      <MemoryRouter>
+        <HomePage />
+      </MemoryRouter>,
+    );
+    await waitFor(() => {
+      expect(first.getByTestId("login-panel")).toBeInTheDocument();
+    });
+    expect(localStorage.getItem("icm_auth_token")).toBeNull();
+    expect(localStorage.getItem("icm_username")).toBeNull();
   });
 });

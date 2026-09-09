@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { clearAuth, createTournament, getToken, getUsername, logout } from "../services/api";
+import { clearAuth, createTournament, getToken, getUsername, logout, me } from "../services/api";
 import { Copyright } from "../components/Copyright";
 import { LoginForm } from "../components/LoginForm";
 
@@ -10,6 +10,22 @@ export function HomePage() {
   const navigate = useNavigate();
   const [starting, setStarting] = useState(false);
   const [user, setUser] = useState<string | null>(getToken() ? getUsername() : null);
+
+  // BUG 2 hardening: a stored token may be stale/invalid (backend restart,
+  // expiry, credentials changed). Validate it on load; if the backend rejects
+  // it, clear the saved session and show the login form instead of leaving the
+  // user in a broken half-authenticated state.
+  useEffect(() => {
+    if (!getToken()) return;
+    me()
+      .then((who) => {
+        if (who.username) setUser(who.username);
+      })
+      .catch(() => {
+        clearAuth();
+        setUser(null);
+      });
+  }, []);
 
   const signOut = async () => {
     try {
