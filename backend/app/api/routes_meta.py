@@ -1,10 +1,13 @@
 """Meta routes: hands, icm, statistics, settings."""
 from __future__ import annotations
 
+from math import isfinite
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.api.deps import require_user
 from app.icm.icm_engine import ICMEngine
+from app.schemas.settings_schemas import SettingsUpdate
 from app.services.game_session import GameSession
 from app.services.statistics import aggregate
 
@@ -57,6 +60,11 @@ def session_statistics(table_id: str, user: str = Depends(require_user)) -> dict
     }
 
 
+# The exact ICM recursion is combinatorial in the number of players, so an
+# unbounded list on this public route would be a CPU denial of service.
+MAX_ICM_PLAYERS = 9
+
+
 @router.get("/icm")
 def icm_calculate(stacks: str, payouts: str) -> dict:
     """Query: /api/icm?stacks=45000,30000,20000&payouts=0.4,0.25,0.2,0.1,0.05"""
@@ -65,6 +73,12 @@ def icm_calculate(stacks: str, payouts: str) -> dict:
         payout_list = [float(x) for x in payouts.split(",") if x.strip()]
         if not stack_list or not payout_list:
             raise ValueError("empty input")
+        if any(s < 0 for s in stack_list):
+            raise ValueError("negative stack")
+        if any(not isfinite(p) or p < 0 for p in payout_list):
+            raise ValueError("invalid payout")
+        if len(stack_list) > MAX_ICM_PLAYERS or len(payout_list) > MAX_ICM_PLAYERS:
+            raise ValueError("too many players")
     except ValueError as exc:
         raise HTTPException(status_code=422, detail="invalid stacks/payouts") from exc
     result = ICMEngine(stack_list, payout_list).calculate()
@@ -79,21 +93,12 @@ def get_settings() -> dict:
 
 
 @router.put("/settings")
-def put_settings(request: dict, _user: str = Depends(require_user)) -> dict:
+def put_settings(request: SettingsUpdate,
+                 _user: str = Depends(require_user)) -> dict:
+    """Update the shared tournament settings (bounds enforced by the schema)."""
     from app.core.tournament_settings import settings as tournament_settings
 
-    allowed = {
-        "startingStack": ("starting_stack", int),
-        "startingSmallBlind": ("starting_small_blind", int),
-        "startingBigBlind": ("starting_big_blind", int),
-        "blindLevelMinutes": ("blind_level_minutes", int),
-        "fastMode": ("fast_mode", bool),
-        "showActionLabels": ("show_action_labels", bool),
-        "showResultLabels": ("show_result_labels", bool),
-    }
-    for key, (attr, caster) in allowed.items():
-        if key in request and hasattr(tournament_settings, attr):
-            setattr(tournament_settings, attr, caster(request[key]))
+    tournament_settings.update(**request.model_dump(exclude_none=True))
     return tournament_settings.to_dict()
 
 

@@ -1,7 +1,18 @@
 """Pydantic schemas for the poker API (mirrors frontend models)."""
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, Field
+
+# Bounded vocabularies used by request schemas. Rejecting an unknown rank/suit
+# at the edge keeps the route's rank/suit lookup tables from raising KeyError
+# (a 500) on hostile input.
+Rank = Literal["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
+Suit = Literal["c", "d", "h", "s"]
+Position = Literal["UTG", "UTG+1", "MP", "LJ", "HJ", "CO", "BTN", "SB", "BB"]
+# Exact ICM is combinatorial; the coach never runs it for more than one table.
+MAX_PLAYERS = 9
 
 
 class ActionRequest(BaseModel):
@@ -10,8 +21,8 @@ class ActionRequest(BaseModel):
 
 
 class CardModel(BaseModel):
-    rank: str
-    suit: str
+    rank: Rank
+    suit: Suit
 
 
 class PlayerStateModel(BaseModel):
@@ -146,20 +157,20 @@ class TournamentCreateRequest(BaseModel):
 
 
 class CoachAdviceRequest(BaseModel):
-    heroCards: list[CardModel]
-    position: str
+    heroCards: list[CardModel] = Field(min_length=2, max_length=2)
+    position: Position
     stack: int = Field(ge=0)
     bigBlind: int = Field(ge=1)
     smallBlind: int = Field(ge=0)
     ante: int = Field(ge=0)
     pot: int = Field(ge=0)
     toCall: int = Field(ge=0)
-    board: list[CardModel] = []
-    street: str = "preflop"
+    board: list[CardModel] = Field(default=[], max_length=5)
+    street: Literal["preflop", "flop", "turn", "river"] = "preflop"
     playersRemaining: int = Field(default=9, ge=2, le=9)
-    paidPositions: int = Field(default=6, ge=1)
-    stacks: list[int]
-    payout: list[float] | None = None
+    paidPositions: int = Field(default=6, ge=1, le=MAX_PLAYERS)
+    stacks: list[int] = Field(min_length=1, max_length=MAX_PLAYERS)
+    payout: list[float] | None = Field(default=None, max_length=MAX_PLAYERS)
     facingRaise: bool = False
     heroSeat: int = 0
     mode: str = "advanced"
@@ -175,11 +186,6 @@ class CoachResponseModel(BaseModel):
     ev: dict | None = None
     outs: dict | None = None
     education: str = ""
-
-
-class RangeQuery(BaseModel):
-    position: str
-    stack_bb: int = Field(default=30, ge=2, le=200)
 
 
 class RangeGridResponse(BaseModel):

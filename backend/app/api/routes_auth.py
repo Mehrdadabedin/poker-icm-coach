@@ -8,11 +8,8 @@ from pydantic import BaseModel, Field
 
 from app.api.deps import bearer_token, require_user
 from app.core.config import settings
-from app.services.auth import (
-    auth_registry,
-    auth_store,
-    normalize_username,
-)
+from app.services.auth import auth_store, normalize_username
+from app.services.user_registry import auth_registry
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 

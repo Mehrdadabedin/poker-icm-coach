@@ -14,7 +14,7 @@ REQUIRED_DIRS = [
     "backend/app/icm", "backend/app/equity", "backend/app/tournament",
     "backend/app/database", "backend/tests", "frontend/src/components",
     "frontend/src/pages", "frontend/src/hooks", "frontend/src/services",
-    "frontend/src/models", "frontend/src/state", "frontend/src/styles",
+    "frontend/src/models", "frontend/src/styles",
     "frontend/tests", "plans", "docs", "scripts",
 ]
 

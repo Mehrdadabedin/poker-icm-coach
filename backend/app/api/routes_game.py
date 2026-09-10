@@ -1,7 +1,7 @@
 """REST routes for tournament/game/coach operations."""
 from __future__ import annotations
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api.deps import require_user
 from app.core.config import settings
@@ -10,6 +10,7 @@ from app.schemas.game_schemas import (
     CoachAdviceRequest,
     CoachResponseModel,
     GameStateModel,
+    Position,
     RangeGridResponse,
     TournamentCreateRequest,
 )
@@ -50,6 +51,18 @@ def _label_for_index(index: int) -> str:
 
 _table_labels = TableLabelAllocator()
 
+# A table is never torn down on its own (a session has no terminal state), so
+# without a cap every POST /api/tournament leaks a 9-player table for the
+# lifetime of the process. Keep only a user's most recent tables.
+MAX_TABLES_PER_USER = 20
+
+
+def _evict_stale_tables(user: str) -> None:
+    """Drop the user's oldest tables beyond MAX_TABLES_PER_USER (oldest first)."""
+    owned = [sid for sid, s in _sessions.items() if s.owner == user]
+    for session_id in owned[: max(0, len(owned) - MAX_TABLES_PER_USER + 1)]:
+        _sessions.pop(session_id, None)
+
 
 def get_session(table_id: str, user: str) -> GameSession:
     try:
@@ -82,6 +95,7 @@ def create_tournament(request: TournamentCreateRequest,
         history_dir=settings.history_dir,
     )
     session.start()
+    _evict_stale_tables(user)
     _sessions[session.session_id] = session
     return session.state()
 
@@ -174,7 +188,8 @@ def coach_hands() -> dict:
 
 
 @router.get("/ranges", response_model=RangeGridResponse)
-def ranges(position: str = "BTN", stack_bb: int = 30) -> dict:
+def ranges(position: Position = "BTN",
+           stack_bb: int = Query(default=30, ge=2, le=200)) -> dict:
     matrix = matrix_for_position(position, stack_bb)
     return {
         "position": position,

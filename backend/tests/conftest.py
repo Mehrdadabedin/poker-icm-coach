@@ -4,7 +4,8 @@ from __future__ import annotations
 import pytest
 
 from app.core.config import settings
-from app.services.auth import auth_registry, auth_store
+from app.services.auth import auth_store
+from app.services.user_registry import auth_registry
 
 
 @pytest.fixture(autouse=True)

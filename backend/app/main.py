@@ -57,16 +57,21 @@ async def table_ws(websocket: WebSocket, table_id: str,
             return
         while True:
             message = await websocket.receive_text()
-            if message == "state":
-                await websocket.send_json(session.state())
-            elif message.startswith("action:"):
-                _prefix, _sep, kind = message.partition(":")
-                rest: list[str] = message.split(":", 2)[2:]
-                amount = int(rest[0]) if rest and rest[0].strip().isdigit() else None
-                session.hero_action(kind.strip(), amount)
-                await websocket.send_json(session.state())
-            elif message == "next":
-                session.next_hand()
-                await websocket.send_json(session.state())
-    except (WebSocketDisconnect, ValueError, RuntimeError):
+            try:
+                if message == "state":
+                    await websocket.send_json(session.state())
+                elif message.startswith("action:"):
+                    _prefix, _sep, kind = message.partition(":")
+                    rest: list[str] = message.split(":", 2)[2:]
+                    amount = int(rest[0]) if rest and rest[0].strip().isdigit() else None
+                    session.hero_action(kind.strip(), amount)
+                    await websocket.send_json(session.state())
+                elif message == "next":
+                    session.next_hand()
+                    await websocket.send_json(session.state())
+            except ValueError as exc:
+                # An illegal action is client error, not a broken connection:
+                # report it the way REST does (400) and keep the socket open.
+                await websocket.send_json({"error": str(exc)})
+    except (WebSocketDisconnect, RuntimeError):
         return
