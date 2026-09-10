@@ -10,6 +10,7 @@ from app.game.actions import Action, ActionType
 from app.game.hand_engine import HandEngine
 from app.game.positions import position_for
 from app.services import hand_history
+from app.services.session_store import mark_finished
 from app.services.game_state_view import build_state_view
 from app.services.hand_history import HandHistoryRecord, HandHistoryStore
 from app.strategy.coach import Coach, CoachRequest
@@ -19,7 +20,6 @@ from app.tournament.tournament_timer import TournamentTimer
 
 class GameSession:
     """Owns one tournament table; drives bots; exposes safe state snapshots."""
-
     def __init__(self, session_id: str | None = None, fast_mode: float = 1.0,
                  rng: random.Random | None = None,
                  starting_stack: int = 45_000,
@@ -33,7 +33,9 @@ class GameSession:
         self.owner = owner  # authenticated username that owns this tournament
         self.table_label = table_label or self.session_id
         self.created_at = time.time()
-        self.status = "active"
+        self.status = "active"  # active | finished | abandoned
+        self.last_seen = time.time()
+        self.idle_timeout = 30 * 60
         self.history_dir = history_dir or ""
         self.tournament_starting_stack = starting_stack
         self.tournament = build_default_tournament(
@@ -72,8 +74,8 @@ class GameSession:
             raise ValueError("current hand is still in progress")
         self._record_and_persist()
         self._apply_reentry_or_eliminate()
+        mark_finished(self)  # hero busted with no re-entry -> finished
         self._begin_hand(first=False)
-
     def phase(self) -> str:
         if self.engine is None:
             return "idle"
@@ -110,6 +112,7 @@ class GameSession:
 
     def state(self) -> dict:
         assert self.engine is not None and self.timer is not None
+        self.last_seen = time.time()
         self.timer.tick()  # advance expired blind levels / breaks on every view
         return build_state_view(self)
 
@@ -143,7 +146,6 @@ class GameSession:
             "outs": rec.outs,
             "education": rec.education,
         }
-
     def grade_hero(self) -> dict | None:
         """Test mode: compare last hero action vs coach recommendation."""
         if self._last_hero_action is None:
@@ -159,8 +161,7 @@ class GameSession:
             "rangeNote": comparison.range_note,
         }
 
-    REENTRY_LEVELS = 3  # levels 1-3 get a fresh stack on bust
-
+    REENTRY_LEVELS = 3
     def _apply_reentry_or_eliminate(self) -> None:
         """Bust-out rule: 45k reset during levels 1-3, elimination from level 4."""
         assert self.tournament is not None
