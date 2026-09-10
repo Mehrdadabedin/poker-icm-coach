@@ -1,14 +1,13 @@
 """A17 — card asset completeness audit (frontend/public/cards).
 
-Verifies the installed deck is exactly the standard 52-card set (+ card backs)
-in both OpenDecks formats (SVG and PNG), that the png assets are actual
+Verifies the installed deck is exactly the standard 52-card set (+ card back)
+as PNG — the only format the renderer loads — that the png assets are actual
 1500x2100 OpenDecks images, and that the CC0 license text is bundled for
 provenance. Mirrors the mapping in scripts/import_opendecks_cards.py without
 depending on the OpenDecks checkout being present.
 """
 from __future__ import annotations
 
-import re
 from pathlib import Path
 
 ASSET_DIR = Path(__file__).resolve().parents[2] / "frontend" / "public" / "cards"
@@ -21,30 +20,11 @@ def _expected_faces() -> set[str]:
     return {f"{r}{s}" for r in RANKS for s in SUITS}
 
 
-def test_exactly_52_svg_card_faces_exist() -> None:
-    files = {p.stem for p in ASSET_DIR.glob("*.svg")}
-    cards = {f for f in files if f != "back"}
-    assert len(cards) == 52, f"expected 52 card faces, found {len(cards)}"
-    assert cards == _expected_faces(), f"missing/extra faces: {_expected_faces() ^ cards}"
-
-
 def test_exactly_52_png_card_faces_exist() -> None:
     files = {p.stem for p in ASSET_DIR.glob("*.png")}
     cards = {f for f in files if f != "back"}
     assert len(cards) == 52, f"expected 52 png card faces, found {len(cards)}"
     assert cards == _expected_faces(), f"missing/extra png faces: {_expected_faces() ^ cards}"
-
-
-def test_each_card_is_a_valid_svg_with_correct_proportions() -> None:
-    for rank in RANKS:
-        for suit in SUITS:
-            path = ASSET_DIR / f"{rank}{suit}.svg"
-            text = path.read_text(encoding="utf-8")
-            assert "<svg" in text, f"{path.name} is not an SVG"
-            m = re.search(r"viewBox\s*=\"0 0 (\d+) (\d+)\"", text)
-            assert m, f"{path.name} missing viewBox"
-            w, h = int(m.group(1)), int(m.group(2))
-            assert abs(w / h - 1500 / 2100) < 0.02, f"{path.name} wrong aspect ratio"
 
 
 def test_each_png_is_an_opendecks_proportion_1500x2100() -> None:
@@ -63,9 +43,14 @@ def test_each_png_is_an_opendecks_proportion_1500x2100() -> None:
             )
 
 
-def test_card_backs_exist() -> None:
-    assert (ASSET_DIR / "back.svg").is_file()
+def test_card_back_exists() -> None:
     assert (ASSET_DIR / "back.png").is_file()
+
+
+def test_no_unused_vector_duplicates_ship_in_the_bundle() -> None:
+    """`public/` is copied verbatim into dist/ and the APK; the renderer only
+    ever resolves .png, so a parallel SVG deck would be pure bundle weight."""
+    assert list(ASSET_DIR.glob("*.svg")) == []
 
 
 def test_cc0_license_bundled() -> None:
