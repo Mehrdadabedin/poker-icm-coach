@@ -65,6 +65,10 @@ no runtime URL or remote dependency is used.
 
 - 52 card-face PNGs + 1 card back PNG (`back.png`, from OpenDecks
   `card back blue.png`) — used by the production renderer.
+- Issue #6: these PNGs are optimized to 300x420 (5:7 preserved) via
+  `scripts/optimize_card_pngs.py` / `import_opendecks_cards.py`, shrinking the
+  deck from ~15 MB to ~2.7 MB while keeping the same OpenDecks artwork and
+  filenames.
 - 52 card-face SVGs + 1 card back SVG (`back.svg`, same OpenDecks source) —
   retained as the vector source of truth in the same asset directory.
 - Assets are served locally by the built frontend (`vite` copies `public/` into

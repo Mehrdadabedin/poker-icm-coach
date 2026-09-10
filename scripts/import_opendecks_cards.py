@@ -81,7 +81,24 @@ def import_deck(source: Path | None = None) -> tuple[int, int]:
     license_src = src / "LICENSE"
     if license_src.is_file():
         shutil.copyfile(license_src, FRONT / "OPEN_DECKS_LICENSE.txt")
+
+    _optimize_pngs(FRONT)  # Issue #6: resize 1500x2100 -> 300x420
     return n_svg, n_png
+
+
+def _optimize_pngs(directory: Path) -> None:
+    """Downscale bundled card PNGs to 300x420 (5:7 preserved) for a lean
+    deployment. Uses PIL if available; otherwise leaves PNGs as-is."""
+    try:
+        from PIL import Image
+    except ImportError:  # pragma: no cover - optional
+        print("Pillow not installed; PNGs left at original resolution")
+        return
+    for path in directory.glob("*.png"):
+        with Image.open(path) as im:
+            if im.size != (300, 420):
+                im = im.resize((300, 420), Image.LANCZOS).convert("RGBA")
+                im.save(path, "PNG", optimize=True)
 
 
 if __name__ == "__main__":

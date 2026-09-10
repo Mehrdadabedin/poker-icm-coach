@@ -47,10 +47,10 @@ def test_each_card_is_a_valid_svg_with_correct_proportions() -> None:
             assert abs(w / h - 1500 / 2100) < 0.02, f"{path.name} wrong aspect ratio"
 
 
-def test_each_png_is_an_opendecks_proportion_1500x2100() -> None:
-    """PNG faces must be the OpenDecks raster (1500x2100). Keeps the local
-    deployment conceptually identical to the source deck (no resampling).
-    Reads width/height straight from the PNG IHDR chunk (no image lib)."""
+def test_each_png_is_optimized_300x420() -> None:
+    """Issue #6: PNG faces must be 300x420 (5:7 aspect preserved) and PNG
+    format, with a reasonable maximum file size. Reads width/height straight
+    from the PNG IHDR chunk (no image lib) and keeps the deck lean."""
     for rank in RANKS:
         for suit in SUITS:
             path = ASSET_DIR / f"{rank}{suit}.png"
@@ -58,9 +58,19 @@ def test_each_png_is_an_opendecks_proportion_1500x2100() -> None:
             assert data.startswith(b"\x89PNG\r\n\x1a\n"), f"{path.name} not a PNG"
             width = int.from_bytes(data[16:20], "big")  # IHDR width
             height = int.from_bytes(data[20:24], "big")  # IHDR height
-            assert (width, height) == (1500, 2100), (
-                f"{path.name} size {(width, height)} != 1500x2100"
+            assert (width, height) == (300, 420), (
+                f"{path.name} size {(width, height)} != 300x420"
             )
+            assert path.stat().st_size <= 300 * 1024, f"{path.name} too large"
+
+
+def test_png_back_optimized() -> None:
+    path = ASSET_DIR / "back.png"
+    data = path.read_bytes()
+    assert data.startswith(b"\x89PNG\r\n\x1a\n")
+    assert int.from_bytes(data[16:20], "big") == 300
+    assert int.from_bytes(data[20:24], "big") == 420
+    assert path.stat().st_size <= 300 * 1024
 
 
 def test_card_backs_exist() -> None:
