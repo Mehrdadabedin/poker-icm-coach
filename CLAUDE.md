@@ -23,7 +23,7 @@ Applies to every output: replies, commit messages, PR bodies, comments, docs.
 ## Commands
 
 ```bash
-cd backend  && uv run pytest        # 437 (441 with a database)
+cd backend  && uv run pytest        # 438 (442 with a database)
 cd frontend && npx vitest run       # 41
 cd backend  && uv run ruff check app tests && uv run mypy app
 cd frontend && npm run lint         # tsc --noEmit + oxlint --deny-warnings
@@ -31,6 +31,16 @@ docker compose up -d postgres && cd backend && uv run alembic upgrade head
 ```
 
 Both suites green before and after. Report counts.
+
+Enable the pre-push hook once per clone, since `git clone` does not copy hooks:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+It runs every gate CI runs. Do not push with `--no-verify` unless you can say
+why in the commit message. CI itself has never run on this repository, see
+issue #8, so the hook is currently the only thing checking anything.
 Global `mypy`/`tsc` run outside the project env — their missing-stub errors are
 noise. Use the commands above.
 

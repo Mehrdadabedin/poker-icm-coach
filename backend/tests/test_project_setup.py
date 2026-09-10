@@ -66,6 +66,18 @@ def test_docker_compose_services() -> None:
         assert service in text, f"compose missing {service}"
 
 
+def test_pre_push_hook_exists_and_is_executable() -> None:
+    """The hook is the local stand-in for CI. Enable it per clone with
+    `git config core.hooksPath .githooks`; git clone does not copy hooks."""
+    hook = ROOT / ".githooks" / "pre-push"
+    assert hook.is_file(), "missing .githooks/pre-push"
+    assert hook.stat().st_mode & 0o111, f"{hook} is not executable"
+    text = hook.read_text()
+    for gate in ["ruff check", "mypy app", "pytest", "tsc --noEmit",
+                 "oxlint --deny-warnings", "vitest run", "vite build"]:
+        assert gate in text, f"pre-push hook no longer runs: {gate}"
+
+
 def _ignored(parts: tuple[str, ...]) -> bool:
     return any(
         p in {".venv", ".venv-rooted", "node_modules", ".git", "__pycache__",

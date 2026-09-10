@@ -131,7 +131,9 @@ Three kinds, each gated differently:
 
 CI gates both sides: backend `ruff` + `mypy app` + `pytest` against a real
 PostgreSQL service, frontend `tsc --noEmit` + `oxlint --deny-warnings` +
-`vitest` + `build`. The oxlint set is `correctness` and `suspicious` as errors
+`vitest` + `build`. `.githooks/pre-push` runs the same list locally, and a test
+asserts it still does. Enable it per clone with
+`git config core.hooksPath .githooks`. The oxlint set is `correctness` and `suspicious` as errors
 plus `no-explicit-any` and `no-console`; `unicorn/no-array-sort` is off because
 the one call site spreads before sorting. Style-opinion categories are
 deliberately not enabled — a linter that warns about everything gets ignored.
