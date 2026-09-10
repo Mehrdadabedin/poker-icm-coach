@@ -6,6 +6,7 @@ lands two operations on one table concurrently.
 """
 from __future__ import annotations
 
+import random
 import threading
 import time
 
@@ -43,7 +44,9 @@ def _run_together(call, times: int = 2) -> list[str]:
 
 @pytest.fixture
 def table() -> GameSession:
-    session = GameSession(fast_mode=1.0, history_dir="")
+    """A seeded table: a freshly dealt hand that a bot cannot end on its own,
+    so "was a second hand dealt?" stays a question about locking."""
+    session = GameSession(fast_mode=1.0, history_dir="", rng=random.Random(20260910))
     session.start()
     return session
 
@@ -88,19 +91,30 @@ def test_two_concurrent_hero_actions_apply_once(
     assert results.count("ok") == 1, f"expected one action to apply, got {results}"
 
 
-def test_state_snapshot_during_an_action_does_not_deadlock(
-    table: GameSession,
+def test_a_state_snapshot_waits_for_an_action_in_flight(
+    table: GameSession, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """state() mutates too (timer.tick advances blind levels), so it takes the
-    same lock as the actions it must not interleave with."""
-    snapshots: list[dict] = []
+    """state() mutates too — timer.tick() advances expired blind levels — and
+    build_state_view must not read pots mid-act, so it takes the same lock."""
+    real_act = HandEngine.act
 
-    def snapshot() -> None:
-        snapshots.append(table.state())
+    def slow_act(self: HandEngine, seat: int, action: Action) -> None:
+        time.sleep(0.05)
+        real_act(self, seat, action)
 
-    reader = threading.Thread(target=snapshot)
-    reader.start()
-    table.hero_action("fold")
-    reader.join(timeout=30)
-    assert not reader.is_alive(), "state() deadlocked against hero_action()"
-    assert snapshots and snapshots[0]["tableId"] == table.session_id
+    monkeypatch.setattr(HandEngine, "act", slow_act)
+    actor = threading.Thread(target=lambda: table.hero_action("fold"))
+    actor.start()
+    time.sleep(0.01)  # let the action take the lock and enter the slow act
+
+    start = time.perf_counter()
+    snapshot = table.state()
+    waited = time.perf_counter() - start
+
+    actor.join(timeout=30)
+    assert not actor.is_alive(), "hero_action() deadlocked against state()"
+    assert waited > 0.02, (
+        f"state() returned in {waited:.3f}s while an action held the table: "
+        "the snapshot was read mid-action"
+    )
+    assert snapshot["tableId"] == table.session_id

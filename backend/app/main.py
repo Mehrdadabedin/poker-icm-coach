@@ -57,7 +57,12 @@ async def table_ws(websocket: WebSocket, table_id: str,
             await websocket.send_json({"error": "table not found"})
             return
         owner = session.owner
-        if owner and auth_store.user_for_token(bearer_token(f"Bearer {token}")) != owner:
+        # Also off the loop: resolving an expired token rewrites the sessions
+        # file, and that is blocking disk I/O.
+        caller = await run_in_threadpool(
+            auth_store.user_for_token, bearer_token(f"Bearer {token}")
+        )
+        if owner and caller != owner:
             await websocket.send_json({"error": "table not found"})
             return
         while True:
