@@ -7,10 +7,11 @@ interface PlayingCardProps {
 }
 
 /** Renders a real playing-card image asset (A17, OpenDecks CC0). The full
- * 52-card deck is bundled locally in /public/cards in PNG and SVG; the
- * production renderer uses the PNG assets (crisp at any display size) —
- * no remote URLs, no emoji, no plain-text cards. The card identity comes
- * from {rank,suit} in game state, mapped deterministically to the file. */
+ * 52-card deck plus the back is bundled locally in /public/cards as PNG
+ * (crisp at any display size) — no remote URLs, no emoji, no plain-text
+ * cards. The card identity comes from {rank,suit} in game state, mapped
+ * deterministically to the file. PNG is the only format installed: see
+ * ARCHITECTURE.md section 6. */
 export function cardAssetUrl(card: Card): string {
   return `${import.meta.env.BASE_URL}cards/${card.rank}${card.suit}.png`;
 }
