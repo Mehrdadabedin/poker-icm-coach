@@ -5,6 +5,9 @@ import json
 import threading
 import time
 
+import pytest
+
+from app.services import user_registry
 from app.services.auth import AuthStore
 from app.services.user_registry import UserRegistry
 
@@ -59,18 +62,38 @@ def test_stale_persisted_token_is_dropped_on_load(tmp_path) -> None:
     assert store.user_for_token("stale") is None
 
 
-def test_unknown_user_costs_the_same_as_a_wrong_password() -> None:
-    """No timing oracle: a miss still pays for one PBKDF2 derivation."""
+def test_an_unknown_username_costs_the_same_as_a_wrong_password(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """No timing oracle: a miss still pays for one PBKDF2 derivation.
+
+    Counted rather than timed. The 200k-round derivation dominates verify()
+    by orders of magnitude, so "same number of derivations" is the invariant
+    that matters, and it holds on a loaded machine where a wall-clock ratio
+    would not.
+    """
     registry = UserRegistry()
     registry.register("Known", "correct-horse")
 
-    def elapsed(username: str) -> float:
-        start = time.perf_counter()
-        assert registry.verify(username, "wrong-password") is False
-        return time.perf_counter() - start
+    derivations: list[bytes] = []
+    real_derive = user_registry._derive
 
-    miss, wrong = elapsed("Nobody"), elapsed("Known")
-    assert min(miss, wrong) > 0.5 * max(miss, wrong)
+    def counting_derive(password: str, salt: bytes) -> bytes:
+        derivations.append(salt)
+        return real_derive(password, salt)
+
+    monkeypatch.setattr(user_registry, "_derive", counting_derive)
+
+    assert registry.verify("Nobody", "wrong-password") is False
+    unknown_user = len(derivations)
+    derivations.clear()
+    assert registry.verify("Known", "wrong-password") is False
+    wrong_password = len(derivations)
+
+    assert unknown_user == wrong_password == 1, (
+        f"unknown username did {unknown_user} derivation(s), "
+        f"wrong password did {wrong_password}"
+    )
 
 
 def test_registry_still_rejects_unknown_and_invalid_usernames() -> None:
