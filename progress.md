@@ -841,3 +841,87 @@ no paid service added.
 - Auth/logout/identity, table isolation (A/B), dealing/positions/rotation/
   betting/blinds/ICM/tournament/re-entry, and all UI flows verified via the
   regression + isolation suites.
+
+
+## Post-hand "NEXT HAND IN" countdown correction (2026-09-12)
+
+### Task
+Change the automatic post-hand Next Hand countdown from 30 seconds to 10.
+
+### Problem found
+- Previous change only set `REVIEW_SECONDS = 30` -> `10`, which correctly
+  changed the START value (10), but the visible countdown did NOT reach and
+  show "0" before auto-advancing (it fired on the tick where remaining hit
+  0, rendering 9..1 then jumping straight to the next hand).
+- The "NEXT HAND IN 28" seen on the deployed phone was the browser serving a
+  stale bundle (the fixed 10-value build must be deployed and the phone
+  hard-refreshed); the repo code was verified to start at 10.
+
+### Root cause
+- `frontend/src/hooks/useAutoNext.ts` decremented and fired `nextRef` at
+  `remaining <= 0`, so the "0" frame was never rendered (it went 1 -> next).
+  It also only ever rendered after decrement, so the displayed value was
+  correct but "0" was skipped.
+
+### Files changed
+- frontend/src/hooks/useAutoNext.ts: render the current value every tick
+  (9..1..0), hold "0" for one full second, then trigger the next hand on the
+  following tick (single interval; stop()/pause() still cancel it).
+- frontend/src/pages/TablePage.tsx: REVIEW_SECONDS 30 -> 10 (the start value;
+  this is the automatic post-hand countdown, verified by live E2E).
+- frontend/tests/useAutoNext.test.tsx (new): deterministic fake-timer tests
+  (starts at 10, reaches 0, holds 0 for a second, then fires; never fires
+  early).
+
+### Tests
+- Full frontend suite: 44 passed (7 files).
+- New useAutoNext tests: 2 passed.
+- Live browser E2E (local): observed sequence
+  NEXT HAND IN 10 -> 9 -> 8 -> 7 -> 6 -> 5 -> 4 -> 3 -> 2 -> 1 -> 0,
+  auto-next advanced the hand; zero console errors.
+- tsc clean; production build succeeded.
+
+### Result
+- Automatic countdown now starts at 10, counts down 10..0, holds 0, then
+  auto-starts the next hand. Manual NEXT HAND, Review Hand, pause/play and
+  all other timers unchanged.
+
+### Remaining concern
+- The deployed site must serve the new bundle (redeploy + hard refresh on
+  the phone) for the user to see 10 instead of the cached 30-start build.
+
+
+## Deployment mismatch diagnosis — timer fixes not deployed (2026-09-12)
+
+### Symptom (real deployed app, hard refreshed)
+- https://icm-master-frontend.onrender.com/#/table/... showed:
+  TIME 20:00 frozen; post-hand NEXT HAND countdown 30s.
+
+### Root cause (verified, not assumed)
+1. The timer fixes exist ONLY in the working tree (uncommitted):
+   - frontend/src/pages/TablePage.tsx: REVIEW_SECONDS 30 -> 10
+   - frontend/src/hooks/useAutoNext.ts: render 0 then auto-next
+   - backend/app/tournament/tournament_timer.py: fast_mode falsy -> x1
+   - backend/app/services/game_session.py: resume level clock on hand-over
+2. origin/main HEAD = 437da28 (no timer fixes). Render deploys from
+   origin/main, so neither fix is live.
+3. Proof the deployed frontend == origin/main@437da28:
+   - Built origin/main frontend with VITE_API_URL=https://poker-icm-coach.onrender.com
+     -> bundle sha 88ab93b1be30fd99 == deployed bundle sha (exact match).
+   - The fixed working-tree build produces daef93a9ba5228b3 (different), with
+     the countdown-to-zero logic present.
+4. Proof the deployed backend is old: POST /api/tournament then 3x /state over
+   3s returned secondsLeft=1200 every time (frozen) on poker-icm-coach.onrender.com.
+
+### What is NOT wrong
+- The production frontend calls the correct backend URL
+  (https://poker-icm-coach.onrender.com baked into the deployed bundle).
+- The code fixes are correct (verified locally: NEXT HAND 10..0; TIME 1200->
+  1199->... live API after applying the fix locally).
+
+### Action required (owner)
+- Commit and push the working-tree timer fixes to origin/main, then redeploy
+  the Render frontend AND backend from main. After redeploy + hard refresh:
+  NEXT HAND 10->9->...->0->next; TIME 20:00->19:59->... (and at 00:00 the
+  existing blind-level advancement applies).
+- This pass made NO code changes beyond validation (no new edits; no push).

@@ -51,9 +51,7 @@ class GameSession:
         self.coach = Coach()
         self.coach_mode = "advanced"
         self._last_hero_action: str | None = None
-        self._history_file: hand_history.HistoryFileStore = hand_history.HistoryFileStore(
-            self.history_dir, self.session_id
-        )
+        self._history_file = hand_history.HistoryFileStore(self.history_dir, self.session_id)
 
     def start(self) -> None:
         self.engine = HandEngine(self.tournament, provider=self.provider, rng=self.rng)
@@ -114,6 +112,8 @@ class GameSession:
         assert self.engine is not None and self.timer is not None
         self.last_seen = time.time()
         self.timer.tick()  # advance expired blind levels / breaks on every view
+        if self.engine.is_complete and not self.timer.running:  # A16 tick on result
+            self.timer.resume()
         return build_state_view(self)
 
     def coach_advice(self) -> dict:
