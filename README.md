@@ -47,8 +47,19 @@ ICM Master
 
 The **backend owns all authoritative game state** — cards, actions, pots, winners,
 blinds, AI and ICM calculations. React renders state snapshots and sends hero actions;
-it never computes poker results itself. Real-time table updates stream over WebSockets;
-REST is used for everything else.
+it never computes poker results itself. Everything the browser does goes over
+REST: the table view polls `GET /api/game/{id}/state`. A WebSocket endpoint
+(`/ws/table/{id}`) is implemented and tested but the client does not use it —
+replacing polling with a server-push stream is open work.
+
+Two documents govern how the code may change:
+
+- **[ARCHITECTURE.md](ARCHITECTURE.md)** — the invariants and the bug behind
+  each one: the per-session lock, what may never run on the event loop, where
+  input bounds live, the auth model, the test layers.
+- **[CLAUDE.md](CLAUDE.md)** — the same rules as short imperatives for coding
+  agents, plus the exact test and lint commands. Read it before changing code,
+  whichever assistant or model you are using.
 
 Backend module map:
 
@@ -62,7 +73,7 @@ Backend module map:
 | `app/equity/` | equity engine (exact + Monte Carlo) |
 | `app/strategy/` | stack analysis, bubble/stage, risk premium, range matrix, push/fold, coach, test mode |
 | `app/services/` | game session (table state), hand history, statistics |
-| `app/api/` | REST routers + WebSocket |
+| `app/api/` | REST routers + WebSocket (client uses REST) |
 | `app/models/` | SQLAlchemy ORM + repositories |
 
 ## Technology stack
@@ -106,15 +117,22 @@ The Vite dev server proxies `/api` and `/ws` to the backend.
 ### 4. Tests
 
 ```bash
-# backend
-cd backend && .venv/bin/pytest
+# backend — 430 tests
+cd backend && uv run pytest
 
-# frontend unit tests
+# the four database tests need PostgreSQL; without it they skip
+docker compose up -d postgres
+cd backend && uv run alembic upgrade head && uv run pytest   # 434 tests
+
+# frontend unit tests — 41 tests
 cd frontend && npm test
 
 # browser end-to-end tests (starts backend + frontend preview automatically)
 cd frontend && npm run e2e
 ```
+
+`tests/test_ws_concurrency.py` starts a real uvicorn server on an ephemeral
+port and skips if the environment forbids binding a socket.
 
 ### 5. Android APK
 
@@ -152,7 +170,8 @@ The APK talks to the FastAPI backend over HTTP (configure the server URL in
 - Phase 2 — Computer AI: **complete** (parts 017–021)
 - Phase 3 — Advanced ICM coach: **complete** (parts 022–034)
 - Packaging & testing: **complete** (parts 035–037)
-- 316 backend tests, 22 frontend tests, 3 Playwright E2E scenarios — all passing.
+- 434 backend tests (430 without a database), 41 frontend tests, 3 Playwright
+  E2E scenarios — all passing.
 
 ### Known limitations
 
@@ -163,3 +182,14 @@ The APK talks to the FastAPI backend over HTTP (configure the server URL in
   generated Capacitor project and build commands are provided and CI-ready.
 - Sessions live in backend memory; hand history/statistics are persisted to
   PostgreSQL via the repository layer.
+- **Single worker only.** Auth tokens and live tables are in-process dicts, so
+  a second uvicorn worker would serve a different set of sessions. Scaling out
+  needs shared session storage first.
+- A table has no terminal state — nothing reaps a finished tournament — so the
+  store keeps a user's 20 most recent tables and drops the rest.
+- `PUT /api/settings` writes one global object: a change affects every user's
+  next tournament.
+- The table view polls every 350 ms instead of receiving pushes; each poll
+  takes the session lock, so it contends with actions.
+- Card PNGs are the raw 1500×2100 OpenDecks rasters, roughly ten times their
+  rendered size.
