@@ -72,15 +72,15 @@ def icm_calculate(stacks: str, payouts: str) -> dict:
 
 
 @router.get("/settings")
-def get_settings() -> dict:
-    from app.core.tournament_settings import settings as tournament_settings
+def get_settings(user: str = Depends(require_user)) -> dict:
+    from app.core.tournament_settings import settings as store
 
-    return tournament_settings.to_dict()
+    return store.for_user(user).to_dict()
 
 
 @router.put("/settings")
-def put_settings(request: dict, _user: str = Depends(require_user)) -> dict:
-    from app.core.tournament_settings import settings as tournament_settings
+def put_settings(request: dict, user: str = Depends(require_user)) -> dict:
+    from app.core.tournament_settings import settings as store
 
     allowed = {
         "startingStack": ("starting_stack", int),
@@ -91,10 +91,11 @@ def put_settings(request: dict, _user: str = Depends(require_user)) -> dict:
         "showActionLabels": ("show_action_labels", bool),
         "showResultLabels": ("show_result_labels", bool),
     }
+    ts = store.for_user(user)
     for key, (attr, caster) in allowed.items():
-        if key in request and hasattr(tournament_settings, attr):
-            setattr(tournament_settings, attr, caster(request[key]))
-    return tournament_settings.to_dict()
+        if key in request and hasattr(ts, attr):
+            setattr(ts, attr, caster(request[key]))
+    return ts.to_dict()
 
 
 @router.get("/active-table")

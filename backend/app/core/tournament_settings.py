@@ -1,11 +1,16 @@
-"""Runtime tournament settings (mutable in-process store).
+"""Runtime tournament settings (mutable in-process store, per-user).
 
-Defaults mirror the project spec; edited via PUT /api/settings and consumed
-when a new tournament is created so the configuration affects the real engine.
+Issue #3: tournament settings are stored PER AUTHENTICATED USER instead of
+being a single process-wide object, so one user's changes never affect another
+user. Defaults mirror the project spec; edited via PUT /api/settings and
+consumed when that user creates a new tournament so the configuration affects
+the real engine. The single-worker in-memory store matches the app's auth/
+session model (see ISSUE #4).
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+import threading
+from dataclasses import dataclass, field
 
 
 @dataclass(slots=True)
@@ -15,7 +20,6 @@ class TournamentSettings:
     starting_big_blind: int = 100
     blind_level_minutes: int = 20
     fast_mode: bool = False
-    # A18/Phase 7: reusable button/result label enable-disable preference
     show_action_labels: bool = True
     show_result_labels: bool = True
 
@@ -30,10 +34,26 @@ class TournamentSettings:
             "showResultLabels": self.show_result_labels,
         }
 
-    def update(self, **kwargs) -> None:
-        for key, value in kwargs.items():
-            if value is not None and hasattr(self, key):
-                setattr(self, key, value)
+
+class SettingsStore:
+    """Per-user TournamentSettings, in-memory (single worker)."""
+
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self._by_user: dict[str, TournamentSettings] = {}
+
+    def for_user(self, user: str) -> TournamentSettings:
+        with self._lock:
+            s = self._by_user.get(user)
+            if s is None:
+                s = TournamentSettings()
+                self._by_user[user] = s
+            return s
+
+    def reset(self) -> None:
+        with self._lock:
+            self._by_user.clear()
 
 
-settings = TournamentSettings()
+# Backwards-compatible module-level handle; tests import `settings`.
+settings = SettingsStore()

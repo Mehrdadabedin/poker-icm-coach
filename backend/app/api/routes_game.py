@@ -1,6 +1,8 @@
 """REST routes for tournament/game/coach operations."""
 from __future__ import annotations
 
+import time
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.api.deps import require_user
@@ -14,6 +16,7 @@ from app.schemas.game_schemas import (
     TournamentCreateRequest,
 )
 from app.services.game_session import GameSession
+from app.services.session_store import cap_live_tables, evict_sessions
 from app.strategy.baseline_ranges import matrix_for_position
 from app.strategy.coach import Coach, CoachRequest
 
@@ -52,6 +55,7 @@ _table_labels = TableLabelAllocator()
 
 
 def get_session(table_id: str, user: str) -> GameSession:
+    evict_sessions(_sessions, owner=user)
     try:
         session = _sessions[table_id]
     except KeyError as exc:
@@ -64,13 +68,14 @@ def get_session(table_id: str, user: str) -> GameSession:
 @router.post("/tournament", response_model=GameStateModel)
 def create_tournament(request: TournamentCreateRequest,
                       user: str = Depends(require_user)) -> dict:
-    from app.core.tournament_settings import settings as tournament_settings
+    from app.core.tournament_settings import settings as store
 
-    starting_stack = request.starting_stack or tournament_settings.starting_stack
-    small = tournament_settings.starting_small_blind
-    big = tournament_settings.starting_big_blind
-    minutes = request.blind_level_minutes or tournament_settings.blind_level_minutes
-    fast = request.fast_mode
+    ts = store.for_user(user)
+    starting_stack = request.starting_stack or ts.starting_stack
+    small = ts.starting_small_blind
+    big = ts.starting_big_blind
+    minutes = request.blind_level_minutes or ts.blind_level_minutes
+    fast = ts.fast_mode
     session = GameSession(
         fast_mode=fast,
         starting_stack=starting_stack,
@@ -82,6 +87,8 @@ def create_tournament(request: TournamentCreateRequest,
         history_dir=settings.history_dir,
     )
     session.start()
+    evict_sessions(_sessions)
+    cap_live_tables(_sessions, user)
     _sessions[session.session_id] = session
     return session.state()
 
