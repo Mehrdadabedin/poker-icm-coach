@@ -15,61 +15,19 @@ from app.schemas.game_schemas import (
     TournamentCreateRequest,
 )
 from app.services.game_session import GameSession
+from app.services.session_store import session_store
 from app.strategy.baseline_ranges import matrix_for_position
 from app.strategy.coach import Coach, CoachRequest
 
 router = APIRouter(prefix="/api")
-_sessions: dict[str, GameSession] = {}
 _coach = Coach()
 
 
-class TableLabelAllocator:
-    """Human-readable table IDs: A..Z, AA, AB ... (A06).
-
-    Labels are never reused while a session is active. The internal
-    session_id (the real data key) stays unique and is what URLs use.
-    """
-
-    def __init__(self) -> None:
-        self._counter = 0
-
-    def allocate(self) -> str:
-        label = _label_for_index(self._counter)
-        self._counter += 1
-        return label
-
-
-def _label_for_index(index: int) -> str:
-    """0 -> A ... 25 -> Z, 26 -> AA, 27 -> AB ... (spreadsheet style)."""
-    letters = ""
-    index += 1
-    while index > 0:
-        index, rem = divmod(index - 1, 26)
-        letters = chr(65 + rem) + letters
-    return letters
-
-
-_table_labels = TableLabelAllocator()
-
-# A table is never torn down on its own (a session has no terminal state), so
-# without a cap every POST /api/tournament leaks a 9-player table for the
-# lifetime of the process. Keep only a user's most recent tables.
-MAX_TABLES_PER_USER = 20
-
-
-def _evict_stale_tables(user: str) -> None:
-    """Drop the user's oldest tables beyond MAX_TABLES_PER_USER (oldest first)."""
-    owned = [sid for sid, s in _sessions.items() if s.owner == user]
-    for session_id in owned[: max(0, len(owned) - MAX_TABLES_PER_USER + 1)]:
-        _sessions.pop(session_id, None)
-
-
 def get_session(table_id: str, user: str) -> GameSession:
-    try:
-        session = _sessions[table_id]
-    except KeyError as exc:
-        raise HTTPException(status_code=404, detail="table not found") from exc
-    if session.owner != user:
+    """The caller's table, or 404 — an unowned table is indistinguishable
+    from a missing one, so ownership never leaks through the status code."""
+    session = session_store.get(table_id)
+    if session is None or session.owner != user:
         raise HTTPException(status_code=404, detail="table not found")
     return session
 
@@ -91,12 +49,11 @@ def create_tournament(request: TournamentCreateRequest,
         level_minutes=minutes,
         owner=user,
         hero_name=user,
-        table_label=_table_labels.allocate(),
+        table_label=session_store.next_label(),
         history_dir=settings.history_dir,
     )
     session.start()
-    _evict_stale_tables(user)
-    _sessions[session.session_id] = session
+    session_store.add(session)
     return session.state()
 
 

@@ -5,14 +5,18 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from app.icm.icm_engine import MAX_EXACT_ICM_PLAYERS
+
 # Bounded vocabularies used by request schemas. Rejecting an unknown rank/suit
 # at the edge keeps the route's rank/suit lookup tables from raising KeyError
 # (a 500) on hostile input.
 Rank = Literal["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
 Suit = Literal["c", "d", "h", "s"]
 Position = Literal["UTG", "UTG+1", "MP", "LJ", "HJ", "CO", "BTN", "SB", "BB"]
-# Exact ICM is combinatorial; the coach never runs it for more than one table.
-MAX_PLAYERS = 9
+# A request that can reach the ICM engine is bounded by what the engine can
+# compute exactly; without it an unauthenticated body is a CPU denial of
+# service. See app/icm/icm_engine.py.
+MAX_TABLE_PLAYERS = MAX_EXACT_ICM_PLAYERS
 
 
 class ActionRequest(BaseModel):
@@ -149,7 +153,7 @@ class GameStateModel(BaseModel):
 
 
 class TournamentCreateRequest(BaseModel):
-    players: int = Field(default=9, ge=2, le=9)
+    players: int = Field(default=9, ge=2, le=MAX_TABLE_PLAYERS)
     starting_stack: int | None = Field(default=None, ge=100)
     blind_level_minutes: int | None = Field(default=None, ge=1)
     ante_mode: str = "bba"
@@ -167,10 +171,10 @@ class CoachAdviceRequest(BaseModel):
     toCall: int = Field(ge=0)
     board: list[CardModel] = Field(default=[], max_length=5)
     street: Literal["preflop", "flop", "turn", "river"] = "preflop"
-    playersRemaining: int = Field(default=9, ge=2, le=9)
-    paidPositions: int = Field(default=6, ge=1, le=MAX_PLAYERS)
-    stacks: list[int] = Field(min_length=1, max_length=MAX_PLAYERS)
-    payout: list[float] | None = Field(default=None, max_length=MAX_PLAYERS)
+    playersRemaining: int = Field(default=9, ge=2, le=MAX_TABLE_PLAYERS)
+    paidPositions: int = Field(default=6, ge=1, le=MAX_TABLE_PLAYERS)
+    stacks: list[int] = Field(min_length=1, max_length=MAX_TABLE_PLAYERS)
+    payout: list[float] | None = Field(default=None, max_length=MAX_TABLE_PLAYERS)
     facingRaise: bool = False
     heroSeat: int = 0
     mode: str = "advanced"

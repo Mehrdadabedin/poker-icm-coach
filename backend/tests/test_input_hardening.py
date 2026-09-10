@@ -1,10 +1,14 @@
 """Input validation on the public/authenticated API surface."""
 from __future__ import annotations
 
+from typing import get_args
+
 from fastapi.testclient import TestClient
 
-from app.api.routes_game import MAX_TABLES_PER_USER, _sessions
+from app.game.positions import POSITION_ORDER
 from app.main import app
+from app.schemas.game_schemas import Position
+from app.services.session_store import MAX_TABLES_PER_USER, session_store
 from tests.api_helpers import login_client, ws_url
 
 anon = TestClient(app)
@@ -15,6 +19,11 @@ COACH_BODY = {
     "position": "BTN", "stack": 30_000, "bigBlind": 400, "smallBlind": 200,
     "ante": 0, "pot": 1_000, "toCall": 400, "stacks": [30_000, 20_000, 10_000],
 }
+
+
+def test_the_validated_position_vocabulary_matches_the_game_engine() -> None:
+    """A schema Literal that drifts from POSITION_ORDER rejects real seats."""
+    assert list(get_args(Position)) == POSITION_ORDER
 
 
 def test_icm_rejects_more_players_than_the_exact_recursion_supports() -> None:
@@ -86,7 +95,7 @@ def test_tables_per_user_are_capped_so_sessions_cannot_leak() -> None:
     body = {"players": 9, "ante_mode": "none", "fast_mode": 1.0}
     ids = [capper.post("/api/tournament", json=body).json()["tableId"]
            for _ in range(MAX_TABLES_PER_USER + 3)]
-    owned = [s for s in _sessions.values() if s.owner == "Capper"]
+    owned = session_store.owned_by("Capper")
     assert len(owned) == MAX_TABLES_PER_USER
     assert capper.get(f"/api/game/{ids[0]}/state").status_code == 404
     assert capper.get(f"/api/game/{ids[-1]}/state").status_code == 200

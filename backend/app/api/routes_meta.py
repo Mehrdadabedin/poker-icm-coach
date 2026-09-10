@@ -1,14 +1,13 @@
 """Meta routes: hands, icm, statistics, settings."""
 from __future__ import annotations
 
-from math import isfinite
-
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.api.deps import require_user
+from app.api.routes_game import get_session
 from app.icm.icm_engine import ICMEngine
 from app.schemas.settings_schemas import SettingsUpdate
-from app.services.game_session import GameSession
+from app.services.session_store import session_store
 from app.services.statistics import aggregate
 
 router = APIRouter(prefix="/api")
@@ -17,7 +16,7 @@ router = APIRouter(prefix="/api")
 @router.get("/game/{table_id}/hands")
 def list_hands(table_id: str, stage: str | None = None,
                user: str = Depends(require_user)) -> dict:
-    session = _session_or_404(table_id, user)
+    session = get_session(table_id, user)
     records = session.history.filter(stage=stage) if stage else session.history.all()
     return {"hands": [
         {
@@ -41,7 +40,7 @@ def list_hands(table_id: str, stage: str | None = None,
 
 @router.get("/game/{table_id}/statistics")
 def session_statistics(table_id: str, user: str = Depends(require_user)) -> dict:
-    session = _session_or_404(table_id, user)
+    session = get_session(table_id, user)
     stats = aggregate(session.history.all())
     return {
         "handsPlayed": stats.hands_played,
@@ -60,28 +59,19 @@ def session_statistics(table_id: str, user: str = Depends(require_user)) -> dict
     }
 
 
-# The exact ICM recursion is combinatorial in the number of players, so an
-# unbounded list on this public route would be a CPU denial of service.
-MAX_ICM_PLAYERS = 9
-
-
 @router.get("/icm")
 def icm_calculate(stacks: str, payouts: str) -> dict:
     """Query: /api/icm?stacks=45000,30000,20000&payouts=0.4,0.25,0.2,0.1,0.05"""
     try:
         stack_list = [int(x) for x in stacks.split(",") if x.strip()]
         payout_list = [float(x) for x in payouts.split(",") if x.strip()]
-        if not stack_list or not payout_list:
-            raise ValueError("empty input")
-        if any(s < 0 for s in stack_list):
-            raise ValueError("negative stack")
-        if any(not isfinite(p) or p < 0 for p in payout_list):
-            raise ValueError("invalid payout")
-        if len(stack_list) > MAX_ICM_PLAYERS or len(payout_list) > MAX_ICM_PLAYERS:
-            raise ValueError("too many players")
+        if not payout_list:
+            raise ValueError("payouts must not be empty")
+        # The engine owns the rest of the invariants (non-empty, non-negative,
+        # finite payouts, player cap) and raises ValueError for each.
+        result = ICMEngine(stack_list, payout_list).calculate()
     except ValueError as exc:
         raise HTTPException(status_code=422, detail="invalid stacks/payouts") from exc
-    result = ICMEngine(stack_list, payout_list).calculate()
     return {"equities": result.equities, "method": result.method}
 
 
@@ -105,22 +95,8 @@ def put_settings(request: SettingsUpdate,
 @router.get("/active-table")
 def active_table(user: str = Depends(require_user)) -> dict:
     """The caller's most recent active tournament table (A05/A12)."""
-    from app.api.routes_game import _sessions
-
-    owned = [s for s in _sessions.values() if s.owner == user and s.status == "active"]
+    owned = [s for s in session_store.owned_by(user) if s.status == "active"]
     if not owned:
         return {"tableId": None, "tableLabel": None}
     last = owned[-1]
     return {"tableId": last.session_id, "tableLabel": last.table_label}
-
-
-def _session_or_404(table_id: str, user: str) -> GameSession:
-    from app.api.routes_game import _sessions
-
-    try:
-        session = _sessions[table_id]
-    except KeyError as exc:
-        raise HTTPException(status_code=404, detail="table not found") from exc
-    if session.owner != user:
-        raise HTTPException(status_code=404, detail="table not found")
-    return session

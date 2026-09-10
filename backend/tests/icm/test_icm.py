@@ -3,7 +3,12 @@ from __future__ import annotations
 
 import pytest
 
-from app.icm.icm_engine import ICMEngine, ICMResult, icm_equities
+from app.icm.icm_engine import (
+    MAX_EXACT_ICM_PLAYERS,
+    ICMEngine,
+    ICMResult,
+    icm_equities,
+)
 from app.tournament.tournament import PayoutStructure
 
 
@@ -96,3 +101,16 @@ def test_nine_player_icm_completes() -> None:
     assert abs(sum(eq) - 1.0) < 1e-6
     # stack order preserved: bigger stack -> more equity
     assert eq[0] > eq[4] > eq[8]
+
+
+def test_more_than_nine_players_is_rejected_not_computed() -> None:
+    """The recursion is factorial in the player count: refuse, don't grind."""
+    with pytest.raises(ValueError, match="at most"):
+        icm_equities([1000] * (MAX_EXACT_ICM_PLAYERS + 1), [0.5, 0.3, 0.2])
+
+
+def test_non_finite_or_negative_payouts_are_rejected() -> None:
+    with pytest.raises(ValueError, match="finite"):
+        icm_equities([1000, 2000], [float("nan"), 0.5])
+    with pytest.raises(ValueError, match="finite"):
+        icm_equities([1000, 2000], [-0.5, 0.5])

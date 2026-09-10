@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from app.strategy.ev import ChipEV, chip_ev
+from app.strategy.ev import chip_ev
 
 
 def test_positive_ev_call() -> None:

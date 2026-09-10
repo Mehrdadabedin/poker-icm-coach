@@ -17,6 +17,7 @@ from app.strategy.test_mode import compare_decisions
 from app.tournament.tournament import build_default_tournament
 from app.tournament.tournament_timer import TournamentTimer
 
+
 class GameSession:
     """Owns one tournament table; drives bots; exposes safe state snapshots."""
 
