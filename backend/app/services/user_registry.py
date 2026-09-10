@@ -20,11 +20,9 @@ logger = logging.getLogger(__name__)
 
 MIN_PASSWORD_LENGTH = 8
 _PBKDF2_ROUNDS = 200_000
-# Fixed decoy material: an unknown username is verified against this so a
-# failed lookup costs the same PBKDF2 work as a real one (no timing oracle
-# telling an attacker which usernames are registered).
+# Fixed decoy salt: an unknown username still pays for one PBKDF2 derivation,
+# so response time does not tell an attacker which usernames are registered.
 _DECOY_SALT = b"\x00" * 16
-_DECOY_HASH = hashlib.pbkdf2_hmac("sha256", b"decoy", _DECOY_SALT, _PBKDF2_ROUNDS)
 
 
 def _derive(password: str, salt: bytes) -> bytes:
@@ -96,8 +94,7 @@ class UserRegistry:
         with self._lock:
             entry = self._users.get(name)
         if entry is None:
-            # Same work as a hit, then fail: constant-time username miss.
-            hmac.compare_digest(_derive(password, _DECOY_SALT), _DECOY_HASH)
+            _derive(password, _DECOY_SALT)  # same work as a hit, then fail
             return False
         salt = base64.b64decode(entry["salt"])
         expected = base64.b64decode(entry["hash"])

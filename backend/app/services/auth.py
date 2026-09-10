@@ -53,8 +53,10 @@ class AuthStore:
     monotonic deadlines would make tokens outlive their TTL (or die instantly)
     after a restart.
 
-    The lock is reentrant: `_save` re-acquires it to snapshot the token table,
-    and it is called from methods that already hold it.
+    `_save` and `_load` take the lock themselves, so every caller must release
+    it first. The lock is reentrant so that forgetting to is a redundant
+    acquire rather than a worker thread wedged forever, which is what a
+    non-reentrant lock did here on the first lookup of an expired token.
     """
 
     def __init__(self, ttl: float = TOKEN_TTL_SECONDS) -> None:

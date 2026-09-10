@@ -85,6 +85,9 @@ def test_settings_still_accepts_a_valid_update() -> None:
 
 def test_ranges_rejects_an_unknown_position_and_out_of_range_depth() -> None:
     assert anon.get("/api/ranges?position=NOWHERE").status_code == 422
+    # A raw "+" decodes to a space: the client must encode UTG+1.
+    assert anon.get("/api/ranges?position=UTG+1").status_code == 422
+    assert anon.get("/api/ranges?position=UTG%2B1").status_code == 200
     assert anon.get("/api/ranges?position=BTN&stack_bb=100000").status_code == 422
     assert anon.get("/api/ranges?position=BTN&stack_bb=30").status_code == 200
 
