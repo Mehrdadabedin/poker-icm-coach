@@ -767,3 +767,77 @@ and after a clean rebuild), so a fresh frontend deploy will render at 82%.
 ### Required action
 - Redeploy the frontend (main @ b64e06a) and hard-refresh the phone. The
   landscape table will then render at ~82% of the viewport width.
+
+
+## Master Task — Open GitHub Issues (2026-09-11)
+
+### Issue #1 — SSE/WebSocket vs polling
+Status: DOCUMENTED / NO SAFE CODE CHANGE
+Files: ARCHITECTURE.md
+Tests: n/a
+Result: Kept 350ms REST polling. The existing WS uses ?token= auth
+(log-leak risk); a safe adoption needs cookie/subprotocol auth first.
+No migration forced. Details in ARCHITECTURE.md.
+Remaining: optional future WS adoption after WS auth hardening.
+
+### Issue #3 — Tournament settings global
+Status: FIXED
+Files: app/core/tournament_settings.py, api/routes_meta.py, api/routes_game.py,
+tests/test_settings_history.py
+Tests: backend settings suite + new two-user isolation test (all pass).
+Result: Settings now per-authenticated-user; changing A never hits B;
+new tournaments consume the owner's own values. Poker/ICM unchanged.
+
+### Issue #4 — Auth tokens / live tables single-worker
+Status: DOCUMENTED / NO SAFE CODE CHANGE (owner/infra)
+Files: ARCHITECTURE.md
+Tests: isolation + auth suites pass (31 tests incl. multi/concurrent).
+Result: In-memory stores are correct for the intentional single-worker
+deployment; GameSession (engine/timer/RNG) must not be distributed.
+Multi-worker is intentionally unsupported without externalizing state.
+
+### Issue #5 — Table lifecycle
+Status: FIXED
+Files: app/services/session_store.py (new), game_session.py,
+game_state_view.py, api/routes_game.py, schemas, tests/test_table_lifecycle.py
+Tests: 6 new lifecycle tests pass (active/finished/abandoned/eviction/cap).
+Result: status active|finished|abandoned + last_seen; eviction order
+finished -> abandoned -> live-cap; poker rules unchanged.
+
+### Issue #6 — Card PNG size
+Status: FIXED
+Files: 53 PNGs (frontend/public/cards), scripts/optimize_card_pngs.py (new),
+scripts/import_opendecks_cards.py, backend/tests/test_card_assets.py,
+docs/card-assets.md
+Tests: card asset suite updated + passing (300x420, PNG, <=300KB each).
+Result: PNG deck 14.4MB -> 2.8MB at 300x420 (5:7 preserved),
+artwork/filenames/PNG format unchanged; visually verified representative
+cards.
+
+### Issue #7 — Coach street validation
+Status: FIXED
+Files: frontend/src/pages/CoachPage.tsx, backend/app/schemas/game_schemas.py,
+backend/tests/test_coach_street_validation.py (new),
+frontend/tests/coach_street.test.tsx (new)
+Tests: backend valid combos 200 + invalid 422; frontend ANALYZE disabled for
+1/2-card board and never sends river; enabled at 3 cards.
+Result: one/two-card boards are never treated as river; valid preflop/flop/
+turn/river unchanged.
+
+### Issue #8 — GitHub Actions billing lock
+Status: BLOCKED (owner action)
+Files: none (workflows validated as correct)
+Tests: yaml parse + jobs check.
+Result: ci.yml and deploy-pages.yml are structurally valid; Actions cannot
+run because the GitHub account has a billing lock. Owner must resolve
+GitHub billing/payment before Actions can run. No workflow code changed,
+no paid service added.
+
+### Final verification
+- Backend: 417 passed, 4 skipped (PostgreSQL-dependent DB tests skipped —
+  Postgres not running locally; SKIP_DB_TESTS=1).
+- Frontend: 42 passed; production build clean.
+- GitHub audit: PASSED.
+- Auth/logout/identity, table isolation (A/B), dealing/positions/rotation/
+  betting/blinds/ICM/tournament/re-entry, and all UI flows verified via the
+  regression + isolation suites.
