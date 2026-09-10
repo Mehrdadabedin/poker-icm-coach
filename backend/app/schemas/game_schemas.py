@@ -1,7 +1,7 @@
 """Pydantic schemas for the poker API (mirrors frontend models)."""
 from __future__ import annotations
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class ActionRequest(BaseModel):
@@ -106,10 +106,10 @@ class HandReviewModel(BaseModel):
     losingHandName: str | None = None
     pressure: str = "Low"
 
-
 class GameStateModel(BaseModel):
     tableId: str
     tableLabel: str = ""
+    status: str = "active"
     username: str | None = None
     handNumber: int
     players: list[PlayerStateModel]
@@ -156,6 +156,17 @@ class CoachAdviceRequest(BaseModel):
     toCall: int = Field(ge=0)
     board: list[CardModel] = []
     street: str = "preflop"
+
+    @model_validator(mode="after")
+    def _check_street_matches_board(self):
+        expected = {0: "preflop", 3: "flop", 4: "turn", 5: "river"}
+        board_len = len(self.board)
+        if expected.get(board_len) != self.street:
+            wanted = expected.get(board_len, "<valid 0/3/4/5-card street>")
+            raise ValueError(
+                f"street '{self.street}' does not match {board_len} board card(s); expected '{wanted}'"
+            )
+        return self
     playersRemaining: int = Field(default=9, ge=2, le=9)
     paidPositions: int = Field(default=6, ge=1)
     stacks: list[int]
