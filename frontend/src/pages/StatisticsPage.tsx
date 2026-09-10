@@ -5,6 +5,14 @@ import { Copyright } from "../components/Copyright";
 
 type Stats = { handsPlayed: number; handsWon: number; vpip: number; pfr: number; aggression: number; averagePot: number; bbWonLost: number; chipProfit: number; coachAgreement: number; icmMistakes: number; positionPerformance: Record<string, number> };
 
+const card = (label: string, value: string, extra?: string) => (
+  <div className="stat-card" key={label}>
+    <div className="stat-value">{value}</div>
+    <div className="stat-label">{label}</div>
+    {extra && <div className="stat-extra">{extra}</div>}
+  </div>
+);
+
 /** STATISTICS screen: session aggregates from the API. */
 export function StatisticsPage() {
   const navigate = useNavigate();
@@ -18,13 +26,6 @@ export function StatisticsPage() {
       .catch(() => undefined);
   }, [tableId]);
 
-  const card = (label: string, value: string, extra?: string) => (
-    <div className="stat-card" key={label}>
-      <div className="stat-value">{value}</div>
-      <div className="stat-label">{label}</div>
-      {extra && <div className="stat-extra">{extra}</div>}
-    </div>
-  );
 
   return (
     <div className="page" data-testid="statistics-page">

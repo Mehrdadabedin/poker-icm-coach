@@ -21,7 +21,7 @@ describe("A08/A17 real card assets", () => {
       for (const suit of ALL_SUITS) {
         const { container } = render(<PlayingCard card={{ rank, suit } as never} />);
         const img = container.querySelector("img");
-        expect(img?.getAttribute("src")).toMatch(new RegExp(`cards/${rank}${suit}\.png$`));
+        expect(img?.getAttribute("src")).toMatch(new RegExp(`cards/${rank}${suit}[.]png$`));
         expect(img?.getAttribute("alt")).toContain(SUIT_WORDS[suit]);
         expect(img?.getAttribute("alt")).toBeTruthy();
       }
@@ -55,7 +55,7 @@ describe("A08/A17 real card assets", () => {
     for (const [rank, suit, file, expectedAlt] of cases) {
       const { container } = render(<PlayingCard card={{ rank, suit } as never} />);
       const img = container.querySelector("img");
-      expect(img?.getAttribute("src")).toMatch(new RegExp(`cards/${file}\.png$`));
+      expect(img?.getAttribute("src")).toMatch(new RegExp(`cards/${file}[.]png$`));
       expect(img?.getAttribute("alt")).toBe(expectedAlt);
     }
   });

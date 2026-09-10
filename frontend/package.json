@@ -9,13 +9,14 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "lint": "tsc --noEmit",
+    "lint": "tsc --noEmit && oxlint --deny-warnings",
     "cap:sync": "npm run build && npx cap sync android",
     "cap:android": "npx cap open android",
     "cap:add": "npx cap add android",
     "apk:debug": "cd android && ./gradlew assembleDebug",
     "apk:release": "cd android && ./gradlew assembleRelease",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "lint:js": "oxlint --deny-warnings"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",
@@ -34,6 +35,7 @@
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",
     "jsdom": "^25.0.1",
+    "oxlint": "^1.78.0",
     "typescript": "^5.7.2",
     "vite": "^6.0.7",
     "vitest": "^3.2.7"

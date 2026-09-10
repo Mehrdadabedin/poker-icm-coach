@@ -128,6 +128,13 @@ Three kinds, each gated differently:
 | Real server (`test_ws_concurrency.py`) | a bindable localhost port | skips if `bind()` fails |
 | Real database (`test_database.py`) | PostgreSQL + migrations | skips if unreachable; `SKIP_DB_TESTS=1` to force |
 
+CI gates both sides: backend `ruff` + `mypy app` + `pytest` against a real
+PostgreSQL service, frontend `tsc --noEmit` + `oxlint --deny-warnings` +
+`vitest` + `build`. The oxlint set is `correctness` and `suspicious` as errors
+plus `no-explicit-any` and `no-console`; `unicorn/no-array-sort` is off because
+the one call site spreads before sorting. Style-opinion categories are
+deliberately not enabled — a linter that warns about everything gets ignored.
+
 Threading tests are **event-driven, never timed**: `tests/concurrency_helpers.py`
 provides a `Gate` that parks a caller inside `HandEngine` and a
 `WaitCountingLock` that lets a test wait until another thread is provably
@@ -139,7 +146,8 @@ enumeration-oracle test counts PBKDF2 derivations.
 
 ## 8. Enforced by tests, not by convention
 
-- **200 lines per Python file**, `test_project_setup.py::test_code_files_under_200_lines`.
+- **200 lines per `.py`, `.ts` and `.tsx` file**,
+  `test_project_setup.py::test_code_files_under_200_lines`.
   Several files sit within a line or two of it, so a change that adds lines
   usually means extracting a module first. That is why `user_registry.py`,
   `settings_schemas.py`, `session_store.py`, `session_coach.py` and

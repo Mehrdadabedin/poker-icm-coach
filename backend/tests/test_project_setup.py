@@ -67,10 +67,14 @@ def test_docker_compose_services() -> None:
 
 
 def _ignored(parts: tuple[str, ...]) -> bool:
-    return any(p in {".venv", ".venv-rooted", "node_modules", ".git", "__pycache__", "dist"} for p in parts)
+    return any(
+        p in {".venv", ".venv-rooted", "node_modules", ".git", "__pycache__",
+              "dist", "android", "test-results", "playwright-report"}
+        for p in parts
+    )
 
 
-@pytest.mark.parametrize("extension", ["py"])
+@pytest.mark.parametrize("extension", ["py", "ts", "tsx"])
 def test_code_files_under_200_lines(extension: str) -> None:
     roots = [ROOT / "backend", ROOT / "scripts", ROOT / "frontend", ROOT / "e2e"]
     for root in roots:

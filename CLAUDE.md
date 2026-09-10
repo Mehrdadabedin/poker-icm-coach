@@ -18,9 +18,10 @@ Applies to every output: replies, commit messages, PR bodies, comments, docs.
 ## Commands
 
 ```bash
-cd backend  && uv run pytest        # 435 (439 with a database)
+cd backend  && uv run pytest        # 437 (441 with a database)
 cd frontend && npx vitest run       # 41
 cd backend  && uv run ruff check app tests && uv run mypy app
+cd frontend && npm run lint         # tsc --noEmit + oxlint --deny-warnings
 docker compose up -d postgres && cd backend && uv run alembic upgrade head
 ```
 
@@ -40,14 +41,15 @@ Violating 1-5 turns `tests/test_invariants.py` red.
 4. Every route taking `table_id` depends on `require_user`. A client-supplied
    username is never authorization.
 5. The ICM player cap is defined once, in `icm_engine.py`. Schemas import it.
-6. 200 lines max per `.py` file. Enforced. Extract a module instead of growing
-   one.
+6. 200 lines max per `.py`, `.ts`, `.tsx` file. Enforced. Extract a module
+   instead of growing one.
 7. Request-field bounds go on the pydantic schema, as `Literal` for any
    vocabulary. Domain invariants go in the engine that owns them.
 8. Ownership failure returns 404, not 403.
 9. `frontend/public/cards` is PNG only. Regenerate with
    `scripts/import_opendecks_cards.py`.
 10. Backend owns all game state. The frontend renders snapshots.
+11. No `any` in TypeScript. No `console.*`. Enforced by oxlint in CI.
 
 ## Tests
 
