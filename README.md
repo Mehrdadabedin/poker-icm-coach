@@ -61,6 +61,9 @@ Two documents govern how the code may change:
   agents, plus the exact test and lint commands. Read it before changing code,
   whichever assistant or model you are using.
 
+Five of those rules are not advisory: `backend/tests/test_invariants.py` parses
+the source and fails CI on violation.
+
 Backend module map:
 
 | Module | Responsibility |
@@ -117,12 +120,12 @@ The Vite dev server proxies `/api` and `/ws` to the backend.
 ### 4. Tests
 
 ```bash
-# backend — 430 tests
+# backend — 435 tests
 cd backend && uv run pytest
 
 # the four database tests need PostgreSQL; without it they skip
 docker compose up -d postgres
-cd backend && uv run alembic upgrade head && uv run pytest   # 434 tests
+cd backend && uv run alembic upgrade head && uv run pytest   # 439 tests
 
 # frontend unit tests — 41 tests
 cd frontend && npm test
@@ -170,7 +173,7 @@ The APK talks to the FastAPI backend over HTTP (configure the server URL in
 - Phase 2 — Computer AI: **complete** (parts 017–021)
 - Phase 3 — Advanced ICM coach: **complete** (parts 022–034)
 - Packaging & testing: **complete** (parts 035–037)
-- 434 backend tests (430 without a database), 41 frontend tests, 3 Playwright
+- 439 backend tests (435 without a database), 41 frontend tests, 3 Playwright
   E2E scenarios — all passing.
 
 ### Known limitations

@@ -1,104 +1,85 @@
-# CLAUDE.md — rules for coding agents in this repository
+# CLAUDE.md — rules for agents in this repo
 
-Any assistant or model working here follows these. They are short imperatives;
-`ARCHITECTURE.md` has the reasoning and the measurements behind each. Several
-are enforced by tests, so breaking one turns the suite red.
+Terse by design. Reasons and measurements: `ARCHITECTURE.md`.
+Several people, harnesses and model providers work here. Follow these, not your
+own conventions.
 
-## Before you change anything
+## Rule 0 — communicate efficiently
 
-```bash
-cd backend  && uv run pytest                      # 430 tests (434 with a database)
-cd frontend && npx vitest run                     # 41 tests
-```
+Applies to every output: replies, commit messages, PR bodies, comments, docs.
 
-Both suites must be green before and after your change. Report the counts.
+- Lead with the result. No preamble, no recap.
+- Say what changed and what broke. Skip what you considered.
+- No teaching tone, no praise, no filler. Assume an expert reader.
+- Report numbers: test counts, measurements, before/after.
+- Say "I did not verify X" when you did not. Never imply verification.
+- A comment records why, never what. Delete comments that restate code.
 
-For the four database tests, start the service first — otherwise they skip:
-
-```bash
-docker compose up -d postgres
-cd backend && uv run alembic upgrade head
-```
-
-Lint with the project's own tooling, which is authoritative:
+## Commands
 
 ```bash
-cd backend && uv run ruff check app tests && uv run mypy app
+cd backend  && uv run pytest        # 435 (439 with a database)
+cd frontend && npx vitest run       # 41
+cd backend  && uv run ruff check app tests && uv run mypy app
+docker compose up -d postgres && cd backend && uv run alembic upgrade head
 ```
 
-A globally installed `mypy` or `tsc` reports dozens of missing-stub errors
-because it runs outside the project environment. Ignore those; use the commands
-above.
+Both suites green before and after. Report counts.
+Global `mypy`/`tsc` run outside the project env — their missing-stub errors are
+noise. Use the commands above.
 
 ## Hard rules
 
-1. **200 lines maximum per Python file.** Asserted by
-   `test_project_setup.py::test_code_files_under_200_lines` and by
-   `scripts/github_audit.py`. Files sit close to the limit on purpose — if your
-   change does not fit, extract a module first rather than growing the file.
-2. **Never call a `GameSession` method from an `async def` without
-   `run_in_threadpool`.** Session calls are slow and synchronous; inline, they
-   freeze every connection in the process. Same for anything that writes to
-   disk, including `auth_store.user_for_token()`.
-3. **Every public `GameSession` method takes `self._lock`.** One table is
-   reachable from REST, the WebSocket, and a 350 ms poll at the same time.
-   Concurrent unlocked `next_hand()` calls destroyed chips.
-4. **Never trust a client-supplied username as authorization.** Depend on
-   `require_user` and resolve the user from the bearer token server-side.
-5. **A request field's bounds belong on the pydantic schema**
-   (`backend/app/schemas/`), as `Literal` for any vocabulary. A domain
-   invariant belongs in the engine that owns it — the ICM player cap lives in
-   `icm_engine.py`, and schemas import the constant instead of repeating `9`.
-6. **Ownership failures return 404, not 403.** Do not leak whether a table
-   exists.
-7. **`frontend/public/cards` is PNG only.** `public/` ships verbatim in `dist/`
-   and in the APK. Regenerate with `scripts/import_opendecks_cards.py`.
-8. **The backend owns all game state.** The frontend renders snapshots and
-   sends actions; it never computes poker results.
+Violating 1-5 turns `tests/test_invariants.py` red.
 
-## Writing tests
+1. Every public `GameSession` method takes `self._lock`. Unlocked concurrent
+   `next_hand()` destroyed chips.
+2. No `async def` calls a session method inline. Use `run_in_threadpool`.
+   Inline froze every connection in the process. Same for disk writes.
+3. Reach tables via `session_store`, never a router's `_sessions`.
+4. Every route taking `table_id` depends on `require_user`. A client-supplied
+   username is never authorization.
+5. The ICM player cap is defined once, in `icm_engine.py`. Schemas import it.
+6. 200 lines max per `.py` file. Enforced. Extract a module instead of growing
+   one.
+7. Request-field bounds go on the pydantic schema, as `Literal` for any
+   vocabulary. Domain invariants go in the engine that owns them.
+8. Ownership failure returns 404, not 403.
+9. `frontend/public/cards` is PNG only. Regenerate with
+   `scripts/import_opendecks_cards.py`.
+10. Backend owns all game state. The frontend renders snapshots.
 
-- **Never gate a concurrency test on a `sleep` margin.** Use
-  `tests/concurrency_helpers.py`: `Gate` parks a caller inside the engine,
-  `WaitCountingLock` lets you wait until another thread is provably blocked.
-- **A test that needs a service skips when the service is absent** — it does
-  not fail. See the `pytestmark` in `tests/test_database.py`.
-- **Assert work, not wall-clock**, for anything security-shaped. The
-  user-enumeration test counts PBKDF2 derivations rather than timing them.
-- Seed the RNG (`GameSession(rng=random.Random(...))`) when the assertion
-  depends on which hand was dealt.
-- Prove a regression test works: revert the fix, watch it fail with a message
-  that names the cause, restore the fix.
+## Tests
+
+- No `sleep` margins in concurrency tests. Use `tests/concurrency_helpers.py`
+  (`Gate`, `WaitCountingLock`).
+- A test needing a service skips when it is absent. See
+  `tests/test_database.py`.
+- Security properties: count work, do not clock it.
+- Seed the RNG when the assertion depends on the hand dealt.
+- Prove a regression test: revert the fix, watch it fail with a message naming
+  the cause, restore.
+
+## Traps
+
+- `data/users.json`, `data/sessions.json`: live credentials and tokens.
+  Gitignored. Never print or commit.
+- Single uvicorn worker only. Tokens and tables are in-process dicts.
+- `GameSession.status` never leaves `"active"`. No lifecycle. The 20-table cap
+  is the stopgap.
+- `PUT /api/settings` writes one global object shared by all users. Current
+  behaviour, not a bug to fix silently.
+- The frontend polls every 350 ms. The websocket endpoint is unused (issue #1).
+
+## Scope
+
+Do the task asked. Report anything else you find; do not fix it in the same
+commit. One reversible decision per commit — the card-asset deletion is its own
+commit because it reverses a documented choice.
 
 ## Conventions
 
-- Python 3.12, `from __future__ import annotations`, type hints everywhere,
-  Pydantic v2, SQLAlchemy 2. TypeScript strict; no `any`.
-- Docstrings explain **why**, not what. A comment that restates the code is
-  noise; a comment that records the bug it prevents is the point.
-- Commit messages state the observed failure and the measurement, not just the
-  change. `git log` on this branch is the model.
-- Update `progress.md` when a numbered plan in `plans/` changes state — a test
-  asserts every row is present.
-- Do not add a dependency without saying why in the commit message; the
-  runtime set is deliberately small.
-
-## Known traps
-
-- `data/users.json` and `data/sessions.json` hold live credentials and bearer
-  tokens. They are gitignored. Never print or commit them.
-- The token store is an in-process dict: **one uvicorn worker only**. Scaling
-  out means moving sessions to PostgreSQL or Redis first.
-- `GameSession.status` never leaves `"active"`; there is no lifecycle. The
-  20-table-per-user cap in `SessionStore` is the stopgap.
-- `PUT /api/settings` writes one process-global object shared by every user.
-  That is current behaviour, not an accident to "fix" silently.
-- The frontend does not use the WebSocket. It polls every 350 ms; the socket
-  endpoint is implemented and tested but unused.
-
-## Scope discipline
-
-Do the task asked. If you find something else broken, say so — do not fold an
-unrelated rewrite into the change. Keep unrelated fixes in separate commits so
-they can be reverted independently: this branch put the card-asset deletion in
-its own commit precisely because it reverses an earlier documented decision.
+Python 3.12, `from __future__ import annotations`, typed. Pydantic v2,
+SQLAlchemy 2. TypeScript strict, no `any`. Update `progress.md` when a
+`plans/` item changes state (asserted). Justify any new dependency in the
+commit message.

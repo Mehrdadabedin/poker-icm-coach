@@ -5,6 +5,8 @@ why. Each rule below was written after breaking it caused a real bug — the
 "why" is there so the next change does not undo the fix.
 
 `CLAUDE.md` is the short imperative version of this file for coding agents.
+Rules 1-5 there are enforced by `backend/tests/test_invariants.py`, which parses
+the source: a violation is a red test, not a review comment.
 
 ---
 
@@ -143,5 +145,8 @@ enumeration-oracle test counts PBKDF2 derivations.
   `settings_schemas.py`, `session_store.py`, `session_coach.py` and
   `tests/concurrency_helpers.py` exist.
 - Directory layout, `progress.md` rows, README sections, and the card-asset
-  inventory are all asserted. `scripts/github_audit.py` runs the same checks in
-  CI.
+  inventory are all asserted; `scripts/check_github.py` runs the same checks.
+- **The invariants in sections 1-4 are parsed out of the source** by
+  `backend/tests/test_invariants.py`: the session lock, no inline session call
+  in an `async def`, no reaching a router's `_sessions`, `require_user` on every
+  `table_id` route, one definition of the ICM cap. CI runs it on every push.
