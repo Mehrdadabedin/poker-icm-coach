@@ -4,7 +4,8 @@ The README says what the project *is*. This file says what must stay true, and
 why. Each rule below was written after breaking it caused a real bug — the
 "why" is there so the next change does not undo the fix.
 
-`CLAUDE.md` is the short imperative version of this file for coding agents.
+`CLAUDE.md` is the short imperative version of this file for coding agents, and
+its rule 0 covers how to write anything here, issues and pull requests included.
 Rules 1-5 there are enforced by `backend/tests/test_invariants.py`, which parses
 the source: a violation is a red test, not a review comment.
 

@@ -14,6 +14,11 @@ Applies to every output: replies, commit messages, PR bodies, comments, docs.
 - Report numbers: test counts, measurements, before/after.
 - Say "I did not verify X" when you did not. Never imply verification.
 - A comment records why, never what. Delete comments that restate code.
+- Gloss any idiom or figure of speech in parentheses the first time you use it:
+  "a free win (something with benefits and no cost)". Readers here are not all
+  native English speakers, and an unexplained idiom costs more than the words it
+  saved. Plain wording is still better where it exists.
+- No em dashes. Use a comma or a full stop.
 
 ## Commands
 
