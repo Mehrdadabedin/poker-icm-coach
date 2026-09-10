@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.concurrency import run_in_threadpool
 
 from app.api.deps import bearer_token
 from app.api.routes_auth import router as auth_router
@@ -44,6 +45,10 @@ async def table_ws(websocket: WebSocket, table_id: str,
 
     Ownership check (A12): when the session is owned by a user, the caller
     must present that user's bearer token (`?token=...`).
+
+    Every session call goes through the threadpool: playing out a hand takes
+    real time (the bot loop), and running that inline would block the event
+    loop — and with it every other connection in the process.
     """
     await websocket.accept()
     session = session_store.get(table_id)
@@ -59,16 +64,16 @@ async def table_ws(websocket: WebSocket, table_id: str,
             message = await websocket.receive_text()
             try:
                 if message == "state":
-                    await websocket.send_json(session.state())
+                    await websocket.send_json(await run_in_threadpool(session.state))
                 elif message.startswith("action:"):
                     _prefix, _sep, kind = message.partition(":")
                     rest: list[str] = message.split(":", 2)[2:]
                     amount = int(rest[0]) if rest and rest[0].strip().isdigit() else None
-                    session.hero_action(kind.strip(), amount)
-                    await websocket.send_json(session.state())
+                    await run_in_threadpool(session.hero_action, kind.strip(), amount)
+                    await websocket.send_json(await run_in_threadpool(session.state))
                 elif message == "next":
-                    session.next_hand()
-                    await websocket.send_json(session.state())
+                    await run_in_threadpool(session.next_hand)
+                    await websocket.send_json(await run_in_threadpool(session.state))
             except ValueError as exc:
                 # An illegal action is client error, not a broken connection:
                 # report it the way REST does (400) and keep the socket open.
