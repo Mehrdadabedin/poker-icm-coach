@@ -797,12 +797,14 @@ deployment; GameSession (engine/timer/RNG) must not be distributed.
 Multi-worker is intentionally unsupported without externalizing state.
 
 ### Issue #5 — Table lifecycle
-Status: FIXED
-Files: app/services/session_store.py (new), game_session.py,
-game_state_view.py, api/routes_game.py, schemas, tests/test_table_lifecycle.py
-Tests: 6 new lifecycle tests pass (active/finished/abandoned/eviction/cap).
-Result: status active|finished|abandoned + last_seen; eviction order
-finished -> abandoned -> live-cap; poker rules unchanged.
+Status: FIXED (re-landed after merge c7d5220, see below)
+Files: app/services/session_store.py (SessionStore), game_session.py,
+game_state_view.py, schemas/game_schemas.py, tests/test_table_lifecycle.py
+Tests: 7 lifecycle tests pass (active/finished/abandoned/engaged/order/
+mark_finished guards).
+Result: status active|finished|abandoned + last_seen; ended tables evicted
+before the per-user cap; poker rules unchanged. The policy lives on
+SessionStore, not on a router registry (hard rule 3).
 
 ### Issue #6 — Card PNG size
 Status: FIXED
@@ -823,6 +825,23 @@ Tests: backend valid combos 200 + invalid 422; frontend ANALYZE disabled for
 1/2-card board and never sends river; enabled at 3 cards.
 Result: one/two-card boards are never treated as river; valid preflop/flop/
 turn/river unchanged.
+
+### Merge c7d5220 — half of PR #2 was dropped
+Status: FIXED
+Files: api/routes_meta.py, api/routes_game.py, core/tournament_settings.py,
+schemas/game_schemas.py, schemas/coach_schemas.py (new),
+services/session_store.py, services/game_session.py,
+tests/test_table_lifecycle.py, tests/test_card_assets.py,
+scripts/import_opendecks_cards.py, docs/card-assets.md, CLAUDE.md,
+ARCHITECTURE.md, frontend/tests/useAutoNext.test.tsx
+Tests: backend 451 passed 4 skipped (was: collection error, 0 tests ran);
+frontend 44 passed, tsc + oxlint clean (was: 1 oxlint error).
+Result: merge c7d5220 resolved nine files that both parents touched by taking
+8d9f251 verbatim, discarding the code for issues #3, #5, #6 and #7 while
+keeping their tests, binaries and progress rows. Issues #3/#5/#6/#7 above were
+accurate on b83d525 and false on main until this fix. No revert: the lost
+changes were re-applied forward, and #5 was rewritten onto SessionStore.
+Remaining: the 20-table cap and the 30-minute idle timeout are still guesses.
 
 ### Issue #8 — GitHub Actions billing lock
 Status: BLOCKED (owner action)

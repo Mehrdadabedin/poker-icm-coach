@@ -23,8 +23,8 @@ Applies to every output: replies, commit messages, PR bodies, comments, docs.
 ## Commands
 
 ```bash
-cd backend  && uv run pytest        # 438 (442 with a database)
-cd frontend && npx vitest run       # 41
+cd backend  && uv run pytest        # 451 (455 with a database)
+cd frontend && npx vitest run       # 44
 cd backend  && uv run ruff check app tests && uv run mypy app
 cd frontend && npm run lint         # tsc --noEmit + oxlint --deny-warnings
 docker compose up -d postgres && cd backend && uv run alembic upgrade head
@@ -82,10 +82,11 @@ Violating 1-5 turns `tests/test_invariants.py` red.
 - `data/users.json`, `data/sessions.json`: live credentials and tokens.
   Gitignored. Never print or commit.
 - Single uvicorn worker only. Tokens and tables are in-process dicts.
-- `GameSession.status` never leaves `"active"`. No lifecycle. The 20-table cap
-  is the stopgap.
-- `PUT /api/settings` writes one global object shared by all users. Current
-  behaviour, not a bug to fix silently.
+- `GameSession.status` is `active`, `finished` or `abandoned`. Ended tables are
+  evicted before the 20-table per-user cap is consulted. The cap is still a
+  guess.
+- `GET`/`PUT /api/settings` are per authenticated user (issue #3). Both require
+  `require_user`; there is no anonymous read.
 - The frontend polls every 350 ms. The websocket endpoint is unused (issue #1).
 
 ## Scope
