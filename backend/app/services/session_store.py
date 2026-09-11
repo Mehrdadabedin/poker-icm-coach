@@ -51,9 +51,14 @@ class SessionStore:
         return label
 
     def add(self, session: GameSession) -> None:
-        """Register a table, evicting ended ones before capping live ones."""
+        """Register a table, evicting ended ones before capping live ones.
+
+        The sweep covers every owner, not just this one: a user who finishes or
+        abandons a table and never creates another would otherwise leak it for
+        the life of the process, which is the leak this store exists to stop.
+        """
+        self.evict_ended()
         if session.owner:
-            self.evict_ended(session.owner)
             self._evict_oldest(session.owner)
         self._sessions[session.session_id] = session
 

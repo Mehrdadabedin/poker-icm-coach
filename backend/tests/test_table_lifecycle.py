@@ -1,4 +1,4 @@
-"""Issue #5 — table lifecycle: active / finished / abandoned eviction.
+"""Issue #5: table lifecycle, active / finished / abandoned eviction.
 
 Tables are reached through `session_store` (hard rule 3), never through a
 router's private registry. Each test owns a distinct user, so no test can be
@@ -91,3 +91,13 @@ def test_mark_finished_needs_hero_out_and_no_live_opponent() -> None:
         player.is_eliminated = True
     assert mark_finished(session) is True
     assert session.status == "finished"
+
+
+def test_one_users_ended_table_is_swept_by_another_users_create() -> None:
+    """The sweep is global. An owner who finishes a table and never comes back
+    must not leak it until they happen to create another."""
+    quitter = login_client("LifeQuitter")
+    tid = _create(quitter)
+    session_store.get(tid).status = "finished"
+    _create(login_client("LifeStranger"))
+    assert session_store.get(tid) is None

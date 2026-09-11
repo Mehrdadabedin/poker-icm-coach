@@ -23,7 +23,7 @@ Applies to every output: replies, commit messages, PR bodies, comments, docs.
 ## Commands
 
 ```bash
-cd backend  && uv run pytest        # 451 (455 with a database)
+cd backend  && uv run pytest        # 452 (456 with a database)
 cd frontend && npx vitest run       # 44
 cd backend  && uv run ruff check app tests && uv run mypy app
 cd frontend && npm run lint         # tsc --noEmit + oxlint --deny-warnings

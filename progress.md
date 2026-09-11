@@ -800,8 +800,8 @@ Multi-worker is intentionally unsupported without externalizing state.
 Status: FIXED (re-landed after merge c7d5220, see below)
 Files: app/services/session_store.py (SessionStore), game_session.py,
 game_state_view.py, schemas/game_schemas.py, tests/test_table_lifecycle.py
-Tests: 7 lifecycle tests pass (active/finished/abandoned/engaged/order/
-mark_finished guards).
+Tests: 8 lifecycle tests pass (active/finished/abandoned/engaged/order/
+global sweep/mark_finished guards).
 Result: status active|finished|abandoned + last_seen; ended tables evicted
 before the per-user cap; poker rules unchanged. The policy lives on
 SessionStore, not on a router registry (hard rule 3).
@@ -834,7 +834,7 @@ services/session_store.py, services/game_session.py,
 tests/test_table_lifecycle.py, tests/test_card_assets.py,
 scripts/import_opendecks_cards.py, docs/card-assets.md, CLAUDE.md,
 ARCHITECTURE.md, frontend/tests/useAutoNext.test.tsx
-Tests: backend 451 passed 4 skipped (was: collection error, 0 tests ran);
+Tests: backend 452 passed 4 skipped (was: collection error, 0 of 453 ran);
 frontend 44 passed, tsc + oxlint clean (was: 1 oxlint error).
 Result: merge c7d5220 resolved nine files that both parents touched by taking
 8d9f251 verbatim, discarding the code for issues #3, #5, #6 and #7 while
