@@ -5,13 +5,15 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api.deps import require_user
 from app.core.config import settings
-from app.schemas.game_schemas import (
-    ActionRequest,
+from app.schemas.coach_schemas import (
     CoachAdviceRequest,
     CoachResponseModel,
+    RangeGridResponse,
+)
+from app.schemas.game_schemas import (
+    ActionRequest,
     GameStateModel,
     Position,
-    RangeGridResponse,
     TournamentCreateRequest,
 )
 from app.services.game_session import GameSession
