@@ -35,8 +35,9 @@ def get_session(table_id: str, user: str) -> GameSession:
 @router.post("/tournament", response_model=GameStateModel)
 def create_tournament(request: TournamentCreateRequest,
                       user: str = Depends(require_user)) -> dict:
-    from app.core.tournament_settings import settings as tournament_settings
+    from app.core.tournament_settings import settings as settings_store
 
+    tournament_settings = settings_store.for_user(user)  # issue #3: per user
     starting_stack = request.starting_stack or tournament_settings.starting_stack
     small = tournament_settings.starting_small_blind
     big = tournament_settings.starting_big_blind
