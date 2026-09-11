@@ -94,3 +94,18 @@ def test_many_consecutive_hands_no_errors() -> None:
         r = client.post(f"/api/game/{tid}/next-hand")
         assert r.status_code == 200, r.text
     assert client.get(f"/api/game/{tid}/state").json()["handNumber"] == 16
+
+
+def test_tournament_creation_returns_200_regression() -> None:
+    """Merge #2 restored the pre-issue-#3 settings reads in create_tournament
+    while keeping the per-user SettingsStore, so it read `starting_small_blind`
+    straight off the store. Every START PRACTICE POST raised AttributeError,
+    which answered 500 without CORS headers. The request body and the bearer
+    headers below are what the frontend sends."""
+    r = client.post("/api/tournament", json={
+        "players": 9, "ante_mode": "none", "fast_mode": 1.0,
+    }, headers={"Origin": RENDER_ORIGIN})
+    assert r.status_code == 200, r.text
+    assert_cors_headers(r)
+    assert r.json()["tableId"]
+    assert len(r.json()["players"]) == 9
