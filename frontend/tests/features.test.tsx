@@ -21,26 +21,26 @@ describe("A08/A17 real card assets", () => {
       for (const suit of ALL_SUITS) {
         const { container } = render(<PlayingCard card={{ rank, suit } as never} />);
         const img = container.querySelector("img");
-        expect(img?.getAttribute("src")).toMatch(new RegExp(`cards/${rank}${suit}\.png$`));
+        expect(img?.getAttribute("src")).toMatch(new RegExp(`cards/${rank}${suit}[.]png$`));
         expect(img?.getAttribute("alt")).toContain(SUIT_WORDS[suit]);
         expect(img?.getAttribute("alt")).toBeTruthy();
       }
     }
   });
 
-  it("all 52 PNG + 52 SVG card assets exist on disk (A17)", async () => {
+  it("all 52 PNG card assets exist on disk, with no unused SVG deck (A17)", async () => {
     const fs = await import("node:fs");
     const path = await import("node:path");
     const dir = path.resolve(__dirname, "../public/cards");
-    for (const format of ["png", "svg"]) {
-      for (const rank of ALL_RANKS) {
-        for (const suit of ALL_SUITS) {
-          const file = path.join(dir, `${rank}${suit}.${format}`);
-          expect(fs.existsSync(file), `missing asset ${rank}${suit}.${format}`).toBe(true);
-        }
+    for (const rank of ALL_RANKS) {
+      for (const suit of ALL_SUITS) {
+        const file = path.join(dir, `${rank}${suit}.png`);
+        expect(fs.existsSync(file), `missing asset ${rank}${suit}.png`).toBe(true);
       }
-      expect(fs.existsSync(path.join(dir, `back.${format}`))).toBe(true);
     }
+    expect(fs.existsSync(path.join(dir, "back.png"))).toBe(true);
+    // public/ ships verbatim in dist/ and the APK; the renderer loads only PNG.
+    expect(fs.readdirSync(dir).filter((f) => f.endsWith(".svg"))).toEqual([]);
   });
 
   it("verifies the required A17 mapping cases: AS KH 8H 10D QC 2C", () => {
@@ -55,7 +55,7 @@ describe("A08/A17 real card assets", () => {
     for (const [rank, suit, file, expectedAlt] of cases) {
       const { container } = render(<PlayingCard card={{ rank, suit } as never} />);
       const img = container.querySelector("img");
-      expect(img?.getAttribute("src")).toMatch(new RegExp(`cards/${file}\.png$`));
+      expect(img?.getAttribute("src")).toMatch(new RegExp(`cards/${file}[.]png$`));
       expect(img?.getAttribute("alt")).toBe(expectedAlt);
     }
   });

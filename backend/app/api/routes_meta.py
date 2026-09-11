@@ -4,8 +4,10 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.api.deps import require_user
+from app.api.routes_game import get_session
 from app.icm.icm_engine import ICMEngine
-from app.services.game_session import GameSession
+from app.schemas.settings_schemas import SettingsUpdate
+from app.services.session_store import session_store
 from app.services.statistics import aggregate
 
 router = APIRouter(prefix="/api")
@@ -14,7 +16,7 @@ router = APIRouter(prefix="/api")
 @router.get("/game/{table_id}/hands")
 def list_hands(table_id: str, stage: str | None = None,
                user: str = Depends(require_user)) -> dict:
-    session = _session_or_404(table_id, user)
+    session = get_session(table_id, user)
     records = session.history.filter(stage=stage) if stage else session.history.all()
     return {"hands": [
         {
@@ -38,7 +40,7 @@ def list_hands(table_id: str, stage: str | None = None,
 
 @router.get("/game/{table_id}/statistics")
 def session_statistics(table_id: str, user: str = Depends(require_user)) -> dict:
-    session = _session_or_404(table_id, user)
+    session = get_session(table_id, user)
     stats = aggregate(session.history.all())
     return {
         "handsPlayed": stats.hands_played,
@@ -63,60 +65,38 @@ def icm_calculate(stacks: str, payouts: str) -> dict:
     try:
         stack_list = [int(x) for x in stacks.split(",") if x.strip()]
         payout_list = [float(x) for x in payouts.split(",") if x.strip()]
-        if not stack_list or not payout_list:
-            raise ValueError("empty input")
+        if not payout_list:
+            raise ValueError("payouts must not be empty")
+        # The engine owns the rest of the invariants (non-empty, non-negative,
+        # finite payouts, player cap) and raises ValueError for each.
+        result = ICMEngine(stack_list, payout_list).calculate()
     except ValueError as exc:
         raise HTTPException(status_code=422, detail="invalid stacks/payouts") from exc
-    result = ICMEngine(stack_list, payout_list).calculate()
     return {"equities": result.equities, "method": result.method}
 
 
 @router.get("/settings")
-def get_settings(user: str = Depends(require_user)) -> dict:
-    from app.core.tournament_settings import settings as store
+def get_settings() -> dict:
+    from app.core.tournament_settings import settings as tournament_settings
 
-    return store.for_user(user).to_dict()
+    return tournament_settings.to_dict()
 
 
 @router.put("/settings")
-def put_settings(request: dict, user: str = Depends(require_user)) -> dict:
-    from app.core.tournament_settings import settings as store
+def put_settings(request: SettingsUpdate,
+                 _user: str = Depends(require_user)) -> dict:
+    """Update the shared tournament settings (bounds enforced by the schema)."""
+    from app.core.tournament_settings import settings as tournament_settings
 
-    allowed = {
-        "startingStack": ("starting_stack", int),
-        "startingSmallBlind": ("starting_small_blind", int),
-        "startingBigBlind": ("starting_big_blind", int),
-        "blindLevelMinutes": ("blind_level_minutes", int),
-        "fastMode": ("fast_mode", bool),
-        "showActionLabels": ("show_action_labels", bool),
-        "showResultLabels": ("show_result_labels", bool),
-    }
-    ts = store.for_user(user)
-    for key, (attr, caster) in allowed.items():
-        if key in request and hasattr(ts, attr):
-            setattr(ts, attr, caster(request[key]))
-    return ts.to_dict()
+    tournament_settings.update(**request.model_dump(exclude_none=True))
+    return tournament_settings.to_dict()
 
 
 @router.get("/active-table")
 def active_table(user: str = Depends(require_user)) -> dict:
     """The caller's most recent active tournament table (A05/A12)."""
-    from app.api.routes_game import _sessions
-
-    owned = [s for s in _sessions.values() if s.owner == user and s.status == "active"]
+    owned = [s for s in session_store.owned_by(user) if s.status == "active"]
     if not owned:
         return {"tableId": None, "tableLabel": None}
     last = owned[-1]
     return {"tableId": last.session_id, "tableLabel": last.table_label}
-
-
-def _session_or_404(table_id: str, user: str) -> GameSession:
-    from app.api.routes_game import _sessions
-
-    try:
-        session = _sessions[table_id]
-    except KeyError as exc:
-        raise HTTPException(status_code=404, detail="table not found") from exc
-    if session.owner != user:
-        raise HTTPException(status_code=404, detail="table not found")
-    return session

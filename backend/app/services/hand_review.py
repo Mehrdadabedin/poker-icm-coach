@@ -14,7 +14,6 @@ from app.poker.hand_rank import CATEGORY_NAMES, HandCategory
 from app.services.bot_review import _pressure, build_explanations
 from app.strategy.hand_codec import RANK_CHAR
 
-
 _SUIT_CHAR = {0: "c", 1: "d", 2: "h", 3: "s"}
 
 

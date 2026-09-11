@@ -49,18 +49,19 @@ vi.mock("../src/services/api", () => ({
   request: vi.fn(),
 }));
 
+async function openForm() {
+  const { LoginForm } = await import("../src/components/LoginForm");
+  render(
+    <MemoryRouter>
+      <LoginForm onLogin={() => undefined} />
+    </MemoryRouter>,
+  );
+  return screen;
+}
+
 describe("A18 registration-first authentication", () => {
   beforeEach(() => localStorage.clear());
 
-  async function openForm() {
-    const { LoginForm } = await import("../src/components/LoginForm");
-    render(
-      <MemoryRouter>
-        <LoginForm onLogin={() => undefined} />
-      </MemoryRouter>,
-    );
-    return screen;
-  }
 
   it("shows LOGIN and SIGN UP choices, no WELCOME BACK heading", async () => {
     await openForm();

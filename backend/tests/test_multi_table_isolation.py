@@ -4,7 +4,7 @@ leave TABLE_B unchanged except for the wall-clock-only `secondsLeft`."""
 
 from __future__ import annotations
 
-from app.api.routes_game import _sessions
+from app.services.session_store import session_store
 from tests.api_helpers import login_client
 
 client = login_client("Alice")
@@ -84,9 +84,9 @@ def test_distinct_table_ids_are_distinct_session_objects() -> None:
     a = create_table()
     b = create_table()
     assert a != b
-    assert _sessions[a] is not _sessions[b]
-    assert _sessions[a].session_id == a
-    assert _sessions[b].session_id == b
+    assert session_store.get(a) is not session_store.get(b)
+    assert session_store.get(a).session_id == a
+    assert session_store.get(b).session_id == b
 
 def test_different_stacks_and_blinds_are_isolated() -> None:
     a = create_table(starting_stack=35_000, blind_level_minutes=5)

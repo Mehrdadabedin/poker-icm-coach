@@ -1,7 +1,22 @@
 """Pydantic schemas for the poker API (mirrors frontend models)."""
 from __future__ import annotations
 
-from pydantic import BaseModel, Field, model_validator
+from typing import Literal
+
+from pydantic import BaseModel, Field
+
+from app.icm.icm_engine import MAX_EXACT_ICM_PLAYERS
+
+# Bounded vocabularies used by request schemas. Rejecting an unknown rank/suit
+# at the edge keeps the route's rank/suit lookup tables from raising KeyError
+# (a 500) on hostile input.
+Rank = Literal["2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"]
+Suit = Literal["c", "d", "h", "s"]
+Position = Literal["UTG", "UTG+1", "MP", "LJ", "HJ", "CO", "BTN", "SB", "BB"]
+# A request that can reach the ICM engine is bounded by what the engine can
+# compute exactly; without it an unauthenticated body is a CPU denial of
+# service. See app/icm/icm_engine.py.
+MAX_TABLE_PLAYERS = MAX_EXACT_ICM_PLAYERS
 
 
 class ActionRequest(BaseModel):
@@ -10,8 +25,8 @@ class ActionRequest(BaseModel):
 
 
 class CardModel(BaseModel):
-    rank: str
-    suit: str
+    rank: Rank
+    suit: Suit
 
 
 class PlayerStateModel(BaseModel):
@@ -106,10 +121,10 @@ class HandReviewModel(BaseModel):
     losingHandName: str | None = None
     pressure: str = "Low"
 
+
 class GameStateModel(BaseModel):
     tableId: str
     tableLabel: str = ""
-    status: str = "active"
     username: str | None = None
     handNumber: int
     players: list[PlayerStateModel]
@@ -138,7 +153,7 @@ class GameStateModel(BaseModel):
 
 
 class TournamentCreateRequest(BaseModel):
-    players: int = Field(default=9, ge=2, le=9)
+    players: int = Field(default=9, ge=2, le=MAX_TABLE_PLAYERS)
     starting_stack: int | None = Field(default=None, ge=100)
     blind_level_minutes: int | None = Field(default=None, ge=1)
     ante_mode: str = "bba"
@@ -146,31 +161,20 @@ class TournamentCreateRequest(BaseModel):
 
 
 class CoachAdviceRequest(BaseModel):
-    heroCards: list[CardModel]
-    position: str
+    heroCards: list[CardModel] = Field(min_length=2, max_length=2)
+    position: Position
     stack: int = Field(ge=0)
     bigBlind: int = Field(ge=1)
     smallBlind: int = Field(ge=0)
     ante: int = Field(ge=0)
     pot: int = Field(ge=0)
     toCall: int = Field(ge=0)
-    board: list[CardModel] = []
-    street: str = "preflop"
-
-    @model_validator(mode="after")
-    def _check_street_matches_board(self):
-        expected = {0: "preflop", 3: "flop", 4: "turn", 5: "river"}
-        board_len = len(self.board)
-        if expected.get(board_len) != self.street:
-            wanted = expected.get(board_len, "<valid 0/3/4/5-card street>")
-            raise ValueError(
-                f"street '{self.street}' does not match {board_len} board card(s); expected '{wanted}'"
-            )
-        return self
-    playersRemaining: int = Field(default=9, ge=2, le=9)
-    paidPositions: int = Field(default=6, ge=1)
-    stacks: list[int]
-    payout: list[float] | None = None
+    board: list[CardModel] = Field(default=[], max_length=5)
+    street: Literal["preflop", "flop", "turn", "river"] = "preflop"
+    playersRemaining: int = Field(default=9, ge=2, le=MAX_TABLE_PLAYERS)
+    paidPositions: int = Field(default=6, ge=1, le=MAX_TABLE_PLAYERS)
+    stacks: list[int] = Field(min_length=1, max_length=MAX_TABLE_PLAYERS)
+    payout: list[float] | None = Field(default=None, max_length=MAX_TABLE_PLAYERS)
     facingRaise: bool = False
     heroSeat: int = 0
     mode: str = "advanced"
@@ -186,11 +190,6 @@ class CoachResponseModel(BaseModel):
     ev: dict | None = None
     outs: dict | None = None
     education: str = ""
-
-
-class RangeQuery(BaseModel):
-    position: str
-    stack_bb: int = Field(default=30, ge=2, le=200)
 
 
 class RangeGridResponse(BaseModel):

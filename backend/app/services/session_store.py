@@ -1,65 +1,67 @@
-"""Session store lifecycle (Issue #5).
+"""In-process registry of live tournament tables.
 
-In-memory GameSession registry with a deterministic eviction policy:
-  1) finished tables first
-  2) abandoned tables second (after a clearly defined idle period)
-  3) only then a safety cap for genuinely live tables
+Extracted from the game router so the WebSocket endpoint and the meta routes
+can reach tables without importing a router's privates (and without the
+function-local imports that used to paper over the resulting cycle).
 
-Active tournaments are never removed by an arbitrary timer; `state()`
-refreshes last_seen so engaged tables stay alive.
+A GameSession has no terminal state — nothing ever marks a table finished — so
+the store caps how many tables one user may hold and drops their oldest beyond
+that. Without the cap every POST /api/tournament leaks a 9-player table for
+the lifetime of the process.
 """
 from __future__ import annotations
 
-import time
+from app.services.game_session import GameSession
 
-LIVE_TABLES_PER_USER = 5  # safety cap for genuinely live tables
-
-
-def evict_sessions(registry: dict, owner: str | None = None, now: float | None = None) -> None:
-    """Remove finished/abandoned sessions (all users or one owner)."""
-    now = now or time.time()
-    dead: list[str] = []
-    for tid, s in list(registry.items()):
-        if owner is not None and s.owner != owner:
-            continue
-        if s.status in ("finished", "abandoned"):
-            dead.append(tid)
-        elif s.status == "active" and now - s.last_seen > s.idle_timeout:
-            s.status = "abandoned"
-            dead.append(tid)
-    for tid in dead:
-        registry.pop(tid, None)
+MAX_TABLES_PER_USER = 20
 
 
-def cap_live_tables(registry: dict, owner: str) -> None:
-    """Evict the oldest live tables only when the safety cap is exceeded."""
-    owned = [s for s in registry.values()
-             if s.owner == owner and s.status == "active"]
-    if len(owned) <= LIVE_TABLES_PER_USER:
-        return
-    # oldest first (last_seen, then created_at as stable tie-breaker)
-    owned.sort(key=lambda s: (s.last_seen, s.created_at))
-    for s in owned[: len(owned) - LIVE_TABLES_PER_USER]:
-        registry.pop(s.session_id, None)
+def label_for_index(index: int) -> str:
+    """0 -> A ... 25 -> Z, 26 -> AA, 27 -> AB ... (spreadsheet style)."""
+    letters = ""
+    index += 1
+    while index > 0:
+        index, rem = divmod(index - 1, 26)
+        letters = chr(65 + rem) + letters
+    return letters
 
 
-def mark_finished(session) -> bool:
-    """True when hero is eliminated and no live opponent remains (records
-    the ended state for eviction). Never changes poker/re-entry rules."""
-    hero = session.tournament.players[session.hero_seat]
-    others_alive = [p for p in session.tournament.players
-                    if p.seat != session.hero_seat and not p.is_eliminated and not p.sit_out]
-    if hero.is_eliminated and not others_alive:
-        session.status = "finished"
-        return True
-    return False
+class SessionStore:
+    """Live tables keyed by session id, plus human-readable table labels (A06).
+
+    Labels are never reused while the process lives; the session_id (the real
+    data key) stays unique and is what URLs use.
+    """
+
+    def __init__(self) -> None:
+        self._sessions: dict[str, GameSession] = {}
+        self._label_counter = 0
+
+    def __len__(self) -> int:
+        return len(self._sessions)
+
+    def next_label(self) -> str:
+        label = label_for_index(self._label_counter)
+        self._label_counter += 1
+        return label
+
+    def add(self, session: GameSession) -> None:
+        """Register a table, evicting the owner's oldest beyond the cap."""
+        if session.owner:
+            self._evict_oldest(session.owner)
+        self._sessions[session.session_id] = session
+
+    def get(self, table_id: str) -> GameSession | None:
+        return self._sessions.get(table_id)
+
+    def owned_by(self, user: str) -> list[GameSession]:
+        """The user's tables, oldest first."""
+        return [s for s in self._sessions.values() if s.owner == user]
+
+    def _evict_oldest(self, user: str) -> None:
+        owned = [s.session_id for s in self.owned_by(user)]
+        for session_id in owned[: max(0, len(owned) - MAX_TABLES_PER_USER + 1)]:
+            self._sessions.pop(session_id, None)
 
 
-def check_abandoned(session, now: float | None = None) -> bool:
-    """Long-idle active tournaments become abandoned (engaged tables never
-    removed by an arbitrary timer)."""
-    now = now or time.time()
-    if session.status == "active" and now - session.last_seen > session.idle_timeout:
-        session.status = "abandoned"
-        return True
-    return False
+session_store = SessionStore()

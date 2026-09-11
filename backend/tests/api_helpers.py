@@ -4,7 +4,8 @@ from __future__ import annotations
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.services.auth import auth_registry, auth_store
+from app.services.auth import auth_store
+from app.services.user_registry import auth_registry
 
 TEST_PASSWORD = "test-pass-1234"
 

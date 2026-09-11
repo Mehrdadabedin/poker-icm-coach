@@ -1,0 +1,48 @@
+#!/bin/sh
+# Runs the same gates as .github/workflows/ci.yml before a push.
+#
+# Enable it once per clone (hooks are not copied by git clone):
+#   git config core.hooksPath .githooks
+#
+# It runs on push, not commit: the backend suite takes about 30 seconds, which
+# is too slow to pay on every commit and cheap to pay once per push.
+# Skip deliberately with `git push --no-verify` when you know why.
+set -e
+
+ROOT=$(git rev-parse --show-toplevel)
+cd "$ROOT"
+
+echo "pre-push: backend lint"
+(cd backend && uv run ruff check app tests)
+
+echo "pre-push: backend types"
+(cd backend && uv run mypy app)
+
+echo "pre-push: backend tests"
+(cd backend && uv run pytest -q)
+
+echo "pre-push: frontend types and lint"
+(cd frontend && npx tsc --noEmit && npx oxlint --deny-warnings)
+
+echo "pre-push: frontend tests"
+(cd frontend && npx vitest run)
+
+echo "pre-push: frontend build"
+(cd frontend && npx vite build >/dev/null)
+
+# The four database tests skip without PostgreSQL, so a green local run is not
+# the same as a green CI run. Say so rather than let it pass unnoticed.
+if ! (cd backend && uv run python -c "
+import sys
+from sqlalchemy.exc import SQLAlchemyError
+from app.database.session import engine
+try:
+    engine.connect().close()
+except SQLAlchemyError:
+    sys.exit(1)
+" 2>/dev/null); then
+  echo "pre-push: WARNING 4 database tests skipped (no PostgreSQL)."
+  echo "           docker compose up -d postgres && cd backend && uv run alembic upgrade head"
+fi
+
+echo "pre-push: all gates passed"

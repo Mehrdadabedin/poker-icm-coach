@@ -62,6 +62,9 @@ jobs:
       - name: Type check
         working-directory: frontend
         run: npx tsc --noEmit
+      - name: Lint
+        working-directory: frontend
+        run: npx oxlint --deny-warnings
       - name: Unit tests
         working-directory: frontend
         run: npx vitest run

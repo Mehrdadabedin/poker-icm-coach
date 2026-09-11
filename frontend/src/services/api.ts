@@ -135,8 +135,9 @@ export function coachCompare(tableId: string) {
 }
 
 export function rangeGrid(position: string, stackBb: number) {
+  // "UTG+1" must be encoded: a raw + in a query string decodes to a space.
   return request<{ position: string; stack_bb: number; grid: string[][] }>(
-    `/api/ranges?position=${position}&stack_bb=${stackBb}`,
+    `/api/ranges?position=${encodeURIComponent(position)}&stack_bb=${stackBb}`,
   );
 }
 

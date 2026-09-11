@@ -9,6 +9,13 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 from functools import lru_cache
+from math import isfinite
+
+# The recursion explores every finishing order, so cost grows factorially in
+# the player count. Nine is a full ring table and the documented exact limit;
+# enforcing it here (rather than at each caller) keeps an unbounded list from
+# becoming a CPU denial of service on whichever route reaches the engine.
+MAX_EXACT_ICM_PLAYERS = 9
 
 
 @dataclass(frozen=True, slots=True)
@@ -30,6 +37,10 @@ def icm_equities(stacks: Sequence[int], payouts: Sequence[float]) -> list[float]
         raise ValueError("stacks must not be empty")
     if any(s < 0 for s in stacks):
         raise ValueError("stacks must be non-negative")
+    if len(stacks) > MAX_EXACT_ICM_PLAYERS or len(payouts) > MAX_EXACT_ICM_PLAYERS:
+        raise ValueError(f"exact ICM supports at most {MAX_EXACT_ICM_PLAYERS} players")
+    if any(not isfinite(p) or p < 0 for p in payouts):
+        raise ValueError("payouts must be finite and non-negative")
     if not payouts:
         return [0.0] * len(stacks)
     if len(stacks) != len(payouts) and len(payouts) < len(stacks):

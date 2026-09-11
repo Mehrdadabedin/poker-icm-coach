@@ -8,9 +8,9 @@ import pathlib
 
 from fastapi.testclient import TestClient
 
-from app.api.routes_game import _label_for_index
 from app.main import app
 from app.services.auth import auth_store
+from app.services.session_store import label_for_index
 from tests.api_helpers import TEST_PASSWORD, login_client, register_user
 
 alice = login_client("Alice")
@@ -136,13 +136,13 @@ def test_two_users_play_independently() -> None:
 # ---------------------------------------------------------------------------
 # A06 table labels and repeat tournaments
 # ---------------------------------------------------------------------------
-def test_label_for_index() -> None:
-    assert _label_for_index(0) == "A"
-    assert _label_for_index(25) == "Z"
-    assert _label_for_index(26) == "AA"
-    assert _label_for_index(27) == "AB"
-    assert _label_for_index(51) == "AZ"
-    assert _label_for_index(52) == "BA"
+def testlabel_for_index() -> None:
+    assert label_for_index(0) == "A"
+    assert label_for_index(25) == "Z"
+    assert label_for_index(26) == "AA"
+    assert label_for_index(27) == "AB"
+    assert label_for_index(51) == "AZ"
+    assert label_for_index(52) == "BA"
 
 def test_new_tournaments_get_distinct_labels_and_ids() -> None:
     first = _table(alice)

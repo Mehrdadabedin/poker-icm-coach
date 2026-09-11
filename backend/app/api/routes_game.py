@@ -1,9 +1,7 @@
 """REST routes for tournament/game/coach operations."""
 from __future__ import annotations
 
-import time
-
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api.deps import require_user
 from app.core.config import settings
@@ -12,55 +10,24 @@ from app.schemas.game_schemas import (
     CoachAdviceRequest,
     CoachResponseModel,
     GameStateModel,
+    Position,
     RangeGridResponse,
     TournamentCreateRequest,
 )
 from app.services.game_session import GameSession
-from app.services.session_store import cap_live_tables, evict_sessions
+from app.services.session_store import session_store
 from app.strategy.baseline_ranges import matrix_for_position
 from app.strategy.coach import Coach, CoachRequest
 
 router = APIRouter(prefix="/api")
-_sessions: dict[str, GameSession] = {}
 _coach = Coach()
 
 
-class TableLabelAllocator:
-    """Human-readable table IDs: A..Z, AA, AB ... (A06).
-
-    Labels are never reused while a session is active. The internal
-    session_id (the real data key) stays unique and is what URLs use.
-    """
-
-    def __init__(self) -> None:
-        self._counter = 0
-
-    def allocate(self) -> str:
-        label = _label_for_index(self._counter)
-        self._counter += 1
-        return label
-
-
-def _label_for_index(index: int) -> str:
-    """0 -> A ... 25 -> Z, 26 -> AA, 27 -> AB ... (spreadsheet style)."""
-    letters = ""
-    index += 1
-    while index > 0:
-        index, rem = divmod(index - 1, 26)
-        letters = chr(65 + rem) + letters
-    return letters
-
-
-_table_labels = TableLabelAllocator()
-
-
 def get_session(table_id: str, user: str) -> GameSession:
-    evict_sessions(_sessions, owner=user)
-    try:
-        session = _sessions[table_id]
-    except KeyError as exc:
-        raise HTTPException(status_code=404, detail="table not found") from exc
-    if session.owner != user:
+    """The caller's table, or 404 — an unowned table is indistinguishable
+    from a missing one, so ownership never leaks through the status code."""
+    session = session_store.get(table_id)
+    if session is None or session.owner != user:
         raise HTTPException(status_code=404, detail="table not found")
     return session
 
@@ -68,14 +35,13 @@ def get_session(table_id: str, user: str) -> GameSession:
 @router.post("/tournament", response_model=GameStateModel)
 def create_tournament(request: TournamentCreateRequest,
                       user: str = Depends(require_user)) -> dict:
-    from app.core.tournament_settings import settings as store
+    from app.core.tournament_settings import settings as tournament_settings
 
-    ts = store.for_user(user)
-    starting_stack = request.starting_stack or ts.starting_stack
-    small = ts.starting_small_blind
-    big = ts.starting_big_blind
-    minutes = request.blind_level_minutes or ts.blind_level_minutes
-    fast = ts.fast_mode
+    starting_stack = request.starting_stack or tournament_settings.starting_stack
+    small = tournament_settings.starting_small_blind
+    big = tournament_settings.starting_big_blind
+    minutes = request.blind_level_minutes or tournament_settings.blind_level_minutes
+    fast = request.fast_mode
     session = GameSession(
         fast_mode=fast,
         starting_stack=starting_stack,
@@ -83,13 +49,11 @@ def create_tournament(request: TournamentCreateRequest,
         level_minutes=minutes,
         owner=user,
         hero_name=user,
-        table_label=_table_labels.allocate(),
+        table_label=session_store.next_label(),
         history_dir=settings.history_dir,
     )
     session.start()
-    evict_sessions(_sessions)
-    cap_live_tables(_sessions, user)
-    _sessions[session.session_id] = session
+    session_store.add(session)
     return session.state()
 
 
@@ -181,7 +145,8 @@ def coach_hands() -> dict:
 
 
 @router.get("/ranges", response_model=RangeGridResponse)
-def ranges(position: str = "BTN", stack_bb: int = 30) -> dict:
+def ranges(position: Position = "BTN",
+           stack_bb: int = Query(default=30, ge=2, le=200)) -> dict:
     matrix = matrix_for_position(position, stack_bb)
     return {
         "position": position,

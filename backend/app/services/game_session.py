@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import random
+import threading
 import time
 import uuid
 
@@ -10,16 +11,26 @@ from app.game.actions import Action, ActionType
 from app.game.hand_engine import HandEngine
 from app.game.positions import position_for
 from app.services import hand_history
-from app.services.session_store import mark_finished
 from app.services.game_state_view import build_state_view
 from app.services.hand_history import HandHistoryRecord, HandHistoryStore
-from app.strategy.coach import Coach, CoachRequest
+from app.services.session_coach import advice_dict, coach_request
+from app.strategy.coach import Coach
 from app.strategy.test_mode import compare_decisions
 from app.tournament.tournament import build_default_tournament
 from app.tournament.tournament_timer import TournamentTimer
 
+
 class GameSession:
-    """Owns one tournament table; drives bots; exposes safe state snapshots."""
+    """Owns one tournament table; drives bots; exposes safe state snapshots.
+
+    Every public entry point holds `_lock`. REST handlers and the table
+    WebSocket both reach one session from threadpool threads, so without it
+    two callers pass the same guard and act on the table twice — two
+    concurrent next_hand() calls used to deal a second hand over the first,
+    losing chips. The lock is reentrant because grade_hero() calls
+    coach_advice(); the private helpers only ever run under a public method.
+    """
+
     def __init__(self, session_id: str | None = None, fast_mode: float = 1.0,
                  rng: random.Random | None = None,
                  starting_stack: int = 45_000,
@@ -33,9 +44,7 @@ class GameSession:
         self.owner = owner  # authenticated username that owns this tournament
         self.table_label = table_label or self.session_id
         self.created_at = time.time()
-        self.status = "active"  # active | finished | abandoned
-        self.last_seen = time.time()
-        self.idle_timeout = 30 * 60
+        self.status = "active"
         self.history_dir = history_dir or ""
         self.tournament_starting_stack = starting_stack
         self.tournament = build_default_tournament(
@@ -51,12 +60,16 @@ class GameSession:
         self.coach = Coach()
         self.coach_mode = "advanced"
         self._last_hero_action: str | None = None
-        self._history_file = hand_history.HistoryFileStore(self.history_dir, self.session_id)
+        self._lock = threading.RLock()
+        self._history_file: hand_history.HistoryFileStore = hand_history.HistoryFileStore(
+            self.history_dir, self.session_id
+        )
 
     def start(self) -> None:
-        self.engine = HandEngine(self.tournament, provider=self.provider, rng=self.rng)
-        self.timer = TournamentTimer(self.tournament, fast_mode=self.fast_mode)
-        self._begin_hand(first=True)
+        with self._lock:
+            self.engine = HandEngine(self.tournament, provider=self.provider, rng=self.rng)
+            self.timer = TournamentTimer(self.tournament, fast_mode=self.fast_mode)
+            self._begin_hand(first=True)
 
     def _begin_hand(self, first: bool = False) -> None:
         assert self.engine is not None and self.timer is not None
@@ -68,31 +81,33 @@ class GameSession:
         self._advance_bots()
 
     def next_hand(self) -> None:
-        if self.phase() != "handOver":
-            raise ValueError("current hand is still in progress")
-        self._record_and_persist()
-        self._apply_reentry_or_eliminate()
-        mark_finished(self)  # hero busted with no re-entry -> finished
-        self._begin_hand(first=False)
+        with self._lock:
+            if self.phase() != "handOver":
+                raise ValueError("current hand is still in progress")
+            self._record_and_persist()
+            self._apply_reentry_or_eliminate()
+            self._begin_hand(first=False)
+
     def phase(self) -> str:
         if self.engine is None:
             return "idle"
         return "handOver" if self.engine.is_complete else "playing"
 
     def hero_action(self, kind: str, amount: int | None = None) -> None:
-        assert self.engine is not None
-        actor = self.engine.current_actor
-        if actor is None or not self.tournament.players[actor].is_human:
-            raise ValueError("hero is not the current actor")
-        action = Action(ActionType(kind), amount=amount)
-        assert self.timer is not None
-        self.timer.pause()
-        self.engine.act(actor, action)
-        self._last_hero_action = f"{kind.upper()}"
-        self._advance_bots()
-        if not self.engine.is_complete:
+        with self._lock:
+            assert self.engine is not None
+            actor = self.engine.current_actor
+            if actor is None or not self.tournament.players[actor].is_human:
+                raise ValueError("hero is not the current actor")
+            action = Action(ActionType(kind), amount=amount)
             assert self.timer is not None
-            self.timer.resume()
+            self.timer.pause()
+            self.engine.act(actor, action)
+            self._last_hero_action = f"{kind.upper()}"
+            self._advance_bots()
+            if not self.engine.is_complete:
+                assert self.timer is not None
+                self.timer.resume()
 
     def _advance_bots(self, guard: int = 5000) -> None:
         assert self.engine is not None
@@ -109,59 +124,33 @@ class GameSession:
             self.timer.pause()
 
     def state(self) -> dict:
-        assert self.engine is not None and self.timer is not None
-        self.last_seen = time.time()
-        self.timer.tick()  # advance expired blind levels / breaks on every view
-        if self.engine.is_complete and not self.timer.running:  # A16 tick on result
-            self.timer.resume()
-        return build_state_view(self)
+        with self._lock:
+            assert self.engine is not None and self.timer is not None
+            self.timer.tick()  # advance expired blind levels / breaks on every view
+            return build_state_view(self)
 
     def coach_advice(self) -> dict:
-        assert self.engine is not None
-        hero = self.tournament.players[self.hero_seat]
-        level = self.tournament.current_blind_level()
-        req = CoachRequest(
-            hero=list(hero.hole_cards),
-            position=position_for(self.tournament.button, self.hero_seat, len(self.tournament.players)),
-            stack=hero.stack, big_blind=level.big, small_blind=level.small,
-            ante=self.tournament.structure.ante_for(self.tournament.ante_mode, level),
-            pot=sum(p.bet_total for p in self.tournament.players),
-            to_call=max(0, self.engine._street.current_bet - self.engine._street.contributions.get(self.hero_seat, 0)),
-            board=list(self.engine._board), street=self.engine.street,
-            players_remaining=sum(1 for p in self.tournament.players if not p.is_eliminated),
-            paid_positions=6, stacks=[p.stack for p in self.tournament.players],
-            payout=[float(x) for x in self.tournament.payout.percentages],
-            facing_raise=(self.engine._street.current_bet > level.big),
-            hero_seat=self.hero_seat, level_index=self.tournament.level_index,
-            mode=self.coach_mode,
-        )
-        rec = self.coach.recommend(req)
-        return {
-            "recommendedAction": rec.recommended_action,
-            "confidence": rec.confidence,
-            "reasoning": rec.reasoning,
-            "alternativeAction": rec.alternative_action,
-            "detail": rec.recommendation_detail,
-            "ev": rec.ev,
-            "outs": rec.outs,
-            "education": rec.education,
-        }
+        with self._lock:
+            return advice_dict(self.coach.recommend(coach_request(self)))
+
     def grade_hero(self) -> dict | None:
         """Test mode: compare last hero action vs coach recommendation."""
-        if self._last_hero_action is None:
-            return None
-        advice = self.coach_advice()
-        comparison = compare_decisions(self._last_hero_action, advice["recommendedAction"])
-        return {
-            "heroAction": self._last_hero_action,
-            "coachAction": advice["recommendedAction"],
-            "grade": comparison.grade,
-            "explanation": comparison.explanation,
-            "icmFactors": comparison.icm_factors,
-            "rangeNote": comparison.range_note,
-        }
+        with self._lock:
+            if self._last_hero_action is None:
+                return None
+            advice = self.coach_advice()
+            comparison = compare_decisions(self._last_hero_action, advice["recommendedAction"])
+            return {
+                "heroAction": self._last_hero_action,
+                "coachAction": advice["recommendedAction"],
+                "grade": comparison.grade,
+                "explanation": comparison.explanation,
+                "icmFactors": comparison.icm_factors,
+                "rangeNote": comparison.range_note,
+            }
 
-    REENTRY_LEVELS = 3
+    REENTRY_LEVELS = 3  # levels 1-3 get a fresh stack on bust
+
     def _apply_reentry_or_eliminate(self) -> None:
         """Bust-out rule: 45k reset during levels 1-3, elimination from level 4."""
         assert self.tournament is not None

@@ -5,6 +5,7 @@ import os
 
 import pytest
 from sqlalchemy import inspect, text
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.database.session import SessionLocal, engine
 from app.game.hand_result import HandAction
@@ -20,10 +21,32 @@ from app.services.statistics import aggregate
 
 H = card_from_str
 
-pytestmark = pytest.mark.skipif(
-    os.environ.get("SKIP_DB_TESTS") == "1",
-    reason="database tests disabled",
-)
+def _database_is_reachable() -> bool:
+    """True when a PostgreSQL server answers on the configured DATABASE_URL.
+
+    An absent database is a missing dependency, not a failing assertion, so
+    these skip rather than erroring with "connection refused". A server that
+    answers but has no schema still fails: that is a real setup or migration
+    problem and the assertions name it.
+    """
+    try:
+        with engine.connect():
+            return True
+    except SQLAlchemyError:
+        return False
+
+
+pytestmark = [
+    pytest.mark.skipif(
+        os.environ.get("SKIP_DB_TESTS") == "1",
+        reason="database tests disabled",
+    ),
+    pytest.mark.skipif(
+        not _database_is_reachable(),
+        reason="no PostgreSQL on DATABASE_URL "
+               "(docker compose up -d postgres && alembic upgrade head)",
+    ),
+]
 
 
 def test_all_tables_exist() -> None:

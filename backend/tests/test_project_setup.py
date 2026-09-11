@@ -14,7 +14,7 @@ REQUIRED_DIRS = [
     "backend/app/icm", "backend/app/equity", "backend/app/tournament",
     "backend/app/database", "backend/tests", "frontend/src/components",
     "frontend/src/pages", "frontend/src/hooks", "frontend/src/services",
-    "frontend/src/models", "frontend/src/state", "frontend/src/styles",
+    "frontend/src/models", "frontend/src/styles",
     "frontend/tests", "plans", "docs", "scripts",
 ]
 
@@ -66,11 +66,27 @@ def test_docker_compose_services() -> None:
         assert service in text, f"compose missing {service}"
 
 
+def test_pre_push_hook_exists_and_is_executable() -> None:
+    """The hook is the local stand-in for CI. Enable it per clone with
+    `git config core.hooksPath .githooks`; git clone does not copy hooks."""
+    hook = ROOT / ".githooks" / "pre-push"
+    assert hook.is_file(), "missing .githooks/pre-push"
+    assert hook.stat().st_mode & 0o111, f"{hook} is not executable"
+    text = hook.read_text()
+    for gate in ["ruff check", "mypy app", "pytest", "tsc --noEmit",
+                 "oxlint --deny-warnings", "vitest run", "vite build"]:
+        assert gate in text, f"pre-push hook no longer runs: {gate}"
+
+
 def _ignored(parts: tuple[str, ...]) -> bool:
-    return any(p in {".venv", ".venv-rooted", "node_modules", ".git", "__pycache__", "dist"} for p in parts)
+    return any(
+        p in {".venv", ".venv-rooted", "node_modules", ".git", "__pycache__",
+              "dist", "android", "test-results", "playwright-report"}
+        for p in parts
+    )
 
 
-@pytest.mark.parametrize("extension", ["py"])
+@pytest.mark.parametrize("extension", ["py", "ts", "tsx"])
 def test_code_files_under_200_lines(extension: str) -> None:
     roots = [ROOT / "backend", ROOT / "scripts", ROOT / "frontend", ROOT / "e2e"]
     for root in roots:

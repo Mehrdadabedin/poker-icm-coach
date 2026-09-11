@@ -5,14 +5,15 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.concurrency import run_in_threadpool
 
 from app.api.deps import bearer_token
 from app.api.routes_auth import router as auth_router
-from app.api.routes_game import _sessions
 from app.api.routes_game import router as game_router
 from app.api.routes_meta import router as meta_router
 from app.core.config import settings
 from app.services.auth import auth_store
+from app.services.session_store import session_store
 
 
 @asynccontextmanager
@@ -44,29 +45,43 @@ async def table_ws(websocket: WebSocket, table_id: str,
 
     Ownership check (A12): when the session is owned by a user, the caller
     must present that user's bearer token (`?token=...`).
+
+    Every session call goes through the threadpool: playing out a hand takes
+    real time (the bot loop), and running that inline would block the event
+    loop — and with it every other connection in the process.
     """
     await websocket.accept()
-    session = _sessions.get(table_id)
+    session = session_store.get(table_id)
     try:
         if session is None:
             await websocket.send_json({"error": "table not found"})
             return
         owner = session.owner
-        if owner and auth_store.user_for_token(bearer_token(f"Bearer {token}")) != owner:
+        # Also off the loop: resolving an expired token rewrites the sessions
+        # file, and that is blocking disk I/O.
+        caller = await run_in_threadpool(
+            auth_store.user_for_token, bearer_token(f"Bearer {token}")
+        )
+        if owner and caller != owner:
             await websocket.send_json({"error": "table not found"})
             return
         while True:
             message = await websocket.receive_text()
-            if message == "state":
-                await websocket.send_json(session.state())
-            elif message.startswith("action:"):
-                _prefix, _sep, kind = message.partition(":")
-                rest: list[str] = message.split(":", 2)[2:]
-                amount = int(rest[0]) if rest and rest[0].strip().isdigit() else None
-                session.hero_action(kind.strip(), amount)
-                await websocket.send_json(session.state())
-            elif message == "next":
-                session.next_hand()
-                await websocket.send_json(session.state())
-    except (WebSocketDisconnect, ValueError, RuntimeError):
+            try:
+                if message == "state":
+                    await websocket.send_json(await run_in_threadpool(session.state))
+                elif message.startswith("action:"):
+                    _prefix, _sep, kind = message.partition(":")
+                    rest: list[str] = message.split(":", 2)[2:]
+                    amount = int(rest[0]) if rest and rest[0].strip().isdigit() else None
+                    await run_in_threadpool(session.hero_action, kind.strip(), amount)
+                    await websocket.send_json(await run_in_threadpool(session.state))
+                elif message == "next":
+                    await run_in_threadpool(session.next_hand)
+                    await websocket.send_json(await run_in_threadpool(session.state))
+            except ValueError as exc:
+                # An illegal action is client error, not a broken connection:
+                # report it the way REST does (400) and keep the socket open.
+                await websocket.send_json({"error": str(exc)})
+    except (WebSocketDisconnect, RuntimeError):
         return
