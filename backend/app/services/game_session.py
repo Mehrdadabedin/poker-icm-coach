@@ -14,6 +14,7 @@ from app.services import hand_history
 from app.services.game_state_view import build_state_view
 from app.services.hand_history import HandHistoryRecord, HandHistoryStore
 from app.services.session_coach import advice_dict, coach_request
+from app.services.session_store import mark_finished
 from app.strategy.coach import Coach
 from app.strategy.test_mode import compare_decisions
 from app.tournament.tournament import build_default_tournament
@@ -44,7 +45,9 @@ class GameSession:
         self.owner = owner  # authenticated username that owns this tournament
         self.table_label = table_label or self.session_id
         self.created_at = time.time()
-        self.status = "active"
+        self.status = "active"  # active | finished | abandoned (issue #5)
+        self.last_seen = self.created_at
+        self.idle_timeout = 30 * 60
         self.history_dir = history_dir or ""
         self.tournament_starting_stack = starting_stack
         self.tournament = build_default_tournament(
@@ -86,6 +89,7 @@ class GameSession:
                 raise ValueError("current hand is still in progress")
             self._record_and_persist()
             self._apply_reentry_or_eliminate()
+            mark_finished(self)  # hero busted with no re-entry left (issue #5)
             self._begin_hand(first=False)
 
     def phase(self) -> str:
@@ -126,7 +130,10 @@ class GameSession:
     def state(self) -> dict:
         with self._lock:
             assert self.engine is not None and self.timer is not None
+            self.last_seen = time.time()  # an engaged table is never abandoned
             self.timer.tick()  # advance expired blind levels / breaks on every view
+            if self.engine.is_complete and not self.timer.running:
+                self.timer.resume()  # the level clock runs through the result screen
             return build_state_view(self)
 
     def coach_advice(self) -> dict:

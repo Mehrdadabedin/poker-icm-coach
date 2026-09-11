@@ -83,15 +83,29 @@ to multiple workers means moving sessions into PostgreSQL or Redis first.
 
 ## 4. Session lifecycle
 
-`GameSession.status` is set to `"active"` and never changes — there is no
-terminal state, and nothing reaps a finished table. Until that is fixed,
-`SessionStore` keeps only a user's most recent `MAX_TABLES_PER_USER` (20)
-tables; without the cap every `POST /api/tournament` leaked a nine-player table
-for the life of the process. The number is a guess, not a measurement.
+`GameSession.status` is `"active"`, `"finished"` or `"abandoned"` (issue #5).
+`next_hand()` marks a table finished once hero is eliminated with no live
+opponent left; `state()` refreshes `last_seen`, and a table idle past
+`idle_timeout` (30 min) is marked abandoned. `SessionStore.add()` evicts ended
+tables before the per-user cap, so a live table is dropped only when a user
+genuinely holds `MAX_TABLES_PER_USER` (20) of them. Without any of this every
+`POST /api/tournament` leaked a nine-player table for the life of the process.
+Both numbers are guesses, not measurements.
+
+The lifecycle lives on `SessionStore`, not on the router. The eviction policy
+shipped once as free functions over a router-owned dict and was lost in merge
+c7d5220; hard rule 3 is what keeps it in one place.
 
 `SessionStore` owns the registry and the A06 label allocator. Reach tables
 through it — `main.py` and `routes_meta.py` used to import a router's private
 `_sessions`, one of them through a function-local import to dodge the cycle.
+
+Tournament settings are per authenticated user, held by `SettingsStore` in
+`app/core/tournament_settings.py`. One account's `PUT /api/settings` never
+reaches another's tables, and a new tournament consumes its owner's values.
+`GET /api/settings` therefore needs an identity and takes `require_user`.
+The bounds stay on `SettingsUpdate` (rule 7): an unvalidated body once allowed
+a big blind of 0, which divides by zero on every new table.
 
 ## 5. Transport: polling today
 
@@ -115,9 +129,12 @@ client moves to `fetch` + `ReadableStream`.
 was ~7.5 MB nothing loaded. `scripts/import_opendecks_cards.py` regenerates the
 deck from the CC0 OpenDecks repository; the vectors are upstream.
 
-Still oversized: the PNGs are the raw 1500×2100 rasters, up to 1.2 MB each and
-about ten times their rendered size. Downscaling needs an image tool and a
-change to `test_each_png_is_an_opendecks_proportion_1500x2100`.
+The PNGs are downscaled to 300×420, the OpenDecks 5:7 aspect, by
+`scripts/optimize_card_pngs.py`, which `import_opendecks_cards.py` also runs so
+a re-import cannot quietly reinstall the 1500×2100 source raster. Cards render
+at 52 px wide, so the deck went from ~14.4 MB to ~2.8 MB with the same artwork
+and filenames. `test_card_assets.py` pins the size and a 300 KB per-asset
+ceiling.
 
 ## 7. Test layers
 

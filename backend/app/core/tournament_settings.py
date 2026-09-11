@@ -10,7 +10,7 @@ session model (see ISSUE #4).
 from __future__ import annotations
 
 import threading
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 
 @dataclass(slots=True)
@@ -33,6 +33,11 @@ class TournamentSettings:
             "showActionLabels": self.show_action_labels,
             "showResultLabels": self.show_result_labels,
         }
+
+    def update(self, **kwargs: object) -> None:
+        for key, value in kwargs.items():
+            if value is not None and hasattr(self, key):
+                setattr(self, key, value)
 
 
 class SettingsStore:
