@@ -145,3 +145,38 @@ def test_blinds_changed_flag_resets_on_read() -> None:
     assert t.blinds_changed
     _ = t.blinds_changed  # consumes the flag
     assert not t.blinds_changed
+
+
+def test_fast_mode_false_does_not_freeze_clock() -> None:
+    """Bug 2: a falsy fast_mode (False/0) must mean normal speed, not 0x."""
+    clock = FakeClock()
+    t = TournamentTimer(tournament=build_default_tournament(), clock=clock, fast_mode=False)
+    t.start()
+    clock.now += 60
+    assert t.seconds_left == 1140  # 1200 - 60 (normal speed, not frozen)
+
+
+def test_seconds_left_counts_across_hand_over_resume() -> None:
+    """Bug 2: after a hand completes the level clock keeps counting while the
+    result screen is shown (GameSession.state resumes a paused timer)."""
+    from app.services.game_session import GameSession
+
+    s = GameSession(starting_stack=45_000, fast_mode=1.0)
+    s.start()
+    while not s.engine.is_complete:
+        actor = s.engine.current_actor
+        if actor is None:
+            break
+        if s.tournament.players[actor].is_human:
+            from app.game.actions import Action, ActionType
+            s.engine.act(actor, Action(ActionType.FOLD))
+        else:
+            s.engine.advance_bot(actor)
+    assert s.engine.is_complete
+    if s.timer.running:
+        s.timer.pause()  # simulate the completion pause
+    before = s.state()["secondsLeft"]
+    import time as _t
+    _t.sleep(1.1)
+    after = s.state()["secondsLeft"]
+    assert before > after, (before, after)

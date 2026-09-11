@@ -51,6 +51,7 @@ def build_state_view(session) -> dict:
     return {
         "tableId": session.session_id,
         "tableLabel": session.table_label,
+        "status": session.status,
         "username": session.owner,
         "handNumber": tournament.hand_number,
         "players": players,

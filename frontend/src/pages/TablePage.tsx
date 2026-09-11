@@ -19,7 +19,7 @@ interface CoachPanel {
   detail: Record<string, string>;
 }
 
-const REVIEW_SECONDS = 30;
+const REVIEW_SECONDS = 10;
 
 /** Live table: compact result + optional Review the Hand (A10/A11/A16). */
 export function TablePage() {

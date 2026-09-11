@@ -25,7 +25,9 @@ class TournamentTimer:
     ) -> None:
         self.tournament = tournament
         self.clock = clock
-        self.fast_mode = fast_mode
+        # fast_mode is a speed multiplier; a falsy value (False/0/None) must
+        # mean "normal speed" (x1), never 0x (which would freeze the clock).
+        self.fast_mode = max(1.0, float(fast_mode or 1.0))
         self.running = False
         self._started_at: float | None = None
         self._accumulated = 0.0

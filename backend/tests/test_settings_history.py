@@ -125,3 +125,39 @@ def test_total_chips_reflect_elimination() -> None:
     assert state["totalChips"] == sum(p.stack for p in s.tournament.players)
     active = sum(1 for p in s.tournament.players if not p.is_eliminated)
     assert state["averageStack"] == state["totalChips"] // active
+
+
+def test_settings_are_isolated_per_user() -> None:
+    """Issue #3: one user's settings must never affect another user's."""
+    from tests.api_helpers import login_client
+
+    a = login_client("SettingsA")
+    b = login_client("SettingsB")
+
+    a.put("/api/settings", json={
+        "startingStack": 25000, "startingSmallBlind": 100,
+        "startingBigBlind": 200, "blindLevelMinutes": 8, "fastMode": True,
+    })
+    b.put("/api/settings", json={
+        "startingStack": 40000, "startingSmallBlind": 100,
+        "startingBigBlind": 200, "blindLevelMinutes": 15, "fastMode": False,
+    })
+
+    # Each sees their own settings.
+    assert a.get("/api/settings").json()["startingStack"] == 25000
+    assert a.get("/api/settings").json()["blindLevelMinutes"] == 8
+    assert b.get("/api/settings").json()["startingStack"] == 40000
+    assert b.get("/api/settings").json()["blindLevelMinutes"] == 15
+
+    # A changes its own stack; B is unaffected.
+    a.put("/api/settings", json={"startingStack": 9999})
+    assert a.get("/api/settings").json()["startingStack"] == 9999
+    assert b.get("/api/settings").json()["startingStack"] == 40000
+
+    # New tournaments consume the owner's settings.
+    sa = a.post("/api/tournament", json={"players": 9}).json()
+    sb = b.post("/api/tournament", json={"players": 9}).json()
+    ta = sum(p["stack"] for p in sa["players"]) + sum(p["bet"] for p in sa["players"])
+    tb = sum(p["stack"] for p in sb["players"]) + sum(p["bet"] for p in sb["players"])
+    assert ta == 9999 * 9, ta
+    assert tb == 40000 * 9, tb

@@ -21,7 +21,6 @@ type Advice = {
 };
 
 const POSITIONS = ["UTG", "UTG+1", "MP", "LJ", "HJ", "CO", "BTN", "SB", "BB"];
-const STREET_LABEL: Record<number, string> = { 0: "PRE-FLOP", 3: "FLOP", 4: "TURN", 5: "RIVER" };
 
 /** ICM COACH: full 169-class + exact-card analysis with EV/outs/education. */
 export function CoachPage() {
@@ -71,10 +70,12 @@ export function CoachPage() {
     setAdvice(null);
   };
 
-  const street = board.length === 0 ? "preflop" : board.length === 3 ? "flop" : board.length === 4 ? "turn" : "river";
+  const STREETS: Record<number, string> = { 0: "preflop", 3: "flop", 4: "turn", 5: "river" };
+  const street = STREETS[board.length] ?? "NOT_READY";
+  const boardReady = street !== "NOT_READY";
 
   const run = async () => {
-    if (hero.some((c) => !c?.rank)) return;
+    if (hero.some((c) => !c?.rank) || !boardReady) return;
     setRunning(true);
     try {
       const data = await request<Advice>("/api/coach/advice", {
@@ -139,13 +140,14 @@ export function CoachPage() {
         <div className="toolbar">
           <label>SMALL BLIND<input type="number" min={0} value={smallBlind} onChange={(e) => setSmallBlind(Number(e.target.value))} /></label>
           <label>BIG BLIND<input type="number" min={1} value={bigBlind} onChange={(e) => setBigBlind(Number(e.target.value))} /></label>
-          <button className="btn" onClick={run} disabled={running} data-testid="analyze-btn">ANALYZE</button>
+          <button className="btn" onClick={run} disabled={running || !boardReady} data-testid="analyze-btn">ANALYZE</button>
           <button className="btn btn-small" onClick={() => navigate("/")}>HOME</button>
         </div>
       </div>
 
       <div className="board-picker">
-        <span className="board-street">BOARD — {STREET_LABEL[board.length] ?? "?"} ({board.length}/5)</span>
+        <span className="board-street">BOARD — {street.toUpperCase()}</span>
+        {!boardReady && <span className="note">Add 0/3/4/5 board cards before analyzing.</span>}
         <div className="board-cards">
           {board.map((c, i) => (
             <span key={i} className="board-chip">{c.rank}{SUIT_SYMBOL[c.suit]}

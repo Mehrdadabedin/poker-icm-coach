@@ -26,15 +26,18 @@ export function useAutoNext(next: () => void, seconds = 30) {
       setPaused(false);
       timerRef.current = setInterval(() => {
         remaining -= 1;
-        if (remaining <= 0) {
+        setCountdown(remaining); // renders 9..1..0
+        if (remaining === 0) {
+          // hold "0" for one full second (do not fire yet)
+          return;
+        }
+        if (remaining < 0) {
+          // "0" was shown; now trigger the next hand
           if (timerRef.current) {
             clearInterval(timerRef.current);
             timerRef.current = null;
           }
-          setCountdown(null);
           nextRef.current();
-        } else {
-          setCountdown(remaining);
         }
       }, 1000);
     },

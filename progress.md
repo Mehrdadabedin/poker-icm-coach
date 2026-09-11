@@ -767,3 +767,161 @@ and after a clean rebuild), so a fresh frontend deploy will render at 82%.
 ### Required action
 - Redeploy the frontend (main @ b64e06a) and hard-refresh the phone. The
   landscape table will then render at ~82% of the viewport width.
+
+
+## Master Task — Open GitHub Issues (2026-09-11)
+
+### Issue #1 — SSE/WebSocket vs polling
+Status: DOCUMENTED / NO SAFE CODE CHANGE
+Files: ARCHITECTURE.md
+Tests: n/a
+Result: Kept 350ms REST polling. The existing WS uses ?token= auth
+(log-leak risk); a safe adoption needs cookie/subprotocol auth first.
+No migration forced. Details in ARCHITECTURE.md.
+Remaining: optional future WS adoption after WS auth hardening.
+
+### Issue #3 — Tournament settings global
+Status: FIXED
+Files: app/core/tournament_settings.py, api/routes_meta.py, api/routes_game.py,
+tests/test_settings_history.py
+Tests: backend settings suite + new two-user isolation test (all pass).
+Result: Settings now per-authenticated-user; changing A never hits B;
+new tournaments consume the owner's own values. Poker/ICM unchanged.
+
+### Issue #4 — Auth tokens / live tables single-worker
+Status: DOCUMENTED / NO SAFE CODE CHANGE (owner/infra)
+Files: ARCHITECTURE.md
+Tests: isolation + auth suites pass (31 tests incl. multi/concurrent).
+Result: In-memory stores are correct for the intentional single-worker
+deployment; GameSession (engine/timer/RNG) must not be distributed.
+Multi-worker is intentionally unsupported without externalizing state.
+
+### Issue #5 — Table lifecycle
+Status: FIXED
+Files: app/services/session_store.py (new), game_session.py,
+game_state_view.py, api/routes_game.py, schemas, tests/test_table_lifecycle.py
+Tests: 6 new lifecycle tests pass (active/finished/abandoned/eviction/cap).
+Result: status active|finished|abandoned + last_seen; eviction order
+finished -> abandoned -> live-cap; poker rules unchanged.
+
+### Issue #6 — Card PNG size
+Status: FIXED
+Files: 53 PNGs (frontend/public/cards), scripts/optimize_card_pngs.py (new),
+scripts/import_opendecks_cards.py, backend/tests/test_card_assets.py,
+docs/card-assets.md
+Tests: card asset suite updated + passing (300x420, PNG, <=300KB each).
+Result: PNG deck 14.4MB -> 2.8MB at 300x420 (5:7 preserved),
+artwork/filenames/PNG format unchanged; visually verified representative
+cards.
+
+### Issue #7 — Coach street validation
+Status: FIXED
+Files: frontend/src/pages/CoachPage.tsx, backend/app/schemas/game_schemas.py,
+backend/tests/test_coach_street_validation.py (new),
+frontend/tests/coach_street.test.tsx (new)
+Tests: backend valid combos 200 + invalid 422; frontend ANALYZE disabled for
+1/2-card board and never sends river; enabled at 3 cards.
+Result: one/two-card boards are never treated as river; valid preflop/flop/
+turn/river unchanged.
+
+### Issue #8 — GitHub Actions billing lock
+Status: BLOCKED (owner action)
+Files: none (workflows validated as correct)
+Tests: yaml parse + jobs check.
+Result: ci.yml and deploy-pages.yml are structurally valid; Actions cannot
+run because the GitHub account has a billing lock. Owner must resolve
+GitHub billing/payment before Actions can run. No workflow code changed,
+no paid service added.
+
+### Final verification
+- Backend: 417 passed, 4 skipped (PostgreSQL-dependent DB tests skipped —
+  Postgres not running locally; SKIP_DB_TESTS=1).
+- Frontend: 42 passed; production build clean.
+- GitHub audit: PASSED.
+- Auth/logout/identity, table isolation (A/B), dealing/positions/rotation/
+  betting/blinds/ICM/tournament/re-entry, and all UI flows verified via the
+  regression + isolation suites.
+
+
+## Post-hand "NEXT HAND IN" countdown correction (2026-09-12)
+
+### Task
+Change the automatic post-hand Next Hand countdown from 30 seconds to 10.
+
+### Problem found
+- Previous change only set `REVIEW_SECONDS = 30` -> `10`, which correctly
+  changed the START value (10), but the visible countdown did NOT reach and
+  show "0" before auto-advancing (it fired on the tick where remaining hit
+  0, rendering 9..1 then jumping straight to the next hand).
+- The "NEXT HAND IN 28" seen on the deployed phone was the browser serving a
+  stale bundle (the fixed 10-value build must be deployed and the phone
+  hard-refreshed); the repo code was verified to start at 10.
+
+### Root cause
+- `frontend/src/hooks/useAutoNext.ts` decremented and fired `nextRef` at
+  `remaining <= 0`, so the "0" frame was never rendered (it went 1 -> next).
+  It also only ever rendered after decrement, so the displayed value was
+  correct but "0" was skipped.
+
+### Files changed
+- frontend/src/hooks/useAutoNext.ts: render the current value every tick
+  (9..1..0), hold "0" for one full second, then trigger the next hand on the
+  following tick (single interval; stop()/pause() still cancel it).
+- frontend/src/pages/TablePage.tsx: REVIEW_SECONDS 30 -> 10 (the start value;
+  this is the automatic post-hand countdown, verified by live E2E).
+- frontend/tests/useAutoNext.test.tsx (new): deterministic fake-timer tests
+  (starts at 10, reaches 0, holds 0 for a second, then fires; never fires
+  early).
+
+### Tests
+- Full frontend suite: 44 passed (7 files).
+- New useAutoNext tests: 2 passed.
+- Live browser E2E (local): observed sequence
+  NEXT HAND IN 10 -> 9 -> 8 -> 7 -> 6 -> 5 -> 4 -> 3 -> 2 -> 1 -> 0,
+  auto-next advanced the hand; zero console errors.
+- tsc clean; production build succeeded.
+
+### Result
+- Automatic countdown now starts at 10, counts down 10..0, holds 0, then
+  auto-starts the next hand. Manual NEXT HAND, Review Hand, pause/play and
+  all other timers unchanged.
+
+### Remaining concern
+- The deployed site must serve the new bundle (redeploy + hard refresh on
+  the phone) for the user to see 10 instead of the cached 30-start build.
+
+
+## Deployment mismatch diagnosis — timer fixes not deployed (2026-09-12)
+
+### Symptom (real deployed app, hard refreshed)
+- https://icm-master-frontend.onrender.com/#/table/... showed:
+  TIME 20:00 frozen; post-hand NEXT HAND countdown 30s.
+
+### Root cause (verified, not assumed)
+1. The timer fixes exist ONLY in the working tree (uncommitted):
+   - frontend/src/pages/TablePage.tsx: REVIEW_SECONDS 30 -> 10
+   - frontend/src/hooks/useAutoNext.ts: render 0 then auto-next
+   - backend/app/tournament/tournament_timer.py: fast_mode falsy -> x1
+   - backend/app/services/game_session.py: resume level clock on hand-over
+2. origin/main HEAD = 437da28 (no timer fixes). Render deploys from
+   origin/main, so neither fix is live.
+3. Proof the deployed frontend == origin/main@437da28:
+   - Built origin/main frontend with VITE_API_URL=https://poker-icm-coach.onrender.com
+     -> bundle sha 88ab93b1be30fd99 == deployed bundle sha (exact match).
+   - The fixed working-tree build produces daef93a9ba5228b3 (different), with
+     the countdown-to-zero logic present.
+4. Proof the deployed backend is old: POST /api/tournament then 3x /state over
+   3s returned secondsLeft=1200 every time (frozen) on poker-icm-coach.onrender.com.
+
+### What is NOT wrong
+- The production frontend calls the correct backend URL
+  (https://poker-icm-coach.onrender.com baked into the deployed bundle).
+- The code fixes are correct (verified locally: NEXT HAND 10..0; TIME 1200->
+  1199->... live API after applying the fix locally).
+
+### Action required (owner)
+- Commit and push the working-tree timer fixes to origin/main, then redeploy
+  the Render frontend AND backend from main. After redeploy + hard refresh:
+  NEXT HAND 10->9->...->0->next; TIME 20:00->19:59->... (and at 00:00 the
+  existing blind-level advancement applies).
+- This pass made NO code changes beyond validation (no new edits; no push).
