@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from app.icm.icm_engine import MAX_EXACT_ICM_PLAYERS
 
@@ -179,6 +179,19 @@ class CoachAdviceRequest(BaseModel):
     heroSeat: int = 0
     mode: str = "advanced"
     exactCards: bool = False
+
+    @model_validator(mode="after")
+    def _street_matches_board(self) -> CoachAdviceRequest:
+        """Issue #7: a board length and a street name that disagree describe no
+        real hand, and the coach would price the spot against the wrong one."""
+        expected = {0: "preflop", 3: "flop", 4: "turn", 5: "river"}
+        wanted = expected.get(len(self.board))
+        if wanted != self.street:
+            raise ValueError(
+                f"street '{self.street}' does not match {len(self.board)} board "
+                f"card(s); expected '{wanted or 'a 0/3/4/5-card board'}'"
+            )
+        return self
 
 
 class CoachResponseModel(BaseModel):
