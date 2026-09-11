@@ -132,6 +132,8 @@ class GameSession:
             assert self.engine is not None and self.timer is not None
             self.last_seen = time.time()  # an engaged table is never abandoned
             self.timer.tick()  # advance expired blind levels / breaks on every view
+            if self.engine.is_complete and not self.timer.running:
+                self.timer.resume()  # the level clock runs through the result screen
             return build_state_view(self)
 
     def coach_advice(self) -> dict:
