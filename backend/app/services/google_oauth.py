@@ -21,8 +21,6 @@ import urllib.parse
 import urllib.request
 from dataclasses import dataclass
 
-from app.core.config import Settings
-
 AUTHORIZE_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth"
 TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
 SCOPE = "openid email profile"
@@ -39,11 +37,6 @@ class GoogleAuthError(Exception):
 class GoogleIdentity:
     subject: str
     email: str
-
-
-def is_configured(config: Settings) -> bool:
-    """Google sign-in needs both credentials; a lone client_id stays disabled."""
-    return bool(config.google_client_id and config.google_client_secret)
 
 
 def _http_post_json(url: str, body: bytes) -> dict[str, object]:

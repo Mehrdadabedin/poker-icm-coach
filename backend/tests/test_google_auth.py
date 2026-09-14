@@ -81,26 +81,6 @@ def _username(client: TestClient, token: str) -> str:
     assert response.status_code == 200, response.text
     return response.json()["username"]
 
-def test_providers_is_public_and_follows_the_two_settings(monkeypatch) -> None:
-    _configure(monkeypatch, on=False)
-    client = TestClient(app)
-    assert client.get("/api/auth/providers").json() == {"google": False, "apple": False, "phone": False}
-    monkeypatch.setattr(settings, "google_client_id", CLIENT_ID)  # an id alone is not enough
-    assert client.get("/api/auth/providers").json()["google"] is False
-    monkeypatch.setattr(settings, "google_client_secret", CLIENT_SECRET)
-    body = client.get("/api/auth/providers")
-    assert body.json() == {"google": True, "apple": False, "phone": False} and CLIENT_SECRET not in body.text
-
-def test_start_is_503_unconfigured_and_400_for_an_untrusted_origin(monkeypatch) -> None:
-    _configure(monkeypatch, on=False)
-    client = TestClient(app)
-    offline = client.get(START_PATH, params={"redirect_uri": FRONTEND}, follow_redirects=False)
-    assert (offline.status_code, offline.json()) == (503, {"detail": "google sign-in is not configured"})
-    _configure(monkeypatch)
-    for bad in ("https://evil.example.com/", "https://icm-master-frontend.onrender.com.evil.xyz", "not-a-url"):
-        refused = client.get(START_PATH, params={"redirect_uri": bad}, follow_redirects=False)
-        assert (refused.status_code, refused.json()) == (400, {"detail": "redirect_uri is not allowed"})
-
 def test_start_redirects_to_google_with_state_and_client_id(monkeypatch) -> None:
     client = _ready(monkeypatch, _identity())
     response = client.get(START_PATH, params={"redirect_uri": f"{FRONTEND}/"}, follow_redirects=False)

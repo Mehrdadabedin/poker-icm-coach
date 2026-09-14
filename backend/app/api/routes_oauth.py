@@ -10,7 +10,7 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from fastapi.responses import RedirectResponse
 
 from app.core.config import settings
-from app.services import google_oauth
+from app.services import google_config, google_oauth
 from app.services.auth import auth_store
 from app.services.user_registry import auth_registry, username_from_email
 
@@ -23,16 +23,28 @@ _CALLBACK_SUFFIX = "/api/auth/google/callback"
 
 
 @router.get("/providers")
-def providers() -> dict[str, bool]:
-    """Public availability probe. Returns booleans only, never a credential."""
-    return {GOOGLE: google_oauth.is_configured(settings), "apple": False, "phone": False}
+def providers() -> dict[str, object]:
+    """Public availability probe. Reports state and missing variable NAMES.
+
+    Only names, never values: a deployment that forgot a credential has to be
+    diagnosable from outside the process.
+    """
+    missing = google_config.missing_configuration(settings)
+    return {
+        GOOGLE: not missing,
+        "apple": False,
+        "phone": False,
+        "google_missing": missing,
+    }
 
 
 @router.get("/google/start")
 def google_start(request: Request, redirect_uri: str = Query(default="")) -> RedirectResponse:
     """Begin the flow: trust-check the caller's origin, then hand off to Google."""
-    if not google_oauth.is_configured(settings):
-        raise HTTPException(status_code=503, detail=_NOT_CONFIGURED)
+    missing = google_config.missing_configuration(settings)
+    if missing:
+        # Name the variables that are blank, so the operator knows what to set.
+        raise HTTPException(status_code=503, detail=f"{_NOT_CONFIGURED}: missing {', '.join(missing)}")
     origin = google_oauth.allowed_origin(redirect_uri, settings.cors_origin_list)
     if origin is None:
         raise HTTPException(status_code=400, detail="redirect_uri is not allowed")
@@ -52,7 +64,7 @@ def google_callback(
     if origin is None:
         # The nonce is single-use and expires, so a replayed or forged state fails.
         raise HTTPException(status_code=400, detail=_BAD_STATE)
-    if not code or not google_oauth.is_configured(settings):
+    if not code or not google_config.is_configured(settings):
         return _failure(origin)
     try:
         identity = google_oauth.authenticate_code(
