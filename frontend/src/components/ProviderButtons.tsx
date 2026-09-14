@@ -1,5 +1,4 @@
 import { googleSignInUrl, type AuthProviders } from "../services/api";
-import type { NoticeTone } from "./AuthMessages";
 import { AppleIcon, ArrowRightIcon, GoogleIcon, PhoneIcon } from "./AuthIcons";
 
 type ProviderKind = "phone" | "google" | "apple";
@@ -33,7 +32,7 @@ export function providerNotice(kind: ProviderKind, googleAvailable: boolean): st
 
 interface ProviderButtonsProps {
   providers: AuthProviders | null;
-  onNotice: (message: string, tone: NoticeTone) => void;
+  onNotice: (message: string) => void;
 }
 
 /** The three provider pills plus the "or" rule that separates them from the
@@ -49,9 +48,9 @@ export function ProviderButtons({ providers, onNotice }: ProviderButtonsProps) {
       window.location.href = googleSignInUrl();
       return;
     }
-    // Google is a configured provider whose sign-in is missing, so its notice
-    // is an error message; Apple and phone are simply not offered yet.
-    onNotice(providerNotice(kind, googleAvailable), kind === "google" ? "error" : "status");
+    // A provider that cannot sign anyone in is an error for the user, so the
+    // notice goes through the same red status line as a rejected password.
+    onNotice(providerNotice(kind, googleAvailable));
   };
 
   return (

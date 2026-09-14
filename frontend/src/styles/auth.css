@@ -3,13 +3,17 @@
    statistics screens keep their own styles untouched.
 
    Geometry is written in reference pixels taken from loginUI.png (a 1024x1536
-   mockup) and scaled by --k: at a 1024px-wide viewport --k is exactly 1px, so
-   every number below is the measured value from the mockup. Narrower viewports
+   mockup) and scaled by --k: at a 1024x1536 viewport --k is exactly 1px, so
+   every number below is the measured value from the mockup. Smaller viewports
    shrink the whole screen proportionally instead of reflowing it. */
 
 .home-page.auth-page,
 .login-panel {
-  --k: clamp(0.5px, calc(100vw / 1024), 1px);
+  /* The mockup is a 1024x1536 frame. --k is one reference pixel: it follows
+     whichever of the two ratios is smaller, so the composition keeps the
+     mockup's share of the frame (about 80% of the height) instead of growing
+     taller than the viewport on wide, short desktop screens. */
+  --k: clamp(0.5px, min(calc(100vw / 1024), calc(100vh / 1536)), 1px);
   --auth-gold: #fad15a;
   --auth-gold-rule: #fcf159;
   --auth-text: #e9eef5;
@@ -21,6 +25,8 @@
   --auth-icon: #919faf;
   --auth-blue: #086aec;
   --auth-ink: #0f151d;
+  /* One error red for every sign-in message on this screen. */
+  --auth-red: #ff6b6b;
 }
 
 .home-page.auth-page {
@@ -302,22 +308,18 @@
   text-align: center;
 }
 
+/* Every message on this screen reports something that went wrong: a rejected
+   credential or a provider that cannot sign anyone in. All of them are red. */
 .auth-error {
-  color: #ff9a92;
+  color: var(--auth-red);
 }
 
 .auth-notice {
   padding: calc(14 * var(--k)) calc(18 * var(--k));
-  border: calc(1 * var(--k)) solid var(--auth-line);
+  border: calc(1 * var(--k)) solid rgba(255, 107, 107, 0.36);
   border-radius: calc(14 * var(--k));
-  background: rgba(255, 255, 255, 0.04);
-  color: #cfd9e5;
-}
-
-/* Google is advertised as a provider but cannot sign anyone in, so its notice
-   is an error: red text, same box, same wording. */
-.auth-notice-error {
-  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.07);
+  color: var(--auth-red);
 }
 
 .auth-success {
@@ -381,14 +383,15 @@
   margin-top: calc(24 * var(--k));
   padding-top: 0;
   border-top: 0;
-  color: #5d6975;
+  color: var(--auth-gold);
   font-size: calc(14 * var(--k));
   letter-spacing: calc(1 * var(--k));
   text-align: center;
 }
 
-/* Short viewports: keep the screen usable rather than clipping the brand. */
-@media (max-height: 760px) {
+/* Very short viewports (landscape phones): top-align so nothing is clipped.
+   Above this the composition is scaled to fit, so it stays centred. */
+@media (max-height: 560px) {
   .home-page.auth-page {
     padding-top: calc(16 * var(--k));
     padding-bottom: calc(24 * var(--k));

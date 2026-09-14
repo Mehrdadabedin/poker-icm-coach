@@ -82,8 +82,8 @@ describe("provider pills", () => {
     expect(notice).toHaveTextContent(
       "Google sign-in isn't available yet. For now, you can sign in with your username and password.",
     );
-    // the red is the .auth-notice-error rule; the notice box itself is unchanged
-    expect(notice).toHaveClass("auth-notice", "auth-notice-error");
+    // one shared error container: .auth-notice is the red status line
+    expect(notice).toHaveClass("auth-notice");
   });
 
   it("shows the Apple notice without a Google clause when Google is absent", async () => {
@@ -94,7 +94,7 @@ describe("provider pills", () => {
       "Apple sign-in isn't available yet. For now, you can create an account with Sign up.",
     );
     expect(notice).not.toHaveTextContent("Google");
-    expect(notice).not.toHaveClass("auth-notice-error");
+    expect(notice).toHaveClass("auth-notice");
   });
 
   it("shows the phone notice naming the SMS configuration gap", async () => {
