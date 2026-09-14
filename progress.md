@@ -925,3 +925,159 @@ Change the automatic post-hand Next Hand countdown from 30 seconds to 10.
   NEXT HAND 10->9->...->0->next; TIME 20:00->19:59->... (and at 00:00 the
   existing blind-level advancement applies).
 - This pass made NO code changes beyond validation (no new edits; no push).
+
+## Session: Login UI redesign + Google authentication (2026-09-14)
+
+### Start state
+- Branch: `fix/tournament-settings-500` (nothing committed to `main`; `main` = `811f775`)
+- Branch HEAD before this session: `8341a68` (POST /api/tournament 500 fix, pushed to origin)
+- Working tree at start: clean except untracked `loginUI.png` and `docs/debug/`
+- Plan: `plan.md` (atomic tasks, updated as work progresses)
+
+### Inspection findings (Phase 1 complete)
+| Area | Finding |
+| --- | --- |
+| Auth architecture | Username + password. `app/api/routes_auth.py` (register/login/logout/me), `app/services/auth.py` (PBKDF2 verifier + revocable bearer tokens, 7-day TTL), `app/services/user_registry.py` (username -> salt/hash), `app/api/deps.py` (`require_user`) |
+| Login endpoint | `POST /api/auth/login` -> `{token, username}`; `POST /api/auth/register` also returns a token (A18) |
+| Signup flow | `POST /api/auth/register`, username 2-24 chars (`[A-Za-z0-9_\- ]`), password >= 8 chars |
+| Session/token | Bearer token in `localStorage` (`icm_auth_token`), resolved server-side; `GET /api/auth/me` validates it |
+| User model | username only. No email field, so email-based account linking is not possible today |
+| Google auth | NOT present (no route, no dependency, no config, no button) |
+| Apple auth | NOT present |
+| Phone/SMS auth | NOT present |
+| Frontend auth | `src/components/LoginForm.tsx`, `src/pages/HomePage.tsx`, `src/services/api.ts`, `src/styles/auth.css` |
+| Config | `.env.example` + `app/core/config.py`; no OAuth variables exist yet |
+| Tests | `backend/tests/test_auth_and_isolation.py`, `backend/tests/test_auth_hardening.py`, `frontend/tests/login.test.tsx` |
+
+### Paid services
+- None required for this task. Google OAuth 2.0 / OIDC is free (Google Cloud
+  OAuth client). Apple sign-in needs a paid Apple Developer membership and SMS
+  needs a paid provider, so both are OUT OF SCOPE and show an "unavailable"
+  notice instead.
+
+### Tasks completed
+- [x] Phase 1 inspection (findings above)
+- [x] `plan.md` created
+
+### Remaining work
+- Phases 2-7 of `plan.md` (UI, Google OAuth, Apple/phone notices, tests,
+  verification, commit)
+
+### Problems discovered / fixed
+- (none yet)
+
+### Backend Google sign-in (Phase 3) - DONE and verified
+
+Files: `backend/app/services/google_oauth.py` (new, 197 lines),
+`backend/app/api/routes_oauth.py` (new, 102 lines), `backend/app/core/config.py`,
+`backend/app/services/user_registry.py`, `backend/app/main.py`,
+`backend/tests/test_google_auth.py` (new, 13 tests), `.env.example`.
+No new runtime dependency: the standard library only.
+
+Verified live against a locally started backend (fake credentials, throwaway
+data files) on port 8099:
+| Request | Result |
+| --- | --- |
+| `GET /api/auth/providers` | 200 `{"google":true,"apple":false,"phone":false}` |
+| `GET /api/auth/google/start` (allowlisted origin) | 302 to accounts.google.com with `state` (43 chars), `scope=openid email profile`, `prompt=select_account`, client secret NOT in the URL |
+| `GET /api/auth/google/start` (evil.example) | 400 `{"detail":"redirect_uri is not allowed"}` |
+| `GET /api/auth/google/callback` (forged state) | 400 `{"detail":"invalid or expired oauth state"}` |
+| `GET /api/auth/google/callback` (valid state, bad code) | 302 `http://localhost:5173/#/auth/callback?error=google_signin_failed` |
+| `GET /api/auth/google/callback` (state replayed) | 400 (state is single use) |
+
+Verified locally: `pytest tests/test_google_auth.py tests/test_auth_and_isolation.py
+tests/test_auth_hardening.py` = 31 passed; `ruff` clean for the new files (2
+pre-existing errors elsewhere); `mypy app` = the 3 pre-existing `routes_meta`
+errors only; all new files <= 200 lines; `backend/data/users.json` and
+`sessions.json` untouched (mtime unchanged, Sep 10).
+
+Required environment variables for real Google sign-in:
+`GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` (optional `GOOGLE_REDIRECT_URI`).
+The Google Cloud console authorized redirect URI must be
+`https://<backend-host>/api/auth/google/callback`.
+
+### Login UI redesign + Google sign-in (Phases 2-7) - DONE and verified
+
+Status: working tree complete on `fix/tournament-settings-500`, uncommitted
+(the owner asked for a review before the commit). `main` untouched.
+
+Files:
+- frontend UI: `src/pages/HomePage.tsx` (unauthenticated branch only),
+  `src/components/LoginForm.tsx`, `LoginForm` helpers `AuthField.tsx`,
+  `AuthFooter.tsx`, `AuthIcons.tsx`, `AuthMessages.tsx`, `ProviderButtons.tsx`,
+  `src/styles/auth.css`, `src/App.tsx` (+1 route), `src/pages/AuthCallbackPage.tsx`
+- frontend API: `src/services/api.ts` (`getAuthProviders`, `googleSignInUrl`)
+- frontend tests: `tests/login.test.tsx` (updated), `tests/login_ui.test.tsx`,
+  `tests/oauth.test.tsx`
+- backend: `app/services/google_oauth.py`, `app/api/routes_oauth.py` (new),
+  `app/core/config.py`, `app/services/user_registry.py`, `app/main.py`,
+  `tests/test_google_auth.py`, `.env.example`
+- docs: `plan.md`, `progress.md`
+
+HOW THE DESIGN WAS MATCHED
+`loginUI.png` was measured pixel by pixel (background, band positions, ink
+boxes, colours). `auth.css` now carries the measured values as reference
+pixels and scales them with one factor:
+`--k: clamp(0.5px, calc(100vw / 1024), 1px)`, so at a 1024px-wide viewport
+every number is exactly the mockup value (716px column) and phones scale down
+proportionally.
+
+Measured against the mockup at 1024x1536 in a real browser (Playwright,
+chromium): every element is within 2px vertically and 3px horizontally -
+title, gold rule, subtitle, three pills (91px tall), "or" rule, both 94px
+inputs, 97px blue button, switch line, caps line, gold rule. Column width 716
+vs 718. Only the subtitle is wider (font substitution on this machine).
+Colours were sampled from the mockup: bg #0e141a, gold #fad15a, rules #fcf159,
+blue #086aec, field #111a21 with a #2c373f border, muted #99a8ba.
+
+BEHAVIOUR VERIFIED IN A REAL BROWSER (against a local backend)
+| Check | Result |
+| --- | --- |
+| Sign up through the UI | session bar shows the new user, token stored |
+| Reload | session survives (server-side token still valid) |
+| Log out, then sign in | session bar shows the same user |
+| Wrong password | "invalid username or password", form stays |
+| Apple pill | "Apple sign-in isn't available yet. For now, you can create an account with Sign up." |
+| Phone pill | "Phone sign-in isn't available yet. SMS verification requires additional service configuration. For now, you can create an account with Sign up." |
+| Google pill, provider not configured | "Google sign-in isn't available yet. For now, you can sign in with your username and password." |
+| Provider notice | drops the "or continue with Google" clause when Google is not configured |
+| Eye toggle | password -> text -> password, aria-label follows |
+| START PRACTICE after sign-in | lands on `/#/table/<id>` (the earlier fix is intact) |
+| Browser page errors | none |
+
+TESTS AND CHECKS
+- `frontend`: `npx vitest run` -> 9 files, 54 passed, 0 failed
+- `frontend`: `npx tsc --noEmit` -> clean; `vite build` -> ok
+- `frontend`: `npx oxlint --deny-warnings` -> 1 error in
+  `tests/useAutoNext.test.tsx`, a pre-existing and unrelated file (untouched)
+- `backend`: `uv run pytest tests/test_google_auth.py tests/test_auth_and_isolation.py
+  tests/test_auth_hardening.py tests/test_http400_paths.py` -> 36 passed
+- `backend`: live probe of the OAuth endpoints (fake credentials, throwaway
+  data files) - see the section above
+- `git diff --stat`: only auth UI, auth API, auth service, tests and docs.
+  `backend/app/api/routes_game.py`, `routes_meta.py`, the ICM/poker engine and
+  every other page are untouched.
+
+REMAINING CONFIGURATION FOR REAL GOOGLE SIGN-IN
+1. Google Cloud console -> OAuth client (Web application).
+2. Authorized redirect URI: `https://<backend-host>/api/auth/google/callback`
+   (local: `http://127.0.0.1:8000/api/auth/google/callback`).
+3. Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` on the backend service.
+   `GOOGLE_REDIRECT_URI` is optional and only overrides the derived callback.
+4. The frontend origin must stay in `CORS_ORIGINS`; that list is also the
+   redirect allowlist, so an unknown origin cannot receive a token.
+Until then `/api/auth/providers` reports `google: false` and the Google pill
+shows the notice instead of starting a broken flow.
+
+DELIBERATE DEVIATIONS
+- The copyright line stays below "PRACTICE - IMPROVE - WIN" (it is an existing
+  element used on every page); the mockup does not show it.
+- Letterform widths differ slightly because the mockup's font is not available
+  offline; geometry, sizes and colours match.
+- Apple and phone are real buttons that explain their status; no fake auth.
+
+PROBLEMS DISCOVERED / FIXED
+- The first UI pass was built at a 360px column, about half the mockup's scale;
+  the whole screen was rebuilt against measured geometry.
+- `provider-notice` wording was made conditional so it never points at a
+  Google button that is not configured.

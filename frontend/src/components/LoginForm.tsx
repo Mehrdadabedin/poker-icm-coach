@@ -1,5 +1,17 @@
-import { useState } from "react";
-import { getUsername, login, register, saveAuth } from "../services/api";
+import { useEffect, useState } from "react";
+import {
+  getAuthProviders,
+  getUsername,
+  login,
+  register,
+  saveAuth,
+  type AuthProviders,
+} from "../services/api";
+import { ArrowRightIcon, EyeIcon, EyeOffIcon } from "./AuthIcons";
+import { AuthField } from "./AuthField";
+import { AuthLegal, AuthSwitch, SignedInNote, type AuthMode } from "./AuthFooter";
+import { AuthMessages } from "./AuthMessages";
+import { ProviderButtons } from "./ProviderButtons";
 
 interface LoginFormProps {
   onLogin: (username: string) => void;
@@ -7,84 +19,78 @@ interface LoginFormProps {
 
 const MIN_PASSWORD_LENGTH = 8;
 
-type Mode = "signin" | "signup";
-
-/** Registration-first authentication entry (A18).
- * First screen offers LOGIN / SIGN UP. New users register (username +
- * password + confirm); existing users log in with credentials.
- * Matches the existing dark/gold compact ICM visual identity. */
+/** Credential sign-in first, with the provider pills on top and sign-up behind
+ * "Don't have an account? Sign up". */
 export function LoginForm({ onLogin }: LoginFormProps) {
-  const [mode, setMode] = useState<Mode>("signin");
+  const [mode, setMode] = useState<AuthMode>("signin");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [reveal, setReveal] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [providers, setProviders] = useState<AuthProviders | null>(null);
+  const stored = getUsername();
+
+  // One lookup per screen: the pills need to know whether Google is configured
+  // server-side. A failure must not block username/password sign-in.
+  useEffect(() => {
+    getAuthProviders()
+      .then(setProviders)
+      .catch(() => setProviders(null));
+  }, []);
+
+  const resetForm = (next: AuthMode) => {
+    setMode(next);
+    setPassword("");
+    setConfirm("");
+    setReveal(false);
+    setError(null);
+    setNotice(null);
+    setSuccess(null);
+  };
 
   const validPassword = password.length >= MIN_PASSWORD_LENGTH;
 
-  const resetForm = (m: Mode) => {
-    setMode(m);
-    setPassword("");
-    setConfirm("");
-    setError(null);
-    setNotice(null);
-  };
-
-  const signIn = async () => {
-    if (busy) return;
-    setError(null);
-    setNotice(null);
+  const validate = (): boolean => {
     if (!name.trim()) {
       setError("Username is required.");
-      return;
+      return false;
     }
     if (!password) {
       setError("Password is required.");
-      return;
+      return false;
     }
-    setBusy(true);
-    try {
-      const auth = await login(name, password);
-      saveAuth(auth.token, auth.username);
-      onLogin(auth.username);
-    } catch (e) {
-      setError((e as Error).message);
-    } finally {
-      setBusy(false);
-    }
-  };
-
-  const signUp = async () => {
-    if (busy) return;
-    setError(null);
-    setNotice(null);
-    if (!name.trim()) {
-      setError("Username is required.");
-      return;
-    }
-    if (!password) {
-      setError("Password is required.");
-      return;
-    }
-    if (!validPassword) {
+    if (mode === "signup" && !validPassword) {
       setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
-      return;
+      return false;
     }
-    if (password !== confirm) {
+    if (mode === "signup" && password !== confirm) {
       setError("Passwords do not match.");
-      return;
+      return false;
     }
+    return true;
+  };
+
+  const authenticate = async () => {
+    if (busy || !validate()) return;
     setBusy(true);
     try {
-      const created = await register(name, password);
-      // A18: signup authorizes the new account immediately (backend returns a
-      // session token), so the user enters the app without a second sign-in.
-      const normalized = created.username.length ? created.username : name.trim();
-      saveAuth(created.token, normalized);
-      setNotice(`Account "${normalized}" created. You are now signed in.`);
-      onLogin(normalized);
+      if (mode === "signup") {
+        const created = await register(name, password);
+        // Registration authorizes the account immediately (the backend returns
+        // a session token), so no second sign-in is needed.
+        const normalized = created.username.length ? created.username : name.trim();
+        saveAuth(created.token, normalized);
+        setSuccess(`Account "${normalized}" created. You are now signed in.`);
+        onLogin(normalized);
+      } else {
+        const auth = await login(name, password);
+        saveAuth(auth.token, auth.username);
+        onLogin(auth.username);
+      }
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -93,102 +99,82 @@ export function LoginForm({ onLogin }: LoginFormProps) {
   };
 
   const submit = () => {
-    if (mode === "signin") void signIn();
-    else void signUp();
+    setError(null);
+    setNotice(null);
+    void authenticate();
   };
 
   return (
     <div className="login-panel" data-testid="login-panel">
-      <div className="auth-mode-switch" data-testid="auth-mode-switch">
-        <button
-          className={`btn auth-mode-btn ${mode === "signin" ? "active" : ""}`}
-          onClick={() => resetForm("signin")}
-          data-testid="mode-signin"
-        >
-          LOGIN
-        </button>
-        <button
-          className={`btn auth-mode-btn ${mode === "signup" ? "active" : ""}`}
-          onClick={() => resetForm("signup")}
-          data-testid="mode-signup"
-        >
-          SIGN UP
-        </button>
-      </div>
+      <ProviderButtons providers={providers} onNotice={setNotice} />
 
-      {mode === "signup" && <h2>CREATE YOUR ACCOUNT</h2>}
-      <p className="note">
-        {mode === "signin"
-          ? "Sign in to continue to your private practice table."
-          : "Register once, then you are signed in automatically."}
-      </p>
-
-      <input
-        className="login-input"
-        type="text"
-        value={name}
-        maxLength={64}
-        placeholder="Username"
-        aria-label="username"
-        data-testid="username-input"
-        onChange={(e) => setName(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") submit();
+      <form
+        className="auth-form"
+        noValidate
+        onSubmit={(event) => {
+          event.preventDefault();
+          submit();
         }}
-        autoComplete="username"
-      />
-      <input
-        className="login-input"
-        type="password"
-        value={password}
-        placeholder="Password"
-        aria-label="password"
-        data-testid="password-input"
-        autoComplete={mode === "signin" ? "current-password" : "new-password"}
-        onChange={(e) => setPassword(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") submit();
-        }}
-      />
-      {mode === "signup" && (
-        <input
-          className="login-input"
-          type="password"
-          value={confirm}
-          placeholder="Confirm password"
-          aria-label="confirm password"
-          data-testid="confirm-password-input"
-          autoComplete="new-password"
-          onChange={(e) => setConfirm(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") submit();
-          }}
-        />
-      )}
-      <button
-        className="btn btn-primary"
-        onClick={submit}
-        disabled={busy}
-        data-testid="auth-submit"
       >
-        {busy ? "PLEASE WAIT…" : mode === "signin" ? "LOGIN" : "SIGN UP"}
-      </button>
+        <AuthField
+          kind="mail"
+          type="text"
+          value={name}
+          placeholder="Email or username"
+          label="Email or username"
+          testId="username-input"
+          autoComplete="username"
+          maxLength={64}
+          onChange={setName}
+          onSubmit={submit}
+        />
+        <AuthField
+          kind="lock"
+          type={reveal ? "text" : "password"}
+          value={password}
+          placeholder="Password"
+          label="Password"
+          testId="password-input"
+          autoComplete={mode === "signin" ? "current-password" : "new-password"}
+          onChange={setPassword}
+          onSubmit={submit}
+          trailing={
+            <button
+              type="button"
+              className="auth-eye"
+              onClick={() => setReveal((value) => !value)}
+              aria-label={reveal ? "Hide password" : "Show password"}
+              aria-pressed={reveal}
+              data-testid="password-toggle"
+            >
+              {reveal ? <EyeOffIcon /> : <EyeIcon />}
+            </button>
+          }
+        />
+        {mode === "signup" && (
+          <AuthField
+            kind="lock"
+            type="password"
+            value={confirm}
+            placeholder="Confirm password"
+            label="Confirm password"
+            testId="confirm-password-input"
+            autoComplete="new-password"
+            onChange={setConfirm}
+            onSubmit={submit}
+          />
+        )}
 
-      {mode === "signin" ? (
-        <button className="btn btn-small auth-switch-link" onClick={() => resetForm("signup")} data-testid="go-signup">
-          No account? SIGN UP
+        <button type="submit" className="auth-submit" disabled={busy} data-testid="auth-submit">
+          <span>{busy ? "Please wait\u2026" : mode === "signin" ? "Sign in" : "Sign up"}</span>
+          <ArrowRightIcon />
         </button>
-      ) : (
-        <button className="btn btn-small auth-switch-link" onClick={() => resetForm("signin")} data-testid="go-signin">
-          Already registered? LOGIN
-        </button>
-      )}
+      </form>
 
-      {error && <p className="error-box" data-testid="auth-error">{error}</p>}
-      {notice && <p className="success-box" data-testid="auth-success">{notice}</p>}
-      {mode === "signin" && getUsername() && (
-        <p className="note">Currently signed in as <b>{getUsername()}</b></p>
-      )}
+      <AuthMessages error={error} notice={notice} success={success} />
+      <AuthSwitch mode={mode} onSwitch={resetForm} />
+      {mode === "signin" && <SignedInNote username={stored} />}
+      <AuthLegal />
     </div>
   );
 }

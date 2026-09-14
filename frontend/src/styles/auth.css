@@ -1,87 +1,391 @@
-/* A18 authentication entry (LOGIN / SIGN UP) — used only by LoginForm. */
+/* ICM MASTER sign-in screen. Everything here is scoped to .auth-page / .auth-*
+   and .login-panel, so the table, ranges, coach, settings, history and
+   statistics screens keep their own styles untouched.
+
+   Geometry is written in reference pixels taken from loginUI.png (a 1024x1536
+   mockup) and scaled by --k: at a 1024px-wide viewport --k is exactly 1px, so
+   every number below is the measured value from the mockup. Narrower viewports
+   shrink the whole screen proportionally instead of reflowing it. */
+
+.home-page.auth-page,
 .login-panel {
+  --k: clamp(0.5px, calc(100vw / 1024), 1px);
+  --auth-gold: #fad15a;
+  --auth-gold-rule: #fcf159;
+  --auth-text: #e9eef5;
+  --auth-muted: #99a8ba;
+  --auth-dim: #75828f;
+  --auth-line: #2c373f;
+  --auth-rule: #333d47;
+  --auth-field: #111a21;
+  --auth-icon: #919faf;
+  --auth-blue: #086aec;
+  --auth-ink: #0f151d;
+}
+
+.home-page.auth-page {
+  background: #0e141a;
+  max-width: none;
+  gap: 0;
+  padding: calc(24 * var(--k)) calc(16 * var(--k)) calc(48 * var(--k));
+  justify-content: center;
+  overflow-y: auto;
+}
+
+/* 716px wide column, exactly as measured in the mockup. */
+.auth-shell {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  width: min(340px, 92vw);
-  background: rgba(29, 36, 44, 0.82);
-  border: 1px solid #333;
-  border-radius: 12px;
-  padding: 16px 18px;
+  width: min(calc(716 * var(--k)), 94vw);
 }
 
-.login-panel h2 {
-  color: var(--accent);
-  font-size: 1.05rem;
-  letter-spacing: 1px;
-  margin: 0;
-}
-
-.login-input {
-  width: 100%;
-  min-height: 42px;
-  border-radius: 8px;
-  border: 1px solid #444;
-  background: #0f1318;
-  color: var(--text);
-  padding: 6px 10px;
-  font-size: 0.95rem;
-}
-
-/* Phase 2: LOGIN / SIGN UP as two compact rectangular controls.
-   Blue (project .btn-primary tone) instead of the gold used before, matching
-   the app's primary button colour; small and consistent. */
-.auth-mode-switch {
-  display: flex;
-  gap: 6px;
-}
-
-.auth-mode-switch .btn {
-  min-height: 32px;
-  min-width: 0;
-  font-size: 0.82rem;
-  font-weight: 700;
-  padding: 4px 14px;
-  border-radius: 6px;
-  flex: 1 1 auto;
-  background: #1565c0;
-  color: #fff;
-}
-
-.auth-mode-switch .btn.active {
-  background: #0d47a1;
-  outline: 2px solid #90caf9;
-  box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.35);
-}
-
-/* Accessible focus for the keyboard */
-.auth-mode-switch .btn:focus-visible,
-.login-panel button:focus-visible {
-  outline: 2px solid #90caf9;
-  outline-offset: 1px;
-}
-
-/* Primary submit uses the same blue family as the mode controls */
-.login-panel .btn-primary {
-  background: #1565c0;
-  color: #fff;
-}
-
-.auth-switch-link {
-  background: transparent;
-  border: 1px solid #555;
-  color: var(--muted);
-}
-
-.auth-switch-link:hover {
-  color: var(--text);
-  border-color: #90caf9;
-}
-
-.success-box {
-  color: #81c784;
-  font-size: 0.78rem;
-  line-height: 1.3;
+/* ---- brand: gold title, short rule, subtitle ---- */
+.auth-brand {
   text-align: center;
+  margin-bottom: calc(78 * var(--k));
+}
+
+.auth-title {
+  margin: 0;
+  color: var(--auth-gold);
+  font-size: calc(54 * var(--k));
+  font-weight: 800;
+  letter-spacing: calc(2.6 * var(--k));
+  line-height: 1.1;
+}
+
+.auth-title-rule {
+  display: block;
+  width: calc(107 * var(--k));
+  height: calc(5 * var(--k));
+  border-radius: calc(3 * var(--k));
+  margin: calc(19 * var(--k)) auto calc(14 * var(--k));
+  background: var(--auth-gold-rule);
+}
+
+.auth-subtitle {
+  margin: 0;
+  color: var(--auth-muted);
+  font-size: calc(29 * var(--k));
+  line-height: 1.3;
+}
+
+/* ---- panel: transparent column of blocks ---- */
+.login-panel {
+  display: flex;
+  flex-direction: column;
+  gap: calc(43 * var(--k));
+  width: 100%;
+  align-items: stretch;
+  color: var(--auth-text);
+}
+
+/* ---- provider pills ---- */
+.auth-providers {
+  display: flex;
+  flex-direction: column;
+  gap: calc(24 * var(--k));
+}
+
+/* The mark and the label sit centred in the pill, the arrow is pinned to the
+   right edge, which is what the mockup shows (label centre 540 vs pill centre
+   512, arrow centre 58px from the right edge). */
+.auth-provider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(30 * var(--k));
+  width: 100%;
+  height: calc(91 * var(--k));
+  padding: 0 calc(56 * var(--k));
+  border: calc(1 * var(--k)) solid transparent;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: calc(30 * var(--k));
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-provider-dark {
+  background: #020203;
+  border-color: #41474c;
+  color: #fff;
+}
+
+.auth-provider-light {
+  background: #fff;
+  color: var(--auth-ink);
+}
+
+.auth-provider-dark:hover {
+  background: #121317;
+}
+
+.auth-provider-light:hover {
+  background: #eef0f3;
+}
+
+.auth-provider-mark,
+.auth-provider-end {
+  display: flex;
+  align-items: center;
+}
+
+/* Mark sizes come from the mockup: each brand glyph has its own ink box. */
+.ico-phone {
+  width: calc(54 * var(--k));
+  height: calc(54 * var(--k));
+}
+
+.ico-google {
+  width: calc(50 * var(--k));
+  height: calc(50 * var(--k));
+}
+
+.ico-apple {
+  width: calc(62 * var(--k));
+  height: calc(62 * var(--k));
+}
+
+.auth-provider-end {
+  position: absolute;
+  right: calc(38 * var(--k));
+}
+
+.ico-arrow {
+  width: calc(42 * var(--k));
+  height: calc(42 * var(--k));
+}
+
+.auth-provider-label {
+  text-align: center;
+}
+
+/* ---- "or" separator: rule, word, rule ---- */
+.auth-or {
+  display: flex;
+  align-items: center;
+  gap: calc(20 * var(--k));
+  height: calc(20 * var(--k));
+  margin-top: calc(9 * var(--k));
+  color: var(--auth-or, #8c9aae);
+  font-size: calc(25 * var(--k));
+}
+
+.auth-or::before,
+.auth-or::after {
+  content: "";
+  flex: 1 1 auto;
+  height: calc(1 * var(--k));
+  background: var(--auth-rule);
+}
+
+/* ---- credential fields ---- */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: calc(21 * var(--k));
+}
+
+.auth-field {
+  display: grid;
+  grid-template-columns: calc(48 * var(--k)) 1fr auto;
+  align-items: center;
+  gap: calc(30 * var(--k));
+  height: calc(94 * var(--k));
+  padding: 0 calc(27 * var(--k));
+  border: calc(1 * var(--k)) solid var(--auth-line);
+  border-radius: calc(16 * var(--k));
+  background: var(--auth-field);
+}
+
+.auth-field:focus-within {
+  border-color: #8ab4ff;
+  box-shadow: 0 0 0 calc(3 * var(--k)) rgba(138, 180, 255, 0.2);
+}
+
+.auth-field-mark {
+  display: flex;
+  color: var(--auth-icon);
+}
+
+.ico-mail {
+  width: calc(50 * var(--k));
+  height: calc(50 * var(--k));
+}
+
+.ico-lock {
+  width: calc(56 * var(--k));
+  height: calc(56 * var(--k));
+}
+
+.ico-eye {
+  width: calc(46 * var(--k));
+  height: calc(46 * var(--k));
+}
+
+.auth-input {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--auth-text);
+  font-family: inherit;
+  font-size: calc(26 * var(--k));
+}
+
+.auth-input:focus {
+  outline: none;
+}
+
+.auth-input::placeholder {
+  color: var(--auth-muted);
+  opacity: 1;
+}
+
+.auth-eye {
+  display: flex;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--auth-icon);
+  cursor: pointer;
+}
+
+.auth-eye:hover {
+  color: var(--auth-text);
+}
+
+/* ---- primary action ---- */
+.auth-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(18 * var(--k));
+  width: 100%;
+  height: calc(97 * var(--k));
+  margin-top: calc(16 * var(--k));
+  border: 0;
+  border-radius: 999px;
+  background: var(--auth-blue);
+  color: #fff;
+  font-family: inherit;
+  font-size: calc(39 * var(--k));
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-submit:active {
+  background: #0560dc;
+}
+
+.auth-submit:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.login-panel button:focus-visible {
+  outline: calc(2 * var(--k)) solid #8ab4ff;
+  outline-offset: calc(2 * var(--k));
+}
+
+/* ---- status lines ---- */
+.auth-error,
+.auth-notice,
+.auth-success {
+  margin: 0;
+  font-size: calc(23 * var(--k));
+  line-height: 1.45;
+  text-align: center;
+}
+
+.auth-error {
+  color: #ff9a92;
+}
+
+.auth-notice {
+  padding: calc(14 * var(--k)) calc(18 * var(--k));
+  border: calc(1 * var(--k)) solid var(--auth-line);
+  border-radius: calc(14 * var(--k));
+  background: rgba(255, 255, 255, 0.04);
+  color: #cfd9e5;
+}
+
+.auth-success {
+  color: #7fd79b;
+}
+
+/* ---- switch prompt, stored account, brand line ---- */
+.auth-switch {
+  margin: 0;
+  color: var(--auth-muted);
+  font-size: calc(23 * var(--k));
+  text-align: center;
+}
+
+.auth-link {
+  padding: 0 calc(3 * var(--k));
+  border: 0;
+  border-radius: calc(4 * var(--k));
+  background: transparent;
+  color: var(--auth-gold);
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-signed-in {
+  margin: 0;
+  color: var(--auth-dim);
+  font-size: calc(21 * var(--k));
+  text-align: center;
+}
+
+.auth-legal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(27 * var(--k));
+  margin-top: calc(66 * var(--k));
+}
+
+.auth-legal-text {
+  margin: 0;
+  color: #9dacbd;
+  font-size: calc(19 * var(--k));
+  letter-spacing: calc(8 * var(--k));
+  /* The trailing letter-space would push the line left of centre. */
+  text-indent: calc(8 * var(--k));
+  text-transform: uppercase;
+}
+
+.auth-legal-rule {
+  width: calc(82 * var(--k));
+  height: calc(5 * var(--k));
+  border-radius: calc(3 * var(--k));
+  background: var(--auth-gold-rule);
+}
+
+/* Copyright sits below the brand line: subdued, not gold, and out of the way. */
+.home-page.auth-page .app-footer {
+  margin-top: calc(24 * var(--k));
+  padding-top: 0;
+  border-top: 0;
+  color: #5d6975;
+  font-size: calc(14 * var(--k));
+  letter-spacing: calc(1 * var(--k));
+  text-align: center;
+}
+
+/* Short viewports: keep the screen usable rather than clipping the brand. */
+@media (max-height: 760px) {
+  .home-page.auth-page {
+    padding-top: calc(16 * var(--k));
+    padding-bottom: calc(24 * var(--k));
+    justify-content: flex-start;
+  }
 }

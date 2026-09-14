@@ -11,6 +11,7 @@ from app.api.deps import bearer_token
 from app.api.routes_auth import router as auth_router
 from app.api.routes_game import router as game_router
 from app.api.routes_meta import router as meta_router
+from app.api.routes_oauth import router as oauth_router
 from app.core.config import settings
 from app.services.auth import auth_store
 from app.services.session_store import session_store
@@ -29,6 +30,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(auth_router)
+app.include_router(oauth_router)
 app.include_router(game_router)
 app.include_router(meta_router)
 
