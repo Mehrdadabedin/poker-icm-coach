@@ -10,7 +10,7 @@ import {
 import { ArrowRightIcon, EyeIcon, EyeOffIcon } from "./AuthIcons";
 import { AuthField } from "./AuthField";
 import { AuthLegal, AuthSwitch, SignedInNote, type AuthMode } from "./AuthFooter";
-import { AuthMessages } from "./AuthMessages";
+import { AuthMessages, type NoticeTone } from "./AuthMessages";
 import { ProviderButtons } from "./ProviderButtons";
 
 interface LoginFormProps {
@@ -30,6 +30,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [noticeTone, setNoticeTone] = useState<NoticeTone>("status");
   const [success, setSuccess] = useState<string | null>(null);
   const [providers, setProviders] = useState<AuthProviders | null>(null);
   const stored = getUsername();
@@ -49,6 +50,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
     setReveal(false);
     setError(null);
     setNotice(null);
+    setNoticeTone("status");
     setSuccess(null);
   };
 
@@ -101,12 +103,19 @@ export function LoginForm({ onLogin }: LoginFormProps) {
   const submit = () => {
     setError(null);
     setNotice(null);
+    setNoticeTone("status");
     void authenticate();
   };
 
   return (
     <div className="login-panel" data-testid="login-panel">
-      <ProviderButtons providers={providers} onNotice={setNotice} />
+      <ProviderButtons
+        providers={providers}
+        onNotice={(message, tone) => {
+          setNotice(message);
+          setNoticeTone(tone);
+        }}
+      />
 
       <form
         className="auth-form"
@@ -171,7 +180,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         </button>
       </form>
 
-      <AuthMessages error={error} notice={notice} success={success} />
+      <AuthMessages error={error} notice={notice} noticeTone={noticeTone} success={success} />
       <AuthSwitch mode={mode} onSwitch={resetForm} />
       {mode === "signin" && <SignedInNote username={stored} />}
       <AuthLegal />

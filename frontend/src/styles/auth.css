@@ -314,6 +314,12 @@
   color: #cfd9e5;
 }
 
+/* Google is advertised as a provider but cannot sign anyone in, so its notice
+   is an error: red text, same box, same wording. */
+.auth-notice-error {
+  color: #ff6b6b;
+}
+
 .auth-success {
   color: #7fd79b;
 }

@@ -1,4 +1,5 @@
 import { googleSignInUrl, type AuthProviders } from "../services/api";
+import type { NoticeTone } from "./AuthMessages";
 import { AppleIcon, ArrowRightIcon, GoogleIcon, PhoneIcon } from "./AuthIcons";
 
 type ProviderKind = "phone" | "google" | "apple";
@@ -32,7 +33,7 @@ export function providerNotice(kind: ProviderKind, googleAvailable: boolean): st
 
 interface ProviderButtonsProps {
   providers: AuthProviders | null;
-  onNotice: (message: string) => void;
+  onNotice: (message: string, tone: NoticeTone) => void;
 }
 
 /** The three provider pills plus the "or" rule that separates them from the
@@ -48,7 +49,9 @@ export function ProviderButtons({ providers, onNotice }: ProviderButtonsProps) {
       window.location.href = googleSignInUrl();
       return;
     }
-    onNotice(providerNotice(kind, googleAvailable));
+    // Google is a configured provider whose sign-in is missing, so its notice
+    // is an error message; Apple and phone are simply not offered yet.
+    onNotice(providerNotice(kind, googleAvailable), kind === "google" ? "error" : "status");
   };
 
   return (

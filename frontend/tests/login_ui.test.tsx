@@ -75,12 +75,15 @@ describe("provider pills", () => {
     expect(screen.getByTestId("password-toggle")).toHaveAttribute("aria-label", "Show password");
   });
 
-  it("shows the Google notice when Google is not configured", async () => {
+  it("shows the Google notice as an error in red when Google is not configured", async () => {
     await openForm();
     fireEvent.click(screen.getByTestId("provider-google"));
-    expect(screen.getByTestId("provider-notice")).toHaveTextContent(
+    const notice = screen.getByTestId("provider-notice");
+    expect(notice).toHaveTextContent(
       "Google sign-in isn't available yet. For now, you can sign in with your username and password.",
     );
+    // the red is the .auth-notice-error rule; the notice box itself is unchanged
+    expect(notice).toHaveClass("auth-notice", "auth-notice-error");
   });
 
   it("shows the Apple notice without a Google clause when Google is absent", async () => {
@@ -91,6 +94,7 @@ describe("provider pills", () => {
       "Apple sign-in isn't available yet. For now, you can create an account with Sign up.",
     );
     expect(notice).not.toHaveTextContent("Google");
+    expect(notice).not.toHaveClass("auth-notice-error");
   });
 
   it("shows the phone notice naming the SMS configuration gap", async () => {
