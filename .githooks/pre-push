@@ -15,10 +15,12 @@ cd "$ROOT"
 # Part 1: refuse to push this repository anywhere but its own remote.
 # git invokes pre-push as: pre-push <remote-name> <remote-url>
 remote_url="${2:-}"
-# Drop any userinfo, since a personal access token remote reads
-# https://user:token@github.com/... and would otherwise look like a foreign host.
-# This also normalises git@ and ssh://git@ down to the same two shapes.
-bare_url="${remote_url#*@}"
+# Normalise every remote form down to github.com/... or github.com:... before
+# matching. The scheme goes first, then any userinfo, because a personal access
+# token remote reads https://user:token@github.com/... and would otherwise look
+# like a foreign host.
+bare_url="${remote_url#*://}"
+bare_url="${bare_url#*@}"
 case "$bare_url" in
   github.com/Mehrdadabedin/poker-icm-coach|github.com/Mehrdadabedin/poker-icm-coach.git|\
   github.com:Mehrdadabedin/poker-icm-coach|github.com:Mehrdadabedin/poker-icm-coach.git) ;;
