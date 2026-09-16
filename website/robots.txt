@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mehrdadabedin.github.io/poker-icm-coach/sitemap.xml

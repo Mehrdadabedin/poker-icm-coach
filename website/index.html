@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- SEO keywords:
+     primary:   poker ICM trainer
+                (chosen because a github.io page can plausibly rank for it: the
+                head term "ICM calculator" is owned by commercial tools, while
+                "poker ICM trainer" still has open-source intent behind it)
+     secondary: bubble pressure, risk premium, push fold ranges
+     intent:    informational, with a navigational tail on the project name
+-->
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Poker ICM trainer for tournament bubbles: ICM Master</title>
+<meta name="description" content="ICM Master is an open source poker ICM trainer. Play nine-handed tournaments while a coach prices each decision in prize money and shows bubble pressure." />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://mehrdadabedin.github.io/poker-icm-coach/" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="stylesheet" href="styles.css" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="ICM Master" />
+<meta property="og:title" content="ICM Master: an open source poker ICM trainer" />
+<meta property="og:description" content="Nine-handed tournament play with a coach that prices every decision in prize money: exact ICM equity, bubble pressure, risk premium and push/fold ranges." />
+<meta property="og:url" content="https://mehrdadabedin.github.io/poker-icm-coach/" />
+<meta property="og:image" content="https://mehrdadabedin.github.io/poker-icm-coach/og.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="ICM Master on dark felt green, with a curve showing prize-pool share falling behind chip share." />
+<meta property="og:locale" content="en_US" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="ICM Master: an open source poker ICM trainer" />
+<meta name="twitter:description" content="Nine-handed tournament play with a coach that prices every decision in prize money: exact ICM equity, bubble pressure, risk premium and push/fold ranges." />
+<meta name="twitter:image" content="https://mehrdadabedin.github.io/poker-icm-coach/og.png" />
+<meta name="twitter:image:alt" content="ICM Master on dark felt green, with a curve showing prize-pool share falling behind chip share." />
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "ICM Master",
+  "description": "An open source poker ICM trainer. Nine-handed tournaments against eight AI opponents, with exact Independent Chip Model equity, bubble pressure, risk premium, push/fold ranges and a session review.",
+  "url": "https://mehrdadabedin.github.io/poker-icm-coach/",
+  "downloadUrl": "https://github.com/Mehrdadabedin/poker-icm-coach",
+  "codeRepository": "https://github.com/Mehrdadabedin/poker-icm-coach",
+  "applicationCategory": "EducationalApplication",
+  "operatingSystem": "Linux, macOS, Windows, Android",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "author": {
+    "@type": "Person",
+    "name": "Mehrdad Abedin",
+    "sameAs": ["https://github.com/Mehrdadabedin"]
+  }
+}
+</script>
+<script>
+  /* The curve is drawn by default. This class arms the draw-on animation, so a
+     browser or capture tool that never runs the animation still shows the
+     finished chart instead of an empty frame. */
+  document.documentElement.classList.add("js");
+</script>
+</head>
+<body>
+
+<header class="hero">
+  <p class="wordmark">ICM Master</p>
+  <h1>A poker ICM trainer for the money bubble</h1>
+  <p class="lede">Nine-handed tournaments against eight AI opponents, with a coach that prices every decision in prize money instead of chips.</p>
+
+  <figure class="curve">
+    <svg viewBox="0 0 420 260" role="img" aria-labelledby="curve-title curve-desc" class="curve-svg">
+      <title id="curve-title">Chip share against prize-pool share</title>
+      <desc id="curve-desc">A straight line where chips and money rise together, and a flatter curve showing the prize-pool share a stack is really worth. The gap between them widens as the stack grows.</desc>
+      <g class="curve-axes">
+        <line x1="44" y1="216" x2="404" y2="216" />
+        <line x1="44" y1="216" x2="44" y2="20" />
+      </g>
+      <line class="curve-linear" x1="44" y1="216" x2="392" y2="38" />
+      <path class="curve-area" d="M44 216 C 170 142, 280 98, 392 86 L392 38 Z" />
+      <path class="curve-icm" d="M44 216 C 170 142, 280 98, 392 86" />
+      <text class="curve-label" x="392" y="28" text-anchor="end">chips</text>
+      <text class="curve-label" x="392" y="126" text-anchor="end">prize money</text>
+      <text class="curve-axis-label" x="224" y="246" text-anchor="middle">your share of the chips</text>
+    </svg>
+    <figcaption>A stack holding 40 percent of the chips is not worth 40 percent of the prize pool. That gap is what ICM measures.</figcaption>
+  </figure>
+
+  <nav aria-label="Primary">
+    <ul class="ctas">
+      <li>
+        <a class="cta cta-primary" href="app/">Open the hosted UI preview</a>
+        <p class="honesty">Buttons and layout only. No backend runs on GitHub Pages, so no cards are dealt there. Real hands need the API running on your machine, which takes two commands.</p>
+      </li>
+      <li><a class="cta cta-secondary" href="#explainer">Read the strategy explainer</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main>
+
+<section id="why">
+  <h2>Why ICM decides tournament money</h2>
+  <p>In a cash game a chip is a fixed amount of money, so the best play is the one that wins the most chips. A tournament pays a ladder: first place takes a slice, second takes less, and everyone below the last paid place takes nothing. The chips you win are therefore worth less per chip than the chips you put at risk, because losing them ends your run while winning them only improves it.</p>
+  <p>The Independent Chip Model turns stacks into prize money. Feed it every player's chips and the payout structure and it returns what each stack is worth right now. Once you see decisions in that currency, calls that look routine turn into mistakes, and folds that feel weak turn out to be the profitable line. That shift is sharpest on the bubble, the point where one more player has to bust before anyone gets paid.</p>
+</section>
+
+<section id="features">
+  <h2>What the coach tells you</h2>
+  <p>By default the table starts with 45,000 chips, 100/100 blinds and 20-minute levels, with a blind timer, a fast mode, and no ante, traditional ante or big-blind ante.</p>
+  <ul class="features">
+    <li>
+      <h3>Exact ICM equity</h3>
+      <p>Your stack converted into its share of the prize pool, computed exactly for up to nine players rather than sampled.</p>
+    </li>
+    <li>
+      <h3>Stage and bubble pressure</h3>
+      <p>The engine reads the stage of the tournament and says when the bubble is bending correct play away from chip EV, and by how much.</p>
+    </li>
+    <li>
+      <h3>Risk premium</h3>
+      <p>The extra equity you need before calling, given what busting would cost you at this payout.</p>
+    </li>
+    <li>
+      <h3>Push/fold with a range matrix</h3>
+      <p>Shove and call ranges for short stacks, drawn as the full 13 by 13 grid of 169 starting hands.</p>
+    </li>
+    <li>
+      <h3>SPR and board texture</h3>
+      <p>Stack-to-pot ratio and a read on the board for the spots after the flop, not just preflop shoves.</p>
+    </li>
+    <li>
+      <h3>Eight opponents with their own habits</h3>
+      <p>Tight, aggressive, TAG, loose, LAG, passive, balanced and adaptive. None of them can see your cards or the streets still to come.</p>
+    </li>
+    <li>
+      <h3>Coaching at your level, and a test mode</h3>
+      <p>Explanations at BEGINNER, INTERMEDIATE or ADVANCED depth. Test mode stays quiet until you act, then grades the decision PREFERRED, ACCEPTABLE or SUBOPTIMAL.</p>
+    </li>
+    <li>
+      <h3>Session review</h3>
+      <p>Hand history, VPIP and PFR (how often you paid to play a hand, and how often you raised first in), aggression, how often you agreed with the coach, your ICM mistakes, results by position and stack depth, and your biggest leak.</p>
+    </li>
+  </ul>
+</section>
+
+<section id="explainer">
+  <h2>ICM, bubble pressure and risk premium in plain terms</h2>
+  <p>Five ideas cover most of what the coach says at the table.</p>
+  <dl class="terms">
+    <dt data-term="icm">ICM, the Independent Chip Model</dt>
+    <dd data-field="definition">A way of converting a stack into the share of the prize pool it is worth, from every player's chip count and the payout structure.</dd>
+    <dd data-field="why_it_matters">Chips you win are worth less than the chips you risk, because the players below you still get paid. Chip EV and money EV stop agreeing the moment the payouts stop being flat.</dd>
+    <dd data-field="example">Four players left, equal stacks, a pool that pays 50/30/20. Everyone holds a quarter of the chips and a quarter of the money. Double up through someone and your chip share doubles, your prize share does not come close.</dd>
+
+    <dt data-term="bubble">The bubble</dt>
+    <dd data-field="definition">The stretch just before the money, when one more player has to go out before anyone gets paid.</dd>
+    <dd data-field="why_it_matters">Everyone's equity rises when somebody else busts, so surviving is briefly worth more than accumulating. Short stacks fold hands they would shove at any other point, and the big stacks can attack almost anything.</dd>
+    <dd data-field="example">Eleven players left, ten get paid. The 10 big blind stack folds ace-nine offsuit in the cutoff, because two shorter stacks are one hand away from busting and the pay jump belongs to whoever outlasts them.</dd>
+
+    <dt data-term="risk_premium">Risk premium</dt>
+    <dd data-field="definition">The extra equity you need on top of a break-even chip call, because busting costs you more prize money than the pot gives back.</dd>
+    <dd data-field="why_it_matters">It is the reason a call that is right in a cash game is wrong in a tournament. Facing a stack that covers you near the bubble, the premium can add ten points or more to the equity you need.</dd>
+    <dd data-field="example">The pot is laying you odds that need 40 percent equity. Add a 7 point risk premium and you need 47 percent, so the hand that beat the pot odds goes in the muck.</dd>
+
+    <dt data-term="push_fold">Push/fold</dt>
+    <dd data-field="definition">The short-stack game, where the only two moves worth making are all-in or fold, and the right one can be solved rather than guessed.</dd>
+    <dd data-field="why_it_matters">Under about 15 big blinds a small raise commits you anyway, so the raise size stops mattering and the range does all the work. This is the spot you meet most often late in a tournament.</dd>
+    <dd data-field="example">Eight big blinds on the button, folded to you. The engine shows the hands that shove for a profit, then what the blinds can call with against that range.</dd>
+
+    <dt data-term="spr">SPR, stack-to-pot ratio</dt>
+    <dd data-field="definition">The effective stack divided by the size of the pot once the flop is out.</dd>
+    <dd data-field="why_it_matters">It tells you how much room is left to play. At a low SPR top pair is already a stack-off, at a high SPR one pair is rarely worth your tournament life.</dd>
+    <dd data-field="example">A 12 big blind stack behind a 6 big blind pot is an SPR of 2. One bet and one raise and the chips are in the middle, so decide on the flop, not the river.</dd>
+  </dl>
+</section>
+
+<section id="quickstart">
+  <h2>Run it on your machine</h2>
+  <p>The backend holds all the game state and the frontend draws what it sends back, so both have to be running.</p>
+  <h3>What you need</h3>
+  <ul data-requirements>
+    <li>Python 3.12 and uv</li>
+    <li>Node and npm</li>
+    <li>Docker, only if you want PostgreSQL behind it</li>
+  </ul>
+  <h3>The commands</h3>
+  <ol class="steps">
+    <li><span class="step-label">Get the code</span><code>git clone https://github.com/Mehrdadabedin/poker-icm-coach</code></li>
+    <li><span class="step-label">Start the API</span><code>cd backend &amp;&amp; uv run uvicorn app.main:app --reload</code></li>
+    <li><span class="step-label">Start the web app</span><code>cd frontend &amp;&amp; npm install &amp;&amp; npm run dev</code></li>
+    <li><span class="step-label">Add PostgreSQL, optional</span><code>docker compose up -d postgres &amp;&amp; cd backend &amp;&amp; uv run alembic upgrade head</code></li>
+  </ol>
+  <p data-note>The database is optional. Without it the backend keeps tables and tokens in memory on a single worker, so a restart clears whatever you were playing.</p>
+</section>
+
+<section id="stack">
+  <h2>How it is built</h2>
+  <p>React, TypeScript and Vite on the front. Python 3.12, FastAPI, Pydantic v2 and SQLAlchemy 2 on the back, with PostgreSQL through Alembic migrations when you want it. Capacitor packages the same frontend for Android.</p>
+  <p>The backend owns every piece of game state and the frontend renders snapshots of it, which keeps the AI honest: it decides from the same public information you have, never from your hole cards or from streets that have not been dealt. Tests on both sides cover concurrency, ICM equity, the coaching engine and the API.</p>
+  <p><a href="https://github.com/Mehrdadabedin/poker-icm-coach" rel="noreferrer">Read the source on GitHub</a></p>
+</section>
+
+</main>
+
+<footer>
+  <p>ICM Master, built by <a href="https://github.com/Mehrdadabedin" rel="noreferrer">Mehrdad Abedin</a>. The code is on <a href="https://github.com/Mehrdadabedin/poker-icm-coach" rel="noreferrer">GitHub</a>.</p>
+  <p class="small">A training tool. It deals no real money and takes no bets.</p>
+</footer>
+
+<script type="module">
+  if (window.document?.modelContext?.registerTool) {
+    const clean = (node) => (node ? node.textContent.replace(/\s+/g, " ").trim() : "");
+    const page = {
+      page: "ICM Master",
+      purpose: "Landing page for ICM Master, an open source poker ICM trainer: what it does, how ICM decides tournament money, and how to run it.",
+      sections: [...document.querySelectorAll("main section > h2")].map(clean),
+      features: [...document.querySelectorAll("#features .features > li")].map((li) => ({
+        name: clean(li.querySelector("h3")),
+        summary: clean(li.querySelector("p")),
+      })),
+      terms: [...document.querySelectorAll("#explainer dt")].map((dt) => {
+        const fields = {};
+        let node = dt.nextElementSibling;
+        while (node && node.tagName === "DD") {
+          fields[node.dataset.field] = clean(node);
+          node = node.nextElementSibling;
+        }
+        return {
+          term: dt.dataset.term,
+          definition: fields.definition,
+          why_it_matters: fields.why_it_matters,
+          example: fields.example,
+        };
+      }),
+      quickstart: {
+        requirements: [...document.querySelectorAll("#quickstart [data-requirements] li")].map(clean),
+        steps: [...document.querySelectorAll("#quickstart .steps > li")].map((li) => ({
+          label: clean(li.querySelector(".step-label")),
+          command: clean(li.querySelector("code")),
+        })),
+        note: clean(document.querySelector("#quickstart [data-note]")),
+      },
+    };
+
+    const reply = (value) => ({
+      content: [{ type: "text", text: JSON.stringify(value) }],
+      structuredContent: value,
+    });
+    const names = ["describe", "list_features", "explain_icm_term", "get_quickstart"];
+
+    const mc = window.document.modelContext;
+    const none = { type: "object", properties: {}, additionalProperties: false };
+
+    mc.registerTool({
+      name: "describe",
+      description: "Says what this page is about and which other tools it offers.",
+      inputSchema: none,
+      execute: async () =>
+        reply({ page: page.page, purpose: page.purpose, sections: page.sections, tools: names }),
+    });
+
+    mc.registerTool({
+      name: "list_features",
+      description: "Lists what the ICM Master coach and table give you, as name and summary pairs.",
+      inputSchema: none,
+      execute: async () => reply({ features: page.features }),
+    });
+
+    mc.registerTool({
+      name: "explain_icm_term",
+      description: "Explains one tournament poker term with its definition, why it matters and an example.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          term: { type: "string", enum: page.terms.map((t) => t.term) },
+        },
+        required: ["term"],
+        additionalProperties: false,
+      },
+      execute: async ({ term }) => {
+        const hit = page.terms.find((t) => t.term === term);
+        if (!hit) {
+          return {
+            content: [{ type: "text", text: `Unknown term. Use one of: ${page.terms.map((t) => t.term).join(", ")}` }],
+            isError: true,
+          };
+        }
+        return reply(hit);
+      },
+    });
+
+    mc.registerTool({
+      name: "get_quickstart",
+      description: "Returns what you need and the commands to run ICM Master locally.",
+      inputSchema: none,
+      execute: async () => reply(page.quickstart),
+    });
+  }
+</script>
+</body>
+</html>
