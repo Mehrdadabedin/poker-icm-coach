@@ -15,12 +15,18 @@ cd "$ROOT"
 # Part 1: refuse to push this repository anywhere but its own remote.
 # git invokes pre-push as: pre-push <remote-name> <remote-url>
 remote_url="${2:-}"
-case "$remote_url" in
-  https://github.com/Mehrdadabedin/*|git@github.com:Mehrdadabedin/*|ssh://git@github.com/Mehrdadabedin/*) ;;
+# Drop any userinfo, since a personal access token remote reads
+# https://user:token@github.com/... and would otherwise look like a foreign host.
+# This also normalises git@ and ssh://git@ down to the same two shapes.
+bare_url="${remote_url#*@}"
+case "$bare_url" in
+  github.com/Mehrdadabedin/poker-icm-coach|github.com/Mehrdadabedin/poker-icm-coach.git|\
+  github.com:Mehrdadabedin/poker-icm-coach|github.com:Mehrdadabedin/poker-icm-coach.git) ;;
   *)
-    echo "pre-push: refusing, the push URL is not under github.com/Mehrdadabedin" >&2
-    echo "          remote: ${1:-?}" >&2
-    echo "          url:    $remote_url" >&2
+    echo "pre-push: refusing, the push URL is not this repository's own remote" >&2
+    echo "          remote:   ${1:-?}" >&2
+    echo "          url:      $remote_url" >&2
+    echo "          expected: github.com/Mehrdadabedin/poker-icm-coach" >&2
     exit 1
     ;;
 esac
@@ -42,6 +48,7 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   if [ "$local_sha" = "$ZERO" ]; then
     echo "pre-push: blocked deletion of '$branch'" >&2
   elif [ "$remote_sha" != "$ZERO" ] &&
+       git cat-file -e "$remote_sha" 2>/dev/null &&
        ! git merge-base --is-ancestor "$remote_sha" "$local_sha" 2>/dev/null; then
     echo "pre-push: blocked force-push to '$branch'" >&2
   else
