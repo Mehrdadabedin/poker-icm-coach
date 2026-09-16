@@ -73,10 +73,10 @@ describe("ICM MASTER sign-in screen", () => {
     expect(screen.getByTestId("password-input")).toHaveAttribute("placeholder", "Password");
     expect(screen.getByTestId("auth-submit")).toHaveTextContent("Sign in");
     expect(screen.getByTestId("password-toggle")).toHaveAttribute("aria-label", "Show password");
-    // provider pills, sign-up prompt and brand line are all present
-    expect(screen.getByTestId("provider-phone")).toHaveTextContent("Continue with phone");
+    // the Google pill, sign-up prompt and brand line are present
     expect(screen.getByTestId("provider-google")).toHaveTextContent("Continue with Google");
-    expect(screen.getByTestId("provider-apple")).toHaveTextContent("Continue with Apple");
+    expect(screen.queryByTestId("provider-phone")).toBeNull();
+    expect(screen.queryByTestId("provider-apple")).toBeNull();
     expect(screen.getByTestId("go-signup")).toHaveTextContent("Sign up");
     expect(screen.getByText("PRACTICE \u2022 IMPROVE \u2022 WIN")).toBeInTheDocument();
     expect(screen.queryByTestId("confirm-password-input")).toBeNull();

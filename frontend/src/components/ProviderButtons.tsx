@@ -1,11 +1,13 @@
 import { googleSignInUrl, type AuthProviders } from "../services/api";
-import { AppleIcon, ArrowRightIcon, GoogleIcon, PhoneIcon } from "./AuthIcons";
+import { ArrowRightIcon, GoogleIcon } from "./AuthIcons";
 
 type ProviderKind = "phone" | "google" | "apple";
 
-/** Copy for a provider the backend has no flow for. The Google clause is only
- * offered when the providers endpoint reports Google as configured, so the
- * notice never points at a control that would fail. */
+/** Copy for a provider the backend has no flow for. Phone and Apple have no
+ * pill on the sign-in screen any more, so those two branches are kept for the
+ * flows rather than rendered today. The Google clause is only offered when the
+ * providers endpoint reports Google as configured, so the notice never points
+ * at a control that would fail. */
 export function providerNotice(kind: ProviderKind, googleAvailable: boolean): string {
   const googleClause = googleAvailable ? " or continue with Google" : "";
   if (kind === "phone") {
@@ -35,22 +37,23 @@ interface ProviderButtonsProps {
   onNotice: (message: string) => void;
 }
 
-/** The three provider pills plus the "or" rule that separates them from the
- * credential fields. Phone and Apple have no backend flow yet, so their click
- * shows a notice instead of sending the browser anywhere. */
+/** The Google pill and the "or" rule that separates it from the credential
+ * fields. Phone and Apple are not offered on this screen. Google runs no flow
+ * in the browser itself, so the click either leaves for the backend flow or
+ * shows the notice. */
 export function ProviderButtons({ providers, onNotice }: ProviderButtonsProps) {
   const googleAvailable = providers?.google === true;
 
-  const choose = (kind: ProviderKind) => {
-    if (kind === "google" && googleAvailable) {
+  const chooseGoogle = () => {
+    if (googleAvailable) {
       // Server-side flow: the backend holds the client secret and returns the
       // browser to /#/auth/callback with the session token.
       window.location.href = googleSignInUrl();
       return;
     }
-    // A provider that cannot sign anyone in is an error for the user, so the
-    // notice goes through the same red status line as a rejected password.
-    onNotice(providerNotice(kind, googleAvailable));
+    // Google is advertised but cannot sign anyone in, so the notice goes
+    // through the same red status line as a rejected password.
+    onNotice(providerNotice("google", googleAvailable));
   };
 
   return (
@@ -58,42 +61,14 @@ export function ProviderButtons({ providers, onNotice }: ProviderButtonsProps) {
       <div className="auth-providers">
         <button
           type="button"
-          className="auth-provider auth-provider-dark"
-          onClick={() => choose("phone")}
-          data-testid="provider-phone"
-        >
-          <span className="auth-provider-mark">
-            <PhoneIcon />
-          </span>
-          <span className="auth-provider-label">Continue with phone</span>
-          <span className="auth-provider-end">
-            <ArrowRightIcon />
-          </span>
-        </button>
-        <button
-          type="button"
           className="auth-provider auth-provider-light"
-          onClick={() => choose("google")}
+          onClick={chooseGoogle}
           data-testid="provider-google"
         >
           <span className="auth-provider-mark">
             <GoogleIcon />
           </span>
           <span className="auth-provider-label">Continue with Google</span>
-          <span className="auth-provider-end">
-            <ArrowRightIcon />
-          </span>
-        </button>
-        <button
-          type="button"
-          className="auth-provider auth-provider-light"
-          onClick={() => choose("apple")}
-          data-testid="provider-apple"
-        >
-          <span className="auth-provider-mark">
-            <AppleIcon />
-          </span>
-          <span className="auth-provider-label">Continue with Apple</span>
           <span className="auth-provider-end">
             <ArrowRightIcon />
           </span>

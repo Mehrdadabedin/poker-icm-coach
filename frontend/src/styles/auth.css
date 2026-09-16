@@ -9,11 +9,12 @@
 
 .home-page.auth-page,
 .login-panel {
-  /* The mockup is a 1024x1536 frame. --k is one reference pixel: it follows
-     whichever of the two ratios is smaller, so the composition keeps the
-     mockup's share of the frame (about 80% of the height) instead of growing
-     taller than the viewport on wide, short desktop screens. */
-  --k: clamp(0.5px, min(calc(100vw / 1024), calc(100vh / 1536)), 1px);
+  /* --k is one reference pixel. It follows whichever of the two ratios is
+     smaller, so the composition keeps the same share of the frame on any
+     desktop (about 80% of the height, as measured in newloging.png) instead
+     of growing taller than the viewport on wide, short screens. The height
+     divisor is the panel's own ink height at --k = 1: 1050 reference pixels. */
+  --k: clamp(0.5px, min(calc(100vw / 1024), calc(100vh / 1310)), 1px);
   --auth-gold: #fad15a;
   --auth-gold-rule: #fcf159;
   --auth-text: #e9eef5;
@@ -55,7 +56,7 @@
 .auth-title {
   margin: 0;
   color: var(--auth-gold);
-  font-size: calc(54 * var(--k));
+  font-size: calc(63 * var(--k));
   font-weight: 800;
   letter-spacing: calc(2.6 * var(--k));
   line-height: 1.1;
@@ -364,15 +365,15 @@
 .auth-legal-text {
   margin: 0;
   color: #9dacbd;
-  font-size: calc(19 * var(--k));
-  letter-spacing: calc(8 * var(--k));
+  font-size: calc(22 * var(--k));
+  letter-spacing: calc(9 * var(--k));
   /* The trailing letter-space would push the line left of centre. */
-  text-indent: calc(8 * var(--k));
+  text-indent: calc(9 * var(--k));
   text-transform: uppercase;
 }
 
 .auth-legal-rule {
-  width: calc(82 * var(--k));
+  width: calc(95 * var(--k));
   height: calc(5 * var(--k));
   border-radius: calc(3 * var(--k));
   background: var(--auth-gold-rule);
@@ -384,7 +385,7 @@
   padding-top: 0;
   border-top: 0;
   color: var(--auth-gold);
-  font-size: calc(14 * var(--k));
+  font-size: calc(17 * var(--k));
   letter-spacing: calc(1 * var(--k));
   text-align: center;
 }

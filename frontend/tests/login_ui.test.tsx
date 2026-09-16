@@ -86,41 +86,14 @@ describe("provider pills", () => {
     expect(notice).toHaveClass("auth-notice");
   });
 
-  it("shows the Apple notice without a Google clause when Google is absent", async () => {
+  it("renders Google as the only provider pill", async () => {
     await openForm();
-    fireEvent.click(screen.getByTestId("provider-apple"));
-    const notice = screen.getByTestId("provider-notice");
-    expect(notice).toHaveTextContent(
-      "Apple sign-in isn't available yet. For now, you can create an account with Sign up.",
-    );
-    expect(notice).not.toHaveTextContent("Google");
-    expect(notice).toHaveClass("auth-notice");
-  });
-
-  it("shows the phone notice naming the SMS configuration gap", async () => {
-    await openForm();
-    fireEvent.click(screen.getByTestId("provider-phone"));
-    const notice = screen.getByTestId("provider-notice");
-    expect(notice).toHaveTextContent(
-      "Phone sign-in isn't available yet. SMS verification requires additional service configuration.",
-    );
-    expect(notice).toHaveTextContent("you can create an account with Sign up");
-    expect(notice).not.toHaveTextContent("Google");
-  });
-
-  it("offers Google in the Apple notice once Google is configured", async () => {
-    setGoogle(true);
-    await openForm();
-    // wait for the provider lookup to land, otherwise the click reads no-provider
-    await waitFor(() => {
-      expect(getAuthProviders).toHaveBeenCalledTimes(1);
-    });
-    fireEvent.click(screen.getByTestId("provider-apple"));
-    await waitFor(() => {
-      expect(screen.getByTestId("provider-notice")).toHaveTextContent(
-        "Apple sign-in isn't available yet. For now, you can create an account with Sign up or continue with Google.",
-      );
-    });
+    expect(screen.getByTestId("provider-google")).toHaveTextContent("Continue with Google");
+    // phone and Apple were removed from this screen
+    expect(screen.queryByTestId("provider-phone")).toBeNull();
+    expect(screen.queryByTestId("provider-apple")).toBeNull();
+    expect(screen.queryByText(/continue with phone/i)).toBeNull();
+    expect(screen.queryByText(/continue with apple/i)).toBeNull();
   });
 
   it("sends the browser to the Google flow when Google is configured", async () => {
