@@ -10,6 +10,15 @@ your sessions with statistics, hand history and ICM-aware feedback.
 
 ---
 
+## Website
+
+- [Live site](https://mehrdadabedin.github.io/poker-icm-coach/)
+- [Hosted UI preview](https://mehrdadabedin.github.io/poker-icm-coach/app/). This is the
+  interface only. GitHub Pages serves static files and runs no backend, so real play needs
+  the backend running (see [How to run locally](#how-to-run-locally)).
+
+---
+
 ## Features
 
 - **9-player table**: 1 human Hero + 8 AI opponents, dealer button rotation, correct
