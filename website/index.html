@@ -107,7 +107,7 @@
 
 <section id="features">
   <h2>What the coach tells you</h2>
-  <p>By default the table starts with 45,000 chips, 100/100 blinds and 20-minute levels, with a blind timer, a fast mode, and no ante, traditional ante or big-blind ante.</p>
+  <p>By default the table starts with 45,000 chips, 100/100 blinds and 20-minute levels, with a blind timer, a fast mode, and a choice of no ante, traditional ante or big-blind ante.</p>
   <ul class="features">
     <li>
       <h3>Exact ICM equity</h3>
@@ -134,8 +134,8 @@
       <p>Tight, aggressive, TAG, loose, LAG, passive, balanced and adaptive. None of them can see your cards or the streets still to come.</p>
     </li>
     <li>
-      <h3>Coaching at your level, and a test mode</h3>
-      <p>Explanations at BEGINNER, INTERMEDIATE or ADVANCED depth. Test mode stays quiet until you act, then grades the decision PREFERRED, ACCEPTABLE or SUBOPTIMAL.</p>
+      <h3>Explanation depth, and a test mode</h3>
+      <p>The coach engine has three depths, BEGINNER, INTERMEDIATE and ADVANCED, and the app ships the advanced one. Test mode stays quiet until you act, then grades the decision PREFERRED, ACCEPTABLE or SUBOPTIMAL.</p>
     </li>
     <li>
       <h3>Session review</h3>
@@ -212,8 +212,8 @@
   if (window.document?.modelContext?.registerTool) {
     const clean = (node) => (node ? node.textContent.replace(/\s+/g, " ").trim() : "");
     const page = {
-      page: "ICM Master",
-      purpose: "Landing page for ICM Master, an open source poker ICM trainer: what it does, how ICM decides tournament money, and how to run it.",
+      page: clean(document.querySelector(".wordmark")),
+      purpose: document.querySelector('meta[name="description"]').content,
       sections: [...document.querySelectorAll("main section > h2")].map(clean),
       features: [...document.querySelectorAll("#features .features > li")].map((li) => ({
         name: clean(li.querySelector("h3")),

@@ -1,3 +1,7 @@
+# Crawlers read robots.txt at the origin root, which for a project Pages site is
+# mehrdadabedin.github.io/robots.txt and belongs to a different repository. This
+# file is only consulted if the site moves to its own domain. Until then the
+# sitemap has to be submitted by hand in Search Console.
 User-agent: *
 Allow: /
 

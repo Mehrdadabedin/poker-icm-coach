@@ -8,8 +8,10 @@
   --rule: #c7d2c5;
   --felt: #1c4b39;
   --felt-soft: #d7e3d8;
-  --brass: #8a5e12;
   --brass-line: #b8862a;
+  /* Focus is felt green, not brass: brass on the light ground is 2.84:1, under
+     the 3:1 minimum for a non-text indicator. */
+  --focus: #1c4b39;
   --shade: rgba(184, 134, 42, 0.18);
   --serif: Charter, "Bitstream Charter", "Iowan Old Style", Georgia, "Liberation Serif", serif;
   --sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -25,8 +27,8 @@
     --rule: #22402f;
     --felt: #58b98f;
     --felt-soft: #16332a;
-    --brass: #e0ae4c;
     --brass-line: #e0ae4c;
+    --focus: #e0ae4c;
     --shade: rgba(224, 174, 76, 0.16);
   }
 }
@@ -45,7 +47,7 @@ body {
 
 a { color: var(--ink); text-decoration-color: var(--brass-line); text-underline-offset: 3px; }
 a:hover { text-decoration-thickness: 2px; }
-:focus-visible { outline: 3px solid var(--brass-line); outline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
 
 h1, h2, h3 { font-weight: 600; line-height: 1.2; margin: 0 0 0.6rem; }
 h1 { font-size: 2rem; letter-spacing: -0.015em; }

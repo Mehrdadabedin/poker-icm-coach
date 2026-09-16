@@ -42,7 +42,8 @@ Returns: `{ requirements: string[], steps: [{ label, command }], note }`
 
 - 9-player Texas Hold'em tournament trainer: 1 human hero, 8 AI opponents with distinct personalities (tight, aggressive, TAG, loose, LAG, passive, balanced, adaptive).
 - Exact Independent Chip Model equity for up to 9 players, plus tournament-stage detection, bubble pressure, risk premium, push/fold engine, 13x13 range matrix, SPR and board texture.
-- Coach detail levels BEGINNER, INTERMEDIATE, ADVANCED. Test mode grades a decision PREFERRED, ACCEPTABLE or SUBOPTIMAL after you act.
+- Coach engine has three detail levels, BEGINNER, INTERMEDIATE and ADVANCED; the app
+  ships ADVANCED. Test mode grades a decision PREFERRED, ACCEPTABLE or SUBOPTIMAL after you act.
 - Session review covers hand history, VPIP, PFR, aggression, coach agreement, ICM mistakes, position and stack performance, biggest-leak detection.
 - Tournament defaults: 45,000 starting chips, 100/100 blinds, 20-minute levels, blind timer with a fast mode. Antes: none, traditional or big-blind ante.
 - Stack: React + TypeScript + Vite front end. Python 3.12 + FastAPI + Pydantic v2 + SQLAlchemy 2 back end. PostgreSQL via Alembic. Android packaging via Capacitor.

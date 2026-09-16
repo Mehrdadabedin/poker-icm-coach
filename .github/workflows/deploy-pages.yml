@@ -47,8 +47,11 @@ jobs:
         run: |
           rm -rf _site
           mkdir -p _site/app
-          if [ -d website ]; then cp -r website/. _site/; fi
+          cp -r website/. _site/
           cp -r frontend/dist/. _site/app/
+          # Source for og.png, rendered once and committed. Shipping it would
+          # publish a second indexable page with the same words as the real one.
+          rm -f _site/og-image.html
 
       - name: Configure Pages
         uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
