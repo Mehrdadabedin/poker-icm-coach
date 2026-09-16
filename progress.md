@@ -1081,3 +1081,147 @@ PROBLEMS DISCOVERED / FIXED
   the whole screen was rebuilt against measured geometry.
 - `provider-notice` wording was made conditional so it never points at a
   Google button that is not configured.
+
+## Session: login error styling + Google OAuth repair (2026-09-14)
+
+Two phases, two commits, kept separate.
+
+### Phase 1 - `055f385 fix: style Google sign-in error message`
+- The Google "not available" notice now renders red (#ff6b6b) through a new
+  `.auth-notice-error` rule. Box, size, position, layout and wording unchanged;
+  Apple and phone notices keep the neutral tone.
+- Tone plumbing: `AuthMessages` accepts `noticeTone`, `ProviderButtons` passes
+  "error" for Google and "status" for Apple/phone, `LoginForm` carries it.
+- Verified in a browser: computed color rgb(255,107,107) on the Google notice,
+  rgb(207,217,229) on the Apple notice, same box geometry and wording.
+- Frontend: 54 tests pass, tsc clean, build ok.
+- The earlier resize of the login page (auth.css `--k`) is still uncommitted and
+  was deliberately kept out of this commit.
+
+### Phase 2 - `bc3fb39 fix: repair Google OAuth authentication`
+
+Exact failure point (evidence, not guesswork):
+- `GET https://poker-icm-coach.onrender.com/api/auth/providers` ->
+  `{"google":false,"apple":false,"phone":false}`
+- `GET .../api/auth/google/start?redirect_uri=https://icm-master-frontend.onrender.com/#/auth/callback`
+  -> `503 {"detail":"google sign-in is not configured"}`
+- Cause: the backend process has no `GOOGLE_CLIENT_ID` and no
+  `GOOGLE_CLIENT_SECRET` (both unset on Render, and also unset in
+  `backend/.env`). The frontend therefore never navigates: the pill reads
+  `google:false` and shows the notice.
+- Not the cause: routes exist; the live backend echoes the production frontend
+  origin in CORS (`ACAO: https://icm-master-frontend.onrender.com`); the redirect
+  URI derivation is correct (`https://poker-icm-coach.onrender.com/api/auth/google/callback`
+  with Render's proxy headers); the frontend bundle in production already
+  contains the Google handler and the backend URL.
+
+Verified working (faked Google token endpoint through the documented
+`_http_post_json` seam, real HTTP, real app):
+| Step | Result |
+| --- | --- |
+| providers (configured) | `{"google":true,...,"google_missing":[]}` |
+| start | 302 to accounts.google.com with a single-use state, no secret in the URL |
+| callback | 302 to `http://localhost:5173/#/auth/callback?token=..&username=fakeuser` |
+| `GET /api/auth/me` with the minted token | 200 `{"username":"fakeuser"}` |
+| second sign-in, same Google subject | same user (no duplicate account) |
+| password login on a Google account | 401 |
+| providers (unconfigured) | `"google_missing":["GOOGLE_CLIENT_ID","GOOGLE_CLIENT_SECRET"]` |
+| start (unconfigured) | 503 `"google sign-in is not configured: missing GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET"` |
+
+Fix in this commit: the failure is now self-diagnosing. `providers` returns
+`google_missing` with variable NAMES (never values) and the 503 detail names
+them too. `app/services/google_config.py` holds the configuration probes so
+every module stays under 200 lines; the OAuth flow itself is unchanged.
+
+Still required (deployment configuration, cannot be done from the repository):
+1. `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` on the backend service.
+2. Google Cloud console authorized redirect URI
+   `https://poker-icm-coach.onrender.com/api/auth/google/callback`.
+3. Production retest after both are set: click Continue with Google and confirm
+   the redirect back to `/#/auth/callback` and an authenticated home screen.
+
+Residual risk noted, not changed: the OAuth state store is in-process (like
+`auth_store`), so a backend restart between start and callback invalidates an
+in-flight sign-in.
+
+Tests: backend 48 passed (google flow 11, google config 2, isolation 18,
+tournament regression, project setup 12); ruff clean for the touched files
+(2 pre-existing errors elsewhere); mypy shows only the 3 pre-existing
+`routes_meta` errors; frontend 54 passed, tsc clean, production build ok.
+
+Not pushed: both commits are local on `fix/tournament-settings-500`.
+
+## Phase 3 - login UI corrections (compact layout, red errors, gold copyright)
+
+- Layout root cause: the deployed build scaled by width only
+  (`clamp(.5px, calc(100vw / 1024), 1px)`). At 1440x900 that gives the block
+  716x1021, so the page overflowed and read as oversized. `--k` now takes the
+  smaller of the width and height ratios: 420x747 at 1440x900, no scrolling.
+- Error colour: `.auth-error` moved from the salmon `#ff9a92` to `--auth-red`
+  `#ff6b6b`; `.auth-notice` (Google, Apple, phone) is that same red on a
+  subtle red tint, so one container serves every message. Removed the
+  `NoticeTone` prop chain that existed only to redden Google.
+- Footer: `PRACTICE - IMPROVE - WIN` unchanged (muted), copyright line now
+  uses `--auth-gold` `#fad15a`.
+- Evidence: production bundle = local build byte for byte
+  (`assets/index-DupqyMOE.css`, 28062 bytes); browser checks on
+  https://icm-master-frontend.onrender.com give the same numbers as local.
+- Auth untouched: no OAuth, backend, session, cookie or CORS file is in the
+  commit. Signup, session-across-reload, logout and sign in verified locally.
+
+## Phase 4 - login page simplified to newloging.png
+
+- Reference is `newloging.png` (note the extra "g"; `newlogin.png` does not
+  exist), a 1665x944 frame: 505px column, ink spanning 756px = 80% of the
+  frame height. Phone and Apple pills removed from the UI; Google is the only
+  provider pill left, above the "or" rule.
+- Scale rule retuned for the shorter layout:
+  `--k: clamp(0.5px, min(calc(100vw / 1024), calc(100vh / 1310)), 1px)`,
+  where 1310 = the panel's ink height at --k = 1 (1050) / 0.803. Before this
+  the height divisor (1536) described the five-block layout, so the block was
+  too small; the width term still governs narrow screens and the 0.5px clamp
+  floor still governs phones.
+- Typography measured against the new reference and adjusted: gold title 54 ->
+  63, caps line 19 -> 22 (letter-spacing 8 -> 9), gold caps rule 82 -> 95,
+  copyright 14 -> 17. Subtitle, pill label, placeholders, Sign in label and
+  the switch prompt already matched within ~3% and were left alone.
+- Verified at 1665x944, 1440x900, 1920x1080, 1366x768 and 390x844: exactly one
+  provider pill, centred within 2px, no horizontal or vertical overflow, ink
+  height 758 against the reference's 756, block 81% of the frame height.
+  Production gives byte-identical results to local.
+- `providerNotice` keeps the phone/Apple copy and `auth.css` keeps the unused
+  `.auth-provider-dark`, `.ico-phone` and `.ico-apple` rules, so the flows can
+  come back without re-deriving them.
+- 52 frontend tests, tsc, oxlint, build, and the local signup/session/logout/
+  sign-in run all pass; no backend or OAuth file is touched.
+- Commit `d24e121 feat: simplify login page UI`, pushed; Render serves
+  `assets/index-rcu592YB.css`, the local build's own hash.
+
+## Phase 5 - icm-master-mcp diagnostics foundation
+
+- Stack correction: the backend is FastAPI + SQLAlchemy/PostgreSQL, not Django.
+  Diagnostics therefore inspect `backend/app/api/routes_oauth.py`,
+  `app/core/config.py` and `app/main.py`, plus the live OpenAPI document.
+- New `mcp/` package (30 files, own `.venv` and `uv.lock`, `package = false`):
+  8 read-only tools, one diagnostics module per subject, a redaction layer and
+  61 tests. Nothing in `backend/` or `frontend/` changed (`git diff HEAD` for
+  both trees is empty).
+- Security: credentials are reported as present/missing by NAME, values are
+  never read; every result passes `redaction.redact_tree`, which also strips
+  `code=`/`access_token=`/`client_secret=` and GOCSPX/ya29/JWT shapes; only
+  three allowlisted GET paths, only to loopback or `*.onrender.com` hosts; no
+  shell tool, no file-reading tool, no write tool.
+- Live checks: the local backend answers `/api/health` and `/api/auth/providers`,
+  `/openapi.json` confirms both Google routes. With no credentials the report is
+  `configuration_error` naming GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET; with
+  credentials present it is `healthy`. Client secret never appears in output.
+- MCP Inspector (`mcp dev server.py`) serves 127.0.0.1:6274, loopback only. The
+  stdio behaviour was verified with a real MCP client, not through the browser UI.
+- Regression: 52 frontend tests pass, tsc clean, vite build clean, 43 auth/OAuth
+  backend tests pass. Backend suite: 448 passed, 9 failed, 4 skipped with
+  `tests/test_table_lifecycle.py` ignored (it cannot import `_sessions`, and the
+  9 failures come from `routes_meta.py` calling `SettingsStore.update`, which
+  does not exist). Both are pre-existing and independent of this change.
+  Frontend lint has one pre-existing error in `tests/useAutoNext.test.tsx`.
+- Committed locally, not pushed: pushing would trigger Render rebuilds for no
+  code change, and this task says not to deploy the MCP server.
