@@ -35,10 +35,13 @@ Both suites green before and after. Report counts.
 Enable the pre-push hook once per clone, since `git clone` does not copy hooks:
 
 ```bash
-git config core.hooksPath .githooks
+sh scripts/install-hooks.sh     # or: git config core.hooksPath .githooks
 ```
 
-It runs every gate CI runs. Do not push with `--no-verify` unless you can say
+It runs every gate CI runs and blocks direct pushes to `main`, so every change
+reaches `main` through a pull request. The block is local only: a clone that
+never ran the installer is not covered, and `main` has no server-side branch
+protection because that needs admin rights on the repository. Do not push with `--no-verify` unless you can say
 why in the commit message. CI itself has never run on this repository, see
 issue #8, so the hook is currently the only thing checking anything.
 Global `mypy`/`tsc` run outside the project env — their missing-stub errors are
