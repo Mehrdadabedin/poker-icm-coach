@@ -8,6 +8,10 @@
   --rule: #c7d2c5;
   --felt: #1c4b39;
   --felt-soft: #d7e3d8;
+  /* The card mat stays dark green in both themes: playing cards are white, and
+     white on a light green ground loses the cards' own edges. */
+  --table-felt: #1c4b39;
+  --table-felt-lit: #2d6f53;
   --brass-line: #b8862a;
   /* Focus is felt green, not brass: brass on the light ground is 2.84:1, under
      the 3:1 minimum for a non-text indicator. */
@@ -27,6 +31,8 @@
     --rule: #22402f;
     --felt: #58b98f;
     --felt-soft: #16332a;
+    --table-felt: #123527;
+    --table-felt-lit: #1d5940;
     --brass-line: #e0ae4c;
     --focus: #e0ae4c;
     --shade: rgba(224, 174, 76, 0.16);
@@ -98,6 +104,49 @@ figcaption {
   color: var(--muted);
   max-width: 34rem;
   margin-top: 0.8rem;
+}
+
+/* Screenshots and card art */
+
+.shot { margin: 2.2rem 0 0; }
+
+.shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+
+.shot-table {
+  padding: 0.6rem;
+  background: var(--felt-soft);
+  border: 1px solid var(--rule);
+  border-top: 3px solid var(--brass-line);
+}
+
+.shot-table figcaption { margin: 0.8rem 0.2rem 0.2rem; }
+
+.shot-panel { max-width: 30rem; }
+.shot-panel img { border: 1px solid var(--rule); }
+
+.hand { margin: 2rem 0 0; }
+
+.hand-cards {
+  display: flex;
+  gap: 0.5rem;
+  width: fit-content;
+  padding: 0.9rem;
+  background: radial-gradient(120% 150% at 28% 0%, var(--table-felt-lit), var(--table-felt) 72%);
+  border: 2px solid var(--brass-line);
+  border-radius: 12px;
+}
+
+.hand-cards img {
+  display: block;
+  width: 104px;
+  height: auto;
+  border-radius: 5px;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, 0.4);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -200,15 +249,18 @@ footer .small { font-size: 0.95rem; }
   .ctas { display: flex; flex-wrap: wrap; gap: 1.5rem 2rem; align-items: start; }
   .ctas > li { flex: 1 1 18rem; margin-bottom: 0; }
   .features { display: grid; grid-template-columns: 1fr 1fr; gap: 0 2.5rem; }
+  .hand-cards img { width: 128px; }
 }
 
 @media (min-width: 60em) {
   h1 { font-size: 3.1rem; max-width: 16ch; }
   .hero { display: grid; grid-template-columns: 1fr 1fr; gap: 0 3rem; align-items: end; }
-  .wordmark, .hero > nav { grid-column: 1 / -1; }
+  .wordmark, .hero > nav, .hero > .shot-table { grid-column: 1 / -1; }
   .curve { margin: 0; grid-column: 2; grid-row: 2 / span 2; }
   .curve-svg { max-width: none; }
   .lede { align-self: start; }
+  .features-lead { display: grid; grid-template-columns: 1fr 30rem; gap: 0 2.5rem; align-items: start; }
+  .features-lead .shot-panel { margin-top: 0; }
   .terms { display: grid; grid-template-columns: 14rem 1fr; column-gap: 2.5rem; }
   .terms dt { grid-column: 1; margin-bottom: 0; }
   .terms dd { grid-column: 2; }
