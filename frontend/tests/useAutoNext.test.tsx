@@ -6,6 +6,15 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { act, renderHook } from "@testing-library/react";
 import { useAutoNext } from "../src/hooks/useAutoNext";
 
+function setup() {
+  const next = vi.fn();
+  const { result } = renderHook(() => useAutoNext(next, 10));
+  act(() => {
+    result.current.start(10);
+  });
+  return { next, result };
+}
+
 describe("useAutoNext post-hand countdown (10s)", () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -13,15 +22,6 @@ describe("useAutoNext post-hand countdown (10s)", () => {
   afterEach(() => {
     vi.useRealTimers();
   });
-
-  function setup() {
-    const next = vi.fn();
-    const { result } = renderHook(() => useAutoNext(next, 10));
-    act(() => {
-      result.current.start(10);
-    });
-    return { next, result };
-  }
 
   it("starts at 10, reaches 0, holds 0 for a second, then triggers next-hand", () => {
     const { next, result } = setup();

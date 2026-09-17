@@ -4,14 +4,19 @@ Extracted from the game router so the WebSocket endpoint and the meta routes
 can reach tables without importing a router's privates (and without the
 function-local imports that used to paper over the resulting cycle).
 
-A GameSession has no terminal state — nothing ever marks a table finished — so
-the store caps how many tables one user may hold and drops their oldest beyond
-that. Without the cap every POST /api/tournament leaks a 9-player table for
-the lifetime of the process.
+Eviction order (issue #5): finished tables go first, then tables idle past
+their timeout, and only then does the per-user cap drop a genuinely live one.
+An engaged table is never removed by an arbitrary timer, since `state()`
+refreshes `last_seen` on every view. Without any of this every POST
+/api/tournament leaks a 9-player table for the lifetime of the process.
 """
 from __future__ import annotations
 
-from app.services.game_session import GameSession
+import time
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:  # runtime import would cycle: game_session marks its own end
+    from app.services.game_session import GameSession
 
 MAX_TABLES_PER_USER = 20
 
@@ -46,7 +51,13 @@ class SessionStore:
         return label
 
     def add(self, session: GameSession) -> None:
-        """Register a table, evicting the owner's oldest beyond the cap."""
+        """Register a table, evicting ended ones before capping live ones.
+
+        The sweep covers every owner, not just this one: a user who finishes or
+        abandons a table and never creates another would otherwise leak it for
+        the life of the process, which is the leak this store exists to stop.
+        """
+        self.evict_ended()
         if session.owner:
             self._evict_oldest(session.owner)
         self._sessions[session.session_id] = session
@@ -58,10 +69,47 @@ class SessionStore:
         """The user's tables, oldest first."""
         return [s for s in self._sessions.values() if s.owner == user]
 
+    def evict_ended(self, owner: str | None = None, now: float | None = None) -> int:
+        """Drop finished and idle-past-timeout tables. Returns the count."""
+        dead = [
+            s.session_id for s in self._sessions.values()
+            if (owner is None or s.owner == owner)
+            and (s.status in ("finished", "abandoned") or check_abandoned(s, now))
+        ]
+        for session_id in dead:
+            self._sessions.pop(session_id, None)
+        return len(dead)
+
     def _evict_oldest(self, user: str) -> None:
         owned = [s.session_id for s in self.owned_by(user)]
         for session_id in owned[: max(0, len(owned) - MAX_TABLES_PER_USER + 1)]:
             self._sessions.pop(session_id, None)
+
+
+def mark_finished(session: GameSession) -> bool:
+    """Mark a table finished once hero is out and no live opponent remains.
+
+    Records the terminal state for eviction. It never changes the poker or
+    re-entry rules, which stay in the engine."""
+    hero = session.tournament.players[session.hero_seat]
+    others_alive = [
+        p for p in session.tournament.players
+        if p.seat != session.hero_seat and not p.is_eliminated and not p.sit_out
+    ]
+    if hero.is_eliminated and not others_alive:
+        session.status = "finished"
+        return True
+    return False
+
+
+def check_abandoned(session: GameSession, now: float | None = None) -> bool:
+    """Mark a long-idle active table abandoned. An engaged table keeps
+    refreshing last_seen through state(), so it is never caught by this."""
+    now = now or time.time()
+    if session.status == "active" and now - session.last_seen > session.idle_timeout:
+        session.status = "abandoned"
+        return True
+    return False
 
 
 session_store = SessionStore()
