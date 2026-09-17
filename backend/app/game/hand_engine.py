@@ -24,6 +24,7 @@ from app.game.street_flow import (
     owes_a_decision,
     rotate_after,
     runout_and_showdown,
+    with_chips,
 )
 from app.poker.deck import Deck
 from app.tournament.tournament import Tournament
@@ -69,7 +70,7 @@ class HandEngine:
         self._deck.shuffle()
         deal_hole_cards(active_players(self.tournament.players), self._deck)
         self.street = "preflop"
-        self._queue = deque(self._order("preflop", active))
+        self._queue = deque(with_chips(self._order("preflop", active), self._active_non_allin()))
 
     @property
     def current_actor(self) -> int | None:
@@ -156,7 +157,7 @@ class HandEngine:
         self._street = StreetState()
         # New street: only in-hand (non-folded) players may act.
         active = sorted(in_hand_seats(self.tournament.players))
-        self._queue = deque(self._order(self.street, active))
+        self._queue = deque(with_chips(self._order(self.street, active), self._active_non_allin()))
 
     def _deal_next_street(self) -> None:
         deal_next_street(self)

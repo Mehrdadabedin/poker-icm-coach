@@ -97,3 +97,30 @@ def test_every_seat_acts_before_anyone_acts_twice() -> None:
             assert not repeats, (
                 f"seed {seed} street {street}: {repeats} acted only after a seat's second turn"
             )
+
+
+def test_a_seat_all_in_on_its_blind_is_not_asked_to_act() -> None:
+    """A blind or an ante can take a short stack's last chip. That seat used to
+    be queued anyway and offered FOLD as its only legal action, which asks a
+    player to fold a hand they are already all-in on."""
+    session = GameSession(starting_stack=45_000, fast_mode=1.0, rng=random.Random(5))
+    tournament = session.tournament
+    tournament.ante_mode = "traditional"
+    for seat, player in enumerate(tournament.players):
+        if seat > 2:
+            player.is_eliminated = True
+            player.stack = 0
+    tournament.players[0].stack = 5  # cannot cover the ante, let alone a blind
+    session.start()
+    engine = session.engine
+    assert engine is not None
+
+    assert tournament.players[0].stack == 0, "the short stack should be all-in on the post"
+    assert 0 not in engine._queue, "an all-in seat was queued to act"
+    while not engine.is_complete and engine.current_actor is not None:
+        actor = engine.current_actor
+        assert tournament.players[actor].stack > 0, f"seat {actor} has no chips but was asked to act"
+        if tournament.players[actor].is_human:
+            engine.act(actor, Action(ActionType.FOLD))
+        else:
+            engine.advance_bot(actor)

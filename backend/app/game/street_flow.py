@@ -64,3 +64,14 @@ def rotate_after(order: list[int], seat: int) -> list[int]:
         return order
     index = order.index(seat)
     return order[index + 1:] + order[: index + 1]
+
+
+def with_chips(seats: list[int], live: list[int]) -> list[int]:
+    """Only seats that can still put chips in get a turn.
+
+    A blind or an ante can take a short stack's last chip, and that seat was
+    still queued to act, then offered FOLD as its only legal action. It is
+    all-in already and owes nothing.
+    """
+    playable = set(live)
+    return [seat for seat in seats if seat in playable]
