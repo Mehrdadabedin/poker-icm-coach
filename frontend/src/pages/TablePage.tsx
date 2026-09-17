@@ -33,6 +33,10 @@ export function TablePage() {
   const [comparison, setComparison] = useState<Record<string, string> | null>(null);
   const { actionLabels, resultLabels } = useLabelPreferences();
 
+  // street is a dependency because the hero can be the actor twice in one hand,
+  // once preflop and again on the flop. Nothing else here changes between those
+  // two turns when the poll never catches the gap, so the panel kept showing
+  // preflop pot odds and a board texture of n/a with three cards out.
   useEffect(() => {
     if (state?.waitingForHero) {
       coachAdvice(tableId)
@@ -41,7 +45,7 @@ export function TablePage() {
     } else if (state?.phase !== "handOver") {
       setCoach(null);
     }
-  }, [state?.waitingForHero, state?.handNumber, state?.phase, tableId]);
+  }, [state?.waitingForHero, state?.handNumber, state?.phase, state?.street, tableId]);
 
   // Auto-next only on the table result state; review suspends it (A10/A16).
   useEffect(() => {
