@@ -47,6 +47,10 @@ def legal_actions(
     """Actions the player may legally take right now (bounded by stack)."""
     to_call = amount_to_call(current_bet, player_contribution)
     min_raise = min_raise_amount(current_bet, last_raise)
+    # Raise and all-in amounts are street totals, so what is already in front of
+    # the player counts toward them. Sizing off the bare stack understated both
+    # by the player's contribution and put the real shove out of reach.
+    reach = player_contribution + stack
     actions: list[Action] = []
     actions.append(Action(ActionType.FOLD))
     if to_call == 0:
@@ -58,10 +62,10 @@ def legal_actions(
             actions.append(Action(ActionType.CALL, amount=to_call, max_amount=stack))
         if stack > to_call and min_raise > 0:
             actions.append(
-                Action(ActionType.RAISE, min_amount=min_raise, max_amount=stack, amount=None)
+                Action(ActionType.RAISE, min_amount=min_raise, max_amount=reach, amount=None)
             )
     if stack > 0:
-        actions.append(Action(ActionType.ALL_IN, amount=stack, is_all_in=True))
+        actions.append(Action(ActionType.ALL_IN, amount=reach, is_all_in=True))
     return actions
 
 
@@ -69,8 +73,12 @@ def _raise_to_amount(amount: int, current_bet: int, contribution: int, stack: in
     min_raise = min_raise_amount(current_bet, last_raise)
     if amount < min_raise:
         raise ValueError(f"raise to {amount} below minimum {min_raise}")
-    if amount > current_bet + stack:
-        raise ValueError(f"raise to {amount} beyond stack reach")
+    # current_bet + stack let a raise through that the player could not pay, and
+    # it failed later inside commit_bet with a message about a bet nobody asked
+    # for. The reach is what is already committed plus what is left.
+    reach = contribution + stack
+    if amount > reach:
+        raise ValueError(f"raise to {amount} beyond stack reach {reach}")
 
 
 def validate_action(

@@ -15,7 +15,7 @@ function renderControls(overrides?: Partial<Parameters<typeof HeroControls>[0]>)
       { kind: "fold" },
       { kind: "check" },
       { kind: "bet", minAmount: 100, maxAmount: 20000 },
-      { kind: "all_in" },
+      { kind: "all_in", amount: 20000 },  // the engine always sizes it
     ]),
     toCall: 0,
     pot: 800,
@@ -65,9 +65,9 @@ describe("HeroControls", () => {
     expect(onAction).toHaveBeenCalledWith("check", undefined);
   });
 
-  it("emits all-in with stack", async () => {
+  it("emits all-in for the amount the engine sized", async () => {
     const onAction = renderControls();
-    await userEvent.click(screen.getByText("ALL-IN"));
+    await userEvent.click(screen.getByRole("button", { name: /all-in/i }));
     expect(onAction).toHaveBeenCalledWith("all_in", 20000);
   });
 
@@ -140,5 +140,41 @@ describe("Phase 7 label preference", () => {
     );
     expect(container.textContent).toContain("FOLD");
     expect(container.textContent).toContain("CHECK");
+  });
+});
+
+describe("all-in sizing", () => {
+  const base = {
+    toCall: 800, pot: 2000, stack: 5000, bigBlind: 100,
+    disabled: false, onAction: vi.fn(),
+  };
+
+  it("shoves for the street total the engine advertises, not the bare stack", () => {
+    const onAction = vi.fn();
+    render(
+      <HeroControls
+        {...base}
+        onAction={onAction}
+        legalActions={[
+          { kind: "fold" },
+          { kind: "call", amount: 800 },
+          { kind: "all_in", amount: 5200 },
+        ]}
+      />,
+    );
+    const allIn = screen.getByRole("button", { name: /all-in/i });
+    expect(allIn.textContent).toContain("5,200");
+    fireEvent.click(allIn);
+    expect(onAction).toHaveBeenCalledWith("all_in", 5200);
+  });
+
+  it("hides all-in when the engine does not offer it", () => {
+    render(
+      <HeroControls
+        {...base}
+        legalActions={[{ kind: "fold" }, { kind: "call", amount: 800 }]}
+      />,
+    );
+    expect(screen.queryByRole("button", { name: /all-in/i })).toBeNull();
   });
 });
