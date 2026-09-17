@@ -76,3 +76,19 @@ def distribute_pots(
             base, odd = divmod(pot.total_amount, len(winners))
             for i, seat in enumerate(winners):
                 players[seat].add_chips(base + (1 if i < odd else 0))
+
+
+def merge_equal_pots(pots: list[SidePot]) -> list[SidePot]:
+    """Fold neighbouring layers that the same seats can win into one.
+
+    Two layers with identical eligibility are one pot in every way that
+    matters, and keeping them apart rounds the odd chip of a split pot once per
+    layer instead of once.
+    """
+    merged: list[SidePot] = []
+    for pot in pots:
+        if merged and merged[-1].eligible_seats == pot.eligible_seats:
+            merged[-1].total_amount += pot.total_amount
+            continue
+        merged.append(pot)
+    return merged

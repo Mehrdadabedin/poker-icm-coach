@@ -168,7 +168,9 @@ class HandEngine:
         if self.is_complete:
             return
         in_hand = in_hand_seats(self.tournament.players)
-        winners, showed, pot_total = settle(self.tournament.players, in_hand, self._board)
+        winners, showed, pot_total = settle(
+            self.tournament.players, in_hand, self._board, self.tournament.ante_mode,
+        )
         self.is_complete = True
         self.street = "complete"
         self.result = HandResult(

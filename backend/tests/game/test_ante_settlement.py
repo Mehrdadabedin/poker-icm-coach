@@ -1,4 +1,9 @@
-"""Antes are dead money at showdown, not a wager anyone matched.
+"""How each ante style settles.
+
+A big blind ante is posted by one seat for the whole table, so it is dead money
+everyone contests. A traditional ante is posted by every player, so it ladders
+like any other contribution and a short stack that could post only part of one
+wins only that much of each opponent's ante.
 
 Settlement read every chip off bet_total, so a big blind ante looked like a
 bet only the big blind had made. Two consequences, both reproduced below: the
@@ -45,7 +50,7 @@ def test_a_losing_big_blind_does_not_get_its_ante_back() -> None:
     players = _table(live={0: 200, 1: 200, 2: 200}, antes={1: 200})
     before = {p.seat: p.stack for p in players}
 
-    winners, _showed, pot_total = settle(players, {0, 1, 2}, BOARD)
+    winners, _showed, pot_total = settle(players, {0, 1, 2}, BOARD, "bba")
 
     assert pot_total == 800, "the ante has to be in the pot"
     by_seat = {p.seat: p for p in players}
@@ -67,7 +72,7 @@ def test_a_player_all_in_for_only_an_ante_wins_only_the_antes() -> None:
     players[1].set_hole_cards(HANDS[2])
     before = {p.seat: p.stack for p in players}
 
-    _winners, _showed, pot_total = settle(players, {0, 1, 2}, BOARD)
+    _winners, _showed, pot_total = settle(players, {0, 1, 2}, BOARD, "bba")
 
     by_seat = {p.seat: p for p in players}
     assert pot_total == 600
@@ -96,3 +101,36 @@ def test_the_chips_balance_across_every_ante_mode() -> None:
                 guard += 1
             total = sum(p.stack for p in session.tournament.players)
             assert total == 9 * 45_000, f"{mode} seed {seed}: {total} chips in play"
+
+
+def test_a_partial_traditional_ante_wins_only_what_it_paid() -> None:
+    """Seat 0 could only post 5 of the 20 ante, then had nothing live. With the
+    best hand it wins 5 from each ante and no more. Treating every ante as one
+    shared dead layer paid it 45 instead of 15."""
+    players = _table(live={1: 200, 2: 200}, antes={0: 5, 1: 20, 2: 20})
+    players[0].stack = 0
+    before = {p.seat: p.stack for p in players}
+
+    _winners, _showed, pot_total = settle(players, {0, 1, 2}, BOARD, "traditional")
+
+    by_seat = {p.seat: p for p in players}
+    assert pot_total == 445
+    assert by_seat[0].stack == 15, "the short ante can only win 5 from each of the three"
+    assert by_seat[1].stack == before[1] + 430, "the rest belongs to the best live hand"
+    assert by_seat[2].stack == before[2]
+
+
+def test_a_split_pot_rounds_the_odd_chip_once() -> None:
+    """Seats 0 and 1 tie. Keeping the dead antes in a layer of their own, with
+    the same three contenders as the live pot, rounded the odd chip twice and
+    paid 4 and 2 where it owed 3 and 3."""
+    players = _table(live={0: 1, 1: 1, 2: 1}, antes={0: 1, 1: 1, 2: 1}, stack=0)
+    players[0].set_hole_cards(HANDS[0])
+    players[1].set_hole_cards([Card(Rank.ACE, Suit.HEARTS), Card(Rank.ACE, Suit.SPADES)])
+    players[2].set_hole_cards(HANDS[2])
+
+    settle(players, {0, 1, 2}, BOARD, "bba")
+
+    by_seat = {p.seat: p for p in players}
+    assert (by_seat[0].stack, by_seat[1].stack) == (3, 3), "the odd chip was rounded twice"
+    assert by_seat[2].stack == 0
