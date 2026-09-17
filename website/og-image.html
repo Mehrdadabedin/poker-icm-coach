@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>ICM Master OG image source</title>
+<style>
+  /* Rendered at 1200x630 with headless Chrome, not linked from the site. */
+  html, body { width: 1200px; height: 630px; margin: 0; overflow: hidden; }
+  body {
+    position: relative;
+    background: #0c1a15;
+    color: #e6ede4;
+    font: 400 20px/1.4 Charter, "Bitstream Charter", "Iowan Old Style", Georgia, "Liberation Serif", serif;
+  }
+  .felt {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(120% 90% at 78% 82%, #16332a 0%, #0c1a15 62%);
+  }
+  svg { position: absolute; inset: 0; }
+  .linear { stroke: #5f8471; stroke-width: 3; stroke-dasharray: 8 10; }
+  .area { fill: rgba(224, 174, 76, 0.15); }
+  .icm { fill: none; stroke: #e0ae4c; stroke-width: 7; stroke-linecap: round; }
+  .tick { stroke: #22402f; stroke-width: 3; }
+  .glyph {
+    font: 400 22px/1 system-ui, "DejaVu Sans", sans-serif;
+    fill: #a3b6a8;
+  }
+  .glyph.bright { fill: #e6ede4; }
+  .copy { position: absolute; left: 78px; top: 96px; width: 560px; }
+  .wordmark { font: 600 22px/1 system-ui, "DejaVu Sans", sans-serif; color: #58b98f; margin: 0 0 26px; }
+  h1 { font: 600 76px/1.05 inherit; letter-spacing: -0.02em; margin: 0 0 24px; }
+  .lede { font-size: 29px; line-height: 1.35; color: #a3b6a8; margin: 0; }
+  .credit {
+    position: absolute;
+    left: 78px;
+    bottom: 54px;
+    font: 400 22px/1 system-ui, "DejaVu Sans", sans-serif;
+    color: #7d9587;
+  }
+</style>
+</head>
+<body>
+<div class="felt"></div>
+<svg viewBox="0 0 1200 630" width="1200" height="630" aria-hidden="true">
+  <line class="tick" x1="560" y1="566" x2="1140" y2="566" />
+  <line class="linear" x1="560" y1="566" x2="1128" y2="128" />
+  <path class="area" d="M560 566 C 760 420, 900 296, 1128 244 L1128 128 Z" />
+  <path class="icm" d="M560 566 C 760 420, 900 296, 1128 244" />
+  <text class="glyph" x="1128" y="112" text-anchor="end">chips</text>
+  <text class="glyph bright" x="1128" y="330" text-anchor="end">prize money</text>
+</svg>
+<div class="copy">
+  <p class="wordmark">ICM Master</p>
+  <h1>Your chips are not your money</h1>
+  <p class="lede">An open source poker ICM trainer: nine-handed tournaments, exact ICM equity, bubble pressure and risk premium.</p>
+</div>
+<p class="credit">Mehrdad Abedin · github.com/Mehrdadabedin</p>
+</body>
+</html>

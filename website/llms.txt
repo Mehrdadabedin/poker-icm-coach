@@ -1,0 +1,50 @@
+# ICM Master
+
+> Advanced poker tournament training platform for 9-player play, ICM strategy, ranges, hand analysis, coaching, and realistic tournament decision-making.
+
+## WebMCP tools
+
+The landing page at `https://mehrdadabedin.github.io/poker-icm-coach/` declares WebMCP tools
+with `document.modelContext.registerTool`. An agent should call these tools instead of scraping
+the HTML. They answer from the same data the page renders, in a closed shape. Registration is
+guarded, so the tools exist only in a browser that supports WebMCP.
+
+### describe
+What this page is and what else can be asked.
+Input: none.
+Returns: `{ page, purpose, sections: string[], tools: string[] }`
+
+### list_features
+The app's capabilities, read from the features section.
+Input: none.
+Returns: `{ features: [{ name, summary }] }`
+
+### explain_icm_term
+Defines one tournament concept, why it matters and an example.
+Input: `{ term }`, one of `icm`, `bubble`, `risk_premium`, `push_fold`, `spr`.
+Returns: `{ term, definition, why_it_matters, example }`
+
+### get_quickstart
+How to run the project locally.
+Input: none.
+Returns: `{ requirements: string[], steps: [{ label, command }], note }`
+
+## Links
+
+- [Landing page](https://mehrdadabedin.github.io/poker-icm-coach/): project overview, strategy explainer, WebMCP tools.
+- [App](https://mehrdadabedin.github.io/poker-icm-coach/app/): UI preview only. No backend is deployed on GitHub Pages, real play needs the backend running locally.
+- [GitHub repository](https://github.com/Mehrdadabedin/poker-icm-coach): source, issues, history.
+- [ARCHITECTURE.md](https://github.com/Mehrdadabedin/poker-icm-coach/blob/main/ARCHITECTURE.md): design decisions and measurements.
+- [CLAUDE.md](https://github.com/Mehrdadabedin/poker-icm-coach/blob/main/CLAUDE.md): rules for agents working in the repo.
+- [Author](https://github.com/Mehrdadabedin): Mehrdad Abedin.
+
+## Project facts
+
+- 9-player Texas Hold'em tournament trainer: 1 human hero, 8 AI opponents with distinct personalities (tight, aggressive, TAG, loose, LAG, passive, balanced, adaptive).
+- Exact Independent Chip Model equity for up to 9 players, plus tournament-stage detection, bubble pressure, risk premium, push/fold engine, 13x13 range matrix, SPR and board texture.
+- Coach engine has three detail levels, BEGINNER, INTERMEDIATE and ADVANCED; the app
+  ships ADVANCED. Test mode grades a decision PREFERRED, ACCEPTABLE or SUBOPTIMAL after you act.
+- Session review covers hand history, VPIP, PFR, aggression, coach agreement, ICM mistakes, position and stack performance, biggest-leak detection.
+- Tournament defaults: 45,000 starting chips, 100/100 blinds, 20-minute levels, blind timer with a fast mode. Antes: none, traditional or big-blind ante.
+- Stack: React + TypeScript + Vite front end. Python 3.12 + FastAPI + Pydantic v2 + SQLAlchemy 2 back end. PostgreSQL via Alembic. Android packaging via Capacitor.
+- The backend owns all game state and the frontend renders snapshots. The AI never sees hidden cards or future streets.

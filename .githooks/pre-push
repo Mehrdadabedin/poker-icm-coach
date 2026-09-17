@@ -12,6 +12,56 @@ set -e
 ROOT=$(git rev-parse --show-toplevel)
 cd "$ROOT"
 
+# Part 1: refuse to push this repository anywhere but its own remote.
+# git invokes pre-push as: pre-push <remote-name> <remote-url>
+remote_url="${2:-}"
+# Normalise every remote form down to github.com/... or github.com:... before
+# matching. The scheme goes first, then any userinfo, because a personal access
+# token remote reads https://user:token@github.com/... and would otherwise look
+# like a foreign host.
+bare_url="${remote_url#*://}"
+bare_url="${bare_url#*@}"
+case "$bare_url" in
+  github.com/Mehrdadabedin/poker-icm-coach|github.com/Mehrdadabedin/poker-icm-coach.git|\
+  github.com:Mehrdadabedin/poker-icm-coach|github.com:Mehrdadabedin/poker-icm-coach.git) ;;
+  *)
+    echo "pre-push: refusing, the push URL is not this repository's own remote" >&2
+    echo "          remote:   ${1:-?}" >&2
+    echo "          url:      $remote_url" >&2
+    echo "          expected: github.com/Mehrdadabedin/poker-icm-coach" >&2
+    exit 1
+    ;;
+esac
+
+# Part 2: no direct pushes to main. Every change reaches main through a pull
+# request, so the merge is reviewable and reversible. This is a local stopgap:
+# the repository has no server-side branch protection (that needs admin rights
+# on github.com/Mehrdadabedin/poker-icm-coach), and any clone that has not run
+# scripts/install-hooks.sh is not covered at all.
+# git passes one line per ref on stdin: <local_ref> <local_sha> <remote_ref> <remote_sha>
+ZERO='0000000000000000000000000000000000000000'
+while read -r local_ref local_sha remote_ref remote_sha; do
+  case "$remote_ref" in
+    refs/heads/main|refs/heads/master) ;;
+    *) continue ;;
+  esac
+  branch="${remote_ref#refs/heads/}"
+
+  if [ "$local_sha" = "$ZERO" ]; then
+    echo "pre-push: blocked deletion of '$branch'" >&2
+  elif [ "$remote_sha" != "$ZERO" ] &&
+       git cat-file -e "$remote_sha" 2>/dev/null &&
+       ! git merge-base --is-ancestor "$remote_sha" "$local_sha" 2>/dev/null; then
+    echo "pre-push: blocked force-push to '$branch'" >&2
+  else
+    echo "pre-push: blocked direct push to '$branch'" >&2
+  fi
+  echo "          open a pull request instead:" >&2
+  echo "          git switch -c <branch> && git push -u origin <branch> && gh pr create" >&2
+  echo "          bypass, and say why in the commit message: git push --no-verify" >&2
+  exit 1
+done
+
 echo "pre-push: backend lint"
 (cd backend && uv run ruff check app tests)
 
