@@ -29,15 +29,19 @@ vi.mock("../src/hooks/useGame", () => ({
   }),
 }));
 
-async function renderTable() {
+async function table() {
   const { TablePage } = await import("../src/pages/TablePage");
-  return render(
+  return (
     <MemoryRouter initialEntries={["/table/A"]}>
       <Routes>
         <Route path="/table/:tableId" element={<TablePage />} />
       </Routes>
-    </MemoryRouter>,
+    </MemoryRouter>
   );
+}
+
+async function renderTable() {
+  return render(await table());
 }
 
 const baseState = {
@@ -53,20 +57,28 @@ describe("coach panel follows the street", () => {
     coachAdvice.mockClear();
   });
 
+  it("asks again when somebody reopens the betting on the same street", async () => {
+    gameState = { ...baseState, street: "flop", actionLog: [{ seat: 1, action: "check" }] };
+    const { rerender } = await renderTable();
+    expect(coachAdvice).toHaveBeenCalledTimes(1);
+
+    gameState = {
+      ...baseState,
+      street: "flop",
+      toCall: 250,
+      actionLog: [{ seat: 1, action: "check" }, { seat: 2, action: "bet" }],
+    };
+    rerender(await table());
+    expect(coachAdvice).toHaveBeenCalledTimes(2);
+  });
+
   it("asks again when the street changes while the hero is still to act", async () => {
     gameState = { ...baseState, street: "preflop" };
     const { rerender } = await renderTable();
     expect(coachAdvice).toHaveBeenCalledTimes(1);
 
     gameState = { ...baseState, street: "flop" };
-    const { TablePage } = await import("../src/pages/TablePage");
-    rerender(
-      <MemoryRouter initialEntries={["/table/A"]}>
-        <Routes>
-          <Route path="/table/:tableId" element={<TablePage />} />
-        </Routes>
-      </MemoryRouter>,
-    );
+    rerender(await table());
     expect(coachAdvice).toHaveBeenCalledTimes(2);
   });
 });

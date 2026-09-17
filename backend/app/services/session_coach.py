@@ -64,9 +64,10 @@ def grade_last_action(session: GameSession) -> dict | None:
     often after the street changed.
     """
     action = session._last_hero_action
-    advice = session._last_hero_advice
-    if action is None or advice is None:
+    request = session._last_hero_request
+    if action is None or request is None:
         return None
+    advice = advice_dict(session.coach.recommend(request))
     comparison = compare_decisions(action, advice["recommendedAction"])
     return {
         "heroAction": action,

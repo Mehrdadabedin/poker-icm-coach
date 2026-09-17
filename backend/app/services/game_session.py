@@ -15,7 +15,7 @@ from app.services.game_state_view import build_state_view
 from app.services.hand_history import HandHistoryRecord, HandHistoryStore
 from app.services.session_coach import advice_dict, coach_request, grade_last_action
 from app.services.session_store import mark_finished
-from app.strategy.coach import Coach
+from app.strategy.coach import Coach, CoachRequest
 from app.tournament.tournament import build_default_tournament
 from app.tournament.tournament_timer import TournamentTimer
 
@@ -62,11 +62,14 @@ class GameSession:
         self.coach = Coach()
         self.coach_mode = "advanced"
         self._last_hero_action: str | None = None
-        # The recommendation as it stood at the hero's decision point. Grading
-        # recomputed it afterwards, by which time the hero had acted and the
-        # bots had answered, so it graded a call against advice for a different
-        # spot, often a different street.
-        self._last_hero_advice: dict | None = None
+        # The hero's decision point, captured before the action is applied.
+        # Grading used to rebuild it afterwards, by which time the hero had
+        # acted and the bots had answered, so it scored a call against advice
+        # for a different spot, often a different street. The request is stored
+        # rather than the recommendation because building it is arithmetic,
+        # while recommending runs equity simulations: doing that here would
+        # make every fold pay for a grade nobody asked for, under the lock.
+        self._last_hero_request: CoachRequest | None = None
         self._lock = threading.RLock()
         self._history_file: hand_history.HistoryFileStore = hand_history.HistoryFileStore(
             self.history_dir, self.session_id
@@ -81,7 +84,7 @@ class GameSession:
     def _begin_hand(self, first: bool = False) -> None:
         assert self.engine is not None and self.timer is not None
         self._last_hero_action = None  # never grade this hand against the last
-        self._last_hero_advice = None
+        self._last_hero_request = None
         self.engine.start_hand()
         if first:
             self.timer.start()
@@ -112,10 +115,10 @@ class GameSession:
             action = Action(ActionType(kind), amount=amount)
             assert self.timer is not None
             self.timer.pause()
-            advice = advice_dict(self.coach.recommend(coach_request(self)))
+            request = coach_request(self)
             self.engine.act(actor, action)
             self._last_hero_action = f"{kind.upper()}"
-            self._last_hero_advice = advice
+            self._last_hero_request = request
             self._advance_bots()
             if not self.engine.is_complete:
                 assert self.timer is not None
