@@ -102,8 +102,12 @@ def test_total_chips_reflect_reentry() -> None:
     s.tournament.players[1].stack = 0  # force a bust in level 1
     s.next_hand()  # re-entry applies, then the new hand starts
     assert not s.tournament.players[1].is_eliminated
-    # re-entered to 45,000, minus a blind if it posted one this hand
-    assert s.tournament.players[1].stack in (45_000, 44_900, 44_800)
+    # Re-entered to a full 45,000. What is behind plus what is already in front
+    # of the seat has to add back up to it. The RNG is not seeded here, so the
+    # bot may have posted a blind, called or raised from the big blind, and
+    # enumerating the amounts pinned this to one particular set of legal moves.
+    seat = s.tournament.players[1]
+    assert seat.stack + seat.bet_total == 45_000
     state = s.state()
     assert state["totalChips"] == sum(p.stack for p in s.tournament.players)
     assert state["averageStack"] == state["totalChips"] // 9

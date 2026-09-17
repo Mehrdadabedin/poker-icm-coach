@@ -44,6 +44,7 @@ def build_state_view(session) -> dict:
     if actor == session.hero_seat:
         hero_legal = legal_actions(
             eng._street.current_bet, hero_contrib, hero.stack, level.big, eng._street.last_raise,
+            can_raise=eng._street.may_raise(session.hero_seat, level.big),
         )
     in_hand_count = len(in_hand_seats(tournament.players))
     total_chips = sum(p.stack for p in tournament.players)

@@ -43,19 +43,30 @@ def post_blinds_and_antes(tournament: Tournament, street: StreetState) -> None:
     mode = tournament.ante_mode
     ante = tournament.structure.ante_for(mode, level)
     for seat in seats:
-        amount = ante if mode == "traditional" else 0
-        if seat == sb_seat:
-            amount += level.small
-        if seat == bb_seat:
-            amount += level.big
-        if mode == "bba" and seat == bb_seat:
-            amount += ante  # big blind ante (per-level; 0 before level 6)
-        if amount:
-            player = tournament.players[seat]
-            amount = min(amount, player.stack)  # short stacks post all-in
-            player.commit_bet(amount)
-            street.contributions[seat] = street.contributions.get(seat, 0) + amount
-    street.current_bet = street.contributions.get(bb_seat, 0)
+        player = tournament.players[seat]
+        ante_due = ante if mode == "traditional" else 0
+        bba_due = ante if (mode == "bba" and seat == bb_seat) else 0
+        blind_due = (level.small if seat == sb_seat else 0) + (level.big if seat == bb_seat else 0)
+
+        # A traditional ante is posted before the blind, so a stack too short for
+        # both is all-in for the ante with no live blind behind it. A big blind
+        # ante goes the other way round, the blind first, per TDA recommended
+        # procedure 11: the live blind takes priority.
+        for kind, amount in (("ante", ante_due), ("blind", blind_due), ("ante", bba_due)):
+            paid = min(amount, player.stack)
+            if not paid:
+                continue
+            player.commit_bet(paid)
+            if kind == "blind":
+                # Only the blind is a live bet. An ante is dead money: it belongs
+                # to the pot, never to the amount anyone has to call. Counting it
+                # here made a big blind ante part of current_bet, so every player
+                # had to call the blind plus the ante, and under traditional
+                # antes it cut everyone's to_call by the ante already posted.
+                street.contributions[seat] = street.contributions.get(seat, 0) + paid
+    # The scheduled big blind, not what the big blind could afford. A short blind
+    # is all-in for less, and the rest of the table still faces a full one.
+    street.current_bet = level.big
 
 
 def preflop_first_seat(button: int, active: list[int], num_seats: int) -> int:
