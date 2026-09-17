@@ -1,6 +1,8 @@
 # ICM Master
 
-> Advanced poker tournament training platform for 9-player play, ICM strategy, ranges, hand analysis, coaching, and realistic tournament decision-making.
+> A poker tournament trainer built around ICM, the Independent Chip Model, which
+> converts a chip stack into the share of the prize pool it is worth. Nine-player
+> tables, ranges, hand analysis, coaching and realistic tournament decisions.
 
 ## WebMCP tools
 
