@@ -81,4 +81,4 @@ def build_state_view(session) -> dict:
 
 
 def _pot_total(tournament) -> int:
-    return sum(p.bet_total for p in tournament.players)
+    return sum(p.bet_total + p.ante_total for p in tournament.players)

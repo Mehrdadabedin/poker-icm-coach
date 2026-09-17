@@ -30,7 +30,7 @@ def coach_request(session: GameSession) -> CoachRequest:
                               len(tournament.players)),
         stack=hero.stack, big_blind=level.big, small_blind=level.small,
         ante=tournament.structure.ante_for(tournament.ante_mode, level),
-        pot=sum(p.bet_total for p in tournament.players),
+        pot=sum(p.bet_total + p.ante_total for p in tournament.players),
         to_call=max(0, engine._street.current_bet - contributed),
         board=list(engine._board), street=engine.street,
         players_remaining=sum(1 for p in tournament.players if not p.is_eliminated),

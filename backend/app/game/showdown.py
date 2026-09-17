@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from app.game.hand_result import HandWinner
 from app.game.player import Player
-from app.game.side_pot import build_side_pots, distribute_pots
+from app.game.side_pot import SidePot, build_side_pots, distribute_pots
 from app.poker.card import Card
 from app.poker.hand_evaluator import best_hand
 
@@ -20,6 +20,14 @@ def settle(
     by_seat = {p.seat: p for p in players}
     contributions = {p.seat: p.bet_total for p in players if p.bet_total > 0}
     pots, refunds = build_side_pots(contributions, eligible_seats)
+    # The antes are one dead layer under the live pots. Everyone still in the
+    # hand paid one and can win it, including a seat all-in for its ante alone,
+    # which has no live contribution to buy it into any side pot. Reading them
+    # off bet_total instead let a big blind ante be refunded to a losing big
+    # blind, and made an ante-only all-in eligible for the whole pot.
+    dead = sum(p.ante_total for p in players)
+    if dead:
+        pots.insert(0, SidePot(rank=-1, total_amount=dead, eligible_seats=set(eligible_seats)))
     for seat, amount in refunds.items():
         by_seat[seat].add_chips(amount)
     winners: list[HandWinner] = []
@@ -41,7 +49,7 @@ def settle(
             best = max(contenders, key=lambda s: hands[s])
             seats = [s for s in contenders if hands[s] == hands[best]]
             winners.append(HandWinner(seats=seats, amount=pot.total_amount))
-    return winners, sorted(eligible_seats), sum(contributions.values())
+    return winners, sorted(eligible_seats), sum(contributions.values()) + dead
 
 
 def merge_winners(winners: list[HandWinner]) -> list[HandWinner]:

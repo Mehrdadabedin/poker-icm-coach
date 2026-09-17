@@ -56,7 +56,10 @@ def post_blinds_and_antes(tournament: Tournament, street: StreetState) -> None:
             paid = min(amount, player.stack)
             if not paid:
                 continue
-            player.commit_bet(paid)
+            if kind == "ante":
+                player.post_ante(paid)
+            else:
+                player.commit_bet(paid)
             if kind == "blind":
                 # Only the blind is a live bet. An ante is dead money: it belongs
                 # to the pot, never to the amount anyone has to call. Counting it

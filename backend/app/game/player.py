@@ -24,6 +24,9 @@ class Player:
         self.hole_cards: list[Card] = []
         self.folded = False
         self.bet_total = 0
+        # Antes are dead money: they belong to the pot but match nothing, so
+        # side pots must not treat them as a wager anyone has to call.
+        self.ante_total = 0
         self.sit_out = False
 
     def new_hand(self) -> None:
@@ -31,6 +34,7 @@ class Player:
         self.hole_cards = []
         self.folded = False
         self.bet_total = 0
+        self.ante_total = 0
 
     def set_hole_cards(self, cards: list[Card]) -> None:
         if len(cards) != 2:
@@ -71,6 +75,15 @@ class Player:
             raise ValueError(f"{self.name} cannot bet {amount} with stack {self.stack}")
         self.stack -= amount
         self.bet_total += amount
+
+    def post_ante(self, amount: int) -> None:
+        """Move chips from stack into the dead pool, matching no bet."""
+        if amount < 0:
+            raise ValueError("ante cannot be negative")
+        if amount > self.stack:
+            raise ValueError(f"{self.name} cannot ante {amount} with stack {self.stack}")
+        self.stack -= amount
+        self.ante_total += amount
 
     def __str__(self) -> str:
         return f"{self.name} (seat {self.seat}, {self.stack} chips)"
