@@ -164,7 +164,7 @@ def test_a_finished_hand_has_no_current_actor() -> None:
             kind = ActionType.CHECK if ActionType.CHECK in legal else ActionType.CALL
             engine.act(actor, Action(kind))
             guard += 1
-        if engine.is_complete:
-            assert engine.current_actor is None, (
-                f"seed {seed}: the hand is complete but seat {engine.current_actor} is still to act"
-            )
+        assert engine.is_complete, f"seed {seed}: the hand stalled before settling"
+        assert engine.current_actor is None, (
+            f"seed {seed}: the hand is complete but seat {engine.current_actor} is still to act"
+        )
