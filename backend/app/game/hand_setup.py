@@ -43,18 +43,26 @@ def post_blinds_and_antes(tournament: Tournament, street: StreetState) -> None:
     mode = tournament.ante_mode
     ante = tournament.structure.ante_for(mode, level)
     for seat in seats:
-        amount = ante if mode == "traditional" else 0
-        if seat == sb_seat:
-            amount += level.small
-        if seat == bb_seat:
-            amount += level.big
+        player = tournament.players[seat]
+        ante_due = ante if mode == "traditional" else 0
         if mode == "bba" and seat == bb_seat:
-            amount += ante  # big blind ante (per-level; 0 before level 6)
-        if amount:
-            player = tournament.players[seat]
-            amount = min(amount, player.stack)  # short stacks post all-in
-            player.commit_bet(amount)
-            street.contributions[seat] = street.contributions.get(seat, 0) + amount
+            ante_due += ante  # big blind ante (per-level; 0 before level 6)
+        blind_due = (level.small if seat == sb_seat else 0) + (level.big if seat == bb_seat else 0)
+
+        # The ante is posted first, so a stack too short for both is all-in for
+        # the ante with no live blind behind it.
+        ante_paid = min(ante_due, player.stack)
+        if ante_paid:
+            player.commit_bet(ante_paid)
+        blind_paid = min(blind_due, player.stack)
+        if blind_paid:
+            player.commit_bet(blind_paid)
+            # Only the blind is a live bet. An ante is dead money: it belongs to
+            # the pot, never to the amount anyone has to call. Counting it here
+            # made a big blind ante part of current_bet, so every player had to
+            # call the blind plus the ante, and under traditional antes it cut
+            # everyone's to_call by the ante they had already posted.
+            street.contributions[seat] = street.contributions.get(seat, 0) + blind_paid
     street.current_bet = street.contributions.get(bb_seat, 0)
 
 

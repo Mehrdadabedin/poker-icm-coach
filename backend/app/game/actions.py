@@ -43,8 +43,14 @@ def legal_actions(
     stack: int,
     big_blind: int,
     last_raise: int,
+    can_raise: bool = True,
 ) -> list[Action]:
-    """Actions the player may legally take right now (bounded by stack)."""
+    """Actions the player may legally take right now (bounded by stack).
+
+    `can_raise` is false for a player who has already acted and has since been
+    faced only with an all-in short of a full raise. Under TDA rules 45 and 49
+    that does not reopen the betting: they may call or fold, nothing more.
+    """
     to_call = amount_to_call(current_bet, player_contribution)
     min_raise = min_raise_amount(current_bet, last_raise)
     # Raise and all-in amounts are street totals, so what is already in front of
@@ -55,8 +61,17 @@ def legal_actions(
     actions.append(Action(ActionType.FOLD))
     if to_call == 0:
         actions.append(Action(ActionType.CHECK))
-        if stack >= big_blind:
-            actions.append(Action(ActionType.BET, min_amount=big_blind, max_amount=stack))
+        if current_bet == 0:
+            if stack >= big_blind:
+                actions.append(Action(ActionType.BET, min_amount=big_blind, max_amount=stack))
+        # The big blind's option: nothing to call, but a bet is already on the
+        # table, so the aggressive move is a raise. BET was offered here and
+        # validate_action rejects a bet whenever a bet is already present, so
+        # every one of those offers was illegal.
+        elif can_raise and min_raise > 0 and reach >= min_raise:
+            actions.append(
+                Action(ActionType.RAISE, min_amount=min_raise, max_amount=reach, amount=None)
+            )
     else:
         if to_call < stack:  # a call that equals/exceeds stack is an all-in call
             actions.append(Action(ActionType.CALL, amount=to_call, max_amount=stack))
@@ -64,11 +79,13 @@ def legal_actions(
         # minimum. Short of that the whole stack is a call or a shove, and
         # offering RAISE handed the client a range whose own endpoints both
         # failed validation.
-        if stack > to_call and min_raise > 0 and reach >= min_raise:
+        if can_raise and stack > to_call and min_raise > 0 and reach >= min_raise:
             actions.append(
                 Action(ActionType.RAISE, min_amount=min_raise, max_amount=reach, amount=None)
             )
-    if stack > 0:
+    # Shoving past the current bet is a raise, so a player who may not raise may
+    # only go all-in for what they owe or less.
+    if stack > 0 and (can_raise or reach <= current_bet):
         actions.append(Action(ActionType.ALL_IN, amount=reach, is_all_in=True))
     return actions
 
@@ -92,9 +109,19 @@ def validate_action(
     stack: int,
     last_raise: int,
     big_blind: int | None = None,
+    can_raise: bool = True,
 ) -> None:
     """Raise ValueError if the action is illegal in the given betting state."""
     to_call = amount_to_call(current_bet, contribution)
+    if not can_raise:
+        reopening = action.type == ActionType.RAISE or (
+            action.type == ActionType.ALL_IN and contribution + stack > current_bet
+        )
+        if reopening:
+            raise ValueError(
+                "the betting is not reopened: an all-in short of a full raise "
+                "leaves you a call or a fold"
+            )
     if action.type == ActionType.FOLD:
         return
     if action.type == ActionType.CHECK:

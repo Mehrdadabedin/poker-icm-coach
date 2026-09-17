@@ -4,10 +4,11 @@ from __future__ import annotations
 import random
 from collections import deque
 
-from app.game.actions import Action, legal_actions, validate_action
+from app.game.actions import Action, ActionType, validate_action
 from app.game.betting import StreetState, apply_action
 from app.game.dealer_button import next_button
-from app.game.dealing import deal_flop, deal_hole_cards, deal_river, deal_turn
+from app.game.dealing import deal_hole_cards
+from app.game.decision_context import build_context
 from app.game.decision_provider import DecisionContext, DecisionProvider, DefaultBot
 from app.game.hand_result import HandAction, HandResult
 from app.game.hand_setup import (
@@ -17,8 +18,8 @@ from app.game.hand_setup import (
     in_hand_seats,
     post_blinds_and_antes,
 )
-from app.game.positions import position_for
 from app.game.showdown import merge_winners, settle
+from app.game.street_flow import deal_next_street, runout_and_showdown
 from app.poker.deck import Deck
 from app.tournament.tournament import Tournament
 
@@ -85,11 +86,24 @@ class HandEngine:
         validate_action(
             action, self._street.current_bet, street_contrib, player.stack,
             self._street.last_raise, self.tournament.current_blind_level().big,
+            can_raise=self._street.may_raise(seat),
         )
         bet_before = self._street.current_bet
+        raise_before = self._street.last_raise
         apply_action(self._street, player, action, street_contrib)
-        self._log.append(HandAction(seat, action.type.value, action.amount, self.street))
-        self._after_action(seat, raised=self._street.current_bet > bet_before)
+        # The log records what the action actually put in, not the number the
+        # caller sent. An all-in ignores the supplied amount entirely, so a bot
+        # was logged at its bare stack and the hero at whatever the client sent.
+        committed = self._street.contributions.get(seat)
+        logged = committed if action.type not in (ActionType.FOLD, ActionType.CHECK) else None
+        self._log.append(HandAction(seat, action.type.value, logged, self.street))
+        # Only a full raise reopens the betting. An all-in short of one takes the
+        # bet up without giving players who already acted another turn to raise.
+        full_raise = self._street.current_bet > bet_before and (
+            self._street.last_raise != raise_before or action.type != ActionType.ALL_IN
+        )
+        self._after_action(seat, raised=self._street.current_bet > bet_before,
+                           full_raise=full_raise)
 
     def advance_bot(self, seat: int) -> None:
         if self.is_complete or seat != self.current_actor:
@@ -99,7 +113,7 @@ class HandEngine:
         self.act(seat, self.provider.decide(self._build_context(seat)))
 
     # round/street flow --------------------------------------------------
-    def _after_action(self, seat: int, raised: bool) -> None:
+    def _after_action(self, seat: int, raised: bool, full_raise: bool = True) -> None:
         in_hand = in_hand_seats(self.tournament.players)
         if len(in_hand) <= 1:
             self._finish_hand()
@@ -110,7 +124,16 @@ class HandEngine:
             return
         if raised:
             order = self._order(self.street, sorted(active_seats(self.tournament.players)))
-            self._queue = deque(s for s in order if s != seat and s in self._active_non_allin())
+            owed = [s for s in order if s != seat and s in self._active_non_allin()]
+            if full_raise:
+                self._queue = deque(owed)
+            else:
+                # Everyone still owes the extra chips, so they all get a turn,
+                # but those who already acted may only call or fold. may_raise
+                # is what enforces that, and the queue keeps the seats that had
+                # not acted yet in front so their raising rights survive.
+                pending = [s for s in self._queue if s != seat]
+                self._queue = deque(pending + [s for s in owed if s not in pending])
         else:
             self._queue.popleft()
         if not self._queue:
@@ -130,32 +153,10 @@ class HandEngine:
         self._queue = deque(self._order(self.street, active))
 
     def _deal_next_street(self) -> None:
-        assert self._deck is not None
-        if self.street == "preflop":
-            self._board.extend(deal_flop(self._deck))
-            self.street = "flop"
-        elif self.street == "flop":
-            self._board.append(deal_turn(self._deck)[0])
-            self.street = "turn"
-        elif self.street == "turn":
-            self._board.append(deal_river(self._deck)[0])
-            self.street = "river"
-        else:
-            self._finish_hand()
+        deal_next_street(self)
 
     def _runout_and_showdown(self) -> None:
-        assert self._deck is not None
-        if self.street == "preflop":
-            self._board.extend(deal_flop(self._deck))
-            self._board.append(deal_turn(self._deck)[0])
-            self._board.append(deal_river(self._deck)[0])
-        elif self.street == "flop":
-            self._board.append(deal_turn(self._deck)[0])
-            self._board.append(deal_river(self._deck)[0])
-        elif self.street == "turn":
-            self._board.append(deal_river(self._deck)[0])
-        self.street = "river"
-        self._finish_hand()
+        runout_and_showdown(self)
 
     def _finish_hand(self) -> None:
         if self.is_complete:
@@ -182,19 +183,4 @@ class HandEngine:
         return [p.seat for p in active_players(self.tournament.players) if not p.folded and p.stack > 0]
 
     def _build_context(self, seat: int) -> DecisionContext:
-        p = self.tournament.players[seat]
-        street_contrib = self._street.contributions.get(seat, 0)
-        legal = legal_actions(
-            self._street.current_bet, street_contrib, p.stack,
-            self.tournament.current_blind_level().big, self._street.last_raise,
-        )
-        return DecisionContext(
-            seat=seat, hole_cards=list(p.hole_cards), board=list(self._board),
-            street=self.street,
-            pot=sum(pl.bet_total for pl in self.tournament.players),
-            current_bet=self._street.current_bet, contribution=street_contrib,
-            stack=p.stack, big_blind=self.tournament.current_blind_level().big,
-            legal_actions=legal,
-            position=position_for(self.button, seat, len(self.tournament.players)),
-            action_history=[(a.seat, a.action, a.amount) for a in self._log],
-        )
+        return build_context(self, seat)
