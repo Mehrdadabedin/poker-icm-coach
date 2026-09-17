@@ -66,7 +66,7 @@
 <header class="hero">
   <p class="wordmark">ICM Master</p>
   <h1>A poker ICM trainer for the money bubble</h1>
-  <p class="lede">Nine-handed tournaments against eight AI opponents, with a coach that prices every decision in prize money instead of chips.</p>
+  <p class="lede">Nine-handed tournaments against eight AI opponents, with a coach that values every decision in prize money instead of chips.</p>
 
   <figure class="curve">
     <svg viewBox="0 0 420 260" role="img" aria-labelledby="curve-title curve-desc" class="curve-svg">
@@ -89,12 +89,18 @@
   <nav aria-label="Primary">
     <ul class="ctas">
       <li>
-        <a class="cta cta-primary" href="app/">Open the hosted UI preview</a>
-        <p class="honesty">Buttons and layout only. No backend runs on GitHub Pages, so no cards are dealt there. Real hands need the API running on your machine, which takes two commands.</p>
+        <a class="cta cta-primary" href="app/">Look around the interface</a>
+        <p class="honesty">This shows you the screens and nothing more. No cards are dealt here, because the part of ICM Master that runs the game has to run on your own computer. Setting that up takes three commands, and they are further down this page.</p>
       </li>
       <li><a class="cta cta-secondary" href="#explainer">Read the strategy explainer</a></li>
     </ul>
   </nav>
+
+  <figure class="shot shot-table">
+    <img src="poker-table-screenshot.webp" width="1440" height="1228" loading="eager" fetchpriority="high" decoding="async"
+         alt="The ICM Master table mid-hand. Nine seats around green felt, the player under the gun holds the four of clubs and the nine of hearts, the flop shows the ace of diamonds, the four of spades and the three of spades, the pot is 560 chips with 160 to call, and fold, call, raise and all-in buttons sit under the table." />
+    <figcaption>A real hand, played on a computer running ICM Master. The green bar under the buttons is the coach grading the decision that was just made.</figcaption>
+  </figure>
 </header>
 
 <main>
@@ -107,15 +113,22 @@
 
 <section id="features">
   <h2>What the coach tells you</h2>
-  <p>By default the table starts with 45,000 chips, 100/100 blinds and 20-minute levels, with a blind timer, a fast mode, and a choice of no ante, traditional ante or big-blind ante.</p>
+  <div class="features-lead">
+    <p>By default the table starts with 45,000 chips, 100/100 blinds and 20-minute levels, with a blind timer, a fast mode, and a choice of no ante, traditional ante or big-blind ante.</p>
+    <figure class="shot shot-panel">
+      <img src="icm-coach-panel.webp" width="720" height="682" loading="lazy" decoding="async"
+           alt="Rows from the coach panel: position under the gun, stack 51,184 chips or 511.8 big blinds, effective stack 45,000 chips, pot odds 33 percent, ICM pressure low, bubble early, stack band big stack, risk premium low, coverage you cover villain, SPR 2.0, alternative check." />
+      <figcaption>Part of the coach panel from that same hand, as it read before the flop.</figcaption>
+    </figure>
+  </div>
   <ul class="features">
     <li>
       <h3>Exact ICM equity</h3>
-      <p>Your stack converted into its share of the prize pool, computed exactly for up to nine players rather than sampled.</p>
+      <p>Your stack converted into its share of the prize pool, worked out exactly for up to nine players, not estimated from samples.</p>
     </li>
     <li>
       <h3>Stage and bubble pressure</h3>
-      <p>The engine reads the stage of the tournament and says when the bubble is bending correct play away from chip EV, and by how much.</p>
+      <p>The engine reads the stage of the tournament and says when the bubble is pulling correct play away from simply winning the most chips, and by how much.</p>
     </li>
     <li>
       <h3>Risk premium</h3>
@@ -123,7 +136,7 @@
     </li>
     <li>
       <h3>Push/fold with a range matrix</h3>
-      <p>Shove and call ranges for short stacks, drawn as the full 13 by 13 grid of 169 starting hands.</p>
+      <p>Shove (all-in) and call ranges for short stacks, drawn as the full 13 by 13 grid of 169 starting hands.</p>
     </li>
     <li>
       <h3>SPR and board texture</h3>
@@ -131,11 +144,11 @@
     </li>
     <li>
       <h3>Eight opponents with their own habits</h3>
-      <p>Tight, aggressive, TAG, loose, LAG, passive, balanced and adaptive. None of them can see your cards or the streets still to come.</p>
+      <p>Tight, aggressive, TAG (tight and aggressive), loose, LAG (loose and aggressive), passive, balanced and adaptive. None of them can see your cards or the cards still to come.</p>
     </li>
     <li>
       <h3>Explanation depth, and a test mode</h3>
-      <p>The coach engine has three depths, BEGINNER, INTERMEDIATE and ADVANCED, and the app ships the advanced one. Test mode stays quiet until you act, then grades the decision PREFERRED, ACCEPTABLE or SUBOPTIMAL.</p>
+      <p>The coach engine has three depths, BEGINNER, INTERMEDIATE and ADVANCED, and the app currently uses the most detailed one. Test mode stays quiet until you act, then grades the decision PREFERRED, ACCEPTABLE or SUBOPTIMAL.</p>
     </li>
     <li>
       <h3>Session review</h3>
@@ -147,57 +160,66 @@
 <section id="explainer">
   <h2>ICM, bubble pressure and risk premium in plain terms</h2>
   <p>Five ideas cover most of what the coach says at the table.</p>
+
+  <figure class="hand">
+    <div class="hand-cards">
+      <img src="cards/ace-of-spades.png" width="300" height="420" loading="lazy" decoding="async" alt="Ace of spades" />
+      <img src="cards/nine-of-hearts.png" width="300" height="420" loading="lazy" decoding="async" alt="Nine of hearts" />
+    </div>
+    <figcaption>Ace-nine offsuit, the hand in the bubble example below.</figcaption>
+  </figure>
+
   <dl class="terms">
     <dt data-term="icm">ICM, the Independent Chip Model</dt>
     <dd data-field="definition">A way of converting a stack into the share of the prize pool it is worth, from every player's chip count and the payout structure.</dd>
-    <dd data-field="why_it_matters">Chips you win are worth less than the chips you risk, because the players below you still get paid. Chip EV and money EV stop agreeing the moment the payouts stop being flat.</dd>
-    <dd data-field="example">Four players left, equal stacks, a pool that pays 50/30/20. Everyone holds a quarter of the chips and a quarter of the money. Double up through someone and your chip share doubles, your prize share does not come close.</dd>
+    <dd data-field="why_it_matters">Chips you win are worth less than the chips you risk, because the players below you still get paid. What is worth the most in chips and what is worth the most in money stop agreeing the moment the payouts stop being flat.</dd>
+    <dd data-field="example">Four players left, equal stacks, a prize pool that pays 50, 30 and 20 percent. Everyone holds a quarter of the chips and a quarter of the money. Double up through someone and your chip share doubles, your prize share does not come close.</dd>
 
     <dt data-term="bubble">The bubble</dt>
     <dd data-field="definition">The stretch just before the money, when one more player has to go out before anyone gets paid.</dd>
     <dd data-field="why_it_matters">Everyone's equity rises when somebody else busts, so surviving is briefly worth more than accumulating. Short stacks fold hands they would shove at any other point, and the big stacks can attack almost anything.</dd>
-    <dd data-field="example">Eleven players left, ten get paid. The 10 big blind stack folds ace-nine offsuit in the cutoff, because two shorter stacks are one hand away from busting and the pay jump belongs to whoever outlasts them.</dd>
+    <dd data-field="example">Eleven players left, ten get paid. The 10 big blind stack folds ace-nine offsuit from the cutoff seat, because two shorter stacks are one hand away from busting and the pay jump belongs to whoever outlasts them.</dd>
 
     <dt data-term="risk_premium">Risk premium</dt>
-    <dd data-field="definition">The extra equity you need on top of a break-even chip call, because busting costs you more prize money than the pot gives back.</dd>
-    <dd data-field="why_it_matters">It is the reason a call that is right in a cash game is wrong in a tournament. Facing a stack that covers you near the bubble, the premium can add ten points or more to the equity you need.</dd>
-    <dd data-field="example">The pot is laying you odds that need 40 percent equity. Add a 7 point risk premium and you need 47 percent, so the hand that beat the pot odds goes in the muck.</dd>
+    <dd data-field="definition">The extra equity you need on top of a call that would break even in chips, because busting costs you more prize money than the pot gives back.</dd>
+    <dd data-field="why_it_matters">It is the reason a call that is right in a cash game is wrong in a tournament. Facing a stack that covers you near the bubble, the premium can add ten percentage points or more to the equity you need.</dd>
+    <dd data-field="example">The pot is laying you odds that need 40 percent equity. Add a 7 percentage point risk premium and you need 47 percent, so the hand that beat the pot odds gets folded instead.</dd>
 
     <dt data-term="push_fold">Push/fold</dt>
-    <dd data-field="definition">The short-stack game, where the only two moves worth making are all-in or fold, and the right one can be solved rather than guessed.</dd>
+    <dd data-field="definition">The short-stack game, where the only two moves worth making are all-in (betting everything you have) or fold, and the right one can be solved rather than guessed.</dd>
     <dd data-field="why_it_matters">Under about 15 big blinds a small raise commits you anyway, so the raise size stops mattering and the range does all the work. This is the spot you meet most often late in a tournament.</dd>
     <dd data-field="example">Eight big blinds on the button, folded to you. The engine shows the hands that shove for a profit, then what the blinds can call with against that range.</dd>
 
     <dt data-term="spr">SPR, stack-to-pot ratio</dt>
     <dd data-field="definition">The effective stack divided by the size of the pot once the flop is out.</dd>
-    <dd data-field="why_it_matters">It tells you how much room is left to play. At a low SPR top pair is already a stack-off, at a high SPR one pair is rarely worth your tournament life.</dd>
+    <dd data-field="why_it_matters">It tells you how much room is left to play. At a low SPR, top pair already means betting your whole stack. At a high SPR, one pair is rarely worth your tournament life.</dd>
     <dd data-field="example">A 12 big blind stack behind a 6 big blind pot is an SPR of 2. One bet and one raise and the chips are in the middle, so decide on the flop, not the river.</dd>
   </dl>
 </section>
 
 <section id="quickstart">
-  <h2>Run it on your machine</h2>
-  <p>The backend holds all the game state and the frontend draws what it sends back, so both have to be running.</p>
+  <h2>Run it on your computer</h2>
+  <p>ICM Master is two programs. One runs the game, one draws the table in your browser, and both need to be running before a hand can be dealt. Three commands, and you keep two of them running in two terminal windows.</p>
   <h3>What you need</h3>
   <ul data-requirements>
     <li>Python 3.12 and uv</li>
     <li>Node and npm</li>
-    <li>Docker, only if you want PostgreSQL behind it</li>
+    <li>Docker, only if you want to keep your hand history between restarts</li>
   </ul>
-  <h3>The commands</h3>
+  <h3>The steps</h3>
   <ol class="steps">
-    <li><span class="step-label">Get the code</span><code>git clone https://github.com/Mehrdadabedin/poker-icm-coach</code></li>
-    <li><span class="step-label">Start the API</span><code>cd backend &amp;&amp; uv run uvicorn app.main:app --reload</code></li>
-    <li><span class="step-label">Start the web app</span><code>cd frontend &amp;&amp; npm install &amp;&amp; npm run dev</code></li>
-    <li><span class="step-label">Add PostgreSQL, optional</span><code>docker compose up -d postgres &amp;&amp; cd backend &amp;&amp; uv run alembic upgrade head</code></li>
+    <li><span class="step-label">Download the code. This creates a poker-icm-coach folder.</span><code>git clone https://github.com/Mehrdadabedin/poker-icm-coach</code></li>
+    <li><span class="step-label">Start the game server. Leave it running. It reports that it is listening on port 8000.</span><code>cd backend &amp;&amp; uv run uvicorn app.main:app --reload</code></li>
+    <li><span class="step-label">Start the browser app, in a second terminal. It shows an address beginning http://localhost. Open that, create an account, and you can deal a hand.</span><code>cd frontend &amp;&amp; npm install &amp;&amp; npm run dev</code></li>
+    <li><span class="step-label">Optional, add a database so your hands survive a restart. Run this before you start the game server.</span><code>docker compose up -d postgres &amp;&amp; cd backend &amp;&amp; uv run alembic upgrade head</code></li>
   </ol>
-  <p data-note>The database is optional. Without it the backend keeps tables and tokens in memory on a single worker, so a restart clears whatever you were playing.</p>
+  <p data-note>You can skip the database. Without it, your table and your sign-in are held in memory only, so restarting the game server ends whatever you were playing. Nothing is lost that you cannot deal again.</p>
 </section>
 
 <section id="stack">
   <h2>How it is built</h2>
   <p>React, TypeScript and Vite on the front. Python 3.12, FastAPI, Pydantic v2 and SQLAlchemy 2 on the back, with PostgreSQL through Alembic migrations when you want it. Capacitor packages the same frontend for Android.</p>
-  <p>The backend owns every piece of game state and the frontend renders snapshots of it, which keeps the AI honest: it decides from the same public information you have, never from your hole cards or from streets that have not been dealt. Tests on both sides cover concurrency, ICM equity, the coaching engine and the API.</p>
+  <p>The backend owns every piece of game state and the frontend renders snapshots of it, which is what keeps the opponents honest. They decide from the same public information you have, never from your hole cards and never from cards that have not been dealt yet. Tests on both sides cover concurrency, ICM equity, the coaching engine and the API.</p>
   <p><a href="https://github.com/Mehrdadabedin/poker-icm-coach" rel="noreferrer">Read the source on GitHub</a></p>
 </section>
 
@@ -205,7 +227,7 @@
 
 <footer>
   <p>ICM Master, built by <a href="https://github.com/Mehrdadabedin" rel="noreferrer">Mehrdad Abedin</a>. The code is on <a href="https://github.com/Mehrdadabedin/poker-icm-coach" rel="noreferrer">GitHub</a>.</p>
-  <p class="small">A training tool. It deals no real money and takes no bets.</p>
+  <p class="small">A practice tool. No real money is dealt, and no bets are taken.</p>
 </footer>
 
 <script type="module">
