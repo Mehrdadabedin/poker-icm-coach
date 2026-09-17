@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 
 from app.game.positions import position_for
 from app.strategy.coach import CoachRecommendation, CoachRequest
+from app.strategy.test_mode import compare_decisions
 
 if TYPE_CHECKING:  # pragma: no cover - import cycle guard
     from app.services.game_session import GameSession
@@ -52,4 +53,27 @@ def advice_dict(rec: CoachRecommendation) -> dict:
         "ev": rec.ev,
         "outs": rec.outs,
         "education": rec.education,
+    }
+
+
+def grade_last_action(session: GameSession) -> dict | None:
+    """The hero's last decision against the advice that stood when they made it.
+
+    Recomputing the advice here instead would price a decision the hero has
+    already taken against the table as it is now, after the bots answered and
+    often after the street changed.
+    """
+    action = session._last_hero_action
+    request = session._last_hero_request
+    if action is None or request is None:
+        return None
+    advice = advice_dict(session.coach.recommend(request))
+    comparison = compare_decisions(action, advice["recommendedAction"])
+    return {
+        "heroAction": action,
+        "coachAction": advice["recommendedAction"],
+        "grade": comparison.grade,
+        "explanation": comparison.explanation,
+        "icmFactors": comparison.icm_factors,
+        "rangeNote": comparison.range_note,
     }
