@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from app.game.actions import amount_to_call
 from app.game.dealing import deal_flop, deal_river, deal_turn
 
 if TYPE_CHECKING:  # pragma: no cover - import cycle guard
@@ -49,7 +50,7 @@ def owes_a_decision(street: StreetState, live: list[int]) -> bool:
     Heads up, the small blind shoving left one player with chips, and the hand
     ran the board out without ever asking them.
     """
-    return any(street.contributions.get(s, 0) < street.current_bet for s in live)
+    return any(amount_to_call(street.current_bet, street.contributions.get(s, 0)) > 0 for s in live)
 
 
 def rotate_after(order: list[int], seat: int) -> list[int]:

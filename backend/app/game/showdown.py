@@ -49,7 +49,7 @@ def settle(
             best = max(contenders, key=lambda s: hands[s])
             seats = [s for s in contenders if hands[s] == hands[best]]
             winners.append(HandWinner(seats=seats, amount=pot.total_amount))
-    return winners, sorted(eligible_seats), sum(contributions.values()) + dead
+    return winners, sorted(eligible_seats), sum(p.committed for p in players)
 
 
 def merge_winners(winners: list[HandWinner]) -> list[HandWinner]:

@@ -50,6 +50,11 @@ class Player:
     def is_all_in(self) -> bool:
         return self.stack == 0 and not self.is_eliminated
 
+    @property
+    def committed(self) -> int:
+        """Total chips this hand has put in: live bets plus the dead ante."""
+        return self.bet_total + self.ante_total
+
     def remove_chips(self, amount: int) -> None:
         """Remove chips (all-in does NOT eliminate; eliminate() is explicit)."""
         if amount < 0:
@@ -78,11 +83,7 @@ class Player:
 
     def post_ante(self, amount: int) -> None:
         """Move chips from stack into the dead pool, matching no bet."""
-        if amount < 0:
-            raise ValueError("ante cannot be negative")
-        if amount > self.stack:
-            raise ValueError(f"{self.name} cannot ante {amount} with stack {self.stack}")
-        self.stack -= amount
+        self.remove_chips(amount)
         self.ante_total += amount
 
     def __str__(self) -> str:
