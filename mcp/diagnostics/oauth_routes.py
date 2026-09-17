@@ -43,6 +43,8 @@ def static_scan(routes_file=None) -> dict:
         "router_prefix": prefix,
         "routes": routes,
         "callback_suffix_constant": suffix.group(1) if suffix else None,
+        # callback.py reads this from the scan so the router source is read once.
+        "proxy_headers_documented": "x-forwarded-proto" in text.lower(),
     }
 
 

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from app.ai.ai_framework import pot_odds as _pot_odds
 from app.equity.equity_engine import hero_vs_range
 from app.poker.card import Card
 from app.strategy.baseline_ranges import matrix_for_position
@@ -62,7 +63,7 @@ def call_jam_decision(
     seed: int | None = 11,
 ) -> PushFoldDecision:
     """Decide whether to call an all-in jam from the given range."""
-    pot_odds = to_call / max(1, pot + to_call)
+    pot_odds = _pot_odds(to_call, pot)
     try:
         equity = hero_vs_range(hero=hero, cells=villain_range, board=[], trials=trials, seed=seed)
         eq = equity.equity

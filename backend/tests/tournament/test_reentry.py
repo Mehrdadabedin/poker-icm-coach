@@ -75,11 +75,14 @@ def test_next_hand_applies_reentry_then_elimination() -> None:
     bot = s.tournament.players[2]
     bot.stack = 0
     s.next_hand()  # applies re-entry
-    # re-entry reset the stack to the starting amount; the new hand may then
-    # post a blind (100) on this seat if it rotates into SB/BB, so assert the
-    # reset happened without coupling to the next hand's blind seats.
+    # Re-entry resets the stack to the starting amount. next_hand deals the
+    # next hand and runs the bots up to the hero, so this seat may have posted
+    # a blind and may also have called or raised by now. What is behind plus
+    # what is already in front of it still has to add back up to the reset.
+    # The RNG is not seeded, and bounding the stack by one blind made this test
+    # fail whenever the seat acted voluntarily before the hero.
     assert not bot.is_eliminated
-    assert 45_000 - 100 <= bot.stack <= 45_000, bot.stack
+    assert bot.stack + bot.bet_total == 45_000, (bot.stack, bot.bet_total)
 
     # level 4 bust -> eliminated
     bot2 = s.tournament.players[3]

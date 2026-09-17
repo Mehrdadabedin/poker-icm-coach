@@ -4,7 +4,7 @@ from __future__ import annotations
 import os
 import re
 
-from config import BACKEND_DIR, backend_env_keys, read_backend_env_value
+from config import BACKEND_DIR, read_backend_env_value
 
 CONFIG_MODULE = BACKEND_DIR / "app/core/config.py"
 MAIN_MODULE = BACKEND_DIR / "app/main.py"
@@ -19,9 +19,10 @@ def _origins_and_source() -> tuple[list[str], str]:
     if "CORS_ORIGINS" in os.environ:
         raw = os.environ["CORS_ORIGINS"]
         return [o.strip() for o in raw.split(",") if o.strip()], "process environment"
-    if "CORS_ORIGINS" in backend_env_keys():
-        value = read_backend_env_value("CORS_ORIGINS") or ""
-        return [o.strip() for o in value.split(",") if o.strip()], "backend/.env"
+    # None means absent or empty; both fall through to the default below.
+    file_value = read_backend_env_value("CORS_ORIGINS")
+    if file_value is not None:
+        return [o.strip() for o in file_value.split(",") if o.strip()], "backend/.env"
     try:
         match = DEFAULT_RE.search(CONFIG_MODULE.read_text())
     except OSError:

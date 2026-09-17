@@ -33,10 +33,16 @@ BEARER_RE = re.compile(r"[\"\']?Authorization[\"\']?\s*[:=]\s*[\"\'`]?\s*Bearer"
 COOKIE_ATTRIBUTES = ("secure", "httponly", "samesite", "domain", "path")
 
 
+SOURCE_SUFFIXES = (".py", ".ts", ".tsx")
+
+
 def _scan(root, *patterns: re.Pattern) -> list[list[str]]:
     """One walk over root's source files, matched against each pattern in turn."""
     hits: list[list[str]] = [[] for _ in patterns]
-    for path in sorted(root.rglob("*.py")) + sorted(root.rglob("*.ts")) + sorted(root.rglob("*.tsx")):
+    candidates = (p for p in root.rglob("*") if p.suffix in SOURCE_SUFFIXES and p.is_file())
+    # Group by suffix, .py then .ts then .tsx, so hit lists keep a stable order.
+    ordered = sorted(candidates, key=lambda p: (SOURCE_SUFFIXES.index(p.suffix), p))
+    for path in ordered:
         if any(part in {"node_modules", ".venv", "dist", "__pycache__"} for part in path.parts):
             continue
         try:
