@@ -4,10 +4,8 @@ from __future__ import annotations
 import pytest
 
 from app.game.hand_result import HandAction
-from app.poker.card import card_from_str
 from app.services.hand_history import HandHistoryRecord, HandHistoryStore, replay
-
-H = card_from_str
+from tests.conftest import H
 
 
 def make_record(hand_number: int, stage: str = "BUBBLE") -> HandHistoryRecord:

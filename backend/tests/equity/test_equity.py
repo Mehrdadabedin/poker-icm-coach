@@ -2,10 +2,8 @@
 from __future__ import annotations
 
 from app.equity.equity_engine import EquityEngine, hero_vs_hand, hero_vs_random, hero_vs_range
-from app.poker.card import card_from_str
 from app.strategy.hand_codec import parse_range
-
-H = card_from_str
+from tests.conftest import H
 
 
 def test_preflop_aa_vs_kk_known() -> None:

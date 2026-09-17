@@ -9,15 +9,9 @@ import { TableHeader } from "../components/TableHeader";
 import { TableSidebar } from "../components/TableSidebar";
 import { useAutoNext } from "../hooks/useAutoNext";
 import { useGame } from "../hooks/useGame";
-import { ActionKind, LegalAction } from "../models/game";
+import { ActionKind, CoachAdvice, LegalAction } from "../models/game";
 import { useLabelPreferences } from "../services/preferences";
 import { clearAuth, coachAdvice, coachCompare, getToken, getUsername, logout } from "../services/api";
-
-interface CoachPanel {
-  recommendedAction: string;
-  reasoning: string;
-  detail: Record<string, string>;
-}
 
 const REVIEW_SECONDS = 10;
 
@@ -29,7 +23,7 @@ export function TablePage() {
   const [showReview, setShowReview] = useState(false);
   const { state, error, act, nextHand, acting, refresh: refreshTable } = useGame(tableId);
   const { countdown, paused, start, stop, pause, resume } = useAutoNext(nextHand, REVIEW_SECONDS);
-  const [coach, setCoach] = useState<CoachPanel | null>(null);
+  const [coach, setCoach] = useState<CoachAdvice | null>(null);
   const [comparison, setComparison] = useState<Record<string, string> | null>(null);
   const { actionLabels, resultLabels } = useLabelPreferences();
 

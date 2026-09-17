@@ -13,7 +13,7 @@ interface CardViewProps {
 export function CardView({ card, faceDown = false, small = false }: CardViewProps) {
   return (
     <PlayingCard
-      card={faceDown ? undefined : card}
+      card={card}
       faceDown={faceDown}
       className={small ? "card-small" : ""}
     />

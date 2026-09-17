@@ -70,17 +70,6 @@ body {
   margin-bottom: 6px;
 }
 
-.last-action {
-  flex: 1;
-  min-width: 180px;
-  text-align: right;
-  color: #d8f5e6;
-  font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .table-felt {
   position: relative;
   aspect-ratio: 16 / 9;
@@ -139,7 +128,6 @@ body {
   flex: 0 0 auto;
 }
 
-.header-btn,
 .btn.header-btn {
   min-width: 64px;
   min-height: 48px;
@@ -149,7 +137,6 @@ body {
   padding: 0 14px;
 }
 
-.header-icon-btn,
 .btn.header-icon-btn {
   min-width: 52px;
   min-height: 48px;

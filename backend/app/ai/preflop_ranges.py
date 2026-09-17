@@ -45,7 +45,7 @@ _DATA: dict[str, str] = {
           "| 8:22+,A2s+,K3s+,Q6s+,J8s+,T8s+,98s,A2o+,K9o+,QTo+ | 5:22+,A2s+,K2s+,Q4s+,J7s+,T7s+,97s+,86s+,A2o+,K7o+,Q9o+",
 }
 
-_OPEN_RANGES: dict[tuple[str, int], set[HandCell]] = {}
+_OPEN_RANGES: dict[tuple[str, int], frozenset[HandCell]] = {}
 
 
 @dataclass(frozen=True, slots=True)
@@ -64,7 +64,7 @@ def _build() -> None:
         for part in row.split("|"):
             band_text, _, range_text = part.strip().partition(":")
             band = int(band_text.strip())
-            _OPEN_RANGES[(position, band)] = parse_range(range_text)
+            _OPEN_RANGES[(position, band)] = frozenset(parse_range(range_text))
 
 
 _build()
@@ -80,7 +80,9 @@ def _band_for(depth_bb: int) -> int:
 def open_range_for(position: str, stack_bb: int) -> OpenRange:
     """Opening range for a position at the given effective stack depth."""
     band = _band_for(stack_bb)
-    cells = frozenset(_OPEN_RANGES.get((position, band), _OPEN_RANGES.get((position, _BANDS[0]), set())))
+    cells = _OPEN_RANGES.get((position, band))
+    if cells is None:
+        cells = _OPEN_RANGES.get((position, _BANDS[0]), frozenset())
     return OpenRange(position=position, band=band, cells=cells)
 
 

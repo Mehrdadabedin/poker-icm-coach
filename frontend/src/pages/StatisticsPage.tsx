@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { request } from "../services/api";
 import { Copyright } from "../components/Copyright";
+import { HomeButton } from "../components/HomeButton";
 
 type Stats = { handsPlayed: number; handsWon: number; vpip: number; pfr: number; aggression: number; averagePot: number; bbWonLost: number; chipProfit: number; coachAgreement: number; icmMistakes: number; positionPerformance: Record<string, number> };
 
@@ -15,7 +15,6 @@ const card = (label: string, value: string, extra?: string) => (
 
 /** STATISTICS screen: session aggregates from the API. */
 export function StatisticsPage() {
-  const navigate = useNavigate();
   const [stats, setStats] = useState<Stats | null>(null);
   const [tableId, setTableId] = useState("");
 
@@ -32,7 +31,7 @@ export function StatisticsPage() {
       <h1 className="screen-title">SESSION STATISTICS</h1>
       <div className="toolbar">
         <input placeholder="table id" value={tableId} onChange={(e) => setTableId(e.target.value)} />
-        <button className="btn btn-small" onClick={() => navigate("/")}>HOME</button>
+        <HomeButton />
       </div>
       {stats && (
         <>

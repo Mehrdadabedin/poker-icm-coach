@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from app.strategy.hand_codec import HAND_RANK_CHARS
+from app.strategy.hand_codec import RANK_CHAR
 
 RANKS = [14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2]
 
@@ -13,8 +13,8 @@ def matrix_size() -> int:
 
 
 def cell_name(hi: int, lo: int, suited: bool | None) -> str:
-    high = HAND_RANK_CHARS[hi]
-    low = HAND_RANK_CHARS[lo]
+    high = RANK_CHAR[hi]
+    low = RANK_CHAR[lo]
     if suited is None:
         return f"{high}{low}"
     return f"{high}{low}{'s' if suited else 'o'}"

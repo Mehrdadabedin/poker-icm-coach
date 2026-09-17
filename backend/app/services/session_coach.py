@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from app.game.positions import position_for
-from app.strategy.coach import CoachRecommendation, CoachRequest
+from app.strategy.coach import Coach, CoachRecommendation, CoachRequest
 from app.strategy.test_mode import compare_decisions
 
 if TYPE_CHECKING:  # pragma: no cover - import cycle guard
@@ -30,11 +30,12 @@ def coach_request(session: GameSession) -> CoachRequest:
                               len(tournament.players)),
         stack=hero.stack, big_blind=level.big, small_blind=level.small,
         ante=tournament.structure.ante_for(tournament.ante_mode, level),
-        pot=sum(p.bet_total for p in tournament.players),
+        pot=sum(p.committed for p in tournament.players),
         to_call=max(0, engine._street.current_bet - contributed),
         board=list(engine._board), street=engine.street,
         players_remaining=sum(1 for p in tournament.players if not p.is_eliminated),
-        paid_positions=6, stacks=[p.stack for p in tournament.players],
+        paid_positions=tournament.payout.paid_positions,
+        stacks=[p.stack for p in tournament.players],
         payout=[float(x) for x in tournament.payout.percentages],
         facing_raise=(engine._street.current_bet > level.big),
         hero_seat=session.hero_seat, level_index=tournament.level_index,
@@ -56,18 +57,17 @@ def advice_dict(rec: CoachRecommendation) -> dict:
     }
 
 
-def grade_last_action(session: GameSession) -> dict | None:
+def grade_last_action(coach: Coach, action: str | None,
+                      request: CoachRequest | None) -> dict | None:
     """The hero's last decision against the advice that stood when they made it.
 
     Recomputing the advice here instead would price a decision the hero has
     already taken against the table as it is now, after the bots answered and
     often after the street changed.
     """
-    action = session._last_hero_action
-    request = session._last_hero_request
     if action is None or request is None:
         return None
-    advice = advice_dict(session.coach.recommend(request))
+    advice = advice_dict(coach.recommend(request))
     comparison = compare_decisions(action, advice["recommendedAction"])
     return {
         "heroAction": action,

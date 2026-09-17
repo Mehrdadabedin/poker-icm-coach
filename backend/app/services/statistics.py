@@ -7,7 +7,6 @@ from app.services.hand_history import HandHistoryRecord
 
 PREFERRED_SCORE = 1.0
 ACCEPTABLE_SCORE = 0.5
-SUBOPTIMAL_SCORE = 0.0
 
 _VPIP_ACTIONS = {"CALL", "RAISE", "3-BET", "4-BET", "ALL-IN", "OPEN JAM", "RESHOVE"}
 _PFR_ACTIONS = {"RAISE", "3-BET", "4-BET", "OPEN JAM", "RESHOVE"}
@@ -101,13 +100,3 @@ def biggest_leak(records: list[HandHistoryRecord]) -> str | None:
         return None
     position, decision = worst[0]
     return f"Calling too wide from {position} ({decision.lower()}) — {abs(worst[1]):,} chips."
-
-
-class StatisticsEngine:
-    """Facade: aggregate a store's records into session statistics."""
-
-    def __init__(self, records: list[HandHistoryRecord] | None = None) -> None:
-        self.records = records or []
-
-    def calculate(self) -> SessionStatistics:
-        return aggregate(self.records)

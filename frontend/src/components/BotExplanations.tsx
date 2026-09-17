@@ -1,14 +1,5 @@
 import { useState } from "react";
-import { BotExplanation, formatChips } from "../models/game";
-
-const ACT_LABEL: Record<string, string> = {
-  fold: "Fold",
-  check: "Check",
-  call: "Call",
-  bet: "Bet",
-  raise: "Raise",
-  all_in: "All-in",
-};
+import { ACTION_LABEL, BotExplanation, formatChips } from "../models/game";
 
 interface BotExplanationsProps {
   explanations: BotExplanation[];
@@ -37,7 +28,7 @@ export function BotExplanations({ explanations }: BotExplanationsProps) {
           <button className="expl-head" onClick={() => toggle(i)} aria-expanded={expanded.has(i)}>
             <span className="expl-arrow">{expanded.has(i) ? "▾" : "▸"}</span>
             <span className="expl-who">
-              <b>{e.name}</b> — {ACT_LABEL[e.action] ?? e.action}
+              <b>{e.name}</b> — {ACTION_LABEL[e.action] ?? e.action}
               {e.amount != null ? ` ${formatChips(e.amount)}` : ""}
               <span className="expl-street">{e.street.toUpperCase()}</span>
             </span>

@@ -3,10 +3,8 @@ from __future__ import annotations
 
 from app.game.player import Player
 from app.game.side_pot import build_side_pots, distribute_pots
-from app.poker.card import card_from_str
 from app.poker.hand_evaluator import best_hand
-
-H = card_from_str
+from tests.conftest import H
 
 # Hands for showdown distribution tests
 ROYAL = best_hand([H(f) for f in ["Tc", "Jc", "Qc", "Kc", "Ac"]])
@@ -18,10 +16,6 @@ PAIR_A = best_hand([H(f) for f in ["As", "Ad", "3c", "7h", "9d"]])
 def build(contribs, eligible):
     pots, _ = build_side_pots(contribs, eligible)
     return pots
-
-
-def make(stack: int) -> Player:
-    return Player(name="X", stack=stack, seat=0)
 
 
 def test_no_side_pots_single_contributor_levels() -> None:

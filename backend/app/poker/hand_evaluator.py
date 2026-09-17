@@ -41,11 +41,9 @@ def best_hand(cards: list[Card]) -> HandRank:
     straight_high = _straight_high(uniq)
 
     if flush_ranks:
-        sf_high = _straight_high(list(dict.fromkeys(flush_ranks)))
+        sf_high = _straight_high(flush_ranks)
         if sf_high is not None:
-            wheel = sf_high == 5 and 14 in flush_ranks and 5 in flush_ranks
-            top = 5 if wheel else sf_high
-            cards5 = _straight_cards(cards, top)
+            cards5 = _straight_cards(cards, sf_high)
             return HandRank(HandCategory.STRAIGHT_FLUSH, (sf_high,), cards5)
 
     if 4 in counts.values():
@@ -64,9 +62,7 @@ def best_hand(cards: list[Card]) -> HandRank:
         return HandRank(HandCategory.FLUSH, tuple(flush_ranks[:5]), _cards_for(cards, {r: 1 for r in flush_ranks[:5]}))
 
     if straight_high is not None:
-        wheel = straight_high == 5 and 14 in set(ranks)
-        top = 5 if wheel else straight_high
-        return HandRank(HandCategory.STRAIGHT, (straight_high,), tuple(_straight_cards(cards, top)))
+        return HandRank(HandCategory.STRAIGHT, (straight_high,), _straight_cards(cards, straight_high))
 
     if trips:
         trip_rank = trips[0]

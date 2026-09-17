@@ -56,12 +56,26 @@ def build_side_pots(
     return pots, refunds
 
 
+def seats_left_of(button: int, players: dict[int, Player]) -> list[int]:
+    """Seats in order from the first one left of the button."""
+    seats = sorted(players)
+    # Split rather than take a modulus against the highest seat: a button above
+    # every seat present wrapped the whole order and reversed it.
+    return [s for s in seats if s > button] + [s for s in seats if s <= button]
+
+
 def distribute_pots(
     pots: list[SidePot],
     players: dict[int, Player],
     hands: dict[int, HandRank],
+    order: list[int] | None = None,
 ) -> None:
-    """Award every pot to the best eligible hand(s), splitting odd chips."""
+    """Award every pot to the best eligible hand(s), splitting odd chips.
+
+    An odd chip goes to the first tied winner left of the button (TDA rule 21).
+    Awarding it in set iteration order handed it to whichever seat the set
+    happened to yield first."""
+    rank_of = {seat: i for i, seat in enumerate(order or [])}
     for pot in pots:
         if pot.total_amount == 0:
             continue
@@ -73,6 +87,23 @@ def distribute_pots(
         if len(winners) == 1:
             players[winners[0]].add_chips(pot.total_amount)
         else:
+            winners.sort(key=lambda s: rank_of.get(s, s))
             base, odd = divmod(pot.total_amount, len(winners))
             for i, seat in enumerate(winners):
                 players[seat].add_chips(base + (1 if i < odd else 0))
+
+
+def merge_equal_pots(pots: list[SidePot]) -> list[SidePot]:
+    """Fold neighbouring layers that the same seats can win into one.
+
+    Two layers with identical eligibility are one pot in every way that
+    matters, and keeping them apart rounds the odd chip of a split pot once per
+    layer instead of once.
+    """
+    merged: list[SidePot] = []
+    for pot in pots:
+        if merged and merged[-1].eligible_seats == pot.eligible_seats:
+            merged[-1].total_amount += pot.total_amount
+            continue
+        merged.append(pot)
+    return merged

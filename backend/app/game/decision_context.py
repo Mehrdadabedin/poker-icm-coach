@@ -28,7 +28,7 @@ def build_context(engine: HandEngine, seat: int) -> DecisionContext:
         hole_cards=list(player.hole_cards),
         board=list(engine._board),
         street=engine.street,
-        pot=sum(p.bet_total for p in tournament.players),
+        pot=sum(p.committed for p in tournament.players),
         current_bet=street.current_bet,
         contribution=contribution,
         stack=player.stack,

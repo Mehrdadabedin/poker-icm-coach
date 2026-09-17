@@ -30,7 +30,7 @@ def compare_decisions(
 
     PREFERRED: same action (or a documented near-equivalent).
     ACCEPTABLE: a reasonable alternative with close expected value.
-    SUBOPTIMAL: a materially worse action — explained, never mocked.
+    SUBOPTIMAL: a materially worse action, explained, never mocked.
     """
     equivalent = equivalent or {("CALL", "CHECK"), ("CHECK", "CALL")}
     if hero_action == coach_action or (hero_action, coach_action) in equivalent:

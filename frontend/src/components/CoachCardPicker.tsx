@@ -9,10 +9,6 @@ export function cardKey(card: Card): string {
   return `${card.rank}${card.suit}`;
 }
 
-export function cardEquals(a: Card, b: Card): boolean {
-  return a.rank === b.rank && a.suit === b.suit;
-}
-
 interface CardPickerProps {
   value: Card | null;
   label: string;
@@ -32,6 +28,7 @@ export function CardPicker({ value, label, used, onChange, resetAfterPick = fals
   }, [value]);
 
   const usedKeys = new Set(used.map(cardKey));
+  const slug = label.toLowerCase().replace(/\W+/g, "-");
 
   const commit = (r: string, s: string) => {
     if (!r || !s) return;
@@ -45,12 +42,12 @@ export function CardPicker({ value, label, used, onChange, resetAfterPick = fals
   };
 
   return (
-    <div className="card-picker" data-testid={`picker-${label.toLowerCase().replace(/\W+/g, "-")}`}>
+    <div className="card-picker" data-testid={`picker-${slug}`}>
       <span className="picker-label">{label}</span>
       <select
         value={rank}
         onChange={(e) => { setRank(e.target.value); commit(e.target.value, suit); }}
-        data-testid={`${label.toLowerCase().replace(/\W+/g, "-")}-rank`}
+        data-testid={`${slug}-rank`}
       >
         <option value="" disabled>Rank</option>
         {RANKS.map((r) => <option key={r} value={r}>{r}</option>)}
@@ -58,7 +55,7 @@ export function CardPicker({ value, label, used, onChange, resetAfterPick = fals
       <select
         value={suit}
         onChange={(e) => { setSuit(e.target.value); commit(rank, e.target.value); }}
-        data-testid={`${label.toLowerCase().replace(/\W+/g, "-")}-suit`}
+        data-testid={`${slug}-suit`}
       >
         <option value="" disabled>Suit</option>
         {SUITS.map((s) => {

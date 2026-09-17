@@ -48,9 +48,17 @@ class AIDecisionProvider:
         return postflop_strategy(ctx, provider, ranks, suited)
 
 
+def to_call_amount(ctx: DecisionContext) -> int:
+    return max(0, ctx.current_bet - ctx.contribution)
+
+
+def pot_odds(to_call: int, pot: int) -> float:
+    return to_call / max(1, pot + to_call)
+
+
 def conservative_action(ctx: DecisionContext) -> Action:
     """Safe fallback when hole cards are unavailable (keeps hands legal)."""
-    to_call = max(0, ctx.current_bet - ctx.contribution)
+    to_call = to_call_amount(ctx)
     if to_call == 0:
         return Action(ActionType.CHECK)
     if to_call >= ctx.stack:
@@ -67,7 +75,7 @@ def clamp_to_legal(
     """Return a legal action closest to the suggestion (used by all AI)."""
     kinds = {a.type for a in legal}
     if suggested.type in kinds:
-        if suggested.type == ActionType.RAISE or suggested.type == ActionType.BET:
+        if suggested.type in (ActionType.RAISE, ActionType.BET):
             meta = next(a for a in legal if a.type == suggested.type)
             low = max(meta.min_amount or 0, suggested.amount or 0)
             high = meta.max_amount or ctx.stack
@@ -75,16 +83,13 @@ def clamp_to_legal(
                 return Action(ActionType.ALL_IN, amount=ctx.stack, is_all_in=True)
             amount = min(max(suggested.amount or low, low), high)
             return Action(suggested.type, amount=amount, min_amount=meta.min_amount, max_amount=meta.max_amount)
-        if suggested.type == ActionType.CALL:
-            to_call = max(0, ctx.current_bet - ctx.contribution)
-            if to_call >= ctx.stack:
-                return Action(ActionType.ALL_IN, amount=ctx.stack, is_all_in=True)
+        if suggested.type == ActionType.CALL and to_call_amount(ctx) >= ctx.stack:
+            return Action(ActionType.ALL_IN, amount=ctx.stack, is_all_in=True)
         return suggested
     if ActionType.CHECK in kinds and ctx.current_bet <= ctx.contribution:
         return Action(ActionType.CHECK)
     if ActionType.CALL in kinds:
-        to_call = max(0, ctx.current_bet - ctx.contribution)
-        return Action(ActionType.CALL, amount=min(to_call, ctx.stack))
+        return Action(ActionType.CALL, amount=min(to_call_amount(ctx), ctx.stack))
     if ActionType.ALL_IN in kinds and suggested.type == ActionType.CALL:
         return Action(ActionType.ALL_IN, amount=ctx.stack, is_all_in=True)
     if ActionType.FOLD in kinds:

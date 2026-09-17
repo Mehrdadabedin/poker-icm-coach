@@ -6,7 +6,7 @@ from diagnostics.cookies import check_cookie_configuration
 from diagnostics.cors import check_cors_configuration
 from diagnostics.health import check_backend_health
 from diagnostics.oauth_env import check_google_oauth_environment
-from diagnostics.oauth_routes import check_oauth_routes
+from diagnostics.oauth_routes import check_oauth_routes, static_scan
 
 
 def decide_status(routes: dict, environment: dict, backend: dict) -> tuple[str, list[str]]:
@@ -37,9 +37,10 @@ def decide_status(routes: dict, environment: dict, backend: dict) -> tuple[str, 
 async def diagnose_google_oauth(base_url: str | None = None, include_production: bool = True) -> dict:
     """Structured Google sign-in report. Changes nothing anywhere."""
     backend = await check_backend_health(base_url)
-    routes = await check_oauth_routes(base_url)
+    scan = static_scan()
+    routes = await check_oauth_routes(base_url, scan=scan)
     environment = check_google_oauth_environment()
-    callback = check_google_callback_configuration(base_url)
+    callback = check_google_callback_configuration(base_url, scan=scan)
     cors = check_cors_configuration()
     cookies = check_cookie_configuration()
     status, findings = decide_status(routes, environment, backend)

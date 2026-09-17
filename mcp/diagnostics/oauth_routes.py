@@ -16,11 +16,15 @@ ROUTES_FILE = BACKEND_DIR / "app/api/routes_oauth.py"
 PREFIX_RE = re.compile(r"APIRouter\(\s*prefix\s*=\s*[\"\']([^\"\']+)[\"\']")
 ROUTE_RE = re.compile(r"@router\.(get|post|put|delete|patch)\(\s*[\"\']([^\"\']+)[\"\']")
 CALLBACK_SUFFIX_RE = re.compile(r"_CALLBACK_SUFFIX\s*=\s*[\"\']([^\"\']+)[\"\']")
-GOOGLE_HINTS = ("google",)
 
 
 def static_scan(routes_file=None) -> dict:
-    """Routes declared in the router module. Missing or odd files degrade."""
+    """Routes declared in the router module. Missing or odd files degrade.
+
+    diagnose_google_oauth needs this result for both the route check and the
+    callback check, so it calls this once and passes it to each as `scan`
+    rather than have every caller read and parse the router source again.
+    """
     path = routes_file or ROUTES_FILE
     try:
         text = path.read_text()
@@ -39,6 +43,8 @@ def static_scan(routes_file=None) -> dict:
         "router_prefix": prefix,
         "routes": routes,
         "callback_suffix_constant": suffix.group(1) if suffix else None,
+        # callback.py reads this from the scan so the router source is read once.
+        "proxy_headers_documented": "x-forwarded-proto" in text.lower(),
     }
 
 
@@ -49,9 +55,12 @@ def _pick(routes: list[dict], needle: str) -> str | None:
     return None
 
 
-async def check_oauth_routes(base_url: str | None = None) -> dict:
-    """Do the Google authorization and callback routes exist?"""
-    scan = static_scan()
+async def check_oauth_routes(base_url: str | None = None, scan: dict | None = None) -> dict:
+    """Do the Google authorization and callback routes exist?
+
+    `scan`: see `static_scan`.
+    """
+    scan = static_scan() if scan is None else scan
     authorization = _pick(scan.get("routes", []), "/google/start")
     callback = _pick(scan.get("routes", []), "/google/callback")
     notes = []
@@ -86,7 +95,7 @@ async def check_oauth_routes(base_url: str | None = None) -> dict:
         "callback_route": callback,
         "routes_found": routes_found,
         "router_prefix": scan.get("router_prefix"),
-        "google_routes": [r for r in scan.get("routes", []) if any(h in r["path"] for h in GOOGLE_HINTS)],
+        "google_routes": [r for r in scan.get("routes", []) if "google" in r["path"]],
         "static_scan": {"file": scan.get("source_file"), "ok": scan.get("ok")},
         "live_check": live,
         "notes": notes + ["read-only: routes are inspected, never changed"],

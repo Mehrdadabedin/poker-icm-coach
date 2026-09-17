@@ -9,7 +9,6 @@ from app.poker.card import Card, Rank, Suit
 
 class DeckEmpty(Exception):
     """Raised when draw() is called on an exhausted deck."""
-    pass  # noqa: PIE790  (explicit exception class)
 
 
 class Deck:

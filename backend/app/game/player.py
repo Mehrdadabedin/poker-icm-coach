@@ -24,6 +24,9 @@ class Player:
         self.hole_cards: list[Card] = []
         self.folded = False
         self.bet_total = 0
+        # Antes are dead money: they belong to the pot but match nothing, so
+        # side pots must not treat them as a wager anyone has to call.
+        self.ante_total = 0
         self.sit_out = False
 
     def new_hand(self) -> None:
@@ -31,6 +34,7 @@ class Player:
         self.hole_cards = []
         self.folded = False
         self.bet_total = 0
+        self.ante_total = 0
 
     def set_hole_cards(self, cards: list[Card]) -> None:
         if len(cards) != 2:
@@ -45,6 +49,11 @@ class Player:
     @property
     def is_all_in(self) -> bool:
         return self.stack == 0 and not self.is_eliminated
+
+    @property
+    def committed(self) -> int:
+        """Total chips this hand has put in: live bets plus the dead ante."""
+        return self.bet_total + self.ante_total
 
     def remove_chips(self, amount: int) -> None:
         """Remove chips (all-in does NOT eliminate; eliminate() is explicit)."""
@@ -72,12 +81,10 @@ class Player:
         self.stack -= amount
         self.bet_total += amount
 
-    def refund_bet(self, amount: int) -> None:
-        """Return chips from the bet pool (uncalled portion)."""
-        if amount < 0 or amount > self.bet_total:
-            raise ValueError(f"invalid refund {amount} of bet_total {self.bet_total}")
-        self.bet_total -= amount
-        self.stack += amount
+    def post_ante(self, amount: int) -> None:
+        """Move chips from stack into the dead pool, matching no bet."""
+        self.remove_chips(amount)
+        self.ante_total += amount
 
     def __str__(self) -> str:
         return f"{self.name} (seat {self.seat}, {self.stack} chips)"

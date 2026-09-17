@@ -6,19 +6,13 @@ cards revealed. Bot decision explanations live in bot_review.py.
 """
 from __future__ import annotations
 
-from app.game.hand_setup import _blind_seats, active_seats
+from app.game.hand_setup import active_seats, blind_seats
 from app.game.positions import position_for
-from app.poker.card import Card
+from app.poker.card import card_model
 from app.poker.hand_evaluator import best_hand
 from app.poker.hand_rank import CATEGORY_NAMES, HandCategory
-from app.services.bot_review import _pressure, build_explanations
+from app.services.bot_review import build_explanations, hand_pressure
 from app.strategy.hand_codec import RANK_CHAR
-
-_SUIT_CHAR = {0: "c", 1: "d", 2: "h", 3: "s"}
-
-
-def card_model(card: Card) -> dict:
-    return {"rank": RANK_CHAR[card.rank.value], "suit": _SUIT_CHAR[card.suit.value]}
 
 
 def hand_description(hand) -> str:
@@ -84,7 +78,7 @@ def build_review(session) -> dict | None:
                     ("Uncontested (all others folded)" if len(result.showed_down) <= 1 else None))
 
     active = sorted(active_seats(players))
-    sb, bb = _blind_seats(result.button, set(active), len(players))
+    sb, bb = blind_seats(result.button, set(active), len(players))
     actions = [
         {"seat": sb, "name": players[sb].name, "action": "small_blind", "amount": level.small, "street": "preflop"},
         {"seat": bb, "name": players[bb].name, "action": "big_blind", "amount": level.big, "street": "preflop"},
@@ -105,7 +99,7 @@ def build_review(session) -> dict | None:
 
     rb = sorted(result.starting_stacks.values(), reverse=True)
     ra = sorted(result.ending_stacks.values(), reverse=True)
-    pressure = _pressure(session, result, level)
+    pressure = hand_pressure(session, result, level)
     return {
         "handNumber": result.hand_number, "pot": result.pot_total,
         "board": [card_model(c) for c in board],

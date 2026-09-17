@@ -9,7 +9,7 @@ from __future__ import annotations
 import os
 import re
 
-from config import SECRET_SETTING_NAMES, backend_env_keys
+from config import SECRET_SETTING_NAMES
 
 REDACTED = "[redacted]"
 
@@ -69,7 +69,6 @@ def assert_no_secret_leak(text: str) -> None:
 __all__ = [
     "REDACTED",
     "assert_no_secret_leak",
-    "backend_env_keys",
     "redact_tree",
     "scrub_text",
 ]

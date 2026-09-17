@@ -19,7 +19,14 @@ from app.game.hand_setup import (
     post_blinds_and_antes,
 )
 from app.game.showdown import merge_winners, settle
-from app.game.street_flow import deal_next_street, runout_and_showdown
+from app.game.street_flow import (
+    deal_next_street,
+    next_street_or_showdown,
+    owes_a_decision,
+    rotate_after,
+    runout_and_showdown,
+    with_chips,
+)
 from app.poker.deck import Deck
 from app.tournament.tournament import Tournament
 
@@ -64,7 +71,12 @@ class HandEngine:
         self._deck.shuffle()
         deal_hole_cards(active_players(self.tournament.players), self._deck)
         self.street = "preflop"
-        self._queue = deque(self._order("preflop", active))
+        self._queue = deque(with_chips(self._order("preflop", active), self._active_non_allin()))
+        if not self._queue:
+            # Blinds and antes can take every remaining stack, leaving nobody to
+            # act. Without this the hand sat on an empty queue with no actor and
+            # no result, and neither the bots nor the hero could move it on.
+            self._next_street_or_showdown()
 
     @property
     def current_actor(self) -> int | None:
@@ -90,23 +102,16 @@ class HandEngine:
             can_raise=self._street.may_raise(seat, big_blind),
         )
         bet_before = self._street.current_bet
-        reopened_before = set(self._street.acted_since_full_raise)
-        apply_action(self._street, player, action, street_contrib, big_blind)
+        full_raise = apply_action(self._street, player, action, street_contrib, big_blind)
         # The log records what the action actually put in, not the number the
         # caller sent. An all-in ignores the supplied amount entirely, so a bot
         # was logged at its bare stack and the hero at whatever the client sent.
         committed = self._street.contributions.get(seat)
         logged = committed if action.type not in (ActionType.FOLD, ActionType.CHECK) else None
         self._log.append(HandAction(seat, action.type.value, logged, self.street))
-        # Only a full raise reopens the betting. An all-in short of one takes the
-        # bet up without giving players who already acted another turn to raise.
-        # apply_action says which happened by replacing the acted set rather
-        # than adding to it. Comparing last_raise instead misread an all-in
-        # whose increment exactly equalled the previous one as incomplete.
-        full_raise = self._street.current_bet > bet_before and (
-            action.type in (ActionType.BET, ActionType.RAISE)
-            or (self._street.acted_since_full_raise == {seat} and reopened_before != {seat})
-        )
+        # Only a full raise reopens the betting. An all-in short of one takes
+        # the bet up without giving players who already acted another turn to
+        # raise; apply_action's return says which happened.
         self._after_action(seat, raised=self._street.current_bet > bet_before,
                            full_raise=full_raise)
 
@@ -123,13 +128,16 @@ class HandEngine:
         if len(in_hand) <= 1:
             self._finish_hand()
             return
-        if len(self._active_non_allin()) <= 1:
-            # everyone left is all-in (or only one has chips left): run the board out
+        live = self._active_non_allin()
+        if len(live) <= 1 and not owes_a_decision(self._street, live):
+            # Nobody left can bet and nobody owes an answer: run the board out.
             self._runout_and_showdown()
             return
         if raised:
-            order = self._order(self.street, sorted(active_seats(self.tournament.players)))
-            owed = [s for s in order if s != seat and s in self._active_non_allin()]
+            order = rotate_after(
+                self._order(self.street, sorted(active_seats(self.tournament.players))), seat
+            )
+            owed = [s for s in order if s != seat and s in live]
             if full_raise:
                 self._queue = deque(owed)
             else:
@@ -145,17 +153,7 @@ class HandEngine:
             self._next_street_or_showdown()
 
     def _next_street_or_showdown(self) -> None:
-        in_hand = in_hand_seats(self.tournament.players)
-        if len(in_hand) <= 1 or all(
-            self.tournament.players[s].stack == 0 for s in in_hand
-        ):
-            self._runout_and_showdown() if len(in_hand) > 1 else self._finish_hand()
-            return
-        self._deal_next_street()
-        self._street = StreetState()
-        # New street: only in-hand (non-folded) players may act.
-        active = sorted(in_hand_seats(self.tournament.players))
-        self._queue = deque(self._order(self.street, active))
+        next_street_or_showdown(self)
 
     def _deal_next_street(self) -> None:
         deal_next_street(self)
@@ -166,8 +164,14 @@ class HandEngine:
     def _finish_hand(self) -> None:
         if self.is_complete:
             return
+        # A settled hand has nobody to act. The queue was left holding the last
+        # street's seats, so current_actor still named one after the result.
+        self._queue.clear()
         in_hand = in_hand_seats(self.tournament.players)
-        winners, showed, pot_total = settle(self.tournament.players, in_hand, self._board)
+        winners, showed, pot_total = settle(
+            self.tournament.players, in_hand, self._board, self.tournament.ante_mode,
+            self.button,
+        )
         self.is_complete = True
         self.street = "complete"
         self.result = HandResult(

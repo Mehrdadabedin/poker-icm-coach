@@ -1,11 +1,10 @@
-import { Card, PlayerView, TableState, chipsInBB } from "./models/game";
+import { Card, HandReview, PlayerView, POSITIONS_9MAX, TableState, chipsInBB } from "./models/game";
 
-const POSITIONS = ["UTG", "UTG+1", "MP", "LJ", "HJ", "CO", "BTN", "SB", "BB"];
 const CHIPS = [32100, 27800, 45000, 39400, 5100, 42900, 41000, 8200, 43500];
 
 /** Static sample table state used by App and tests until the API lands. */
 export function sampleTableState(heroSeat = 0, dealerSeat = 8): TableState {
-  const players: PlayerView[] = POSITIONS.map((position, i) => {
+  const players: PlayerView[] = POSITIONS_9MAX.map((position, i) => {
     const base: PlayerView = {
       seat: i,
       name: i === heroSeat ? "Alice" : `Bot ${i}`,
@@ -54,7 +53,7 @@ export function sampleTableState(heroSeat = 0, dealerSeat = 8): TableState {
 }
 
 /** Sample completed-hand review (A10 tests). */
-export function sampleReview(): import("./models/game").HandReview {
+export function sampleReview(): HandReview {
   return {
     handNumber: 7,
     pot: 3400,

@@ -154,7 +154,7 @@ class GameSession:
     def grade_hero(self) -> dict | None:
         """Test mode: compare last hero action vs coach recommendation."""
         with self._lock:
-            return grade_last_action(self)
+            return grade_last_action(self.coach, self._last_hero_action, self._last_hero_request)
 
     REENTRY_LEVELS = 3  # levels 1-3 get a fresh stack on bust
 

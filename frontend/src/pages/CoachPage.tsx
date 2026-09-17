@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { request } from "../services/api";
 import { Copyright } from "../components/Copyright";
-import { Card } from "../models/game";
+import { HomeButton } from "../components/HomeButton";
+import { Card, POSITIONS_9MAX } from "../models/game";
 import { CardPicker, SUIT_SYMBOL, cardKey } from "../components/CoachCardPicker";
 
 interface HandClass {
@@ -20,11 +20,8 @@ type Advice = {
   education: string;
 };
 
-const POSITIONS = ["UTG", "UTG+1", "MP", "LJ", "HJ", "CO", "BTN", "SB", "BB"];
-
 /** ICM COACH: full 169-class + exact-card analysis with EV/outs/education. */
 export function CoachPage() {
-  const navigate = useNavigate();
   const [mode, setMode] = useState<"hand" | "exact">("hand");
   const [hands169, setHands169] = useState<HandClass[]>([]);
   const [handName, setHandName] = useState("AA");
@@ -122,7 +119,7 @@ export function CoachPage() {
               key={i}
               label={`CARD ${i + 1}`}
               value={hero[i]?.rank ? hero[i] : null}
-              used={hero.filter((_, j) => j !== i) as Card[]}
+              used={hero.filter((_, j) => j !== i)}
               onChange={setHeroCard(i as 0 | 1)}
             />
           ))}
@@ -131,7 +128,7 @@ export function CoachPage() {
 
       <div className="train-grid">
         <div className="toolbar">
-          <label>POSITION<select value={position} onChange={(e) => setPosition(e.target.value)}>{POSITIONS.map((p) => <option key={p}>{p}</option>)}</select></label>
+          <label>POSITION<select value={position} onChange={(e) => setPosition(e.target.value)}>{POSITIONS_9MAX.map((p) => <option key={p}>{p}</option>)}</select></label>
           <label>OPPONENTS<input type="number" min={1} max={8} value={opponents} onChange={(e) => setOpponents(Number(e.target.value))} /></label>
           <label>STACK<input type="number" min={0} value={stack} onChange={(e) => setStack(Number(e.target.value))} /></label>
           <label>POT<input type="number" min={0} value={pot} onChange={(e) => setPot(Number(e.target.value))} /></label>
@@ -141,7 +138,7 @@ export function CoachPage() {
           <label>SMALL BLIND<input type="number" min={0} value={smallBlind} onChange={(e) => setSmallBlind(Number(e.target.value))} /></label>
           <label>BIG BLIND<input type="number" min={1} value={bigBlind} onChange={(e) => setBigBlind(Number(e.target.value))} /></label>
           <button className="btn" onClick={run} disabled={running || !boardReady} data-testid="analyze-btn">ANALYZE</button>
-          <button className="btn btn-small" onClick={() => navigate("/")}>HOME</button>
+          <HomeButton />
         </div>
       </div>
 
@@ -155,7 +152,7 @@ export function CoachPage() {
             </span>
           ))}
           {board.length < 5 && (
-            <CardPicker label="ADD CARD" value={null} used={[...hero, ...board].filter(Boolean) as Card[]} onChange={addBoardCard} resetAfterPick />
+            <CardPicker label="ADD CARD" value={null} used={[...hero, ...board]} onChange={addBoardCard} resetAfterPick />
           )}
         </div>
       </div>

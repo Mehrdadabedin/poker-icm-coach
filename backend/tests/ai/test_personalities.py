@@ -80,7 +80,7 @@ def test_adaptive_profile_adjusts() -> None:
     base = adaptive_profile()
     # winning stretch increases bluffing slightly; everything stays in bounds
     for _ in range(8):
-        base.observe_result(won=True, shown_down=False)
+        base.observe_result(won=True)
     assert 0 <= base.bluff <= 1
     assert 0 <= base.vpip <= 1
     assert 0 <= base.call_tendency <= 1
@@ -91,5 +91,5 @@ def test_adaptive_learning_trend() -> None:
     # repeated losses against aggressive opponents should reduce bluffing
     start_bluff = a.bluff
     for _ in range(10):
-        a.observe_result(won=False, shown_down=True)
+        a.observe_result(won=False)
     assert a.bluff < start_bluff + 1e-9 or a.bluff <= 0.2  # pushes toward low bluff

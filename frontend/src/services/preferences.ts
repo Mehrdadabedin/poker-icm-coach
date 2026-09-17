@@ -11,14 +11,14 @@ when the label is hidden.
 import { useEffect, useState } from "react";
 import { request } from "./api";
 
-export interface LabelPreferences {
+interface LabelPreferences {
   actionLabels: boolean;
   resultLabels: boolean;
 }
 
 const DEFAULTS: LabelPreferences = { actionLabels: true, resultLabels: true };
 
-type SettingsPayload = {
+export type SettingsPayload = {
   startingStack: number;
   startingSmallBlind: number;
   startingBigBlind: number;
@@ -31,7 +31,7 @@ type SettingsPayload = {
 let cached: LabelPreferences | null = null;
 let inflight: Promise<LabelPreferences> | null = null;
 
-export function loadLabelPreferences(force = false): Promise<LabelPreferences> {
+function loadLabelPreferences(force = false): Promise<LabelPreferences> {
   if (cached !== null && !force) return Promise.resolve(cached);
   if (inflight === null) {
     inflight = request<SettingsPayload>("/api/settings")

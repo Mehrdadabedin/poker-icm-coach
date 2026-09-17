@@ -22,10 +22,6 @@ class BoardTexture:
     def wet(self) -> bool:
         return self.connected and len(self.suits) <= 2 or self.paired and self.count >= 4
 
-    @property
-    def two_tone(self) -> bool:
-        return len(self.suits) == 2
-
 
 def classify_board(cards: list[Card]) -> BoardTexture:
     if not cards:

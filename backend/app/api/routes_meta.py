@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from app.api.deps import require_user
 from app.api.routes_game import get_session
+from app.core.tournament_settings import settings as tournament_settings
 from app.icm.icm_engine import ICMEngine
 from app.schemas.settings_schemas import SettingsUpdate
 from app.services.session_store import session_store
@@ -77,9 +78,7 @@ def icm_calculate(stacks: str, payouts: str) -> dict:
 
 @router.get("/settings")
 def get_settings(user: str = Depends(require_user)) -> dict:
-    from app.core.tournament_settings import settings as store
-
-    return store.for_user(user).to_dict()
+    return tournament_settings.for_user(user).to_dict()
 
 
 @router.put("/settings")
@@ -89,9 +88,7 @@ def put_settings(request: SettingsUpdate,
 
     Issue #3: settings are per user, so one account's edit never reaches
     another's tables."""
-    from app.core.tournament_settings import settings as store
-
-    ts = store.for_user(user)
+    ts = tournament_settings.for_user(user)
     ts.update(**request.model_dump(exclude_none=True))
     return ts.to_dict()
 

@@ -25,7 +25,7 @@ class PersonalityProfile:
     four_bet: float = 0.04
     results: list[bool] = field(default_factory=list)  # won/lost history
 
-    def observe_result(self, won: bool, shown_down: bool = False) -> None:
+    def observe_result(self, won: bool) -> None:
         """Feed a hand result; adaptive profiles shift tendencies bounded."""
         self.results.append(won)
         recent = self.results[-20:]
@@ -39,15 +39,22 @@ class PersonalityProfile:
         self._clamp()
 
     def _clamp(self) -> None:
-        for attr in ("vpip", "pfr", "three_bet", "aggression", "bluff",
-                     "call_tendency", "fold_tendency", "four_bet"):
-            value = getattr(self, attr)
-            setattr(self, attr, max(0.0, min(1.0, value)))
+        clamp01(self, _PROFILE_ATTRS)
+
+
+_PROFILE_ATTRS = ("vpip", "pfr", "three_bet", "aggression", "bluff",
+                  "call_tendency", "fold_tendency", "four_bet")
+
+
+def clamp01(obj: object, attrs: tuple[str, ...]) -> None:
+    """Bound each named [0, 1] attribute of obj in place."""
+    for attr in attrs:
+        value = getattr(obj, attr)
+        setattr(obj, attr, max(0.0, min(1.0, value)))
 
 
 def validate_profile(p: PersonalityProfile) -> None:
-    for attr in ("vpip", "pfr", "three_bet", "aggression", "bluff",
-                 "call_tendency", "fold_tendency", "four_bet"):
+    for attr in _PROFILE_ATTRS:
         value = getattr(p, attr)
         if not 0 <= value <= 1:
             raise ValueError(f"{p.name}.{attr} out of range: {value}")
@@ -76,9 +83,7 @@ def profiles() -> list[PersonalityProfile]:
 
 def adaptive_profile() -> PersonalityProfile:
     """Starts balanced and shifts with observed results."""
-    return PersonalityProfile(name="adaptive", vpip=0.28, pfr=0.17, three_bet=0.09,
-                              aggression=0.55, bluff=0.16, call_tendency=0.50,
-                              fold_tendency=0.35, four_bet=0.05)
+    return _p("adaptive", 0.28, 0.17, 0.09, 0.55, 0.16, 0.50, 0.35, 0.05)
 
 
 def profile_for(name: str) -> PersonalityProfile:

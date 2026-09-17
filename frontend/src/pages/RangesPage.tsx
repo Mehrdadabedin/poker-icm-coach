@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { rangeGrid } from "../services/api";
 import { Copyright } from "../components/Copyright";
-
-const COLUMNS = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"];
-const POSITIONS = ["UTG", "UTG+1", "MP", "LJ", "HJ", "CO", "BTN", "SB", "BB"];
+import { HomeButton } from "../components/HomeButton";
+import { RANKS as COLUMNS } from "../components/CoachCardPicker";
+import { POSITIONS_9MAX as POSITIONS } from "../models/game";
 
 /** RANGES screen: baseline 13x13 matrix per position and stack depth. */
 export function RangesPage() {
-  const navigate = useNavigate();
   const [position, setPosition] = useState("BTN");
   const [depth, setDepth] = useState(30);
   const [grid, setGrid] = useState<string[][]>([]);
@@ -28,7 +26,7 @@ export function RangesPage() {
         <select value={depth} onChange={(e) => setDepth(Number(e.target.value))}>
           {[100, 50, 30, 20, 12, 8, 5].map((d) => <option key={d} value={d}>{d} BB</option>)}
         </select>
-        <button className="btn btn-small" onClick={() => navigate("/")}>HOME</button>
+        <HomeButton />
       </div>
       <div className="matrix-scroll">
         <table className="range-matrix" data-testid="range-matrix">

@@ -11,9 +11,6 @@ from app.poker.card import Card
 
 logger = logging.getLogger(__name__)
 
-POSITION_LABEL = {"UTG": "UTG", "UTG+1": "UTG+1", "MP": "MP", "LJ": "LJ", "HJ": "HJ",
-                  "CO": "CO", "BTN": "BTN", "SB": "SB", "BB": "BB"}
-
 
 @dataclass(slots=True)
 class HandHistoryRecord:

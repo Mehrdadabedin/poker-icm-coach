@@ -1,8 +1,6 @@
 """FastAPI application entry point with REST + WebSocket."""
 from __future__ import annotations
 
-from contextlib import asynccontextmanager
-
 from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.concurrency import run_in_threadpool
@@ -16,13 +14,7 @@ from app.core.config import settings
 from app.services.auth import auth_store
 from app.services.session_store import session_store
 
-
-@asynccontextmanager
-async def lifespan(_app: FastAPI):
-    yield
-
-
-app = FastAPI(title="ICM Master API", version="0.1.0", lifespan=lifespan)
+app = FastAPI(title="ICM Master API", version="0.1.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origin_list,

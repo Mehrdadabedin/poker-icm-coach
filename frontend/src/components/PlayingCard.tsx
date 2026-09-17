@@ -12,7 +12,7 @@ interface PlayingCardProps {
  * cards. The card identity comes from {rank,suit} in game state, mapped
  * deterministically to the file. PNG is the only format installed: see
  * ARCHITECTURE.md section 6. */
-export function cardAssetUrl(card: Card): string {
+function cardAssetUrl(card: Card): string {
   return `${import.meta.env.BASE_URL}cards/${card.rank}${card.suit}.png`;
 }
 

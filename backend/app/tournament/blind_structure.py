@@ -35,12 +35,12 @@ def default_structure(
     ]
     # Honor the configured starting blinds exactly at level 1; scale the
     # schedule per-axis so later levels keep the same relative shape.
-    sb_scale = small_blind / max(1, 100)
-    bb_scale = big_blind / max(1, 100)
+    sb_scale = small_blind / 100
+    bb_scale = big_blind / 100
     levels = [
         BlindLevel(
             small=int(s * sb_scale), big=int(b * bb_scale),
-            ante=int(a * bb_scale) if a else 0, break_after=br,
+            ante=int(a * bb_scale), break_after=br,
         )
         for s, b, a, br in schedule
     ]

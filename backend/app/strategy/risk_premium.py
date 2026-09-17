@@ -29,10 +29,6 @@ class RiskPremium:
     fold_equity: float | None = None
     call_equity: float | None = None
 
-    @property
-    def coverage_label(self) -> str:
-        return covering(self.hero_chips if hasattr(self, "hero_chips") else 0, 0)
-
 
 def covering(hero: int, villain: int) -> str:
     if hero > villain:

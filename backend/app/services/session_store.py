@@ -71,6 +71,7 @@ class SessionStore:
 
     def evict_ended(self, owner: str | None = None, now: float | None = None) -> int:
         """Drop finished and idle-past-timeout tables. Returns the count."""
+        now = now if now is not None else time.time()
         dead = [
             s.session_id for s in self._sessions.values()
             if (owner is None or s.owner == owner)

@@ -20,12 +20,6 @@ def require_user(authorization: str = Header(default="")) -> str:
     return user
 
 
-def optional_user(authorization: str = Header(default="")) -> str | None:
-    """Like require_user but returns None when no valid token is present."""
-    token = bearer_token(authorization)
-    return auth_store.user_for_token(token)
-
-
 def bearer_token(authorization: str) -> str | None:
     if not authorization:
         return None

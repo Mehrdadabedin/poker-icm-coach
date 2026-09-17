@@ -1,16 +1,12 @@
+import { CoachAdvice, TableAction } from "../models/game";
 import { ActionHistory } from "./ActionHistory";
-
-interface CoachPanel {
-  recommendedAction: string;
-  reasoning: string;
-  detail: Record<string, string>;
-}
+import { CoachPanelView } from "./CoachPanelView";
 
 interface TableSidebarProps {
-  actions: Array<{ seat: number; action: string; amount: number | null; street: string }>;
+  actions: TableAction[];
   heroSeat: number;
   nameBySeat: Map<number, string>;
-  coach: CoachPanel | null;
+  coach: CoachAdvice | null;
 }
 
 /** Right-hand column under the table: live action history and the coach. */
@@ -18,21 +14,7 @@ export function TableSidebar({ actions, heroSeat, nameBySeat, coach }: TableSide
   return (
     <div className="table-cols">
       <ActionHistory actions={actions} heroSeat={heroSeat} nameBySeat={nameBySeat} />
-      {coach && (
-        <div className="coach-panel table-side" data-testid="coach-panel">
-          <h3>ICM COACH</h3>
-          <div className="coach-recommendation">{coach.recommendedAction}</div>
-          <p>{coach.reasoning}</p>
-          <dl>
-            {Object.entries(coach.detail).slice(0, 14).map(([k, v]) => (
-              <div key={k} className="coach-row">
-                <dt>{k}</dt>
-                <dd>{v}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-      )}
+      {coach && <CoachPanelView coach={coach} className="coach-panel table-side" testId="coach-panel" />}
     </div>
   );
 }

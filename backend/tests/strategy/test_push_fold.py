@@ -1,7 +1,6 @@
 """Push/fold engine tests (Atomic Part 028)."""
 from __future__ import annotations
 
-from app.poker.card import card_from_str
 from app.strategy.push_fold import (
     PushFoldDecision,
     PushFoldEngine,
@@ -9,8 +8,7 @@ from app.strategy.push_fold import (
     open_jam_range,
     reshove_range,
 )
-
-H = card_from_str
+from tests.conftest import H
 
 
 def test_open_jam_range_exists_all_depths() -> None:

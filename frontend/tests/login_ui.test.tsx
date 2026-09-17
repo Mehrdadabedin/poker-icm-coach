@@ -5,7 +5,8 @@ import { act, fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom";
 import { getAuthProviders } from "../src/services/api";
 
-vi.mock("../src/services/api", () => ({
+vi.mock("../src/services/api", async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
   getToken: vi.fn(() => null),
   getUsername: vi.fn(() => null),
   saveAuth: vi.fn(),
@@ -16,15 +17,6 @@ vi.mock("../src/services/api", () => ({
   me: vi.fn(async () => ({ username: "Mehrdad" })),
   getAuthProviders: vi.fn(async () => ({ google: false, apple: false, phone: false })),
   googleSignInUrl: vi.fn(() => "https://api.test/api/auth/google/start"),
-  AuthError: class AuthError extends Error {},
-  createTournament: vi.fn(),
-  getState: vi.fn(),
-  sendAction: vi.fn(),
-  nextHand: vi.fn(),
-  coachAdvice: vi.fn(),
-  coachCompare: vi.fn(),
-  rangeGrid: vi.fn(),
-  request: vi.fn(),
 }));
 
 async function openForm() {

@@ -40,14 +40,6 @@ class OutsReport:
         }
 
 
-def _improves(hero: list[Card], board: list[Card], candidate: Card) -> bool:
-    if len(board) >= 5:
-        return False  # river: no more cards to improve with
-    current = best_hand(hero + board).category
-    improved = best_hand(hero + board + [candidate]).category
-    return improved > current
-
-
 def compute_outs(hero: list[Card], board: list[Card]) -> OutsReport:
     """Enumerate the actual remaining deck and count improving cards."""
     if len(hero) != 2 or len(board) > 5:
@@ -56,7 +48,11 @@ def compute_outs(hero: list[Card], board: list[Card]) -> OutsReport:
     deck.remove(hero + board)
     pool = deck.cards
     n_next = len(pool) if len(board) == 3 else max(0, len(pool) - 1)
-    outs = sum(1 for c in pool if _improves(hero, board, c))
+    if len(board) >= 5:
+        outs = 0  # river: no more cards to improve with
+    else:
+        current = best_hand(hero + board).category
+        outs = sum(1 for c in pool if best_hand(hero + board + [c]).category > current)
     improve_turn = outs / n_next if n_next else 0.0
     # by the river: 1 - P(miss both streets)
     n_river_pool = len(pool) - 1

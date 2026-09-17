@@ -6,11 +6,13 @@ legality by the AI framework.
 """
 from __future__ import annotations
 
-from app.ai.ai_framework import AIDecisionProvider
+from app.ai.ai_framework import AIDecisionProvider, to_call_amount
+from app.ai.ai_framework import pot_odds as _pot_odds
 from app.ai.preflop_ranges import open_range_for
 from app.game.actions import Action, ActionType
 from app.game.decision_provider import DecisionContext
 from app.strategy.hand_codec import HandCell
+from app.strategy.stack_analysis import SHORT_BB
 
 
 def _open_frequency(cell: HandCell, provider: AIDecisionProvider) -> float:
@@ -46,7 +48,7 @@ def preflop_strategy(
     cell = HandCell(max(hole_ranks), min(hole_ranks),
                     None if hole_ranks[0] == hole_ranks[1] else suited)
     open_set = open_range_for(ctx.position, int(depth_bb)).cells
-    to_call = max(0, ctx.current_bet - ctx.contribution)
+    to_call = to_call_amount(ctx)
     is_unopened = ctx.current_bet == 0 or (
         ctx.position == "BB" and ctx.current_bet == bb and ctx.contribution == bb
     )
@@ -82,8 +84,8 @@ def _vs_raise(ctx: DecisionContext, provider: AIDecisionProvider, cell: HandCell
               open_set: frozenset[HandCell], depth_bb: float, bb: int, to_call: int) -> Action:
     rng = provider.rng
     pers = provider.personality
-    pot_odds = to_call / max(1, ctx.pot + to_call)
-    if depth_bb <= 10:
+    pot_odds = _pot_odds(to_call, ctx.pot)
+    if depth_bb <= SHORT_BB:
         if (cell in open_set and _raiseable(cell)) and rng.random() < 0.75:
             return Action(ActionType.ALL_IN, amount=ctx.stack, is_all_in=True)
         if cell in open_set and rng.random() < 0.5 + 0.3 * pers.call_tendency:
@@ -103,8 +105,3 @@ def _vs_raise(ctx: DecisionContext, provider: AIDecisionProvider, cell: HandCell
         return Action(ActionType.CALL, amount=min(to_call, ctx.stack))
     return Action(ActionType.FOLD)
 
-
-def range_for_position(ctx: DecisionContext, provider: AIDecisionProvider) -> set[HandCell]:
-    """Expose the effective opening range (used by stats/coach)."""
-    depth_bb = ctx.stack / max(ctx.big_blind, 1)
-    return set(open_range_for(ctx.position, int(depth_bb)).cells)

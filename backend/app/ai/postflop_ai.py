@@ -5,11 +5,11 @@ texture, SPR and personality. Not solver-accurate.
 """
 from __future__ import annotations
 
-from app.ai.ai_framework import AIDecisionProvider
+from app.ai.ai_framework import AIDecisionProvider, pot_odds, to_call_amount
 from app.ai.board_texture import BoardTexture, classify_board
 from app.game.actions import Action, ActionType
 from app.game.decision_provider import DecisionContext
-from app.poker.card import Card
+from app.poker.card import Card, Rank, Suit
 from app.poker.hand_evaluator import best_hand
 from app.poker.hand_rank import HandCategory
 
@@ -61,6 +61,11 @@ def _was_aggressor(ctx: DecisionContext, seat: int) -> bool:
     )
 
 
+def _sized_bet(ctx: DecisionContext, fraction: float) -> int:
+    """A pot-fraction bet, capped at the stack."""
+    return int(min(ctx.stack, ctx.pot * fraction))
+
+
 def postflop_strategy(
     ctx: DecisionContext,
     provider: AIDecisionProvider,
@@ -72,20 +77,17 @@ def postflop_strategy(
     hole = _hole_cards(hole_ranks, suited, ctx.board)
     texture = classify_board(ctx.board)
     equity = equity_estimate(hole, ctx.board, [])
-    to_call = max(0, ctx.current_bet - ctx.contribution)
-    pot_odds = to_call / max(1, ctx.pot + to_call)
+    to_call = to_call_amount(ctx)
 
     if to_call == 0:
         return _no_bet_decision(ctx, p, equity, texture, hole, hole_ranks, suited)
-    return _vs_bet_decision(ctx, p, equity, pot_odds, to_call)
+    return _vs_bet_decision(ctx, p, equity, pot_odds(to_call, ctx.pot), to_call)
 
 
 def _hole_cards(ranks: tuple[int, int], suited: bool, board: list[Card]) -> list[Card]:
     """Build representative hole cards avoiding rank/suit collisions with the board."""
     high = max(ranks)
     low = min(ranks)
-    from app.poker.card import Rank, Suit
-
     blocked = {(c.rank.value, c.suit) for c in board}
     suits = list(Suit)
     sa = next(s for s in suits if (high, s) not in blocked)
@@ -107,16 +109,13 @@ def _no_bet_decision(ctx: DecisionContext, provider: AIDecisionProvider, equity:
     value = equity >= 0.7 or (equity >= 0.55 and spr <= 3)
     bluff = (equity < 0.45 and not texture.wet and max(ranks) >= 12 and rng.random() < pers.bluff * 0.5)
     if value and rng.random() < 0.4 + 0.5 * pers.aggression:
-        size = int(min(ctx.stack, ctx.pot * (0.5 if spr > 6 else 0.75)))
-        return Action(ActionType.BET, amount=size)
+        return Action(ActionType.BET, amount=_sized_bet(ctx, 0.5 if spr > 6 else 0.75))
     if aggressor and ctx.street == "flop" and rng.random() < pers.aggression * 0.5 + 0.25:
-        size = int(min(ctx.stack, ctx.pot * 0.6))
-        return Action(ActionType.BET, amount=size)
+        return Action(ActionType.BET, amount=_sized_bet(ctx, 0.6))
     if bluff:
-        return Action(ActionType.BET, amount=int(min(ctx.stack, ctx.pot * 0.5)))
+        return Action(ActionType.BET, amount=_sized_bet(ctx, 0.5))
     if equity >= 0.5 and rng.random() < 0.3:
-        size = int(min(ctx.stack, ctx.pot * 0.4))
-        return Action(ActionType.BET, amount=size)
+        return Action(ActionType.BET, amount=_sized_bet(ctx, 0.4))
     return Action(ActionType.CHECK)
 
 
@@ -126,8 +125,7 @@ def _vs_bet_decision(ctx: DecisionContext, provider: AIDecisionProvider, equity:
     pers = provider.personality
     margin = 0.08 + 0.05 * pers.aggression
     if equity >= 0.8 and rng.random() < pers.aggression * 0.6 + 0.3:
-        size = int(min(ctx.stack, ctx.pot))
-        return Action(ActionType.RAISE, amount=size)
+        return Action(ActionType.RAISE, amount=_sized_bet(ctx, 1.0))
     if equity >= pot_odds + margin or (equity >= pot_odds and rng.random() < 0.7):
         return Action(ActionType.CALL, amount=min(to_call, ctx.stack))
     if equity >= pot_odds - 0.06 and pers.call_tendency > 0.5 and rng.random() < 0.4:

@@ -1,15 +1,16 @@
 """Baseline strategy ranges: 13x13 matrices per position and stack depth.
 
-BASELINE STRATEGY RANGE — heuristic practice tables shared by the AI and
+BASELINE STRATEGY RANGE, heuristic practice tables shared by the AI and
 the coach (not solver-exact). Mixed frequencies are representative.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from functools import lru_cache
 
 from app.ai.preflop_ranges import open_range_for
 from app.strategy.hand_codec import HandCell
 from app.strategy.range_matrix import RangeMatrix, cell_key, cell_name
+from app.strategy.stack_analysis import SHORT_BB
 
 RANGE_TYPES = [
     "OPEN RAISE", "CALL", "3-BET", "4-BET", "3-BET JAM", "CALL 3-BET",
@@ -22,13 +23,7 @@ def range_types() -> list[str]:
     return list(RANGE_TYPES)
 
 
-@dataclass(frozen=True, slots=True)
-class _HandClass:
-    premium: frozenset[str]
-    strong: frozenset[str]
-
-
-_PREMIUM = frozenset({"AA", "KK", "QQ", "JJ", "TT", "AKs", "AKo"})
+PREMIUM_HANDS = frozenset({"AA", "KK", "QQ", "JJ", "TT", "AKs", "AKo"})
 _STRONG = frozenset(
     {"99", "88", "AQs", "AQo", "AJs", "KQs", "KJs", "QJs", "ATs", "AJo", "KQo", "JTs"}
 )
@@ -37,7 +32,7 @@ _STRONG = frozenset(
 def _class_of(cell: HandCell) -> int:
     """0 = premium, 1 = strong, 2 = rest-of-range."""
     name = cell_name(cell.hi, cell.lo, cell.suited)
-    if name in _PREMIUM:
+    if name in PREMIUM_HANDS:
         return 0
     if name in _STRONG:
         return 1
@@ -46,7 +41,7 @@ def _class_of(cell: HandCell) -> int:
 
 def _open_frequencies(cell: HandCell, stack_bb: int) -> dict[str, float]:
     cls = _class_of(cell)
-    if stack_bb <= 10:
+    if stack_bb <= SHORT_BB:
         if cls == 0:
             return {"OPEN JAM": 0.8, "OPEN RAISE": 0.1, "FOLD": 0.1}
         if cls == 1:
@@ -59,8 +54,13 @@ def _open_frequencies(cell: HandCell, stack_bb: int) -> dict[str, float]:
     return {"OPEN RAISE": 0.5, "CALL": 0.28, "FOLD": 0.22}
 
 
+@lru_cache(maxsize=256)
 def matrix_for_position(position: str, stack_bb: int) -> RangeMatrix:
-    """Build the baseline open-action matrix for a position at a depth."""
+    """Build the baseline open-action matrix for a position at a depth.
+
+    Cached: every coach decision and range-grid poll requests one, no caller
+    mutates the result, and (position, stack_bb) fully determines it.
+    """
     cells: dict[str, dict[str, float]] = {}
     open_cells = set(open_range_for(position, stack_bb).cells)
     for hi in range(14, 1, -1):

@@ -1,6 +1,6 @@
 // Typed game state mirrored from the backend API (part 034 keeps them in sync).
 
-export type Suit = "c" | "d" | "h" | "s";
+type Suit = "c" | "d" | "h" | "s";
 
 export interface Card {
   rank: string; // 2..9, T, J, Q, K, A
@@ -28,10 +28,7 @@ export interface TableAction {
   street: string;
 }
 
-export interface ReviewCard {
-  rank: string;
-  suit: Suit;
-}
+type ReviewCard = Card;
 
 export interface ReviewShowdown {
   seat: number;
@@ -132,21 +129,9 @@ export interface LegalAction {
   maxAmount?: number;
 }
 
-export const cardSymbol: Record<Suit, string> = {
-  c: "\u2663",
-  d: "\u2666",
-  h: "\u2665",
-  s: "\u2660",
-};
-
-export const cardColor = (suit: Suit): "red" | "black" =>
-  suit === "h" || suit === "d" ? "red" : "black";
-
-export const cardFace = (card: Card): string => `${card.rank}${cardSymbol[card.suit]}`;
-
 // Semantic full-word names for accessibility (A17 professional cards).
 // 8 + h => "8 of Hearts"; A + s => "Ace of Spades"; T + d => "10 of Diamonds".
-export const RANK_WORD: Record<string, string> = {
+const RANK_WORD: Record<string, string> = {
   A: "Ace", K: "King", Q: "Queen", J: "Jack", T: "10",
   "9": "9", "8": "8", "7": "7", "6": "6", "5": "5", "4": "4", "3": "3", "2": "2",
 };
@@ -154,11 +139,46 @@ export const SUIT_WORD: Record<Suit, string> = {
   s: "Spades", h: "Hearts", d: "Diamonds", c: "Clubs",
 };
 
+// Fixed 9-max seat order, shared by the sample state and the practice tools.
+export const POSITIONS_9MAX = ["UTG", "UTG+1", "MP", "LJ", "HJ", "CO", "BTN", "SB", "BB"];
+
+// Shared by ActionHistory and BotExplanations; PokerTable uses its own
+// upper-case, past-tense labels for the in-seat badge and stays separate.
+export const ACTION_LABEL: Record<string, string> = {
+  fold: "Fold", check: "Check", call: "Call", bet: "Bet", raise: "Raise", all_in: "All-in",
+};
+
 export const cardAlt = (card: Card): string =>
   `${RANK_WORD[card.rank] ?? card.rank} of ${SUIT_WORD[card.suit]}`;
 
 export function formatChips(value: number): string {
   return value.toLocaleString("en-US");
+}
+
+/** Shared shape for the ICM coach's advice on the current decision, rendered
+ * by both the live table sidebar and the post-hand review. */
+export interface CoachAdvice {
+  recommendedAction: string;
+  reasoning: string;
+  detail: Record<string, string>;
+}
+
+/** Hand-result headline text (HandResult and HandReview show the same
+ * CHOPPED/YOU WON/YOU LOST/NO CHANGE facts, just in different layouts). */
+export function reviewResultMeta(review: HandReview): { title: string; subtitle: string; glyph: string } {
+  const net = review.heroNet;
+  const won = review.heroWon && !review.chop;
+  const lost = !review.heroWon && !review.chop && net < 0;
+  const title = review.chop ? "CHOPPED" : review.heroWon ? "YOU WON" : net === 0 ? "NO CHANGE" : "YOU LOST";
+  const subtitle = review.chop
+    ? `${net >= 0 ? "+" : "-"}${formatChips(Math.abs(net))} chips`
+    : review.heroWon
+      ? `+${formatChips(net)} chips`
+      : net < 0
+        ? `-${formatChips(-net)} chips`
+        : "You folded without risking chips";
+  const glyph = review.chop ? "⇄" : won ? "✓" : lost ? "✕" : "◼";
+  return { title, subtitle, glyph };
 }
 
 export function chipsInBB(stack: number, bigBlind: number): number {

@@ -9,9 +9,7 @@ from app.ai.personalities import profile_for
 from app.ai.postflop_ai import equity_estimate, postflop_strategy
 from app.game.actions import Action, ActionType
 from app.game.decision_provider import DecisionContext
-from app.poker.card import card_from_str
-
-H = card_from_str
+from tests.conftest import H
 
 
 def ctx_flop(board: list[str], current_bet: int = 0, contribution: int = 0,

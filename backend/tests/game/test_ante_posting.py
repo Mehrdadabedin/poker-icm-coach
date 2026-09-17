@@ -62,13 +62,13 @@ def test_a_traditional_ante_does_not_reduce_what_a_player_owes() -> None:
     non_blind = next(seat for seat in seats if seat not in blinds)
     owed = amount_to_call(street.current_bet, street.contributions.get(non_blind, 0))
     assert owed == BIG, "the ante was deducted from the call"
-    assert tournament.players[non_blind].bet_total == ante, "the ante never reached the pot"
+    assert tournament.players[non_blind].ante_total == ante, "the ante never reached the pot"
 
 
 def test_every_posted_chip_still_reaches_the_pot() -> None:
     for mode, level_index in (("none", 0), ("traditional", 0), ("bba", _bba_level_with_an_ante())):
         tournament, _ = _post(mode, level_index)
-        committed = sum(p.bet_total for p in tournament.players)
+        committed = sum(p.bet_total + p.ante_total for p in tournament.players)
         missing = sum(45_000 - p.stack for p in tournament.players)
         assert committed == missing, f"{mode}: chips left the stacks without reaching the pot"
 
@@ -90,7 +90,8 @@ def test_a_traditional_ante_is_posted_before_the_blind() -> None:
     ante = tournament.structure.ante_for("traditional", tournament.current_blind_level())
     bb_seat = max(street.contributions, key=lambda s: street.contributions[s])
     short, short_street = _post("traditional", stacks={bb_seat: ante})
-    assert short.players[bb_seat].bet_total == ante
+    assert short.players[bb_seat].ante_total == ante
+    assert short.players[bb_seat].bet_total == 0, "the ante was recorded as a live bet"
     assert short_street.contributions.get(bb_seat, 0) == 0, "the ante became a live blind"
 
 
