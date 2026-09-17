@@ -18,7 +18,6 @@ from app.strategy.hand_codec import RANK_CHAR
 from app.strategy.range_matrix import cell_name
 
 _SYM = {0: 0x2663, 1: 0x2666, 2: 0x2665, 3: 0x2660}
-_PAID = 6
 _BOARD_LEN = {"preflop": 0, "flop": 3, "turn": 4, "river": 5}
 
 
@@ -47,7 +46,7 @@ def hand_pressure(session, result, level) -> str:
     stacks = list(result.starting_stacks.values()) or [1]
     info = detect_stage(
         players_remaining=sum(1 for p in tournament.players if not p.is_eliminated),
-        paid_positions=_PAID,
+        paid_positions=tournament.payout.paid_positions,
         hero_stack_bb=result.starting_stacks[session.hero_seat] / max(1, level.big),
         average_stack_bb=(sum(stacks) / len(stacks)) / max(1, level.big),
         shortest_stack_bb=min(stacks) / max(1, level.big),

@@ -12,6 +12,7 @@ from app.ai.preflop_ranges import open_range_for
 from app.game.actions import Action, ActionType
 from app.game.decision_provider import DecisionContext
 from app.strategy.hand_codec import HandCell
+from app.strategy.stack_analysis import SHORT_BB
 
 
 def _open_frequency(cell: HandCell, provider: AIDecisionProvider) -> float:
@@ -84,7 +85,7 @@ def _vs_raise(ctx: DecisionContext, provider: AIDecisionProvider, cell: HandCell
     rng = provider.rng
     pers = provider.personality
     pot_odds = _pot_odds(to_call, ctx.pot)
-    if depth_bb <= 10:
+    if depth_bb <= SHORT_BB:
         if (cell in open_set and _raiseable(cell)) and rng.random() < 0.75:
             return Action(ActionType.ALL_IN, amount=ctx.stack, is_all_in=True)
         if cell in open_set and rng.random() < 0.5 + 0.3 * pers.call_tendency:

@@ -54,28 +54,6 @@ class StreetState:
         return sum(self.contributions.values())
 
 
-def round_can_finish(
-    remaining_seats: list[int],
-    contributions: dict[int, int],
-    current_bet: int,
-    all_in_seats: set[int],
-    blind_posts: set[int],
-) -> bool:
-    """True when betting is complete: everyone matched (or is all-in/folded).
-
-    At least one aggressor must exist on the street (or only blinds posted
-    preflop, which counts as everyone matched).
-    """
-    if not remaining_seats:
-        return True
-    for seat in remaining_seats:
-        if seat in all_in_seats:
-            continue
-        if contributions.get(seat, 0) < current_bet:
-            return False
-    return True
-
-
 def apply_action(street: StreetState, player: Player, action: Action, street_contrib: int,
                  big_blind: int = 0) -> bool:
     """Apply an already-validated action to the street state and player.
