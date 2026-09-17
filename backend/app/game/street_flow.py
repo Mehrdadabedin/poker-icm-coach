@@ -86,6 +86,10 @@ def next_street_or_showdown(engine: HandEngine) -> None:
         engine._runout_and_showdown() if len(in_hand) > 1 else engine._finish_hand()
         return
     engine._deal_next_street()
+    if engine.is_complete:
+        # Dealing past the river settles the hand. Carrying on rebuilt a queue
+        # on a finished hand, so it reported a current actor after the result.
+        return
     engine._street = StreetState()
     # New street: only in-hand, non-folded players with chips may act.
     active = sorted(in_hand_seats(engine.tournament.players))

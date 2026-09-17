@@ -59,10 +59,9 @@ def build_side_pots(
 def seats_left_of(button: int, players: dict[int, Player]) -> list[int]:
     """Seats in order from the first one left of the button."""
     seats = sorted(players)
-    if not seats:
-        return seats
-    span = max(seats) + 1
-    return sorted(seats, key=lambda s: (s - button - 1) % span)
+    # Split rather than take a modulus against the highest seat: a button above
+    # every seat present wrapped the whole order and reversed it.
+    return [s for s in seats if s > button] + [s for s in seats if s <= button]
 
 
 def distribute_pots(

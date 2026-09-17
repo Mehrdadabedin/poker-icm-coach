@@ -143,3 +143,28 @@ def test_a_hand_where_the_posts_take_every_stack_still_settles() -> None:
     assert engine.is_complete, "the hand stalled with nobody able to act"
     assert engine.result is not None
     assert len(engine._board) == 5, "an all-in before the flop runs the board out"
+
+
+def test_a_finished_hand_has_no_current_actor() -> None:
+    """Dealing past the river settles the hand, and the transition used to carry
+    on and rebuild a queue on top of it, so a finished hand still named an
+    actor."""
+    for seed in range(25):
+        session = GameSession(starting_stack=1_000, fast_mode=1.0, rng=random.Random(seed))
+        for seat, player in enumerate(session.tournament.players):
+            if seat > 1:
+                player.is_eliminated = True
+                player.stack = 0
+        session.start()
+        engine = session.engine
+        guard = 0
+        while not engine.is_complete and engine.current_actor is not None and guard < 200:
+            actor = engine.current_actor
+            legal = {a.type for a in engine._build_context(actor).legal_actions}
+            kind = ActionType.CHECK if ActionType.CHECK in legal else ActionType.CALL
+            engine.act(actor, Action(kind))
+            guard += 1
+        if engine.is_complete:
+            assert engine.current_actor is None, (
+                f"seed {seed}: the hand is complete but seat {engine.current_actor} is still to act"
+            )

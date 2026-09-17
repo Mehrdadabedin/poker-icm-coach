@@ -164,6 +164,9 @@ class HandEngine:
     def _finish_hand(self) -> None:
         if self.is_complete:
             return
+        # A settled hand has nobody to act. The queue was left holding the last
+        # street's seats, so current_actor still named one after the result.
+        self._queue.clear()
         in_hand = in_hand_seats(self.tournament.players)
         winners, showed, pot_total = settle(
             self.tournament.players, in_hand, self._board, self.tournament.ante_mode,
