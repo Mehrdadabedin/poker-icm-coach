@@ -5,7 +5,8 @@ import { MemoryRouter } from "react-router-dom";
 
 const analyzeCalls = vi.fn();
 
-vi.mock("../src/services/api", () => ({
+vi.mock("../src/services/api", async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
   request: async (path: string, options?: RequestInit) => {
     if (path === "/api/coach/advice") {
       analyzeCalls(path, options);
@@ -14,13 +15,6 @@ vi.mock("../src/services/api", () => ({
     }
     return { hands: [] };
   },
-  createTournament: vi.fn(),
-  getToken: vi.fn(() => "t"), getUsername: vi.fn(() => "A"),
-  clearAuth: vi.fn(), saveAuth: vi.fn(),
-  login: vi.fn(), register: vi.fn(), logout: vi.fn(), me: vi.fn(),
-  getState: vi.fn(), sendAction: vi.fn(), nextHand: vi.fn(),
-  coachAdvice: vi.fn(), coachCompare: vi.fn(), rangeGrid: vi.fn(),
-  AuthError: class AuthError extends Error {},
 }));
 
 describe("Issue #7 coach street validation", () => {

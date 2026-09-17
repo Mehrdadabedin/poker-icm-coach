@@ -1,4 +1,4 @@
-import { formatChips, ReviewAction, TableAction } from "../models/game";
+import { ACTION_LABEL, formatChips, ReviewAction, TableAction } from "../models/game";
 
 type AnyAction = TableAction | ReviewAction;
 
@@ -10,15 +10,9 @@ const STREET_TITLE: Record<string, string> = {
   river: "RIVER",
 };
 
-const ACTION_LABEL: Record<string, string> = {
+const BLIND_LABEL: Record<string, string> = {
   small_blind: "posts SB",
   big_blind: "posts BB",
-  fold: "Fold",
-  check: "Check",
-  call: "Call",
-  bet: "Bet",
-  raise: "Raise",
-  all_in: "All-in",
 };
 
 interface ActionHistoryProps {
@@ -46,7 +40,7 @@ export function ActionHistory({ actions, heroSeat, nameBySeat }: ActionHistoryPr
           <span>
             {blindPosts.map((b) => (
               <span key={b.seat}>
-                <b>{seatName(b)}</b> {ACTION_LABEL[b.action] ?? b.action} {b.amount != null ? formatChips(b.amount) : ""}
+                <b>{seatName(b)}</b> {BLIND_LABEL[b.action] ?? b.action} {b.amount != null ? formatChips(b.amount) : ""}
                 {b.seat !== blindPosts[blindPosts.length - 1].seat ? "  " : ""}
               </span>
             ))}

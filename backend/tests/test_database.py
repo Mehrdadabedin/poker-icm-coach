@@ -15,11 +15,10 @@ from app.models.repositories import (
     save_hand,
     save_statistics,
 )
-from app.poker.card import card_from_str
 from app.services.hand_history import HandHistoryRecord
 from app.services.statistics import aggregate
+from tests.conftest import H
 
-H = card_from_str
 
 def _database_is_reachable() -> bool:
     """True when a PostgreSQL server answers on the configured DATABASE_URL.

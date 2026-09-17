@@ -1,9 +1,6 @@
 """Stack analysis: BB stacks, effective stacks, table snapshot, ranks."""
 from __future__ import annotations
 
-from dataclasses import dataclass
-from statistics import median
-
 VERY_SHORT_BB = 6
 SHORT_BB = 10
 MEDIUM_BB = 20
@@ -18,47 +15,6 @@ def stack_in_bb(chips: int, big_blind: int) -> float:
 def effective_stack(hero_chips: int, villain_chips: int) -> int:
     """The most that can be won or lost at this decision point."""
     return min(hero_chips, villain_chips)
-
-
-@dataclass(frozen=True, slots=True)
-class StackSnapshot:
-    """Aggregate table stack statistics plus the hero's standing."""
-
-    stacks: tuple[int, ...]
-    average: float
-    median: float
-    largest: int
-    shortest: int
-    rank: int
-    hero_stack: int
-    short_stacks: int
-    very_short_stacks: int
-
-
-def snapshot_for(
-    hero_index: int,
-    stacks: list[int],
-    big_blind: int,
-    short_threshold_bb: int = SHORT_BB,
-    very_short_threshold_bb: int = VERY_SHORT_BB,
-) -> StackSnapshot:
-    if not stacks or not (0 <= hero_index < len(stacks)):
-        raise ValueError("invalid hero index / empty stacks")
-    hero = stacks[hero_index]
-    ordered = sorted(stacks, reverse=True)
-    rank = ordered.index(hero) + 1
-    bbs = [stack_in_bb(s, big_blind) for s in stacks]
-    return StackSnapshot(
-        stacks=tuple(stacks),
-        average=round(sum(stacks) / len(stacks), 2),
-        median=median(stacks),
-        largest=max(stacks),
-        shortest=min(stacks),
-        rank=rank,
-        hero_stack=hero,
-        short_stacks=sum(1 for bb in bbs if bb <= short_threshold_bb),
-        very_short_stacks=sum(1 for bb in bbs if bb <= very_short_threshold_bb),
-    )
 
 
 def classify_stack(stack_bb: float) -> str:

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from app.ai.ai_framework import pot_odds
 from app.ai.board_texture import BoardTexture, classify_board
 from app.icm.icm_engine import icm_equities
 from app.strategy.bubble import PressureLevel, StageInfo, bubble_pressure, detect_stage
@@ -31,10 +32,6 @@ class Analyses:
     icm_ev: str | None = None
     tournament_equity: float | None = None
     extra: dict = field(default_factory=dict)
-
-
-def pot_odds(to_call: int, pot: int) -> float:
-    return to_call / max(1, pot + to_call)
 
 
 def _cell_key(hero) -> str:

@@ -33,8 +33,9 @@ BEARER_RE = re.compile(r"[\"\']?Authorization[\"\']?\s*[:=]\s*[\"\'`]?\s*Bearer"
 COOKIE_ATTRIBUTES = ("secure", "httponly", "samesite", "domain", "path")
 
 
-def _scan(root, pattern: re.Pattern) -> list[str]:
-    hits = []
+def _scan(root, *patterns: re.Pattern) -> list[list[str]]:
+    """One walk over root's source files, matched against each pattern in turn."""
+    hits: list[list[str]] = [[] for _ in patterns]
     for path in sorted(root.rglob("*.py")) + sorted(root.rglob("*.ts")) + sorted(root.rglob("*.tsx")):
         if any(part in {"node_modules", ".venv", "dist", "__pycache__"} for part in path.parts):
             continue
@@ -42,16 +43,16 @@ def _scan(root, pattern: re.Pattern) -> list[str]:
             text = path.read_text()
         except OSError:
             continue
-        if pattern.search(text):
-            hits.append(str(path.relative_to(root.parent)))
+        for bucket, pattern in zip(hits, patterns):
+            if pattern.search(text):
+                bucket.append(str(path.relative_to(root.parent)))
     return hits
 
 
 def check_cookie_configuration() -> dict:
     """Cookie attribute metadata, or a clear statement that none applies."""
-    backend_hits = _scan(BACKEND_DIR / "app", COOKIE_API_RE)
-    attribute_hits = _scan(BACKEND_DIR / "app", COOKIE_ATTR_RE)
-    frontend_hits = _scan(FRONTEND_DIR / "src", DOC_COOKIE_RE)
+    backend_hits, attribute_hits = _scan(BACKEND_DIR / "app", COOKIE_API_RE, COOKIE_ATTR_RE)
+    (frontend_hits,) = _scan(FRONTEND_DIR / "src", DOC_COOKIE_RE)
     api_source = ""
     try:
         api_source = (FRONTEND_DIR / "src/services/api.ts").read_text()

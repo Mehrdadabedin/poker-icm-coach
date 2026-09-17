@@ -4,8 +4,11 @@ from __future__ import annotations
 import pytest
 
 from app.core.config import settings
+from app.poker.card import card_from_str
 from app.services.auth import auth_store
 from app.services.user_registry import auth_registry
+
+H = card_from_str  # shorthand for a Card from a two-char face, e.g. H("As")
 
 
 @pytest.fixture(autouse=True)

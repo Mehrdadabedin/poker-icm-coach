@@ -1,11 +1,9 @@
 """Strategy coach tests (Atomic Part 029)."""
 from __future__ import annotations
 
-from app.poker.card import card_from_str
 from app.strategy.coach import Coach, CoachRequest
 from app.strategy.coach_modes import filter_for_mode
-
-H = card_from_str
+from tests.conftest import H
 
 PAYOUT = [0.4, 0.25, 0.15, 0.1, 0.06, 0.04]
 

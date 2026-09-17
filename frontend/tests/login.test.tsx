@@ -6,7 +6,8 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
-vi.mock("../src/services/api", () => ({
+vi.mock("../src/services/api", async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
   getToken: vi.fn(() => localStorage.getItem("icm_auth_token")),
   getUsername: vi.fn(() => localStorage.getItem("icm_username")),
   saveAuth: vi.fn((token: string, username: string) => {
@@ -37,15 +38,6 @@ vi.mock("../src/services/api", () => ({
   }),
   getAuthProviders: vi.fn(async () => ({ google: false, apple: false, phone: false })),
   googleSignInUrl: vi.fn(() => "https://api.test/api/auth/google/start"),
-  AuthError: class AuthError extends Error {},
-  createTournament: vi.fn(),
-  getState: vi.fn(),
-  sendAction: vi.fn(),
-  nextHand: vi.fn(),
-  coachAdvice: vi.fn(),
-  coachCompare: vi.fn(),
-  rangeGrid: vi.fn(),
-  request: vi.fn(),
 }));
 
 async function openForm() {

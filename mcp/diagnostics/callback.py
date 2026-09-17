@@ -33,9 +33,12 @@ def _proxy_derivation_documented() -> bool:
         return False
 
 
-def check_google_callback_configuration(base_url: str | None = None) -> dict:
-    """Expected redirect URI, its source, and the frontend return target."""
-    scan = static_scan()
+def check_google_callback_configuration(base_url: str | None = None, scan: dict | None = None) -> dict:
+    """Expected redirect URI, its source, and the frontend return target.
+
+    `scan`: see `static_scan`.
+    """
+    scan = static_scan() if scan is None else scan
     callback_path = None
     for route in scan.get("routes", []):
         if route["path"].endswith("/google/callback"):

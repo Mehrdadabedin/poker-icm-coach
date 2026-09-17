@@ -1,11 +1,9 @@
 """Session statistics tests (Atomic Part 032)."""
 from __future__ import annotations
 
-from app.poker.card import card_from_str
 from app.services.hand_history import HandHistoryRecord
 from app.services.statistics import aggregate, biggest_leak, position_performance
-
-H = card_from_str
+from tests.conftest import H
 
 
 def record(hand_number: int, decision: str, grade: str | None, net: int,

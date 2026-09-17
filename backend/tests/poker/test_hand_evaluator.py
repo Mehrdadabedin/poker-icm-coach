@@ -3,11 +3,9 @@ from __future__ import annotations
 
 import pytest
 
-from app.poker.card import card_from_str
 from app.poker.hand_evaluator import best_hand, compare_hands, hand_name
 from app.poker.hand_rank import HandCategory
-
-H = card_from_str
+from tests.conftest import H
 
 
 def ev(faces: list[str]):

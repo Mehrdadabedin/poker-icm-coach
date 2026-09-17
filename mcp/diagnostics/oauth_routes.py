@@ -19,7 +19,12 @@ CALLBACK_SUFFIX_RE = re.compile(r"_CALLBACK_SUFFIX\s*=\s*[\"\']([^\"\']+)[\"\']"
 
 
 def static_scan(routes_file=None) -> dict:
-    """Routes declared in the router module. Missing or odd files degrade."""
+    """Routes declared in the router module. Missing or odd files degrade.
+
+    diagnose_google_oauth needs this result for both the route check and the
+    callback check, so it calls this once and passes it to each as `scan`
+    rather than have every caller read and parse the router source again.
+    """
     path = routes_file or ROUTES_FILE
     try:
         text = path.read_text()
@@ -48,9 +53,12 @@ def _pick(routes: list[dict], needle: str) -> str | None:
     return None
 
 
-async def check_oauth_routes(base_url: str | None = None) -> dict:
-    """Do the Google authorization and callback routes exist?"""
-    scan = static_scan()
+async def check_oauth_routes(base_url: str | None = None, scan: dict | None = None) -> dict:
+    """Do the Google authorization and callback routes exist?
+
+    `scan`: see `static_scan`.
+    """
+    scan = static_scan() if scan is None else scan
     authorization = _pick(scan.get("routes", []), "/google/start")
     callback = _pick(scan.get("routes", []), "/google/callback")
     notes = []

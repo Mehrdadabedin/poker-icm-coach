@@ -78,9 +78,12 @@ class Card:
     def rank_char(self) -> str:
         return _CHAR_BY_RANK.get(self.rank.value, str(self.rank.value))
 
+    def suit_char(self) -> str:
+        return _CHAR_BY_SUIT[self.suit]
+
     def ascii(self) -> str:
         """ASCII face like 'As' for logs and tests."""
-        return f"{self.rank_char()}{_CHAR_BY_SUIT[self.suit]}"
+        return f"{self.rank_char()}{self.suit_char()}"
 
     def encode(self) -> int:
         """Encode to a unique int 0..51 (rank-major), used by evaluators."""
@@ -92,3 +95,8 @@ class Card:
             raise ValueError(f"invalid card code: {code}")
         rank_value = code // 4 + 2
         return cls(rank=Rank(rank_value), suit=Suit(code % 4))
+
+
+def card_model(card: Card) -> dict[str, str]:
+    """JSON-able {rank, suit} dict used by API responses."""
+    return {"rank": card.rank_char(), "suit": card.suit_char()}

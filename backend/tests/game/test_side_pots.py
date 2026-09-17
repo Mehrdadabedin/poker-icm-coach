@@ -3,10 +3,8 @@ from __future__ import annotations
 
 from app.game.player import Player
 from app.game.side_pot import build_side_pots, distribute_pots
-from app.poker.card import card_from_str
 from app.poker.hand_evaluator import best_hand
-
-H = card_from_str
+from tests.conftest import H
 
 # Hands for showdown distribution tests
 ROYAL = best_hand([H(f) for f in ["Tc", "Jc", "Qc", "Kc", "Ac"]])

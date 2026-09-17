@@ -7,8 +7,9 @@ numbers. Explanations are state-derived, never generic filler.
 """
 from __future__ import annotations
 
+from app.ai.ai_framework import pot_odds
 from app.ai.postflop_ai import equity_estimate
-from app.game.hand_setup import _blind_seats, active_seats
+from app.game.hand_setup import active_seats, blind_seats
 from app.game.positions import position_for
 from app.poker.card import Card
 from app.strategy.bubble import bubble_pressure, detect_stage
@@ -41,7 +42,7 @@ def _equity(cards: list[Card], street: str, board: list[Card]) -> float:
         return 0.0
 
 
-def _pressure(session, result, level) -> str:
+def hand_pressure(session, result, level) -> str:
     tournament = session.tournament
     stacks = list(result.starting_stacks.values()) or [1]
     info = detect_stage(
@@ -85,7 +86,7 @@ def build_explanations(session, result, level, pressure: str) -> list[dict]:
     active = sorted(active_seats(players))
     if not active:
         return []
-    sb, bb = _blind_seats(result.button, set(active), len(players))
+    sb, bb = blind_seats(result.button, set(active), len(players))
     start = result.starting_stacks
     contrib = {s: 0 for s in active}
     contrib[sb], contrib[bb] = level.small, level.big
@@ -100,7 +101,7 @@ def build_explanations(session, result, level, pressure: str) -> list[dict]:
             continue
         sc = contrib.get(a.seat, 0)
         to_call = max(0, bet - sc)
-        pot_odds = to_call / max(1, sum(cum.values()) + to_call) if to_call > 0 else 0.0
+        odds = pot_odds(to_call, sum(cum.values()))
         hole = list(result.hole_cards.get(a.seat, []))
         equity = _equity(hole, street, board) if len(hole) == 2 else 0.0
         stack_bb = round(max(0, start.get(a.seat, 0) - cum.get(a.seat, 0)) / max(1, level.big), 1)
@@ -110,10 +111,10 @@ def build_explanations(session, result, level, pressure: str) -> list[dict]:
             "amount": a.amount, "street": street, "position": pos,
             "hand": _hand_text(hole) if len(hole) == 2 else "",
             "handCode": _code(hole) if len(hole) == 2 else "",
-            "stackBB": stack_bb, "potOdds": f"{pot_odds:.0%}", "equity": f"{equity:.0%}",
+            "stackBB": stack_bb, "potOdds": f"{odds:.0%}", "equity": f"{equity:.0%}",
             "icmPressure": pressure.title(), "faced": _faced(street, bet, to_call, level),
             "reason": _decision(a.action, _hand_text(hole) if len(hole) == 2 else "?",
-                                stack_bb, equity, pot_odds, pressure, pos),
+                                stack_bb, equity, odds, pressure, pos),
         })
         if a.action in ("bet", "raise", "all_in") and a.amount is not None:
             add = max(0, a.amount - sc)

@@ -18,7 +18,7 @@ def in_hand_seats(players: list[Player]) -> set[int]:
     return {p.seat for p in players if not p.folded and not p.sit_out and not p.is_eliminated}
 
 
-def _blind_seats(button: int, seats: set[int], num_seats: int) -> tuple[int, int]:
+def blind_seats(button: int, seats: set[int], num_seats: int) -> tuple[int, int]:
     """SB/BB seats relative to the button; heads-up the button posts SB."""
     if len(seats) == 2:
         sb = button if button in seats else next(iter(seats))
@@ -39,7 +39,7 @@ def post_blinds_and_antes(tournament: Tournament, street: StreetState) -> None:
     seats = active_seats(tournament.players)
     if not seats:
         return
-    sb_seat, bb_seat = _blind_seats(tournament.button, seats, len(tournament.players))
+    sb_seat, bb_seat = blind_seats(tournament.button, seats, len(tournament.players))
     mode = tournament.ante_mode
     ante = tournament.structure.ante_for(mode, level)
     for seat in seats:
@@ -73,7 +73,7 @@ def preflop_first_seat(button: int, active: list[int], num_seats: int) -> int:
     """UTG (third clockwise from button); heads-up: the button (SB) acts first."""
     if len(active) == 2:
         return button
-    sb, _ = _blind_seats(button, set(active), num_seats)
+    sb, _ = blind_seats(button, set(active), num_seats)
     order = first_action_order("flop", button, active, num_seats)
     idx = order.index(sb)
     return order[(idx + 2) % len(order)]

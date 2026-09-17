@@ -4,15 +4,8 @@ from __future__ import annotations
 from app.game.actions import legal_actions
 from app.game.hand_setup import in_hand_seats
 from app.game.positions import position_for
+from app.poker.card import card_model
 from app.services.hand_review import build_review
-
-_RANK_CHAR = {2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7", 8: "8", 9: "9",
-              10: "T", 11: "J", 12: "Q", 13: "K", 14: "A"}
-_SUIT_CHAR = {0: "c", 1: "d", 2: "h", 3: "s"}
-
-
-def card_model(card) -> dict:
-    return {"rank": _RANK_CHAR[card.rank.value], "suit": _SUIT_CHAR[card.suit.value]}
 
 
 def build_state_view(session) -> dict:
