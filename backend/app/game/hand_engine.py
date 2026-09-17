@@ -19,7 +19,12 @@ from app.game.hand_setup import (
     post_blinds_and_antes,
 )
 from app.game.showdown import merge_winners, settle
-from app.game.street_flow import deal_next_street, runout_and_showdown
+from app.game.street_flow import (
+    deal_next_street,
+    owes_a_decision,
+    rotate_after,
+    runout_and_showdown,
+)
 from app.poker.deck import Deck
 from app.tournament.tournament import Tournament
 
@@ -116,13 +121,16 @@ class HandEngine:
         if len(in_hand) <= 1:
             self._finish_hand()
             return
-        if len(self._active_non_allin()) <= 1:
-            # everyone left is all-in (or only one has chips left): run the board out
+        live = self._active_non_allin()
+        if len(live) <= 1 and not owes_a_decision(self._street, live):
+            # Nobody left can bet and nobody owes an answer: run the board out.
             self._runout_and_showdown()
             return
         if raised:
-            order = self._order(self.street, sorted(active_seats(self.tournament.players)))
-            owed = [s for s in order if s != seat and s in self._active_non_allin()]
+            order = rotate_after(
+                self._order(self.street, sorted(active_seats(self.tournament.players))), seat
+            )
+            owed = [s for s in order if s != seat and s in live]
             if full_raise:
                 self._queue = deque(owed)
             else:

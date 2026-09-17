@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 from app.game.dealing import deal_flop, deal_river, deal_turn
 
 if TYPE_CHECKING:  # pragma: no cover - import cycle guard
+    from app.game.betting import StreetState
     from app.game.hand_engine import HandEngine
 
 
@@ -40,3 +41,25 @@ def runout_and_showdown(engine: HandEngine) -> None:
         engine._board.append(deal_river(engine._deck)[0])
     engine.street = "river"
     engine._finish_hand()
+
+
+def owes_a_decision(street: StreetState, live: list[int]) -> bool:
+    """True while someone with chips still has to call or fold.
+
+    Heads up, the small blind shoving left one player with chips, and the hand
+    ran the board out without ever asking them.
+    """
+    return any(street.contributions.get(s, 0) < street.current_bet for s in live)
+
+
+def rotate_after(order: list[int], seat: int) -> list[int]:
+    """The same seat order, starting at the seat after this one.
+
+    A raise reopens the action clockwise from the raiser. Rebuilding from the
+    street's first seat gave a player who had already acted another turn before
+    someone else had taken a first one.
+    """
+    if seat not in order:
+        return order
+    index = order.index(seat)
+    return order[index + 1:] + order[: index + 1]
