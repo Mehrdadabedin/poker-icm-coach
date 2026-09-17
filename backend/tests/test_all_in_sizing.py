@@ -72,3 +72,28 @@ def test_all_in_is_offered_only_while_the_hero_has_chips() -> None:
 def test_nothing_committed_yet_leaves_the_sizing_at_the_stack() -> None:
     first_in = {a.type.value: a for a in legal_actions(0, 0, STACK, BIG_BLIND, 0)}
     assert first_in["all_in"].amount == STACK
+
+
+def test_raise_is_not_offered_when_the_minimum_is_out_of_reach() -> None:
+    """Hero has 900 behind facing 1000 with 200 in: the minimum raise-to is
+    1900 and the reach is 1100, so both ends of the offered range were illegal.
+    The shove stays available."""
+    short = {a.type.value: a for a in legal_actions(CURRENT_BET, CONTRIBUTION, 900, BIG_BLIND, LAST_RAISE)}
+    assert "raise" not in short
+    assert short["all_in"].amount == 1100
+
+
+def test_raise_is_offered_when_the_reach_exactly_meets_the_minimum() -> None:
+    stack = 1700  # reach 1900, which is the minimum raise-to
+    edge = {a.type.value: a for a in legal_actions(CURRENT_BET, CONTRIBUTION, stack, BIG_BLIND, LAST_RAISE)}
+    assert edge["raise"].min_amount == edge["raise"].max_amount == 1900
+    validate_action(Action(ActionType.RAISE, amount=1900), CURRENT_BET, CONTRIBUTION,
+                    stack, LAST_RAISE, BIG_BLIND)
+
+
+def test_a_call_that_takes_the_whole_stack_is_offered_as_a_shove() -> None:
+    """to_call == stack: CALL is withheld, since calling would leave nothing,
+    and the all-in totals what the hero can actually reach."""
+    exact = {a.type.value: a for a in legal_actions(CURRENT_BET, CONTRIBUTION, 800, BIG_BLIND, LAST_RAISE)}
+    assert "call" not in exact
+    assert exact["all_in"].amount == 1000 == CURRENT_BET

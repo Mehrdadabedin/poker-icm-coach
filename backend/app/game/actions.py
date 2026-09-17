@@ -60,7 +60,11 @@ def legal_actions(
     else:
         if to_call < stack:  # a call that equals/exceeds stack is an all-in call
             actions.append(Action(ActionType.CALL, amount=to_call, max_amount=stack))
-        if stack > to_call and min_raise > 0:
+        # A raise is only offered when the player can actually reach the
+        # minimum. Short of that the whole stack is a call or a shove, and
+        # offering RAISE handed the client a range whose own endpoints both
+        # failed validation.
+        if stack > to_call and min_raise > 0 and reach >= min_raise:
             actions.append(
                 Action(ActionType.RAISE, min_amount=min_raise, max_amount=reach, amount=None)
             )
