@@ -18,10 +18,6 @@ def build(contribs, eligible):
     return pots
 
 
-def make(stack: int) -> Player:
-    return Player(name="X", stack=stack, seat=0)
-
-
 def test_no_side_pots_single_contributor_levels() -> None:
     contribs = {0: 100, 1: 100, 2: 100}
     pots = build(contribs, {0, 1, 2})

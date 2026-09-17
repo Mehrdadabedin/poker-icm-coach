@@ -50,9 +50,6 @@ class StreetState:
     def record_contribution(self, seat: int, amount: int) -> None:
         self.contributions[seat] = self.contributions.get(seat, 0) + amount
 
-    def total_contributions(self) -> int:
-        return sum(self.contributions.values())
-
 
 def apply_action(street: StreetState, player: Player, action: Action, street_contrib: int,
                  big_blind: int = 0) -> bool:

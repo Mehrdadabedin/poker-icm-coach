@@ -72,13 +72,6 @@ class Player:
         self.stack -= amount
         self.bet_total += amount
 
-    def refund_bet(self, amount: int) -> None:
-        """Return chips from the bet pool (uncalled portion)."""
-        if amount < 0 or amount > self.bet_total:
-            raise ValueError(f"invalid refund {amount} of bet_total {self.bet_total}")
-        self.bet_total -= amount
-        self.stack += amount
-
     def __str__(self) -> str:
         return f"{self.name} (seat {self.seat}, {self.stack} chips)"
 

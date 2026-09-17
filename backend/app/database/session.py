@@ -18,12 +18,3 @@ def build_engine(database_url: str | None = None):
 
 engine = build_engine()
 SessionLocal = sessionmaker(bind=engine, autoflush=False, expire_on_commit=False)
-
-
-def get_db():
-    """FastAPI dependency yielding a database session."""
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()

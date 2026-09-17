@@ -7,8 +7,7 @@ from app.ai.personalities import clamp01
 from app.game.hand_result import HandAction
 
 PREFLOP_AGGRESSIVE = {"raise", "all_in"}
-_STATS_ATTRS = ("vpip", "pfr", "three_bet", "fold_to_three_bet",
-                "aggression", "c_bet", "fold_to_c_bet", "showdown")
+_STATS_ATTRS = ("vpip", "pfr", "three_bet", "aggression", "showdown")
 
 
 @dataclass(slots=True)
@@ -20,12 +19,8 @@ class OpponentStats:
     vpip: float = 0.0
     pfr: float = 0.0
     three_bet: float = 0.0
-    fold_to_three_bet: float = 0.0
     aggression: float = 0.5
-    c_bet: float = 0.0
-    fold_to_c_bet: float = 0.0
     showdown: float = 0.0
-    actions_seen: int = 0
 
     def _clamp(self) -> None:
         clamp01(self, _STATS_ATTRS)

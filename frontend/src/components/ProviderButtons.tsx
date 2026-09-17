@@ -8,7 +8,7 @@ type ProviderKind = "phone" | "google" | "apple";
  * flows rather than rendered today. The Google clause is only offered when the
  * providers endpoint reports Google as configured, so the notice never points
  * at a control that would fail. */
-export function providerNotice(kind: ProviderKind, googleAvailable: boolean): string {
+function providerNotice(kind: ProviderKind, googleAvailable: boolean): string {
   const googleClause = googleAvailable ? " or continue with Google" : "";
   if (kind === "phone") {
     return (

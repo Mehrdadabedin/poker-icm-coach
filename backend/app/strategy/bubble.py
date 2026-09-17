@@ -70,8 +70,6 @@ class StageInfo:
 class BubblePressure:
     level: PressureLevel
     label: str
-    distance_to_bubble: int
-    short_stacks: int
 
     def __str__(self) -> str:
         return self.label
@@ -117,7 +115,6 @@ def detect_stage(
 
 def bubble_pressure(info: StageInfo) -> BubblePressure:
     """Heuristic pressure rating: closest to bubble + short stacks -> higher."""
-    distance = max(0, info.players_remaining - info.paid_positions)
     short = 1 if info.shortest_stack_bb <= 6 else 0
     hero_short = 1 if info.hero_stack_bb <= 8 else 0
     score = 0
@@ -134,7 +131,4 @@ def bubble_pressure(info: StageInfo) -> BubblePressure:
         level = PressureLevel.MEDIUM
     else:
         level = PressureLevel.LOW
-    return BubblePressure(
-        level=level, label=PRESSURE_LABELS[level],
-        distance_to_bubble=distance, short_stacks=short + hero_short,
-    )
+    return BubblePressure(level=level, label=PRESSURE_LABELS[level])

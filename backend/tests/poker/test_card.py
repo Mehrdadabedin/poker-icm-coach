@@ -11,9 +11,6 @@ ALL_STRINGS = [
     for s in "cdhs"
 ]
 
-SUIT_SYMBOLS = {Suit.CLUBS: "c", Suit.DIAMONDS: "d", Suit.HEARTS: "h", Suit.SPADES: "s"}
-
-
 def test_parses_all_52_cards() -> None:
     assert len(ALL_STRINGS) == 52
     cards = {card_from_str(cs) for cs in ALL_STRINGS}

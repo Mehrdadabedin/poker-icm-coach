@@ -1,6 +1,6 @@
 // Typed game state mirrored from the backend API (part 034 keeps them in sync).
 
-export type Suit = "c" | "d" | "h" | "s";
+type Suit = "c" | "d" | "h" | "s";
 
 export interface Card {
   rank: string; // 2..9, T, J, Q, K, A
@@ -28,7 +28,7 @@ export interface TableAction {
   street: string;
 }
 
-export type ReviewCard = Card;
+type ReviewCard = Card;
 
 export interface ReviewShowdown {
   seat: number;
@@ -131,7 +131,7 @@ export interface LegalAction {
 
 // Semantic full-word names for accessibility (A17 professional cards).
 // 8 + h => "8 of Hearts"; A + s => "Ace of Spades"; T + d => "10 of Diamonds".
-export const RANK_WORD: Record<string, string> = {
+const RANK_WORD: Record<string, string> = {
   A: "Ace", K: "King", Q: "Queen", J: "Jack", T: "10",
   "9": "9", "8": "8", "7": "7", "6": "6", "5": "5", "4": "4", "3": "3", "2": "2",
 };

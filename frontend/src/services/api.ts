@@ -5,7 +5,7 @@ const API_BASE = import.meta.env.VITE_API_URL ?? "";
 const TOKEN_KEY = "icm_auth_token";
 const USERNAME_KEY = "icm_username";
 
-export class AuthError extends Error {
+class AuthError extends Error {
   constructor(message: string) {
     super(message);
     this.name = "AuthError";

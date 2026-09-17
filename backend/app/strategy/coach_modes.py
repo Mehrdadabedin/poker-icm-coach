@@ -30,10 +30,6 @@ class CoachRecommendationView:
     alternative_action: str
     recommendation_detail: dict[str, str] = field(default_factory=dict)
 
-    @property
-    def summary(self) -> str:
-        return f"{self.recommended_action} ({self.confidence:.0%})"
-
 
 def filter_for_mode(rec, mode: str) -> CoachRecommendationView:
     """Strip detail keys not shown at the requested mode."""

@@ -12,12 +12,6 @@ def make_players(n: int = 9) -> list[Player]:
     return [Player(name=f"P{i}", stack=1000, seat=i) for i in range(n)]
 
 
-def active_ids(players: list[Player], seats: set[int] | None = None) -> set[int]:
-    if seats is None:
-        return {p.seat for p in players}
-    return seats
-
-
 def test_hole_cards_two_each_unique() -> None:
     deck = Deck(random.Random(3))
     deck.shuffle()

@@ -15,11 +15,6 @@ def _create_table() -> str:
     return response.json()["tableId"]
 
 
-def _hero_turn(table_id: str) -> bool:
-    state = client.get(f"/api/game/{table_id}/state").json()
-    return state["waitingForHero"]
-
-
 def _act_hero(table_id: str, kind: str, amount: int | None = None) -> dict:
     body = {"kind": kind}
     if amount is not None:
