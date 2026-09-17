@@ -83,14 +83,15 @@ class HandEngine:
         if player.folded:  # folded players are permanently out of the hand
             raise ValueError(f"seat {seat} folded and cannot act again")
         street_contrib = self._street.contributions.get(seat, 0)
+        big_blind = self.tournament.current_blind_level().big
         validate_action(
             action, self._street.current_bet, street_contrib, player.stack,
-            self._street.last_raise, self.tournament.current_blind_level().big,
-            can_raise=self._street.may_raise(seat),
+            self._street.last_raise, big_blind,
+            can_raise=self._street.may_raise(seat, big_blind),
         )
         bet_before = self._street.current_bet
-        raise_before = self._street.last_raise
-        apply_action(self._street, player, action, street_contrib)
+        reopened_before = set(self._street.acted_since_full_raise)
+        apply_action(self._street, player, action, street_contrib, big_blind)
         # The log records what the action actually put in, not the number the
         # caller sent. An all-in ignores the supplied amount entirely, so a bot
         # was logged at its bare stack and the hero at whatever the client sent.
@@ -99,8 +100,12 @@ class HandEngine:
         self._log.append(HandAction(seat, action.type.value, logged, self.street))
         # Only a full raise reopens the betting. An all-in short of one takes the
         # bet up without giving players who already acted another turn to raise.
+        # apply_action says which happened by replacing the acted set rather
+        # than adding to it. Comparing last_raise instead misread an all-in
+        # whose increment exactly equalled the previous one as incomplete.
         full_raise = self._street.current_bet > bet_before and (
-            self._street.last_raise != raise_before or action.type != ActionType.ALL_IN
+            action.type in (ActionType.BET, ActionType.RAISE)
+            or (self._street.acted_since_full_raise == {seat} and reopened_before != {seat})
         )
         self._after_action(seat, raised=self._street.current_bet > bet_before,
                            full_raise=full_raise)

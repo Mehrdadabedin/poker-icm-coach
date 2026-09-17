@@ -35,7 +35,7 @@ def build_context(engine: HandEngine, seat: int) -> DecisionContext:
         big_blind=big_blind,
         legal_actions=legal_actions(
             street.current_bet, contribution, player.stack, big_blind,
-            street.last_raise, can_raise=street.may_raise(seat),
+            street.last_raise, can_raise=street.may_raise(seat, big_blind),
         ),
         position=position_for(engine.button, seat, len(tournament.players)),
         action_history=[(a.seat, a.action, a.amount) for a in engine._log],

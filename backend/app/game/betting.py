@@ -27,10 +27,25 @@ class StreetState:
         self.last_aggressor = None
         self.acted_since_full_raise = set()
 
-    def may_raise(self, seat: int) -> bool:
-        """False once the seat has acted and nothing since has reopened the
-        betting for it."""
-        return seat not in self.acted_since_full_raise
+    def full_increment(self, big_blind: int) -> int:
+        """The smallest raise increment that counts as a full raise.
+
+        Never below the big blind: on a fresh street last_raise is 0, and
+        treating any increment as full let an all-in for 80 into a 200 blind
+        reopen the betting and become the new minimum."""
+        return max(self.last_raise, big_blind)
+
+    def may_raise(self, seat: int, big_blind: int) -> bool:
+        """Whether the seat may still raise.
+
+        Acting closes the right, and an all-in short of a full raise does not
+        give it back (TDA rules 45 and 49). Short all-ins do add up though: once
+        what the seat owes since it last acted reaches a full raise, the betting
+        is reopened for it (TDA rule 47)."""
+        if seat not in self.acted_since_full_raise:
+            return True
+        owed = self.current_bet - self.contributions.get(seat, 0)
+        return owed >= self.full_increment(big_blind)
 
     def record_contribution(self, seat: int, amount: int) -> None:
         self.contributions[seat] = self.contributions.get(seat, 0) + amount
@@ -61,7 +76,8 @@ def round_can_finish(
     return True
 
 
-def apply_action(street: StreetState, player: Player, action: Action, street_contrib: int) -> None:
+def apply_action(street: StreetState, player: Player, action: Action, street_contrib: int,
+                 big_blind: int = 0) -> None:
     """Apply an already-validated action to the street state and player."""
     # Recorded before the branches because CHECK returns early, and because a
     # full bet or raise below replaces the set outright.
@@ -87,7 +103,7 @@ def apply_action(street: StreetState, player: Player, action: Action, street_con
         street.contributions[player.seat] = new_total
         if new_total > street.current_bet:
             increment = new_total - street.current_bet
-            if increment >= street.last_raise:
+            if increment >= street.full_increment(big_blind):
                 # A full raise. It reopens the betting and sets the new minimum.
                 street.last_raise = increment
                 street.acted_since_full_raise = {player.seat}
