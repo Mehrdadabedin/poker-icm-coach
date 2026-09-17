@@ -13,11 +13,7 @@ import { ActionKind, LegalAction } from "../models/game";
 import { useLabelPreferences } from "../services/preferences";
 import { clearAuth, coachAdvice, coachCompare, getToken, getUsername, logout } from "../services/api";
 
-interface CoachPanel {
-  recommendedAction: string;
-  reasoning: string;
-  detail: Record<string, string>;
-}
+type CoachPanel = Awaited<ReturnType<typeof coachAdvice>>;
 
 const REVIEW_SECONDS = 10;
 

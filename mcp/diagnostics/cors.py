@@ -33,16 +33,16 @@ def _origins_and_source() -> tuple[list[str], str]:
 
 def _middleware_flags() -> dict:
     """What the CORSMiddleware call actually passes. Absent means default."""
+    unknown = {"source": None, "allow_credentials": "unknown", "allow_methods": "unknown",
+               "allow_headers": "unknown"}
     try:
         text = MAIN_MODULE.read_text()
     except OSError:
-        return {"source": None, "allow_credentials": "unknown", "allow_methods": "unknown",
-                "allow_headers": "unknown"}
+        return unknown
     block = MIDDLEWARE_RE.search(text)
     if not block:
         # No CORS middleware call to read: say so instead of guessing defaults.
-        return {"source": None, "allow_credentials": "unknown", "allow_methods": "unknown",
-                "allow_headers": "unknown", "allow_origins": "unknown"}
+        return unknown
     body = block.group(1)
 
     def value(name: str) -> str:
@@ -54,7 +54,6 @@ def _middleware_flags() -> dict:
         "allow_credentials": value("allow_credentials"),
         "allow_methods": value("allow_methods"),
         "allow_headers": value("allow_headers"),
-        "allow_origins": value("allow_origins"),
     }
 
 

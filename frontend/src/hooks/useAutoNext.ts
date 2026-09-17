@@ -9,18 +9,22 @@ export function useAutoNext(next: () => void, seconds = 30) {
   const nextRef = useRef(next);
   nextRef.current = next;
 
-  const stop = useCallback(() => {
+  const clearTimer = () => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
     }
+  };
+
+  const stop = useCallback(() => {
+    clearTimer();
     setCountdown(null);
     setPaused(false);
   }, []);
 
   const start = useCallback(
     (from = seconds) => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      clearTimer();
       let remaining = from;
       setCountdown(remaining);
       setPaused(false);
@@ -33,10 +37,7 @@ export function useAutoNext(next: () => void, seconds = 30) {
         }
         if (remaining < 0) {
           // "0" was shown; now trigger the next hand
-          if (timerRef.current) {
-            clearInterval(timerRef.current);
-            timerRef.current = null;
-          }
+          clearTimer();
           nextRef.current();
         }
       }, 1000);
@@ -45,10 +46,7 @@ export function useAutoNext(next: () => void, seconds = 30) {
   );
 
   const pause = useCallback(() => {
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
-    }
+    clearTimer();
     setPaused(true);
   }, []);
 

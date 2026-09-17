@@ -23,7 +23,7 @@ export const clearAuth = (): void => {
   localStorage.removeItem(USERNAME_KEY);
 };
 
-async function request<T>(path: string, options?: RequestInit): Promise<T> {
+export async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -160,5 +160,3 @@ export function rangeGrid(position: string, stackBb: number) {
     `/api/ranges?position=${encodeURIComponent(position)}&stack_bb=${stackBb}`,
   );
 }
-
-export { request };

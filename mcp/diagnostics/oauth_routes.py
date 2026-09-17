@@ -16,7 +16,6 @@ ROUTES_FILE = BACKEND_DIR / "app/api/routes_oauth.py"
 PREFIX_RE = re.compile(r"APIRouter\(\s*prefix\s*=\s*[\"\']([^\"\']+)[\"\']")
 ROUTE_RE = re.compile(r"@router\.(get|post|put|delete|patch)\(\s*[\"\']([^\"\']+)[\"\']")
 CALLBACK_SUFFIX_RE = re.compile(r"_CALLBACK_SUFFIX\s*=\s*[\"\']([^\"\']+)[\"\']")
-GOOGLE_HINTS = ("google",)
 
 
 def static_scan(routes_file=None) -> dict:
@@ -86,7 +85,7 @@ async def check_oauth_routes(base_url: str | None = None) -> dict:
         "callback_route": callback,
         "routes_found": routes_found,
         "router_prefix": scan.get("router_prefix"),
-        "google_routes": [r for r in scan.get("routes", []) if any(h in r["path"] for h in GOOGLE_HINTS)],
+        "google_routes": [r for r in scan.get("routes", []) if "google" in r["path"]],
         "static_scan": {"file": scan.get("source_file"), "ok": scan.get("ok")},
         "live_check": live,
         "notes": notes + ["read-only: routes are inspected, never changed"],

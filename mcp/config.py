@@ -47,22 +47,31 @@ NON_SECRET_READABLE = frozenset(
 )
 
 
+def _parse_env_file(path: Path) -> dict[str, str]:
+    """Key/value pairs from a simple `KEY=value` file.
+
+    Comments and blank or malformed lines are skipped; the first occurrence of
+    a key wins.
+    """
+    try:
+        text = path.read_text()
+    except OSError:
+        return {}
+    values: dict[str, str] = {}
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped or stripped.startswith("#") or "=" not in stripped:
+            continue
+        key, _, value = stripped.partition("=")
+        values.setdefault(key.strip(), value.strip())
+    return values
+
+
 def read_backend_env_value(name: str) -> str | None:
     """Value of an allowlisted non-secret variable in backend/.env."""
     if name not in NON_SECRET_READABLE:
         raise ValueError(f"{name} is not on the readable allowlist")
-    try:
-        text = BACKEND_ENV_FILE.read_text()
-    except OSError:
-        return None
-    for line in text.splitlines():
-        stripped = line.strip()
-        if stripped.startswith("#") or "=" not in stripped:
-            continue
-        key, _, value = stripped.partition("=")
-        if key.strip() == name:
-            return value.strip() or None
-    return None
+    return _parse_env_file(BACKEND_ENV_FILE).get(name) or None
 
 
 def backend_env_keys() -> frozenset[str]:
@@ -71,19 +80,7 @@ def backend_env_keys() -> frozenset[str]:
     Values are dropped on the line that reads them, so a secret cannot reach
     any caller of this function.
     """
-    try:
-        text = BACKEND_ENV_FILE.read_text()
-    except OSError:
-        return frozenset()
-    names = set()
-    for line in text.splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        name, _, value = line.partition("=")
-        if value.strip():
-            names.add(name.strip())
-    return frozenset(names)
+    return frozenset(k for k, v in _parse_env_file(BACKEND_ENV_FILE).items() if v)
 
 
 def production_backend_url() -> str | None:
@@ -92,14 +89,7 @@ def production_backend_url() -> str | None:
     Read from frontend/.env.production (VITE_API_URL): the deployed value is
     reported only when the repository actually states it.
     """
-    try:
-        text = FRONTEND_PROD_ENV_FILE.read_text()
-    except OSError:
-        return None
-    for line in text.splitlines():
-        if line.strip().startswith("VITE_API_URL="):
-            return line.split("=", 1)[1].strip() or None
-    return None
+    return _parse_env_file(FRONTEND_PROD_ENV_FILE).get("VITE_API_URL") or None
 
 
 def host_allowed(base_url: str) -> bool:

@@ -63,7 +63,7 @@ def build_state_view(session) -> dict:
             for a in eng._log
         ],
         "review": build_review(session),
-        "playersRemaining": sum(1 for p in tournament.players if not p.is_eliminated),
+        "playersRemaining": active_count,
         "inHand": in_hand_count,
         "communityCards": [card_model(c) for c in eng._board],
         "pot": _pot_total(tournament),

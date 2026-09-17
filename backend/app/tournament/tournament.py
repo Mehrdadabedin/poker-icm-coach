@@ -48,10 +48,6 @@ class PayoutStructure:
         return cls((0.35, 0.20, 0.12, 0.08, 0.06, 0.05, 0.04, 0.03, 0.02, 0.01,
                     0.01, 0.01, 0.01, 0.005, 0.005))
 
-    @classmethod
-    def custom(cls, percentages: tuple[float, ...]) -> PayoutStructure:
-        return cls(percentages)
-
 
 @dataclass(slots=True)
 class Tournament:
@@ -74,9 +70,6 @@ class Tournament:
     def advance_level(self) -> BlindLevel:
         self.level_index = min(self.level_index + 1, len(self.structure) - 1)
         return self.current_blind_level()
-
-    def seat_of(self, player: Player) -> int:
-        return player.seat
 
     def next_hand(self) -> None:
         self.hand_number += 1

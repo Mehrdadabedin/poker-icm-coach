@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { request } from "../services/api";
 import { Copyright } from "../components/Copyright";
+import { HomeButton } from "../components/HomeButton";
 
 type HandRow = {
   handNumber: number; heroPosition: string; pot: number; winnerSeats: number[];
@@ -11,7 +11,6 @@ type HandRow = {
 
 /** HAND HISTORY: auto-loads the active tournament table and groups by blind level. */
 export function HistoryPage() {
-  const navigate = useNavigate();
   const [hands, setHands] = useState<HandRow[]>([]);
   const [tableId, setTableId] = useState("");
   const [loaded, setLoaded] = useState(false);
@@ -20,12 +19,7 @@ export function HistoryPage() {
     // auto-detect the caller's most recent tournament table (per-user)
     request<{ tableId: string | null; tableLabel: string | null }>("/api/active-table")
       .then((d) => {
-        if (d.tableId) {
-          setTableId(d.tableId);
-          request<{ hands: HandRow[] }>(`/api/game/${d.tableId}/hands`)
-            .then((data) => setHands(data.hands))
-            .catch(() => undefined);
-        }
+        if (d.tableId) load(d.tableId);
       })
       .catch(() => undefined)
       .finally(() => setLoaded(true));
@@ -52,7 +46,7 @@ export function HistoryPage() {
       <h1 className="screen-title">HAND HISTORY</h1>
       <div className="toolbar">
         <input placeholder="table id" value={tableId} onChange={(e) => load(e.target.value)} data-testid="history-table-input" />
-        <button className="btn btn-small" onClick={() => navigate("/")}>HOME</button>
+        <HomeButton />
       </div>
       <p className="note">
         {tableId ? `Tournament table: ${tableId} — ${hands.length} completed hand(s)` : loaded ? "No active table yet — start a practice session first." : "Loading active table…"}

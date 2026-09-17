@@ -1,19 +1,14 @@
 import { useState } from "react";
-import { HandReview as ReviewData, formatChips } from "../models/game";
+import { CoachAdvice, HandReview as ReviewData, formatChips, reviewResultMeta } from "../models/game";
 import { ActionHistory } from "./ActionHistory";
 import { BotExplanations } from "./BotExplanations";
 import { CardView } from "./CardView";
+import { CoachPanelView } from "./CoachPanelView";
 import { ShowdownHands } from "./ShowdownHands";
-
-interface CoachPanel {
-  recommendedAction: string;
-  reasoning: string;
-  detail: Record<string, string>;
-}
 
 interface HandReviewProps {
   review: ReviewData;
-  coach: CoachPanel | null;
+  coach: CoachAdvice | null;
   comparison: Record<string, string> | null;
   totalPlayers: number;
   nameBySeat: Map<number, string>;
@@ -27,21 +22,7 @@ interface HandReviewProps {
 export function HandReview({ review, coach, comparison, totalPlayers, nameBySeat, onBack }: HandReviewProps) {
   const [showCoach, setShowCoach] = useState(true);
   const net = review.heroNet;
-
-  const title = review.chop
-    ? "CHOPPED"
-    : review.heroWon
-      ? "YOU WON"
-      : net === 0
-        ? "NO CHANGE"
-        : "YOU LOST";
-  const subtitle = review.chop
-    ? `${net >= 0 ? "+" : "-"}${formatChips(Math.abs(net))} chips`
-    : review.heroWon
-      ? `+${formatChips(net)} chips`
-      : net < 0
-        ? `-${formatChips(-net)} chips`
-        : "You folded without risking chips";
+  const { title, subtitle } = reviewResultMeta(review);
 
   return (
     <div className="hand-review" data-testid="hand-review">
@@ -141,21 +122,7 @@ export function HandReview({ review, coach, comparison, totalPlayers, nameBySeat
                   <b>{comparison.grade}</b> — {comparison.explanation}
                 </div>
               )}
-              {coach && (
-                <div className="coach-panel" data-testid="review-coach-panel">
-                  <h3>ICM COACH</h3>
-                  <div className="coach-recommendation">{coach.recommendedAction}</div>
-                  <p>{coach.reasoning}</p>
-                  <dl>
-                    {Object.entries(coach.detail).slice(0, 14).map(([k, v]) => (
-                      <div key={k} className="coach-row">
-                        <dt>{k}</dt>
-                        <dd>{v}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-              )}
+              {coach && <CoachPanelView coach={coach} testId="review-coach-panel" />}
             </>
           )}
         </div>

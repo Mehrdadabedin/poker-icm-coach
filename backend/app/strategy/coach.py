@@ -1,6 +1,6 @@
 """Dynamic strategy coach: combines all engines into one recommendation.
 
-The coach is advisory only — it never controls the hero. Recommendations
+The coach is advisory only, it never controls the hero. Recommendations
 recompute from the full request every time (no stale state).
 """
 from __future__ import annotations
@@ -9,7 +9,7 @@ from dataclasses import dataclass, field
 
 from app.ai.postflop_ai import equity_estimate
 from app.poker.card import Card
-from app.strategy.baseline_ranges import matrix_for_position
+from app.strategy.baseline_ranges import PREMIUM_HANDS, matrix_for_position
 from app.strategy.coach_analysis import (
     Analyses,
     _cell_key,
@@ -25,8 +25,9 @@ from app.strategy.coach_ev import (
     outs_for,
 )
 from app.strategy.push_fold import PushFoldEngine
+from app.strategy.stack_analysis import SHORT_BB
 
-PREMIUM = {"AA", "KK", "QQ", "JJ", "TT", "AKs", "AKo"}
+LATE_POSITIONS = ("CO", "BTN", "SB")
 
 @dataclass(slots=True)
 class CoachRequest:
@@ -82,15 +83,16 @@ class Coach:
         analyses = icm_ev_for(req, analyses, action, amount)
         ev = chip_ev_for(req, analyses, action, amount)
         analyses.chip_ev = f"{ev['evClass']} ({ev['chipEv']:+,})" if ev else "n/a"
-        detail = _build_detail(req, analyses, action, alt, reason)
         rp_label, _ = risk_premium_for(req, analyses)
+        detail = _build_detail(req, analyses, action, alt, reason, rp_label)
+        outs = outs_for(req)
         return CoachRecommendation(
             recommended_action=action, confidence=_confidence(analyses),
             reasoning=reason, alternative_action=alt,
             recommendation_detail=detail, icm_pressure=analyses.pressure,
             risk_premium=rp_label, ev=ev,
-            outs=outs_for(req),
-            education=education_for(req, analyses, ev, None, action, amount),
+            outs=outs,
+            education=education_for(req, analyses, ev, outs, action, amount),
         )
 
     def _decide(self, req: CoachRequest, a: Analyses) -> tuple[str, str, str]:
@@ -101,9 +103,9 @@ class Coach:
 
     def _preflop(self, req: CoachRequest, a: Analyses) -> tuple[str, str, str]:
         name = a.hand_name
-        premium = name in PREMIUM
+        premium = name in PREMIUM_HANDS
         if not req.facing_raise or req.to_call == 0:
-            if a.stack_bb <= 10:
+            if a.stack_bb <= SHORT_BB:
                 decision = self._pushfold.decide(
                     req.hero, req.position, int(a.stack_bb),
                 )
@@ -113,10 +115,9 @@ class Coach:
             matrix = matrix_for_position(req.position, int(a.stack_bb))
             freqs = matrix.cell_frequencies(_cell_key(req.hero))
             if freqs.get("OPEN RAISE", 0) >= 0.5:
-                alt = "CALL"
-                if req.position in ("CO", "BTN", "SB"):
-                    alt = "CHECK"
-                steal = " Steal spot from late position." if req.position in ("CO", "BTN", "SB") else ""
+                is_late = req.position in LATE_POSITIONS
+                alt = "CHECK" if is_late else "CALL"
+                steal = " Steal spot from late position." if is_late else ""
                 return "RAISE", alt, f"{name} is in the {req.position} open range.{steal}"
             return "FOLD", "CHECK", f"{name} is not in the {req.position} open range."
         # facing a raise
@@ -139,8 +140,8 @@ class Coach:
             if equity >= 0.62 or (equity >= 0.5 and a.spr <= 3):
                 return "BET", "CHECK", f"Strong equity {equity:.0%} on {a.hand_name}."
             if equity >= 0.45:
-                return "CHECK", "BET", f"Medium equity {equity:.0%} — keep pot small."
-            return "CHECK", "FOLD", f"Weak equity {equity:.0%} — no value to bet."
+                return "CHECK", "BET", f"Medium equity {equity:.0%}, keep pot small."
+            return "CHECK", "FOLD", f"Weak equity {equity:.0%}, no value to bet."
         required = a.pot_odds + 0.08
         if equity >= required + 0.05:
             return "RAISE", "CALL", f"Equity {equity:.0%} beats pot odds {a.pot_odds:.0%}."
@@ -153,7 +154,7 @@ def _confidence(a: Analyses) -> float:
     return round(min(0.95, 0.5 + margin), 2)
 
 def _build_detail(req: CoachRequest, a: Analyses, action: str, alt: str,
-                  reason: str) -> dict[str, str]:
+                  reason: str, rp_label: str) -> dict[str, str]:
     detail: dict[str, str] = {
         "ACTION": action,
         "WHY": reason,
@@ -164,7 +165,7 @@ def _build_detail(req: CoachRequest, a: Analyses, action: str, alt: str,
         "ICM PRESSURE": a.pressure,
         "BUBBLE": a.stage.label if a.stage else "?",
         "STACK BAND": a.stack_band,
-        "RISK PREMIUM": risk_premium_for(req, a)[0],
+        "RISK PREMIUM": rp_label,
         "COVERAGE": a.coverage,
         "SPR": f"{a.spr}",
         "ALTERNATIVE": alt,

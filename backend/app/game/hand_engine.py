@@ -90,23 +90,16 @@ class HandEngine:
             can_raise=self._street.may_raise(seat, big_blind),
         )
         bet_before = self._street.current_bet
-        reopened_before = set(self._street.acted_since_full_raise)
-        apply_action(self._street, player, action, street_contrib, big_blind)
+        full_raise = apply_action(self._street, player, action, street_contrib, big_blind)
         # The log records what the action actually put in, not the number the
         # caller sent. An all-in ignores the supplied amount entirely, so a bot
         # was logged at its bare stack and the hero at whatever the client sent.
         committed = self._street.contributions.get(seat)
         logged = committed if action.type not in (ActionType.FOLD, ActionType.CHECK) else None
         self._log.append(HandAction(seat, action.type.value, logged, self.street))
-        # Only a full raise reopens the betting. An all-in short of one takes the
-        # bet up without giving players who already acted another turn to raise.
-        # apply_action says which happened by replacing the acted set rather
-        # than adding to it. Comparing last_raise instead misread an all-in
-        # whose increment exactly equalled the previous one as incomplete.
-        full_raise = self._street.current_bet > bet_before and (
-            action.type in (ActionType.BET, ActionType.RAISE)
-            or (self._street.acted_since_full_raise == {seat} and reopened_before != {seat})
-        )
+        # Only a full raise reopens the betting. An all-in short of one takes
+        # the bet up without giving players who already acted another turn to
+        # raise; apply_action's return says which happened.
         self._after_action(seat, raised=self._street.current_bet > bet_before,
                            full_raise=full_raise)
 

@@ -18,7 +18,7 @@ export interface LabelPreferences {
 
 const DEFAULTS: LabelPreferences = { actionLabels: true, resultLabels: true };
 
-type SettingsPayload = {
+export type SettingsPayload = {
   startingStack: number;
   startingSmallBlind: number;
   startingBigBlind: number;

@@ -5,6 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api.deps import require_user
 from app.core.config import settings
+from app.core.tournament_settings import settings as tournament_settings
+from app.poker.card import Card, parse_rank, parse_suit
 from app.schemas.coach_schemas import (
     CoachAdviceRequest,
     CoachResponseModel,
@@ -17,6 +19,7 @@ from app.schemas.game_schemas import (
     TournamentCreateRequest,
 )
 from app.services.game_session import GameSession
+from app.services.session_coach import advice_dict
 from app.services.session_store import session_store
 from app.strategy.baseline_ranges import matrix_for_position
 from app.strategy.coach import Coach, CoachRequest
@@ -37,13 +40,11 @@ def get_session(table_id: str, user: str) -> GameSession:
 @router.post("/tournament", response_model=GameStateModel)
 def create_tournament(request: TournamentCreateRequest,
                       user: str = Depends(require_user)) -> dict:
-    from app.core.tournament_settings import settings as settings_store
-
-    tournament_settings = settings_store.for_user(user)  # issue #3: per user
-    starting_stack = request.starting_stack or tournament_settings.starting_stack
-    small = tournament_settings.starting_small_blind
-    big = tournament_settings.starting_big_blind
-    minutes = request.blind_level_minutes or tournament_settings.blind_level_minutes
+    user_settings = tournament_settings.for_user(user)  # issue #3: per user
+    starting_stack = request.starting_stack or user_settings.starting_stack
+    small = user_settings.starting_small_blind
+    big = user_settings.starting_big_blind
+    minutes = request.blind_level_minutes or user_settings.blind_level_minutes
     # fast_mode is the request's speed multiplier, not the settings flag.
     # TournamentSettings.fast_mode is a bool, and TournamentTimer clamps with
     # max(1.0, float(...)), so a bool always collapses to 1.0 and silently
@@ -110,14 +111,9 @@ def coach_compare(table_id: str, user: str = Depends(require_user)) -> dict:
 @router.post("/coach/advice", response_model=CoachResponseModel)
 def standalone_coach_advice(request: CoachAdviceRequest) -> dict:
     """Coach advice from a caller-supplied decision point (validated input)."""
-    from app.poker.card import Card, Rank, Suit
-
-    rank_value = {"2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9,
-                  "T": 10, "J": 11, "Q": 12, "K": 13, "A": 14}
-    suit_value = {"c": 0, "d": 1, "h": 2, "s": 3}
 
     def to_card(model) -> Card:
-        return Card(Rank(rank_value[model.rank]), Suit(suit_value[model.suit]))
+        return Card(parse_rank(model.rank), parse_suit(model.suit))
 
     req = CoachRequest(
         hero=[to_card(c) for c in request.heroCards],
@@ -130,17 +126,7 @@ def standalone_coach_advice(request: CoachAdviceRequest) -> dict:
         hero_seat=request.heroSeat, mode=request.mode,
         exact_cards=request.exactCards,
     )
-    rec = _coach.recommend(req)
-    return {
-        "recommendedAction": rec.recommended_action,
-        "confidence": rec.confidence,
-        "reasoning": rec.reasoning,
-        "alternativeAction": rec.alternative_action,
-        "detail": rec.recommendation_detail,
-        "ev": rec.ev,
-        "outs": rec.outs,
-        "education": rec.education,
-    }
+    return advice_dict(_coach.recommend(req))
 
 
 @router.get("/coach/hands")

@@ -134,12 +134,12 @@
   font-size: 1rem;
 }
 
-.settings-check {
-  flex-direction: row !important;
+.settings-grid .settings-check {
+  flex-direction: row;
   align-items: center;
-  gap: 8px !important;
+  gap: 8px;
   font-weight: 700;
-  color: var(--text) !important;
+  color: var(--text);
   min-height: 42px;
 }
 
@@ -182,7 +182,6 @@
 
 @media (max-width: 640px) {
   .app-footer {
-    text-align: right;
     font-size: 0.66rem;
     margin-top: 12px;
     padding-top: 8px;

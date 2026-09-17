@@ -34,10 +34,6 @@ class StackSnapshot:
     short_stacks: int
     very_short_stacks: int
 
-    @property
-    def hero_in_bb(self) -> float:
-        return 0.0  # filled by caller via classify; kept for interface stability
-
 
 def snapshot_for(
     hero_index: int,
@@ -51,8 +47,7 @@ def snapshot_for(
     hero = stacks[hero_index]
     ordered = sorted(stacks, reverse=True)
     rank = ordered.index(hero) + 1
-    short = [s for s in stacks if stack_in_bb(s, big_blind) <= short_threshold_bb]
-    very_short = [s for s in stacks if stack_in_bb(s, big_blind) <= very_short_threshold_bb]
+    bbs = [stack_in_bb(s, big_blind) for s in stacks]
     return StackSnapshot(
         stacks=tuple(stacks),
         average=round(sum(stacks) / len(stacks), 2),
@@ -61,8 +56,8 @@ def snapshot_for(
         shortest=min(stacks),
         rank=rank,
         hero_stack=hero,
-        short_stacks=len(short),
-        very_short_stacks=len(very_short),
+        short_stacks=sum(1 for bb in bbs if bb <= short_threshold_bb),
+        very_short_stacks=sum(1 for bb in bbs if bb <= very_short_threshold_bb),
     )
 
 

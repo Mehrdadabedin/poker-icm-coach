@@ -1,6 +1,6 @@
 import { formatChips, ReviewAction, TableAction } from "../models/game";
 
-type AnyAction = TableAction | ReviewAction | { seat: number; name: string; action: string; amount: number | null; street: string };
+type AnyAction = TableAction | ReviewAction;
 
 const STREET_ORDER = ["preflop", "flop", "turn", "river"];
 const STREET_TITLE: Record<string, string> = {

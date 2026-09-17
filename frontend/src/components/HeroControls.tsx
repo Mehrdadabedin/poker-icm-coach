@@ -1,6 +1,12 @@
 import { useState } from "react";
 import { ActionKind, LegalAction, formatChips } from "../models/game";
 
+// Phase 7: single reusable label mechanism — glyphs with accessible text.
+const GLYPH: Record<string, string> = {
+  fold: "✕", check: "✓", call: "▲",
+  bet: "●", raise: "⬈", all_in: "★",
+};
+
 interface HeroControlsProps {
   legalActions: LegalAction[];
   toCall: number;
@@ -39,12 +45,6 @@ export function HeroControls({
   const callKind: ActionKind = toCall > 0 ? "call" : "check";
   const callLabel =
     callKind === "call" ? `CALL ${formatChips(toCall)}` : "CHECK";
-
-  // Phase 7: single reusable label mechanism — glyphs with accessible text.
-  const GLYPH: Record<string, string> = {
-    fold: "\u2715", check: "\u2713", call: "\u25b2",
-    bet: "\u25cf", raise: "\u2b08", all_in: "\u2605",
-  };
 
   const openSizing = (kind: ActionKind) => {
     const m = meta(kind);

@@ -1,17 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { request } from "../services/api";
 import { Copyright } from "../components/Copyright";
-
-type Settings = {
-  startingStack: number; startingSmallBlind: number; startingBigBlind: number;
-  blindLevelMinutes: number; fastMode: boolean;
-  showActionLabels: boolean; showResultLabels: boolean;
-};
+import { HomeButton } from "../components/HomeButton";
+import type { SettingsPayload as Settings } from "../services/preferences";
 
 /** SETTINGS screen: editable tournament defaults that affect new tournaments. */
 export function SettingsPage() {
-  const navigate = useNavigate();
   const [settings, setSettings] = useState<Settings | null>(null);
   const [saved, setSaved] = useState(false);
 
@@ -41,7 +35,7 @@ export function SettingsPage() {
     <div className="page" data-testid="settings-page">
       <h1 className="screen-title">TOURNAMENT SETTINGS</h1>
       <div className="toolbar">
-        <button className="btn btn-small" onClick={() => navigate("/")}>HOME</button>
+        <HomeButton />
       </div>
       {settings ? (
         <div className="settings-grid">

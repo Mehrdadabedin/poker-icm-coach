@@ -39,6 +39,7 @@ _RANK_CHARS = {
 }
 _SUIT_CHARS = {"c": Suit.CLUBS, "d": Suit.DIAMONDS, "h": Suit.HEARTS, "s": Suit.SPADES}
 _CHAR_BY_SUIT = {suit: char for char, suit in _SUIT_CHARS.items()}
+_CHAR_BY_RANK = {rank.value: char for char, rank in _RANK_CHARS.items()}
 _SUIT_SYMBOLS = {Suit.CLUBS: "\u2663", Suit.DIAMONDS: "\u2666", Suit.HEARTS: "\u2665", Suit.SPADES: "\u2660"}
 
 
@@ -75,7 +76,7 @@ class Card:
         return f"{self.rank_char()}{_SUIT_SYMBOLS[self.suit]}"
 
     def rank_char(self) -> str:
-        return {10: "T", 11: "J", 12: "Q", 13: "K", 14: "A"}.get(self.rank.value, str(self.rank.value))
+        return _CHAR_BY_RANK.get(self.rank.value, str(self.rank.value))
 
     def ascii(self) -> str:
         """ASCII face like 'As' for logs and tests."""

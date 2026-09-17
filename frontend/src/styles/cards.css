@@ -40,11 +40,6 @@
   width: 56px;
 }
 
-/* Review screen hero/board cards */
-.review-grid .playing-card {
-  width: 60px;
-}
-
 /* Responsive: shrink on narrow screens without breaking proportions */
 @media (max-width: 640px) {
   .playing-card { width: 34px; }

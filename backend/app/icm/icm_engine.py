@@ -43,10 +43,8 @@ def icm_equities(stacks: Sequence[int], payouts: Sequence[float]) -> list[float]
         raise ValueError("payouts must be finite and non-negative")
     if not payouts:
         return [0.0] * len(stacks)
-    if len(stacks) != len(payouts) and len(payouts) < len(stacks):
+    if len(payouts) < len(stacks):
         payouts = payouts + (0.0,) * (len(stacks) - len(payouts))
-    if len(stacks) == 1:
-        return [payouts[0]]
 
     @lru_cache(maxsize=4096)
     def _eq(stacks_t: tuple[int, ...], prizes_t: tuple[float, ...]) -> tuple[float, ...]:

@@ -63,7 +63,7 @@ def post_blinds_and_antes(tournament: Tournament, street: StreetState) -> None:
                 # here made a big blind ante part of current_bet, so every player
                 # had to call the blind plus the ante, and under traditional
                 # antes it cut everyone's to_call by the ante already posted.
-                street.contributions[seat] = street.contributions.get(seat, 0) + paid
+                street.record_contribution(seat, paid)
     # The scheduled big blind, not what the big blind could afford. A short blind
     # is all-in for less, and the rest of the table still faces a full one.
     street.current_bet = level.big

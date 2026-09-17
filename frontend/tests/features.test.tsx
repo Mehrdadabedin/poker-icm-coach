@@ -7,22 +7,19 @@ import { PlayingCard } from "../src/components/PlayingCard";
 import { HandResult } from "../src/components/HandResult";
 import { HandReview } from "../src/components/HandReview";
 import { sampleReview } from "../src/sampleState";
+import { RANKS as ALL_RANKS, SUITS as ALL_SUITS } from "../src/components/CoachCardPicker";
+import { SUIT_WORD } from "../src/models/game";
 
 const review = sampleReview();
 
-const ALL_RANKS = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"];
-const ALL_SUITS = ["s", "h", "d", "c"];
-
 describe("A08/A17 real card assets", () => {
-  const SUIT_WORDS: Record<string, string> = { s: "Spades", h: "Hearts", d: "Diamonds", c: "Clubs" };
-
   it("maps every one of the 52 cards to the correct local PNG asset (renderer)", () => {
     for (const rank of ALL_RANKS) {
       for (const suit of ALL_SUITS) {
         const { container } = render(<PlayingCard card={{ rank, suit } as never} />);
         const img = container.querySelector("img");
         expect(img?.getAttribute("src")).toMatch(new RegExp(`cards/${rank}${suit}[.]png$`));
-        expect(img?.getAttribute("alt")).toContain(SUIT_WORDS[suit]);
+        expect(img?.getAttribute("alt")).toContain(SUIT_WORD[suit]);
         expect(img?.getAttribute("alt")).toBeTruthy();
       }
     }

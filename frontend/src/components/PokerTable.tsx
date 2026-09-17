@@ -30,7 +30,7 @@ export function PokerTable({ state, children }: PokerTableProps) {
 
   const revealBySeat = new Map<number, { cards: Card[] | null; hand: string | null }>();
   for (const s of review?.showdown ?? []) {
-    revealBySeat.set(s.seat, { cards: s.cards as Card[], hand: s.handName });
+    revealBySeat.set(s.seat, { cards: s.cards, hand: s.handName });
   }
   const winners = new Set(review?.winners ?? []);
   const allIn = new Set(review?.allInSeats ?? []);

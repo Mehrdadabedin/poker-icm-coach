@@ -1,4 +1,4 @@
-import { HandReview, formatChips } from "../models/game";
+import { HandReview, formatChips, reviewResultMeta } from "../models/game";
 
 interface HandResultProps {
   review: HandReview;
@@ -13,26 +13,10 @@ interface HandResultProps {
   showResultLabels?: boolean;
 }
 
-function resultMeta(review: HandReview) {
-  const net = review.heroNet;
-  const won = review.heroWon && !review.chop;
-  const lost = !review.heroWon && !review.chop && net < 0;
-  const title = review.chop ? "CHOPPED" : review.heroWon ? "YOU WON" : net === 0 ? "NO CHANGE" : "YOU LOST";
-  const subtitle = review.chop
-    ? `${net >= 0 ? "+" : "-"}${formatChips(Math.abs(net))} chips`
-    : review.heroWon
-      ? `+${formatChips(net)} chips`
-      : net < 0
-        ? `-${formatChips(-net)} chips`
-        : "You folded without risking chips";
-  const glyph = review.chop ? "\u21c4" : won ? "\u2713" : lost ? "\u2715" : "\u25fc";
-  return { title, subtitle, glyph };
-}
-
 /** Compact post-hand result (A10/A16): stays on the table, never auto-opens
  * the detailed history. The player chooses REVIEW THE HAND or NEXT HAND. */
 export function HandResult({ review, username, onReview, onNext, countdown, paused, showResultLabels = true }: HandResultProps) {
-  const { title, subtitle, glyph } = resultMeta(review);
+  const { title, subtitle, glyph } = reviewResultMeta(review);
 
   return (
     <div className="hand-result" data-testid="hand-result" role="status" aria-label={`${title}, ${subtitle}`}>

@@ -68,10 +68,14 @@ def icm_ev_for(req, a: Analyses, action: str, amount: int | None = None) -> Anal
     except IndexError:
         return a
     payouts = list(req.payout)
-    try:
-        eq_fold = icm_equities(stacks, payouts)[hero]
-    except ValueError:
-        return a
+    cached_fold_equity = a.extra.get("fold_equity")
+    if cached_fold_equity is not None:
+        eq_fold = cached_fold_equity
+    else:
+        try:
+            eq_fold = icm_equities(stacks, payouts)[hero]
+        except ValueError:
+            return a
     a.extra["fold_equity"] = eq_fold
     a.tournament_equity = round(eq_fold, 4)
     if action == "FOLD":
