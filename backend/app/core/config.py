@@ -23,6 +23,14 @@ class Settings(BaseSettings):
     auth_users_file: str = "data/users.json"
     auth_sessions_file: str = "data/sessions.json"
 
+    # Google sign-in. Only read from the environment; never logged or returned.
+    # Both values are required before the provider is advertised as available.
+    google_client_id: str = ""
+    google_client_secret: str = ""
+    # Public backend callback override. Blank derives it from the request
+    # (X-Forwarded-Proto/Host), which is what Render's proxy needs.
+    google_redirect_uri: str = ""
+
     @property
     def cors_origin_list(self) -> list[str]:
         return [o.strip() for o in self.cors_origins.split(",") if o.strip()]

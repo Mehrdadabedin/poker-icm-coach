@@ -44,6 +44,10 @@ def create_tournament(request: TournamentCreateRequest,
     small = tournament_settings.starting_small_blind
     big = tournament_settings.starting_big_blind
     minutes = request.blind_level_minutes or tournament_settings.blind_level_minutes
+    # fast_mode is the request's speed multiplier, not the settings flag.
+    # TournamentSettings.fast_mode is a bool, and TournamentTimer clamps with
+    # max(1.0, float(...)), so a bool always collapses to 1.0 and silently
+    # discards whatever multiplier the client asked for.
     fast = request.fast_mode
     session = GameSession(
         fast_mode=fast,

@@ -1,0 +1,29 @@
+[project]
+name = "icm-master-mcp"
+version = "0.1.0"
+description = "ICM Master MCP server: read-only development diagnostics for the app."
+requires-python = ">=3.12"
+dependencies = [
+    "mcp[cli]>=2.2",
+    "httpx>=0.28",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-asyncio>=1.4.0",
+]
+
+[tool.uv]
+# The server is run from this directory (stdio), it is never installed as a
+# package: keeping it "virtual" means the Django/FastAPI production dependency
+# set in ../backend is untouched by anything here.
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"
+# The diagnostics are async because they share one httpx client shape with the
+# tools; auto mode keeps the test files free of per-test markers.
+asyncio_mode = "auto"

@@ -48,12 +48,18 @@ export function HomePage() {
   };
 
   if (!user) {
+    // The sign-in screen owns the full viewport: brand header, then the panel.
     return (
-      <div className="page home-page" data-testid="home-page">
-        <h1 className="screen-title" data-testid="app-title">ICM MASTER</h1>
-        <p className="home-tagline">9-player tournament practice with an ICM coach</p>
-        <LoginForm onLogin={setUser} />
-        <Copyright />
+      <div className="page home-page auth-page" data-testid="home-page">
+        <div className="auth-shell">
+          <header className="auth-brand">
+            <h1 className="auth-title" data-testid="app-title">ICM MASTER</h1>
+            <span className="auth-title-rule" aria-hidden="true" />
+            <p className="auth-subtitle">9-player tournament practice with an ICM coach</p>
+          </header>
+          <LoginForm onLogin={setUser} />
+          <Copyright />
+        </div>
       </div>
     );
   }

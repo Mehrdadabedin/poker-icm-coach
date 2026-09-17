@@ -87,6 +87,26 @@ export function me(): Promise<{ username: string }> {
   return request<{ username: string }>("/api/auth/me");
 }
 
+export interface AuthProviders {
+  google: boolean;
+  apple: boolean;
+  phone: boolean;
+}
+
+/** Which third-party sign-in providers the backend has configured.
+ * Public endpoint: it only reports availability, it never returns secrets. */
+export function getAuthProviders(): Promise<AuthProviders> {
+  return request<AuthProviders>("/api/auth/providers");
+}
+
+/** URL that starts the server-side Google OAuth flow. The backend validates
+ * the callback origin against its CORS allowlist and returns the browser here
+ * with the session token. */
+export function googleSignInUrl(): string {
+  const redirect = `${window.location.origin}/#/auth/callback`;
+  return `${API_BASE}/api/auth/google/start?redirect_uri=${encodeURIComponent(redirect)}`;
+}
+
 export function createTournament(fastMode = 10): Promise<TableState> {
   // Stack/blinds/duration come from the runtime tournament settings
   // (editable on the Tournament Settings screen); fast mode may be passed.

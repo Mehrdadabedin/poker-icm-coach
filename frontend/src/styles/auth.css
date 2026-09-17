@@ -1,87 +1,190 @@
-/* A18 authentication entry (LOGIN / SIGN UP) — used only by LoginForm. */
+/* ICM MASTER sign-in screen. Everything here is scoped to .auth-page / .auth-*
+   and .login-panel, so the table, ranges, coach, settings, history and
+   statistics screens keep their own styles untouched.
+
+   Geometry is written in reference pixels taken from loginUI.png (a 1024x1536
+   mockup) and scaled by --k: at a 1024x1536 viewport --k is exactly 1px, so
+   every number below is the measured value from the mockup. Smaller viewports
+   shrink the whole screen proportionally instead of reflowing it. */
+
+.home-page.auth-page,
 .login-panel {
+  /* --k is one reference pixel. It follows whichever of the two ratios is
+     smaller, so the composition keeps the same share of the frame on any
+     desktop (about 80% of the height, as measured in newloging.png) instead
+     of growing taller than the viewport on wide, short screens. The height
+     divisor is the panel's own ink height at --k = 1: 1050 reference pixels. */
+  --k: clamp(0.5px, min(calc(100vw / 1024), calc(100vh / 1310)), 1px);
+  --auth-gold: #fad15a;
+  --auth-gold-rule: #fcf159;
+  --auth-text: #e9eef5;
+  --auth-muted: #99a8ba;
+  --auth-dim: #75828f;
+  --auth-line: #2c373f;
+  --auth-rule: #333d47;
+  --auth-field: #111a21;
+  --auth-icon: #919faf;
+  --auth-blue: #086aec;
+  --auth-ink: #0f151d;
+  /* One error red for every sign-in message on this screen. */
+  --auth-red: #ff6b6b;
+}
+
+.home-page.auth-page {
+  background: #0e141a;
+  max-width: none;
+  gap: 0;
+  padding: calc(24 * var(--k)) calc(16 * var(--k)) calc(48 * var(--k));
+  justify-content: center;
+  overflow-y: auto;
+}
+
+/* 716px wide column, exactly as measured in the mockup. */
+.auth-shell {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  width: min(340px, 92vw);
-  background: rgba(29, 36, 44, 0.82);
-  border: 1px solid #333;
-  border-radius: 12px;
-  padding: 16px 18px;
+  width: min(calc(716 * var(--k)), 94vw);
 }
 
-.login-panel h2 {
-  color: var(--accent);
-  font-size: 1.05rem;
-  letter-spacing: 1px;
-  margin: 0;
-}
-
-.login-input {
-  width: 100%;
-  min-height: 42px;
-  border-radius: 8px;
-  border: 1px solid #444;
-  background: #0f1318;
-  color: var(--text);
-  padding: 6px 10px;
-  font-size: 0.95rem;
-}
-
-/* Phase 2: LOGIN / SIGN UP as two compact rectangular controls.
-   Blue (project .btn-primary tone) instead of the gold used before, matching
-   the app's primary button colour; small and consistent. */
-.auth-mode-switch {
-  display: flex;
-  gap: 6px;
-}
-
-.auth-mode-switch .btn {
-  min-height: 32px;
-  min-width: 0;
-  font-size: 0.82rem;
-  font-weight: 700;
-  padding: 4px 14px;
-  border-radius: 6px;
-  flex: 1 1 auto;
-  background: #1565c0;
-  color: #fff;
-}
-
-.auth-mode-switch .btn.active {
-  background: #0d47a1;
-  outline: 2px solid #90caf9;
-  box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.35);
-}
-
-/* Accessible focus for the keyboard */
-.auth-mode-switch .btn:focus-visible,
-.login-panel button:focus-visible {
-  outline: 2px solid #90caf9;
-  outline-offset: 1px;
-}
-
-/* Primary submit uses the same blue family as the mode controls */
-.login-panel .btn-primary {
-  background: #1565c0;
-  color: #fff;
-}
-
-.auth-switch-link {
-  background: transparent;
-  border: 1px solid #555;
-  color: var(--muted);
-}
-
-.auth-switch-link:hover {
-  color: var(--text);
-  border-color: #90caf9;
-}
-
-.success-box {
-  color: #81c784;
-  font-size: 0.78rem;
-  line-height: 1.3;
+/* ---- brand: gold title, short rule, subtitle ---- */
+.auth-brand {
   text-align: center;
+  margin-bottom: calc(78 * var(--k));
+}
+
+.auth-title {
+  margin: 0;
+  color: var(--auth-gold);
+  font-size: calc(63 * var(--k));
+  font-weight: 800;
+  letter-spacing: calc(2.6 * var(--k));
+  line-height: 1.1;
+}
+
+.auth-title-rule {
+  display: block;
+  width: calc(107 * var(--k));
+  height: calc(5 * var(--k));
+  border-radius: calc(3 * var(--k));
+  margin: calc(19 * var(--k)) auto calc(14 * var(--k));
+  background: var(--auth-gold-rule);
+}
+
+.auth-subtitle {
+  margin: 0;
+  color: var(--auth-muted);
+  font-size: calc(29 * var(--k));
+  line-height: 1.3;
+}
+
+/* ---- panel: transparent column of blocks ---- */
+.login-panel {
+  display: flex;
+  flex-direction: column;
+  gap: calc(43 * var(--k));
+  width: 100%;
+  align-items: stretch;
+  color: var(--auth-text);
+}
+
+/* ---- provider pills ---- */
+.auth-providers {
+  display: flex;
+  flex-direction: column;
+  gap: calc(24 * var(--k));
+}
+
+/* The mark and the label sit centred in the pill, the arrow is pinned to the
+   right edge, which is what the mockup shows (label centre 540 vs pill centre
+   512, arrow centre 58px from the right edge). */
+.auth-provider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(30 * var(--k));
+  width: 100%;
+  height: calc(91 * var(--k));
+  padding: 0 calc(56 * var(--k));
+  border: calc(1 * var(--k)) solid transparent;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: calc(30 * var(--k));
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-provider-dark {
+  background: #020203;
+  border-color: #41474c;
+  color: #fff;
+}
+
+.auth-provider-light {
+  background: #fff;
+  color: var(--auth-ink);
+}
+
+.auth-provider-dark:hover {
+  background: #121317;
+}
+
+.auth-provider-light:hover {
+  background: #eef0f3;
+}
+
+.auth-provider-mark,
+.auth-provider-end {
+  display: flex;
+  align-items: center;
+}
+
+/* Mark sizes come from the mockup: each brand glyph has its own ink box. */
+.ico-phone {
+  width: calc(54 * var(--k));
+  height: calc(54 * var(--k));
+}
+
+.ico-google {
+  width: calc(50 * var(--k));
+  height: calc(50 * var(--k));
+}
+
+.ico-apple {
+  width: calc(62 * var(--k));
+  height: calc(62 * var(--k));
+}
+
+.auth-provider-end {
+  position: absolute;
+  right: calc(38 * var(--k));
+}
+
+.ico-arrow {
+  width: calc(42 * var(--k));
+  height: calc(42 * var(--k));
+}
+
+.auth-provider-label {
+  text-align: center;
+}
+
+/* ---- "or" separator: rule, word, rule ---- */
+.auth-or {
+  display: flex;
+  align-items: center;
+  gap: calc(20 * var(--k));
+  height: calc(20 * var(--k));
+  margin-top: calc(9 * var(--k));
+  color: var(--auth-or, #8c9aae);
+  font-size: calc(25 * var(--k));
+}
+
+.auth-or::before,
+.auth-or::after {
+  content: "";
+  flex: 1 1 auto;
+  height: calc(1 * var(--k));
+  background: var(--auth-rule);
 }

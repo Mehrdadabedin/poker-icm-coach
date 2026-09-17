@@ -13,6 +13,8 @@ import "./styles/explanations.css";
 import "./styles/coach-analyzer.css";
 import "./styles/cards.css";
 import "./styles/auth.css";
+import "./styles/auth-form.css";
+import "./styles/auth-footer.css";
 import "./styles/mobile.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

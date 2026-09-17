@@ -7,6 +7,7 @@ import { SettingsPage } from "./pages/SettingsPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { StatisticsPage } from "./pages/StatisticsPage";
 import { TrainingPage } from "./pages/TrainingPage";
+import { AuthCallbackPage } from "./pages/AuthCallbackPage";
 
 /** Root router for the ICM Master application. */
 export function App() {
@@ -15,6 +16,7 @@ export function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/table/:tableId" element={<TablePage />} />
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
         <Route path="/training" element={<TrainingPage />} />
         <Route path="/ranges" element={<RangesPage />} />
         <Route path="/coach" element={<CoachPage />} />
