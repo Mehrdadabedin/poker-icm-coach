@@ -13,7 +13,6 @@ class StreetState:
 
     current_bet: int = 0
     last_raise: int = 0
-    last_aggressor: int | None = None
     contributions: dict[int, int] = field(default_factory=dict)
     # Seats that have acted since the last full raise. A player in this set has
     # already had their say at the current level, so an all-in that raises by
@@ -24,7 +23,6 @@ class StreetState:
     def reset_street(self) -> None:
         self.current_bet = 0
         self.last_raise = 0
-        self.last_aggressor = None
         self.acted_since_full_raise = set()
 
     def full_increment(self, big_blind: int) -> int:
