@@ -12,7 +12,6 @@ if str(MCP_ROOT) not in sys.path:
     sys.path.insert(0, str(MCP_ROOT))
 
 import config  # noqa: E402
-import diagnostics.callback as callback_module  # noqa: E402
 import diagnostics.cookies as cookies_module  # noqa: E402
 import diagnostics.health as health_module  # noqa: E402
 import diagnostics.oauth_routes as routes_module  # noqa: E402

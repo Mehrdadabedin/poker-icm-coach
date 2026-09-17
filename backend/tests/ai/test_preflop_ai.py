@@ -11,7 +11,7 @@ from app.game.actions import Action, ActionType
 from app.game.decision_provider import DecisionContext
 
 
-def ctx_for(position: str, open_action: bool = True, stack_bb: int = 30, current_bet: int = 0,
+def ctx_for(position: str, stack_bb: int = 30, current_bet: int = 0,
             contribution: int = 0, big_blind: int = 100) -> DecisionContext:
     return DecisionContext(
         seat=3, hole_cards=[], board=[], street="preflop", pot=300,

@@ -25,7 +25,7 @@ class PersonalityProfile:
     four_bet: float = 0.04
     results: list[bool] = field(default_factory=list)  # won/lost history
 
-    def observe_result(self, won: bool, shown_down: bool = False) -> None:
+    def observe_result(self, won: bool) -> None:
         """Feed a hand result; adaptive profiles shift tendencies bounded."""
         self.results.append(won)
         recent = self.results[-20:]

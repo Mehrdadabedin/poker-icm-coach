@@ -9,10 +9,6 @@ export function cardKey(card: Card): string {
   return `${card.rank}${card.suit}`;
 }
 
-export function cardEquals(a: Card, b: Card): boolean {
-  return a.rank === b.rank && a.suit === b.suit;
-}
-
 interface CardPickerProps {
   value: Card | null;
   label: string;
