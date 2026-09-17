@@ -124,3 +124,22 @@ def test_a_seat_all_in_on_its_blind_is_not_asked_to_act() -> None:
             engine.act(actor, Action(ActionType.FOLD))
         else:
             engine.advance_bot(actor)
+
+
+def test_a_hand_where_the_posts_take_every_stack_still_settles() -> None:
+    """Filtering all-in seats out of the queue left nothing to act when blinds
+    and antes took every remaining stack: no actor, no result, and neither the
+    bots nor the hero could move the hand on."""
+    session = GameSession(starting_stack=50, fast_mode=1.0, rng=random.Random(2))
+    for seat, player in enumerate(session.tournament.players):
+        if seat > 1:
+            player.is_eliminated = True
+            player.stack = 0
+    session.start()
+    engine = session.engine
+    assert engine is not None
+
+    assert not engine._queue, "the posts should have taken both stacks"
+    assert engine.is_complete, "the hand stalled with nobody able to act"
+    assert engine.result is not None
+    assert len(engine._board) == 5, "an all-in before the flop runs the board out"

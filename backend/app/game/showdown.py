@@ -3,7 +3,13 @@ from __future__ import annotations
 
 from app.game.hand_result import HandWinner
 from app.game.player import Player
-from app.game.side_pot import SidePot, build_side_pots, distribute_pots, merge_equal_pots
+from app.game.side_pot import (
+    SidePot,
+    build_side_pots,
+    distribute_pots,
+    merge_equal_pots,
+    seats_left_of,
+)
 from app.poker.card import Card
 from app.poker.hand_evaluator import best_hand
 
@@ -13,6 +19,7 @@ def settle(
     eligible_seats: set[int],
     board: list[Card],
     ante_mode: str = "none",
+    button: int = 0,
 ) -> tuple[list[HandWinner], list[int], int]:
     """Distribute every pot to the best eligible hand(s); apply refunds.
 
@@ -53,7 +60,7 @@ def settle(
             winners.append(HandWinner(seats=[seat], amount=amount))
     else:
         hands = {s: best_hand(by_seat[s].hole_cards + list(board)) for s in eligible_seats}
-        distribute_pots(pots, by_seat, hands)
+        distribute_pots(pots, by_seat, hands, seats_left_of(button, by_seat))
         for pot in pots:
             contenders = [s for s in pot.eligible_seats if s in hands]
             if not contenders:

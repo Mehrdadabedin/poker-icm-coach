@@ -21,6 +21,7 @@ from app.game.hand_setup import (
 from app.game.showdown import merge_winners, settle
 from app.game.street_flow import (
     deal_next_street,
+    next_street_or_showdown,
     owes_a_decision,
     rotate_after,
     runout_and_showdown,
@@ -71,6 +72,11 @@ class HandEngine:
         deal_hole_cards(active_players(self.tournament.players), self._deck)
         self.street = "preflop"
         self._queue = deque(with_chips(self._order("preflop", active), self._active_non_allin()))
+        if not self._queue:
+            # Blinds and antes can take every remaining stack, leaving nobody to
+            # act. Without this the hand sat on an empty queue with no actor and
+            # no result, and neither the bots nor the hero could move it on.
+            self._next_street_or_showdown()
 
     @property
     def current_actor(self) -> int | None:
@@ -147,17 +153,7 @@ class HandEngine:
             self._next_street_or_showdown()
 
     def _next_street_or_showdown(self) -> None:
-        in_hand = in_hand_seats(self.tournament.players)
-        if len(in_hand) <= 1 or all(
-            self.tournament.players[s].stack == 0 for s in in_hand
-        ):
-            self._runout_and_showdown() if len(in_hand) > 1 else self._finish_hand()
-            return
-        self._deal_next_street()
-        self._street = StreetState()
-        # New street: only in-hand (non-folded) players may act.
-        active = sorted(in_hand_seats(self.tournament.players))
-        self._queue = deque(with_chips(self._order(self.street, active), self._active_non_allin()))
+        next_street_or_showdown(self)
 
     def _deal_next_street(self) -> None:
         deal_next_street(self)
@@ -171,6 +167,7 @@ class HandEngine:
         in_hand = in_hand_seats(self.tournament.players)
         winners, showed, pot_total = settle(
             self.tournament.players, in_hand, self._board, self.tournament.ante_mode,
+            self.button,
         )
         self.is_complete = True
         self.street = "complete"

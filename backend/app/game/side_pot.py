@@ -56,12 +56,27 @@ def build_side_pots(
     return pots, refunds
 
 
+def seats_left_of(button: int, players: dict[int, Player]) -> list[int]:
+    """Seats in order from the first one left of the button."""
+    seats = sorted(players)
+    if not seats:
+        return seats
+    span = max(seats) + 1
+    return sorted(seats, key=lambda s: (s - button - 1) % span)
+
+
 def distribute_pots(
     pots: list[SidePot],
     players: dict[int, Player],
     hands: dict[int, HandRank],
+    order: list[int] | None = None,
 ) -> None:
-    """Award every pot to the best eligible hand(s), splitting odd chips."""
+    """Award every pot to the best eligible hand(s), splitting odd chips.
+
+    An odd chip goes to the first tied winner left of the button (TDA rule 21).
+    Awarding it in set iteration order handed it to whichever seat the set
+    happened to yield first."""
+    rank_of = {seat: i for i, seat in enumerate(order or [])}
     for pot in pots:
         if pot.total_amount == 0:
             continue
@@ -73,6 +88,7 @@ def distribute_pots(
         if len(winners) == 1:
             players[winners[0]].add_chips(pot.total_amount)
         else:
+            winners.sort(key=lambda s: rank_of.get(s, s))
             base, odd = divmod(pot.total_amount, len(winners))
             for i, seat in enumerate(winners):
                 players[seat].add_chips(base + (1 if i < odd else 0))

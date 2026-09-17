@@ -5,13 +5,15 @@ Split out of hand_engine.py, which owns the betting flow and was at the
 """
 from __future__ import annotations
 
+from collections import deque
 from typing import TYPE_CHECKING
 
 from app.game.actions import amount_to_call
+from app.game.betting import StreetState
 from app.game.dealing import deal_flop, deal_river, deal_turn
+from app.game.hand_setup import in_hand_seats
 
 if TYPE_CHECKING:  # pragma: no cover - import cycle guard
-    from app.game.betting import StreetState
     from app.game.hand_engine import HandEngine
 
 
@@ -75,3 +77,19 @@ def with_chips(seats: list[int], live: list[int]) -> list[int]:
     """
     playable = set(live)
     return [seat for seat in seats if seat in playable]
+
+
+def next_street_or_showdown(engine: HandEngine) -> None:
+    """Deal the next street, or settle when nobody can act any more."""
+    in_hand = in_hand_seats(engine.tournament.players)
+    if len(in_hand) <= 1 or all(engine.tournament.players[s].stack == 0 for s in in_hand):
+        engine._runout_and_showdown() if len(in_hand) > 1 else engine._finish_hand()
+        return
+    engine._deal_next_street()
+    engine._street = StreetState()
+    # New street: only in-hand, non-folded players with chips may act.
+    active = sorted(in_hand_seats(engine.tournament.players))
+    engine._queue = deque(with_chips(engine._order(engine.street, active),
+                                     engine._active_non_allin()))
+    if not engine._queue:
+        next_street_or_showdown(engine)

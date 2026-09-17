@@ -134,3 +134,31 @@ def test_a_split_pot_rounds_the_odd_chip_once() -> None:
     by_seat = {p.seat: p for p in players}
     assert (by_seat[0].stack, by_seat[1].stack) == (3, 3), "the odd chip was rounded twice"
     assert by_seat[2].stack == 0
+
+
+def test_the_odd_chip_goes_to_the_first_tied_seat_left_of_the_button() -> None:
+    """TDA rule 21. The remainder used to follow set iteration order, so it
+    landed on whichever seat the eligible set happened to yield first."""
+    players = _table(live={0: 1, 1: 1, 2: 1}, antes={2: 2}, stack=0)
+    players[0].set_hole_cards(HANDS[0])
+    players[1].set_hole_cards([Card(Rank.ACE, Suit.HEARTS), Card(Rank.ACE, Suit.SPADES)])
+    players[2].set_hole_cards(HANDS[2])
+
+    settle(players, {0, 1, 2}, BOARD, "bba", button=0)
+
+    by_seat = {p.seat: p for p in players}
+    assert (by_seat[0].stack, by_seat[1].stack) == (2, 3), (
+        "seat 1 sits first left of the button, so it takes the odd chip"
+    )
+
+
+def test_moving_the_button_moves_the_odd_chip() -> None:
+    players = _table(live={0: 1, 1: 1, 2: 1}, antes={2: 2}, stack=0)
+    players[0].set_hole_cards(HANDS[0])
+    players[1].set_hole_cards([Card(Rank.ACE, Suit.HEARTS), Card(Rank.ACE, Suit.SPADES)])
+    players[2].set_hole_cards(HANDS[2])
+
+    settle(players, {0, 1, 2}, BOARD, "bba", button=1)
+
+    by_seat = {p.seat: p for p in players}
+    assert (by_seat[0].stack, by_seat[1].stack) == (3, 2), "seat 0 is now first after the button"
