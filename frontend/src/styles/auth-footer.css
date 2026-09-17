@@ -1,0 +1,76 @@
+/* Split out of auth.css to stay under the 200-line file cap, which
+   scripts/check_github.py enforces for css as well. Load order is the
+   cascade order, so main.tsx imports these three in sequence. */
+
+/* ---- switch prompt, stored account, brand line ---- */
+.auth-switch {
+  margin: 0;
+  color: var(--auth-muted);
+  font-size: calc(23 * var(--k));
+  text-align: center;
+}
+
+.auth-link {
+  padding: 0 calc(3 * var(--k));
+  border: 0;
+  border-radius: calc(4 * var(--k));
+  background: transparent;
+  color: var(--auth-gold);
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-signed-in {
+  margin: 0;
+  color: var(--auth-dim);
+  font-size: calc(21 * var(--k));
+  text-align: center;
+}
+
+.auth-legal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: calc(27 * var(--k));
+  margin-top: calc(66 * var(--k));
+}
+
+.auth-legal-text {
+  margin: 0;
+  color: #9dacbd;
+  font-size: calc(22 * var(--k));
+  letter-spacing: calc(9 * var(--k));
+  /* The trailing letter-space would push the line left of centre. */
+  text-indent: calc(9 * var(--k));
+  text-transform: uppercase;
+}
+
+.auth-legal-rule {
+  width: calc(95 * var(--k));
+  height: calc(5 * var(--k));
+  border-radius: calc(3 * var(--k));
+  background: var(--auth-gold-rule);
+}
+
+/* Copyright sits below the brand line: subdued, not gold, and out of the way. */
+.home-page.auth-page .app-footer {
+  margin-top: calc(24 * var(--k));
+  padding-top: 0;
+  border-top: 0;
+  color: var(--auth-gold);
+  font-size: calc(17 * var(--k));
+  letter-spacing: calc(1 * var(--k));
+  text-align: center;
+}
+
+/* Very short viewports (landscape phones): top-align so nothing is clipped.
+   Above this the composition is scaled to fit, so it stays centred. */
+@media (max-height: 560px) {
+  .home-page.auth-page {
+    padding-top: calc(16 * var(--k));
+    padding-bottom: calc(24 * var(--k));
+    justify-content: flex-start;
+  }
+}

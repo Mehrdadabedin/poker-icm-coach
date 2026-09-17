@@ -76,20 +76,24 @@ def icm_calculate(stacks: str, payouts: str) -> dict:
 
 
 @router.get("/settings")
-def get_settings() -> dict:
-    from app.core.tournament_settings import settings as tournament_settings
+def get_settings(user: str = Depends(require_user)) -> dict:
+    from app.core.tournament_settings import settings as store
 
-    return tournament_settings.to_dict()
+    return store.for_user(user).to_dict()
 
 
 @router.put("/settings")
 def put_settings(request: SettingsUpdate,
-                 _user: str = Depends(require_user)) -> dict:
-    """Update the shared tournament settings (bounds enforced by the schema)."""
-    from app.core.tournament_settings import settings as tournament_settings
+                 user: str = Depends(require_user)) -> dict:
+    """Update the caller's tournament settings (bounds enforced by the schema).
 
-    tournament_settings.update(**request.model_dump(exclude_none=True))
-    return tournament_settings.to_dict()
+    Issue #3: settings are per user, so one account's edit never reaches
+    another's tables."""
+    from app.core.tournament_settings import settings as store
+
+    ts = store.for_user(user)
+    ts.update(**request.model_dump(exclude_none=True))
+    return ts.to_dict()
 
 
 @router.get("/active-table")

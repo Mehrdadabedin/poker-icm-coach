@@ -61,6 +61,10 @@ export function HeroControls({
     setAmount("");
   };
 
+  // The engine sizes an all-in as a street total, so it already counts what the
+  // hero has in front of them. Falling back to the bare stack understates it.
+  const allInTo = meta("all_in")?.amount ?? stack;
+
   const sizeAction = meta(sizing ?? "bet");
   const minSize = sizeAction?.minAmount ?? bigBlind;
   const maxSize = sizeAction?.maxAmount ?? stack;
@@ -116,15 +120,17 @@ export function HeroControls({
             {showLabels ? "RAISE" : GLYPH.raise}
           </button>
         )}
-        <button
-          className="btn btn-allin"
-          disabled={acting}
-          aria-label="All-in"
-          title="All-in"
-          onClick={() => onAction("all_in", stack)}
-        >
-          {showLabels ? "ALL-IN" : GLYPH.all_in}
-        </button>
+        {has("all_in") && (
+          <button
+            className="btn btn-allin"
+            disabled={acting}
+            aria-label={`All-in ${formatChips(allInTo)}`}
+            title={`All-in ${formatChips(allInTo)}`}
+            onClick={() => onAction("all_in", allInTo)}
+          >
+            {showLabels ? `ALL-IN ${formatChips(allInTo)}` : GLYPH.all_in}
+          </button>
+        )}
       </div>
       {sizing && (
         <div className="bet-sizing" data-testid="bet-sizing">

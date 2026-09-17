@@ -23,8 +23,8 @@ Applies to every output: replies, commit messages, PR bodies, comments, docs.
 ## Commands
 
 ```bash
-cd backend  && uv run pytest        # 438 (442 with a database)
-cd frontend && npx vitest run       # 41
+cd backend  && uv run pytest        # 452 (456 with a database)
+cd frontend && npx vitest run       # 44
 cd backend  && uv run ruff check app tests && uv run mypy app
 cd frontend && npm run lint         # tsc --noEmit + oxlint --deny-warnings
 docker compose up -d postgres && cd backend && uv run alembic upgrade head
@@ -35,10 +35,13 @@ Both suites green before and after. Report counts.
 Enable the pre-push hook once per clone, since `git clone` does not copy hooks:
 
 ```bash
-git config core.hooksPath .githooks
+sh scripts/install-hooks.sh     # or: git config core.hooksPath .githooks
 ```
 
-It runs every gate CI runs. Do not push with `--no-verify` unless you can say
+It runs every gate CI runs and blocks direct pushes to `main`, so every change
+reaches `main` through a pull request. The block is local only: a clone that
+never ran the installer is not covered, and `main` has no server-side branch
+protection because that needs admin rights on the repository. Do not push with `--no-verify` unless you can say
 why in the commit message. CI itself has never run on this repository, see
 issue #8, so the hook is currently the only thing checking anything.
 Global `mypy`/`tsc` run outside the project env — their missing-stub errors are
@@ -82,10 +85,11 @@ Violating 1-5 turns `tests/test_invariants.py` red.
 - `data/users.json`, `data/sessions.json`: live credentials and tokens.
   Gitignored. Never print or commit.
 - Single uvicorn worker only. Tokens and tables are in-process dicts.
-- `GameSession.status` never leaves `"active"`. No lifecycle. The 20-table cap
-  is the stopgap.
-- `PUT /api/settings` writes one global object shared by all users. Current
-  behaviour, not a bug to fix silently.
+- `GameSession.status` is `active`, `finished` or `abandoned`. Ended tables are
+  evicted before the 20-table per-user cap is consulted. The cap is still a
+  guess.
+- `GET`/`PUT /api/settings` are per authenticated user (issue #3). Both require
+  `require_user`; there is no anonymous read.
 - The frontend polls every 350 ms. The websocket endpoint is unused (issue #1).
 
 ## Scope

@@ -65,6 +65,10 @@ remote dependency is used.
 
 - 52 card-face PNGs + 1 card back PNG (`back.png`, from OpenDecks
   `card back blue.png`) — used by the production renderer.
+- Issue #6: these PNGs are downsampled to 300x420 (the OpenDecks 5:7 aspect)
+  by `scripts/optimize_card_pngs.py`, which `import_opendecks_cards.py` also
+  runs. Same artwork and filenames, deck size ~14.4 MB -> ~2.8 MB. Cards render
+  at 52px wide, so the 1500x2100 source raster was pure bundle weight.
 - Assets are served locally by the built frontend (`vite` copies `public/` into
   `dist/`).
 
