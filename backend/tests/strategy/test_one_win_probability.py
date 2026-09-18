@@ -82,14 +82,54 @@ def test_preflop_falls_back_to_the_same_table() -> None:
     assert win_probability_for(aces) == 0.68, "the preflop table moved"
 
 
-def test_the_same_hand_gets_the_same_answer_whatever_order_it_arrives_in() -> None:
-    """Equity does not depend on card order, but an unsorted cache key gave the
-    same hand two entries and two slightly different sampled answers."""
+def test_the_same_hand_reuses_one_cache_entry_whatever_order_it_arrives_in() -> None:
+    """Asserting the two answers match proves nothing, because a seeded
+    simulation returns the same number for a reordered hand anyway. What the
+    sorted key buys is one entry instead of two, so assert the cache."""
+    from app.strategy.coach_analysis import _simulated
+
     hero = [Card(Rank.NINE, Suit.HEARTS), Card(Rank.TEN, Suit.HEARTS)]
     board = [Card(Rank.TWO, Suit.CLUBS), Card(Rank.SEVEN, Suit.DIAMONDS),
              Card(Rank.KING, Suit.SPADES)]
+
+    _simulated.cache_clear()
     first = win_probability_for(_request(hero, board))
-    assert win_probability_for(_request(hero[::-1], board[::-1])) == first
+    again = win_probability_for(_request(hero[::-1], board[::-1]))
+    info = _simulated.cache_info()
+
+    assert again == first
+    assert info.currsize == 1, f"the same hand took {info.currsize} cache entries"
+    assert (info.misses, info.hits) == (1, 1), f"{info.misses} misses, {info.hits} hits"
+
+
+def test_the_outs_report_quotes_the_same_number_as_the_decision() -> None:
+    """outs_for used to run its own 5,000 trial simulation of the spot the
+    decision had already simulated."""
+    from app.strategy.coach_analysis import _simulated
+    from app.strategy.coach_ev import outs_for
+
+    hero = [Card(Rank.NINE, Suit.HEARTS), Card(Rank.TEN, Suit.HEARTS)]
+    board = [Card(Rank.TWO, Suit.CLUBS), Card(Rank.SEVEN, Suit.DIAMONDS),
+             Card(Rank.KING, Suit.SPADES)]
+    req = _request(hero, board)
+
+    _simulated.cache_clear()
+    shared = win_probability_for(req)
+    before = _simulated.cache_info().misses
+    report = outs_for(req)
+
+    assert report is not None
+    assert report["winProb"] == shared, "the outs report quotes a different number"
+    assert _simulated.cache_info().misses == before, "the outs report simulated again"
+
+
+def test_preflop_equity_reaches_the_display() -> None:
+    """Analyses.equity was only set postflop, so a preflop hand the coach had
+    priced at 68 percent was displayed as 0."""
+    from app.strategy.coach_analysis import analyze_request
+
+    req = _request([Card(Rank.ACE, Suit.CLUBS), Card(Rank.ACE, Suit.DIAMONDS)], [])
+    assert analyze_request(req).equity == win_probability_for(req) == 0.68
 
 
 def test_the_answer_is_the_same_on_every_run() -> None:

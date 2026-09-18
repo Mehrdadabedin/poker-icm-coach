@@ -80,7 +80,7 @@ def win_probability_for(req) -> float:
     Measured against a 40,000 trial reference, the heuristic was out by 10.8
     points on average and the simulation by 0.6, so the simulation is what
     survives. It is cached because a single recommendation asks for it twice,
-    once for the analysis and once for the outs report.
+    once for the decision and once for the outs report.
     """
     if len(req.board) >= 3:
         # Sorted because equity does not depend on the order the cards arrive
@@ -97,6 +97,10 @@ def analyze_request(req) -> Analyses:
     others = [s for s in req.stacks if s != req.stack] or [req.stack]
     effective = effective_stack(req.stack, max(others))
     results = Analyses(
+        # Set for every street, not only postflop. Preflop it stayed 0.0, so
+        # EST. EQUITY displayed 0 percent on a hand the coach had already priced
+        # at 68, and confidence read 0.67 where the formula wanted 0.95.
+        equity=win_probability_for(req),
         stack_bb=stack_bb,
         eff_stack_bb=round(effective / bb, 1),
         pot_odds=pot_odds(req.to_call, req.pot),

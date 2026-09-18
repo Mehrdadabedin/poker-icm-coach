@@ -103,9 +103,15 @@ def icm_ev_for(req, a: Analyses, action: str, amount: int | None = None) -> Anal
 def outs_for(req) -> dict | None:
     if len(req.board) < 3:
         return None
-    from app.strategy.outs import winning_probability
+    # compute_outs for the card counting, and the shared estimate for the
+    # probability. winning_probability would run a second 5,000 trial
+    # simulation of the spot the decision has already simulated.
+    from app.strategy.outs import OutsReport, compute_outs
 
-    return winning_probability(req.hero, list(req.board)).to_dict()
+    base = compute_outs(req.hero, list(req.board))
+    return OutsReport(outs=base.outs, unknown=base.unknown,
+                      improve_turn=base.improve_turn, improve_river=base.improve_river,
+                      win_prob=win_probability_for(req), method="monte-carlo").to_dict()
 
 
 def education_for(req, a: Analyses, ev: dict | None, outs: dict | None,
