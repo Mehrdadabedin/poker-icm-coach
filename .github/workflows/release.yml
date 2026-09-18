@@ -128,6 +128,18 @@ jobs:
           (cd staging && sha256sum -- * > ../SHA256SUMS.txt && mv ../SHA256SUMS.txt .)
           ls -l staging
 
+      - name: Refuse to ship runtime data
+        # backend/data holds live credentials and session tokens. Hatchling only
+        # reads a .gitignore under its own root, so the repo rule that hides them
+        # does not protect an sdist, and a published Release cannot be recalled.
+        run: |
+          listing=$(tar tzf "staging/poker_icm_coach_backend-$VERSION.tar.gz"; unzip -Z1 "staging/poker_icm_coach_backend-$VERSION-py3-none-any.whl"; unzip -Z1 staging/frontend-dist.zip)
+          if grep -Eiq '(^|/)data/|users\.json|sessions\.json|(^|/)\.env($|[^.])' <<<"$listing"; then
+            echo "an artifact contains runtime data, refusing to release"
+            grep -Ei '(^|/)data/|users\.json|sessions\.json|(^|/)\.env($|[^.])' <<<"$listing"
+            exit 1
+          fi
+
       - name: Attest build provenance
         uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3
         with:

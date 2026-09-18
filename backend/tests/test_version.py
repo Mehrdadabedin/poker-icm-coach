@@ -1,7 +1,9 @@
-"""The version surface has one source: the installed distribution's metadata."""
+"""The version surface has one source, and the sdist carries no credentials."""
 from __future__ import annotations
 
+import tomllib
 from importlib.metadata import PackageNotFoundError
+from pathlib import Path
 
 import pytest
 
@@ -29,3 +31,14 @@ def test_health_reports_the_same_version_as_the_openapi_document() -> None:
     reported = login_client().get("/api/health").json()["version"]
     assert reported == app.version
     assert reported == version_module.app_version()
+
+
+def test_sdist_packs_an_allowlist_not_the_working_tree() -> None:
+    """Hatchling reads only a .gitignore under backend/, so the repo rule that
+    hides backend/data/ does not protect an sdist. Without this allowlist the
+    sdist packs data/users.json and data/sessions.json."""
+    config = tomllib.loads(
+        (Path(__file__).resolve().parents[1] / "pyproject.toml").read_text()
+    )
+    include = config["tool"]["hatch"]["build"]["targets"]["sdist"]["include"]
+    assert include == ["app", "alembic", "alembic.ini", "pyproject.toml"]
