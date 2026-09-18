@@ -11,7 +11,7 @@ import random
 
 from app.equity.equity_engine import hero_vs_random
 from app.poker.card import Card, Rank, Suit
-from app.strategy.coach import CoachRequest
+from app.strategy.coach import Coach, CoachRequest
 from app.strategy.coach_analysis import win_probability_for
 from app.strategy.coach_ev import win_prob
 
@@ -39,11 +39,71 @@ def test_the_analysis_and_the_displayed_number_are_the_same_number() -> None:
         )
 
 
+def test_the_recommendation_itself_uses_the_shared_number() -> None:
+    """The decision path called the heuristic directly, so changing only the
+    overlay left the advice priced off the wrong number.
+
+    Deuces on an ace-ace-ace board is a full house, and the heuristic reads that
+    category and calls it 95 percent. The simulation knows most of the deck also
+    makes trip aces or better, and prices it at 64. Facing 3,000 into a 1,000
+    pot the required equity is above both 64 and the pot odds, so the honest
+    number folds and the heuristic calls."""
+    from app.ai.postflop_ai import equity_estimate
+
+    hero = [Card(Rank.TWO, Suit.CLUBS), Card(Rank.TWO, Suit.DIAMONDS)]
+    board = [Card(Rank.ACE, Suit.SPADES), Card(Rank.ACE, Suit.HEARTS),
+             Card(Rank.ACE, Suit.DIAMONDS)]
+    req = _request(hero, board)
+    req.to_call = 3_000
+    req.facing_raise = True
+
+    quoted = win_probability_for(req)
+    heuristic = equity_estimate(hero, board, [])
+    assert heuristic - quoted > 0.25, (
+        f"this spot should split the two badly: {heuristic:.2f} against {quoted:.2f}"
+    )
+
+    rec = Coach().recommend(req)
+
+    assert rec.recommended_action == "FOLD", (
+        f"advised {rec.recommended_action} on {quoted:.0%} equity facing 3,000"
+    )
+    assert f"{quoted:.0%}" in rec.reasoning, (
+        f"the reasoning quotes a different number: {rec.reasoning}"
+    )
+
+
 def test_preflop_falls_back_to_the_same_table() -> None:
     rng = random.Random(5)
     for _ in range(8):
         req = _request(rng.sample(DECK, 2), [])
         assert win_probability_for(req) == win_prob(req)
+    aces = _request([Card(Rank.ACE, Suit.CLUBS), Card(Rank.ACE, Suit.DIAMONDS)], [])
+    assert win_probability_for(aces) == 0.68, "the preflop table moved"
+
+
+def test_the_same_hand_gets_the_same_answer_whatever_order_it_arrives_in() -> None:
+    """Equity does not depend on card order, but an unsorted cache key gave the
+    same hand two entries and two slightly different sampled answers."""
+    hero = [Card(Rank.NINE, Suit.HEARTS), Card(Rank.TEN, Suit.HEARTS)]
+    board = [Card(Rank.TWO, Suit.CLUBS), Card(Rank.SEVEN, Suit.DIAMONDS),
+             Card(Rank.KING, Suit.SPADES)]
+    first = win_probability_for(_request(hero, board))
+    assert win_probability_for(_request(hero[::-1], board[::-1])) == first
+
+
+def test_the_answer_is_the_same_on_every_run() -> None:
+    """Unseeded, the shared estimate resampled whenever the cache was cold, so
+    two processes could quote different numbers for the same spot."""
+    from app.strategy.coach_analysis import _simulated
+
+    hero = [Card(Rank.QUEEN, Suit.CLUBS), Card(Rank.JACK, Suit.CLUBS)]
+    board = [Card(Rank.TWO, Suit.HEARTS), Card(Rank.FIVE, Suit.SPADES),
+             Card(Rank.NINE, Suit.DIAMONDS)]
+    req = _request(hero, board)
+    first = win_probability_for(req)
+    _simulated.cache_clear()
+    assert win_probability_for(req) == first, "a cold cache gave a different answer"
 
 
 def test_the_number_tracks_a_high_trial_reference() -> None:

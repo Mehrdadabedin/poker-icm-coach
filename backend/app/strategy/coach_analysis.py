@@ -61,11 +61,14 @@ def _preflop_equity(name: str) -> float:
     return 0.20
 
 
+SIM_SEED = 7  # the seed the outs report has always used, so the two agree
+
+
 @lru_cache(maxsize=1024)
 def _simulated(hero: tuple, board: tuple) -> float:
     from app.equity.equity_engine import hero_vs_random
 
-    return hero_vs_random(list(hero), list(board)).equity
+    return hero_vs_random(list(hero), list(board), seed=SIM_SEED).equity
 
 
 def win_probability_for(req) -> float:
@@ -80,7 +83,10 @@ def win_probability_for(req) -> float:
     once for the analysis and once for the outs report.
     """
     if len(req.board) >= 3:
-        return _simulated(tuple(req.hero), tuple(req.board))
+        # Sorted because equity does not depend on the order the cards arrive
+        # in, and an unsorted key gave the same hand two cache entries and two
+        # slightly different sampled answers.
+        return _simulated(tuple(sorted(req.hero, key=str)), tuple(sorted(req.board, key=str)))
     return _preflop_equity(_cell_key(req.hero))
 
 
