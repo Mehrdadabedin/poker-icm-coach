@@ -11,10 +11,13 @@ from app.api.routes_game import router as game_router
 from app.api.routes_meta import router as meta_router
 from app.api.routes_oauth import router as oauth_router
 from app.core.config import settings
+from app.core.version import app_version
 from app.services.auth import auth_store
 from app.services.session_store import session_store
 
-app = FastAPI(title="ICM Master API", version="0.1.0")
+VERSION = app_version()
+
+app = FastAPI(title="ICM Master API", version=VERSION)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origin_list,
@@ -29,7 +32,7 @@ app.include_router(meta_router)
 
 @app.get("/api/health")
 def health() -> dict:
-    return {"status": "ok"}
+    return {"status": "ok", "version": VERSION}
 
 
 @app.websocket("/ws/table/{table_id}")

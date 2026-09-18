@@ -1,6 +1,7 @@
 """FastAPI + WebSocket API tests (Atomic Part 034)."""
 from __future__ import annotations
 
+from app.main import VERSION
 from tests.api_helpers import login_client, ws_url
 
 client = login_client()
@@ -25,7 +26,7 @@ def _act_hero(table_id: str, kind: str, amount: int | None = None) -> dict:
 
 
 def test_health() -> None:
-    assert client.get("/api/health").json() == {"status": "ok"}
+    assert client.get("/api/health").json() == {"status": "ok", "version": VERSION}
 
 
 def test_create_tournament_state() -> None:
