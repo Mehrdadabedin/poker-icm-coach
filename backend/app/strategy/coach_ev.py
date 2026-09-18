@@ -111,7 +111,7 @@ def outs_for(req) -> dict | None:
     base = compute_outs(req.hero, list(req.board))
     return OutsReport(outs=base.outs, unknown=base.unknown,
                       improve_turn=base.improve_turn, improve_river=base.improve_river,
-                      win_prob=win_probability_for(req), method="monte-carlo").to_dict()
+                      win_prob=win_probability_for(req), method="estimate").to_dict()
 
 
 def education_for(req, a: Analyses, ev: dict | None, outs: dict | None,

@@ -102,11 +102,27 @@ def test_the_same_hand_reuses_one_cache_entry_whatever_order_it_arrives_in() -> 
     assert (info.misses, info.hits) == (1, 1), f"{info.misses} misses, {info.hits} hits"
 
 
-def test_the_outs_report_quotes_the_same_number_as_the_decision() -> None:
+def test_the_outs_report_quotes_the_same_number_as_the_decision(monkeypatch) -> None:
     """outs_for used to run its own 5,000 trial simulation of the spot the
-    decision had already simulated."""
+    decision had already simulated.
+
+    The sampler is counted at both import sites, because counting cache misses
+    cannot see a simulation that never goes through the cache, which is exactly
+    what the old outs_for did."""
+    from app.equity import equity_engine
+    from app.strategy import outs as outs_module
     from app.strategy.coach_analysis import _simulated
     from app.strategy.coach_ev import outs_for
+
+    calls = []
+    real = equity_engine.hero_vs_random
+
+    def counted(*args, **kwargs):
+        calls.append(1)
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(equity_engine, "hero_vs_random", counted)
+    monkeypatch.setattr(outs_module, "hero_vs_random", counted)
 
     hero = [Card(Rank.NINE, Suit.HEARTS), Card(Rank.TEN, Suit.HEARTS)]
     board = [Card(Rank.TWO, Suit.CLUBS), Card(Rank.SEVEN, Suit.DIAMONDS),
@@ -115,12 +131,31 @@ def test_the_outs_report_quotes_the_same_number_as_the_decision() -> None:
 
     _simulated.cache_clear()
     shared = win_probability_for(req)
-    before = _simulated.cache_info().misses
+    assert len(calls) == 1, "the decision should simulate once"
     report = outs_for(req)
 
     assert report is not None
     assert report["winProb"] == shared, "the outs report quotes a different number"
-    assert _simulated.cache_info().misses == before, "the outs report simulated again"
+    assert len(calls) == 1, f"the outs report simulated again: {len(calls)} runs"
+
+
+def test_the_outs_report_keeps_every_field_it_had() -> None:
+    """It is hand built now rather than coming from winning_probability, so it
+    has to carry the same shape, method label included."""
+    from app.strategy.coach_ev import outs_for
+    from app.strategy.outs import winning_probability
+
+    hero = [Card(Rank.NINE, Suit.HEARTS), Card(Rank.TEN, Suit.HEARTS)]
+    board = [Card(Rank.TWO, Suit.CLUBS), Card(Rank.SEVEN, Suit.DIAMONDS),
+             Card(Rank.KING, Suit.SPADES)]
+    built = outs_for(_request(hero, board))
+    original = winning_probability(hero, list(board)).to_dict()
+
+    assert built is not None
+    assert built.keys() == original.keys()
+    for field in built:
+        if field != "winProb":
+            assert built[field] == original[field], f"{field} changed"
 
 
 def test_preflop_equity_reaches_the_display() -> None:
