@@ -23,8 +23,8 @@ Applies to every output: replies, commit messages, PR bodies, comments, docs.
 ## Commands
 
 ```bash
-cd backend  && uv run pytest        # 452 (456 with a database)
-cd frontend && npx vitest run       # 44
+cd backend  && uv run pytest        # 514 (518 with a database)
+cd frontend && npx vitest run       # 56
 cd backend  && uv run ruff check app tests && uv run mypy app
 cd frontend && npm run lint         # tsc --noEmit + oxlint --deny-warnings
 docker compose up -d postgres && cd backend && uv run alembic upgrade head
@@ -42,8 +42,8 @@ It runs every gate CI runs and blocks direct pushes to `main`, so every change
 reaches `main` through a pull request. The block is local only: a clone that
 never ran the installer is not covered, and `main` has no server-side branch
 protection because that needs admin rights on the repository. Do not push with `--no-verify` unless you can say
-why in the commit message. CI itself has never run on this repository, see
-issue #8, so the hook is currently the only thing checking anything.
+why in the commit message. CI runs on every push now, so the hook is the early
+warning rather than the only check.
 Global `mypy`/`tsc` run outside the project env — their missing-stub errors are
 noise. Use the commands above.
 
