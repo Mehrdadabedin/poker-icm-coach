@@ -187,3 +187,7 @@
     padding-top: 8px;
   }
 }
+
+.app-version {
+  opacity: 0.75;
+}

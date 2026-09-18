@@ -1,0 +1,197 @@
+name: Release
+
+# workflow_dispatch only. A release workflow that also triggered on the tag it
+# pushes would re-enter itself on every release.
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: 'Bump from the newest vX.Y.Z tag. The first release with "patch" is v0.0.1, pick "minor" for v0.1.0.'
+        required: false
+        default: patch
+        type: choice
+        options: [patch, minor, major]
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+# Releases queue, they never cancel each other: a cancelled run can leave a
+# pushed tag with no release behind it.
+concurrency:
+  group: release-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      mode: ${{ steps.plan.outputs.mode }}
+      tag: ${{ steps.plan.outputs.tag }}
+      version: ${{ steps.plan.outputs.version }}
+      ref: ${{ steps.plan.outputs.ref }}
+      assets: ${{ steps.plan.outputs.assets }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          # Without the full history the tag lookup finds nothing and every
+          # release computes v0.0.1 over the top of the last one.
+          fetch-depth: 0
+
+      - name: Plan the release
+        id: plan
+        env:
+          BUMP: ${{ inputs.bump }}
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/release_plan.sh | tee -a "$GITHUB_STEP_SUMMARY"
+
+  release:
+    needs: plan
+    # verify means the tag is already released with its full asset set. Nothing
+    # left to do, and re-uploading would touch a published release.
+    if: needs.plan.outputs.mode != 'verify'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ needs.plan.outputs.tag }}
+      VERSION: ${{ needs.plan.outputs.version }}
+      ASSETS: ${{ needs.plan.outputs.assets }}
+    steps:
+      - name: Checkout the planned ref
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+          # A repair builds the commit that was tagged, not whatever main has
+          # grown since.
+          ref: ${{ needs.plan.outputs.ref }}
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e # v6
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node.js
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Stamp the tag version into the build
+        working-directory: backend
+        # Runner only. Nothing is committed back, so the tag stays the one
+        # source and no release can drift from a checked-in literal.
+        run: uv version --no-sync "$VERSION"
+
+      - name: Build the backend distributions
+        working-directory: backend
+        run: uv build
+
+      - name: Build the frontend bundle
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Verify the built backend reports the planned version
+        # The wheel is installed clean and asked over the real endpoint, because
+        # reading the stamped pyproject back would only prove sed worked.
+        run: |
+          uv venv --python 3.12 /tmp/verify
+          uv pip install --python /tmp/verify/bin/python "backend/dist/poker_icm_coach_backend-$VERSION-py3-none-any.whl" httpx
+          mkdir -p /tmp/probe
+          cd /tmp/probe
+          /tmp/verify/bin/python - <<'PY'
+          import os
+          from fastapi.testclient import TestClient
+          from app.main import app
+          expected = os.environ["VERSION"]
+          reported = TestClient(app).get("/api/health").json()["version"]
+          assert reported == expected, f"/api/health reports {reported}, the tag says {expected}"
+          assert app.version == expected, f"openapi reports {app.version}, the tag says {expected}"
+          print(f"artifact reports {reported}")
+          PY
+
+      - name: Stage the release assets
+        run: |
+          mkdir -p staging
+          # Named, not globbed: a wheel whose filename lost the version fails here.
+          cp "backend/dist/poker_icm_coach_backend-$VERSION-py3-none-any.whl" staging/
+          cp "backend/dist/poker_icm_coach_backend-$VERSION.tar.gz" staging/
+          # The wheel keeps its standards-compliant name, the zip carries the
+          # stable releases/latest/download URL.
+          (cd backend/dist && zip -qr "$GITHUB_WORKSPACE/staging/backend-wheels.zip" .)
+          (cd frontend/dist && zip -qr "$GITHUB_WORKSPACE/staging/frontend-dist-$VERSION.zip" .)
+          cp "staging/frontend-dist-$VERSION.zip" staging/frontend-dist.zip
+          (cd staging && sha256sum -- * > ../SHA256SUMS.txt && mv ../SHA256SUMS.txt .)
+          ls -l staging
+
+      - name: Refuse to ship runtime data
+        # backend/data holds live credentials and session tokens. Hatchling only
+        # reads a .gitignore under its own root, so the repo rule that hides them
+        # does not protect an sdist, and a published Release cannot be recalled.
+        run: |
+          listing=$(tar tzf "staging/poker_icm_coach_backend-$VERSION.tar.gz"; unzip -Z1 "staging/poker_icm_coach_backend-$VERSION-py3-none-any.whl"; unzip -Z1 staging/frontend-dist.zip)
+          if grep -Eiq '(^|/)data/|users\.json|sessions\.json|(^|/)\.env($|[^.])' <<<"$listing"; then
+            echo "an artifact contains runtime data, refusing to release"
+            grep -Ei '(^|/)data/|users\.json|sessions\.json|(^|/)\.env($|[^.])' <<<"$listing"
+            exit 1
+          fi
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@977bb373ede98d70efdf65b84cb5f73e068dcc2a # v3
+        with:
+          subject-path: 'staging/*'
+
+      - name: Create and push the tag
+        # Idempotent: a retry after a tag push repairs that tag, it never bumps.
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
+            echo "tag $TAG already exists locally"
+          else
+            git tag -a "$TAG" -m "Release $TAG"
+          fi
+          if git ls-remote --tags --refs origin "$TAG" | grep -q .; then
+            echo "tag $TAG is already on origin"
+          else
+            git push origin "$TAG"
+          fi
+
+      - name: Create or reuse the draft release
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "reusing the existing draft for $TAG"
+          else
+            gh release create "$TAG" --draft --verify-tag --generate-notes --title "$TAG"
+          fi
+
+      - name: Upload the assets
+        # --clobber is safe only because the plan proved this release is still a
+        # draft: a published release is never overwritten, the plan fails instead.
+        run: gh release upload "$TAG" staging/* --clobber
+
+      - name: Verify the full asset set before publishing
+        run: |
+          have=$(gh release view "$TAG" --json assets --jq '.assets[].name')
+          missing=""
+          for name in $ASSETS; do
+            grep -qxF "$name" <<<"$have" || missing="$missing $name"
+          done
+          if [ -n "$missing" ]; then
+            echo "draft $TAG is missing:$missing"
+            exit 1
+          fi
+
+      - name: Publish the release
+        run: |
+          gh release edit "$TAG" --draft=false --latest
+          state=$(gh release view "$TAG" --json isDraft --jq '.isDraft')
+          if [ "$state" != "false" ]; then
+            echo "$TAG is still a draft"
+            exit 1
+          fi
+          echo "published $TAG" >> "$GITHUB_STEP_SUMMARY"

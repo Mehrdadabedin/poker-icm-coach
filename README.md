@@ -183,6 +183,38 @@ The APK talks to the FastAPI backend over HTTP (configure the server URL in
 | `GET /api/settings` | tournament defaults |
 | `WS /ws/table/{id}` | real-time state stream |
 
+## Releases
+
+Git tags are the only version source. `backend/pyproject.toml`,
+`mcp/pyproject.toml` and `frontend/package.json` all carry the placeholder
+`0.0.0+dev` and are never hand-bumped: the release workflow stamps the tag's
+version into the runner's copy and commits nothing back.
+
+Run the **Release** workflow by hand (Actions, "Run workflow") and pick
+`patch`, `minor` or `major`. It reads the newest `vX.Y.Z` tag, computes the
+next one, builds and stamps the artifacts, proves the built backend reports
+that version over `GET /api/health`, attests build provenance, pushes the tag,
+then drafts, verifies and publishes the Release. The first release with
+`patch` is `v0.0.1`, so pick `minor` for `v0.1.0`.
+
+A retry repairs the tag it already pushed, it never bumps a second time. A
+release that is already published and complete is left alone, and a published
+release with missing assets fails the run instead of being overwritten.
+
+| Asset | Stable URL |
+|-------|------------|
+| Backend wheel + sdist, standards-compliant filenames | `releases/latest/download/backend-wheels.zip` |
+| Built frontend bundle | `releases/latest/download/frontend-dist.zip` |
+| Checksums | `releases/latest/download/SHA256SUMS.txt` |
+
+Base for the stable URLs:
+`https://github.com/Mehrdadabedin/poker-icm-coach/`. The versioned wheel,
+sdist and `frontend-dist-<version>.zip` are attached to each Release as well.
+
+Running version: `GET /api/health` returns it, and the app footer shows what
+the backend reported. A working tree that was never stamped reports
+`0.0.0+dev`.
+
 ## Project status
 
 - Phase 1 — Core poker game: **complete** (parts 001–016)

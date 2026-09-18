@@ -160,3 +160,13 @@ export function rangeGrid(position: string, stackBb: number) {
     `/api/ranges?position=${encodeURIComponent(position)}&stack_bb=${stackBb}`,
   );
 }
+
+export interface Health {
+  status: string;
+  version: string;
+}
+
+/** Liveness plus the running backend version, the app's only version source. */
+export function health(): Promise<Health> {
+  return request<Health>("/api/health");
+}

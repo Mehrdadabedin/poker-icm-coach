@@ -744,8 +744,8 @@ wheels = [
 
 [[package]]
 name = "poker-icm-coach-backend"
-version = "0.1.0"
-source = { virtual = "." }
+version = "0.0.0+dev"
+source = { editable = "." }
 dependencies = [
     { name = "alembic" },
     { name = "fastapi" },
