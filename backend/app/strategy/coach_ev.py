@@ -8,16 +8,12 @@ values always refer to the same action and comparison.
 from __future__ import annotations
 
 from app.icm.icm_engine import icm_equities
-from app.strategy.coach_analysis import Analyses, _cell_key, _preflop_equity
+from app.strategy.coach_analysis import Analyses, win_probability_for
 
 
 def win_prob(req) -> float:
     """Best available winning probability for this decision point."""
-    if len(req.board) >= 3:
-        from app.strategy.outs import winning_probability
-
-        return winning_probability(req.hero, list(req.board)).win_prob
-    return _preflop_equity(_cell_key(req.hero))
+    return win_probability_for(req)
 
 
 def action_risk(req, action: str, amount: int | None = None) -> int:
