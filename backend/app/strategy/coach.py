@@ -7,7 +7,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from app.ai.postflop_ai import equity_estimate
 from app.poker.card import Card
 from app.strategy.baseline_ranges import PREMIUM_HANDS, matrix_for_position
 from app.strategy.coach_analysis import (
@@ -16,6 +15,7 @@ from app.strategy.coach_analysis import (
     _preflop_equity,
     analyze_request,
     risk_premium_for,
+    win_probability_for,
 )
 from app.strategy.coach_ev import (
     action_risk,
@@ -132,9 +132,7 @@ class Coach:
         return "FOLD", "CALL", f"{name} equity ~{est:.0%} below required {a.pot_odds + 0.06:.0%}.{icm_note}"
 
     def _postflop(self, req: CoachRequest, a: Analyses) -> tuple[str, str, str]:
-        board = req.board
-        hero = req.hero
-        equity = equity_estimate(hero, board, [])
+        equity = win_probability_for(req)
         a.equity = equity
         if req.to_call == 0:
             if equity >= 0.62 or (equity >= 0.5 and a.spr <= 3):

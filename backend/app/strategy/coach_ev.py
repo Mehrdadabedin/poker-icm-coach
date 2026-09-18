@@ -8,16 +8,12 @@ values always refer to the same action and comparison.
 from __future__ import annotations
 
 from app.icm.icm_engine import icm_equities
-from app.strategy.coach_analysis import Analyses, _cell_key, _preflop_equity
+from app.strategy.coach_analysis import Analyses, win_probability_for
 
 
 def win_prob(req) -> float:
     """Best available winning probability for this decision point."""
-    if len(req.board) >= 3:
-        from app.strategy.outs import winning_probability
-
-        return winning_probability(req.hero, list(req.board)).win_prob
-    return _preflop_equity(_cell_key(req.hero))
+    return win_probability_for(req)
 
 
 def action_risk(req, action: str, amount: int | None = None) -> int:
@@ -107,9 +103,15 @@ def icm_ev_for(req, a: Analyses, action: str, amount: int | None = None) -> Anal
 def outs_for(req) -> dict | None:
     if len(req.board) < 3:
         return None
-    from app.strategy.outs import winning_probability
+    # compute_outs for the card counting, and the shared estimate for the
+    # probability. winning_probability would run a second 5,000 trial
+    # simulation of the spot the decision has already simulated.
+    from app.strategy.outs import OutsReport, compute_outs
 
-    return winning_probability(req.hero, list(req.board)).to_dict()
+    base = compute_outs(req.hero, list(req.board))
+    return OutsReport(outs=base.outs, unknown=base.unknown,
+                      improve_turn=base.improve_turn, improve_river=base.improve_river,
+                      win_prob=win_probability_for(req), method="estimate").to_dict()
 
 
 def education_for(req, a: Analyses, ev: dict | None, outs: dict | None,
