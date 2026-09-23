@@ -91,6 +91,37 @@
 }
 
 
+/* Header PAUSE as in the desktop reference: same compact blue box as LOG OUT,
+   green while paused, with a text label and the HOME / PAUSE / LOG OUT order.
+   Everything here is desktop only. Below the breakpoint the shared header keeps
+   the exact mobile rendering it had before: icon only, amber or green, and
+   HOME / LOG OUT / pause in the original DOM order. */
+@media (min-width: 960px) {
+  .header-btn.header-pause {
+    background: #1565c0;
+    color: #fff;
+    min-width: 84px;
+    padding: 0 12px;
+    font-size: 0.72rem;
+    letter-spacing: 0.5px;
+  }
+
+  .header-pause.header-icon-play {
+    background: #2e7d32;
+  }
+
+  .header-right > .btn-logout {
+    order: 1;
+  }
+}
+
+/* The label exists only for the desktop header. */
+@media (max-width: 959px) {
+  .header-pause-label {
+    display: none;
+  }
+}
+
 /* Home/table header LOG OUT — smaller blue rectangular button, white text */
 .btn-logout {
   background: #1565c0;

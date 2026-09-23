@@ -5,6 +5,44 @@
   padding: 12px;
 }
 
+/* Panel title row with the UI-only desktop HIDE / SHOW control on the right. */
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.panel-head h3 {
+  margin: 0 0 6px;
+}
+
+.panel-head .coach-toggle {
+  margin: 0 0 6px;
+  background: #243040;
+  border: 1px solid #35455a;
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  cursor: pointer;
+}
+
+/* HIDE / SHOW is a desktop control. Below the breakpoint the wrapper stops
+   generating a box and the button is removed from the layout, so the mobile
+   panels keep exactly the geometry they had before this feature existed. */
+@media (max-width: 959px) {
+  .panel-head {
+    display: contents;
+  }
+
+  .panel-head .coach-toggle {
+    display: none;
+  }
+}
+
 .coach-panel h3 {
   margin: 0 0 6px;
   color: var(--accent);

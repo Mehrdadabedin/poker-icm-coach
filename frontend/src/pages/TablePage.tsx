@@ -24,6 +24,9 @@ export function TablePage() {
   const { state, error, act, nextHand, acting, refresh: refreshTable } = useGame(tableId);
   const { countdown, paused, start, stop, pause, resume } = useAutoNext(nextHand, REVIEW_SECONDS);
   const [coach, setCoach] = useState<CoachAdvice | null>(null);
+  // UI-only HIDE / SHOW for the two side panels; no game or API state.
+  const [coachHidden, setCoachHidden] = useState(false);
+  const [historyHidden, setHistoryHidden] = useState(false);
   const [comparison, setComparison] = useState<Record<string, string> | null>(null);
   const { actionLabels, resultLabels } = useLabelPreferences();
 
@@ -161,6 +164,10 @@ export function TablePage() {
               heroSeat={state.heroSeat}
               nameBySeat={nameBySeat}
               coach={coach}
+              coachCollapsed={coachHidden}
+              historyCollapsed={historyHidden}
+              onToggleCoach={() => setCoachHidden((v) => !v)}
+              onToggleHistory={() => setHistoryHidden((v) => !v)}
             />
           )}
         </>

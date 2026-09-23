@@ -80,13 +80,54 @@ body {
   box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.45);
 }
 
-/* Desktop: compact table, centered, reduced vertical rhythm (mobile untouched). */
+/* Desktop: ICM COACH on the left, the poker table in the centre and HAND
+   HISTORY on the right, followed by the action bar. Nothing overlaps and the
+   table keeps the widest column. Mobile (< 960px) is untouched in mobile.css. */
 @media (min-width: 960px) {
-  .table-wrap {
-    max-width: 720px;
+  .table-page {
+    display: grid;
+    grid-template-columns: minmax(240px, 1.26fr) minmax(0, 3fr) minmax(190px, 1fr);
+    grid-template-areas:
+      "head  head   head"
+      "coach table  hist";
+    grid-template-rows: auto auto;
+    align-content: start;
+    gap: 10px;
+    max-width: 1500px;
+    margin: 0 auto;
+    padding: 8px 12px 12px;
   }
+  .app-header {
+    grid-area: head;
+    max-width: none;
+  }
+  .table-wrap {
+    grid-area: table;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+  /* display: contents removes the sidebar wrapper box so its two panels become
+     grid items of .table-page and land on opposite sides of the table. */
   .table-cols {
-    max-width: 720px;
+    display: contents;
+  }
+  /* Only the live table sidebar panels, not the copies nested in .hand-review.
+     align-self: start keeps each panel as tall as its own content, so HIDE
+     actually shortens it instead of leaving stretched empty space. */
+  .table-page > .table-cols > .coach-panel {
+    grid-area: coach;
+    align-self: start;
+    margin-top: 0;
+  }
+  .table-page > .table-cols > .action-history {
+    grid-area: hist;
+    align-self: start;
+    margin-top: 0;
+  }
+  /* Post-hand review spans the full width instead of sitting in the coach column. */
+  .hand-review {
+    grid-column: 1 / -1;
   }
   .table-header,
   .table-status {
@@ -96,13 +137,6 @@ body {
   }
   .table-felt {
     min-height: 320px;
-  }
-  .table-cols.table-cols {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
-    width: min(720px, 100%);
-    max-width: none;
   }
   .table-side {
     margin-top: 0;
@@ -116,7 +150,6 @@ body {
   justify-content: space-between;
   gap: 8px;
   width: 100%;
-  max-width: 980px;
   margin: 0 auto;
   padding: 6px 10px;
 }
@@ -166,12 +199,6 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 1.35rem;
-}
-
-@media (min-width: 960px) {
-  .app-header {
-    max-width: 720px;
-  }
 }
 
 /* Keep the old generic .top-bar usable by other pages */
