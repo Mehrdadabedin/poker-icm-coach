@@ -1334,3 +1334,72 @@ this session's task list in `plan.md`, which this entry does not change.
 - [ ] Deploy test frontend (the test service rebuilds on push; the served assets
       are checked after the push)
 - [ ] Test live URL (multi-viewport browser pass on the test URL)
+
+
+## A17 - Integrate the ICM MASTER demo video into the public landing page (2026-09-23)
+
+Status: implemented and verified locally. Not committed or deployed at the time of
+writing; the test frontend rebuilds automatically once this is pushed. Production
+untouched.
+
+Numbering: the owner-requested label is A17. `prime-agent-spec/atomic_plan.md`
+already used A17 for the OpenDecks card bundle, so this entry is documented there
+as "A17 (landing page)" with a numbering note; no existing task was renamed,
+reordered or removed.
+
+### Source
+| Item | Value |
+| --- | --- |
+| Source file | `/home/mehrdad/Downloads/ICM MASATER.mp4` (left untouched) |
+| Size | 5,961,614 bytes (5.7 MB) |
+| sha256 | `2019904ff2ad3facb990164dc8185fe5769a6dbb1463eeebf1e701f1d8787441` (source and copy identical) |
+| Container / codecs | ISO MP4 (`isom/iso2/avc1/mp41`), H.264 `avc1` video + AAC `mp4a` audio |
+| Duration | 25.00 s (video track, timescale 15360) |
+| Frame size | 3408x1702 = 2.00:1 (NOT 16:9) |
+
+### Final asset
+- Filename: `icm-master-demo.mp4`
+- Location: `frontend/public/videos/icm-master-demo.mp4` (Vite serves `public/` at
+  the web root, so the URL is `/videos/icm-master-demo.mp4`)
+- Bundled into the build: `dist/videos/icm-master-demo.mp4`, 5,961,614 bytes
+
+### Implementation
+- `frontend/src/pages/LandingPage.tsx`: the placeholder block inside the
+  "SEE ICM MASTER IN ACTION" card was replaced by
+  `<video className="lp-video-el" data-testid="landing-video-player" controls
+  preload="metadata" playsInline>` with
+  `<source src="/videos/icm-master-demo.mp4" type="video/mp4" />`. The heading,
+  the `.lp-video` 16:9 container, `data-testid="landing-video"` and
+  `data-video-slot="16:9"` are unchanged.
+- `frontend/src/styles/landing.css`: `.lp-video-el` changed from
+  `object-fit: cover` to `object-fit: contain` plus `background: #000`, because
+  the clip is 2:1 inside a 16:9 slot (letterbox instead of crop/stretch). The
+  section comment now names the bundled clip. The now-unused placeholder rules
+  (`.lp-video-placeholder`, `.lp-play`, `.lp-video-label`, `.lp-video-note`) were
+  deliberately kept, matching the project's habit of leaving retired UI rules in
+  place (see `auth.css`), so they are inert.
+- `frontend/tests/landing.test.tsx`: new test asserting the player is a `VIDEO`
+  with `controls` + `preload="metadata"`, without `autoplay` or `loop`, whose
+  source is `/videos/icm-master-demo.mp4`, with no placeholder copy and no
+  external host in its markup.
+- No other file changed. No dependency added.
+
+### Verification (local, 2026-09-23)
+- Source exists; copy is byte-identical (`sha256sum` match); original still in
+  Downloads with its original mtime.
+- `npx tsc --noEmit` clean; `npx oxlint --deny-warnings src tests` 0 warnings /
+  0 errors (53 files); `npx vitest run` 69 passed in 13 files (one new A17 test);
+  `npm run build` succeeded.
+- Build output: `dist/assets/index-CBaNVXH6.css` (33.36 kB),
+  `dist/assets/index-N2nwq8GD.js` (239.50 kB), and
+  `dist/videos/icm-master-demo.mp4` (5,961,614 bytes) - the MP4 is in the build.
+- The built stylesheet contains
+  `.lp-video-el{display:block;width:100%;height:100%;object-fit:contain;background:#000}`.
+- Not run: browser playback verification (automation timed out twice; see the
+  session report). Playback, responsive sizing and the live URL still need one
+  browser pass, and the test-frontend deployment is pending the push.
+- Unchanged and confirmed by `git status` / `git diff --stat`: no authentication,
+  OAuth, backend, API, poker, game, route or Render file is modified.
+- Pre-existing working-tree items, not mine and not staged: modified
+  `frontend/tsconfig.tsbuildinfo` (build artifact) and untracked
+  `Adjustedpokertable.png` (reference image from an earlier task).

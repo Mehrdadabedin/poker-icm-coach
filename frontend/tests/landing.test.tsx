@@ -59,6 +59,23 @@ describe("public landing page", () => {
     );
   });
 
+  it("plays the bundled demo clip with plain HTML5 controls", async () => {
+    await openLanding();
+    const player = screen.getByTestId("landing-video-player");
+    expect(player.tagName).toBe("VIDEO");
+    expect(player).toHaveAttribute("controls");
+    expect(player).toHaveAttribute("preload", "metadata");
+    expect(player).not.toHaveAttribute("autoplay");
+    expect(player).not.toHaveAttribute("loop");
+    expect(player.querySelector("source")).toHaveAttribute(
+      "src",
+      "/videos/icm-master-demo.mp4",
+    );
+    // no placeholder artwork and no external host is left behind
+    expect(screen.queryByText(/coming soon/i)).toBeNull();
+    expect(player.outerHTML).not.toMatch(/youtube|vimeo|http/i);
+  });
+
   it("links into the existing authentication flow only", async () => {
     await openLanding();
     expect(screen.getByTestId("landing-login")).toHaveAttribute("href", "/login");

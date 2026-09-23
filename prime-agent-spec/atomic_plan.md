@@ -430,6 +430,38 @@ Deployment:
   `https://poker-icm-coach.onrender.com` untouched.
 
 
+## A17 — Integrate ICM MASTER demo video into the public landing page (IMPLEMENTED)
+
+Numbering note: A17 above ("Professional playing-card assets (OpenDecks CC0)") is
+a different, already-completed task; this entry keeps the owner-requested label.
+No existing task was renamed, reordered or removed.
+
+Goal: replace the landing page's demo placeholder with the supplied ICM MASTER
+demo clip, bundled as a local frontend asset and played by a plain HTML5 player.
+
+Scope:
+- Source clip `/home/mehrdad/Downloads/ICM MASATER.mp4` (5,961,614 bytes,
+  sha256 2019904ff2ad3fac..., H.264/avc1 + AAC/mp4a, 25.0 s, 3408x1702 = 2:1),
+  copied unchanged to `frontend/public/videos/icm-master-demo.mp4`. The file in
+  Downloads is untouched.
+- The "SEE ICM MASTER IN ACTION" section keeps its heading, its 16:9 container
+  and its width; only the placeholder block is replaced by the player.
+- Player: `<video controls preload="metadata" playsInline>` with
+  `<source src="/videos/icm-master-demo.mp4" type="video/mp4" />`. No autoplay, no
+  loop, no poster, no overlay, no external host (no YouTube/Vimeo/CDN).
+- `.lp-video-el` uses `object-fit: contain` with a black background, because the
+  clip is 2:1 inside a 16:9 slot: it is letterboxed rather than cropped or
+  stretched.
+
+Strict exclusions (unchanged): authentication and `LoginForm`, Google OAuth,
+backend/API/database/WebSocket/CORS, environment variables, Render
+configuration, poker table and all game logic, every other landing-page section,
+the NEXORA footer, dependencies.
+
+Deployment: branch `FIX-POKERTABLE-LAYOUT-TEST` and the test frontend only;
+production untouched.
+
+
 ---
 NOTE: Google authentication, Facebook authentication, and Google/Facebook OAuth
 are intentionally OUT OF SCOPE and must not be added to this plan or the app.

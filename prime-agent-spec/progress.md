@@ -43,6 +43,7 @@ Main requested changes:
 | A15 | Documentation | 🟢 | progress.md (this file) + repo progress.md updated; .env.example/.gitignore updated. |
 | A16 (landing page) | ICM MASTER public landing page | 🟢 | Owner-labelled A16, distinct from the A16 hand-review row above. Public landing page at `/` for a signed-out visitor (signed-in users still get the existing home screen), `/login` = the existing sign-in screen. Zero-touch auth: LOGIN/SIGN UP/START TRAINING link to `/login`, registration via the login page's own "Sign up" link. New `LandingPage.tsx` + `landing.css` + `tests/landing.test.tsx`; only existing changed files are `App.tsx` (+13/-1) and `main.tsx` (+1 import). tsc/oxlint clean, 68 frontend tests pass, build ok. NEXORA footer preserved. Test frontend only. |
 | A16 | Optional hand review must not interrupt the live game | 🟢 | Implemented with A10: compact result stays on table; review opens only on click; return to table; pause/play intact. |
+| A17 (landing page) | ICM MASTER demo video on the public landing page | 🟢 | Owner-labelled A17, distinct from the A17 card-asset row below. `/home/mehrdad/Downloads/ICM MASATER.mp4` (5.7 MB, H.264+AAC, 25 s, 2:1) copied unchanged to `frontend/public/videos/icm-master-demo.mp4`; placeholder replaced by `<video controls preload="metadata" playsInline>` with a local `<source>`; `.lp-video-el` uses `object-fit: contain` (letterbox) because the clip is 2:1 in a 16:9 slot. No autoplay, no loop, no external host, no dependency. tsc/oxlint clean, 69 frontend tests pass, build ok with the MP4 in `dist/videos/`. Test frontend only. |
 | A17 | Professional playing-card assets (OpenDecks CC0) | 🟢 | OpenDecks 52-card deck installed locally in BOTH PNG and SVG (frontend/public/cards/); production renderer now uses the PNG set (cards/<rank><suit>.png + back.png); CC0 license bundled; mapping layer scripts/import_opendecks_cards.py (validates 52/52 per format); hero seat container fit verified (no clip/overlap, desktop/tablet/mobile); semantic alt text; backend test_card_assets.py (6) + frontend A08/A17 suite. |
 | A18 | Registration-first authentication flow | 🟢 | SIGN IN / SIGN UP entry; username + password + confirm registration with validation; salted PBKDF2 password hashes; duplicate/short rejected; invalid sign-in 401; bearer-token session preserved; users.json best-effort persistence; login.test.tsx + backend auth tests; 400 backend / 37 frontend tests pass. |
 | A19 | WebAuthn / passkey / biometric authentication | 🟡 | PLANNED — NOT IMPLEMENTED |
@@ -120,6 +121,20 @@ The browser console/network screenshots show a POST action request returning HTT
 - No Google/Facebook/OAuth; no poker/ICM/card changes; A19-A25 stay PLANNED.
 
 ## Verification log
+
+### 2026-09-23 (A17 landing-page demo video)
+- Asset: `frontend/public/videos/icm-master-demo.mp4` (5,961,614 bytes, sha256
+  verified identical to the source in Downloads, which is untouched).
+- `LandingPage.tsx`: placeholder replaced by a plain HTML5 player
+  (`controls`, `preload="metadata"`, `playsInline`, no autoplay/loop) with
+  `<source src="/videos/icm-master-demo.mp4" type="video/mp4" />`; the section
+  heading and the 16:9 container are unchanged.
+- `landing.css`: `.lp-video-el` `object-fit: cover` -> `contain` + black
+  background, so the 2:1 clip is letterboxed, not cropped or stretched.
+- Checks: tsc clean, oxlint 0/0, 69 frontend tests pass (one new A17 test),
+  `npm run build` ok with `dist/videos/icm-master-demo.mp4` present.
+- Outstanding: browser playback/responsive pass and the test-frontend deployment
+  (automation timed out; nothing was reverted or refactored because of it).
 
 ### 2026-09-23 (A16 landing page)
 - New public landing page: `frontend/src/pages/LandingPage.tsx` (header, hero,

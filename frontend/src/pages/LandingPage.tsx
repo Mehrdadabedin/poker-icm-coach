@@ -11,9 +11,11 @@ import { Copyright } from "../components/Copyright";
  * to registration. The sign-in component, the poker table and the app menu are
  * untouched.
  *
- * The demo block is a 16:9 placeholder: drop a real clip in by replacing the
- * <div className="lp-video-placeholder"> with
- * <video className="lp-video-el" src="..." controls preload="metadata" />.
+ * The demo block (A17) holds the bundled ICM MASTER demo clip from
+ * `frontend/public/videos/icm-master-demo.mp4`, served as a static asset at
+ * `/videos/icm-master-demo.mp4`. It is a plain HTML5 player: no autoplay, no
+ * loop, no external host. The 16:9 container is unchanged; the clip is 2:1, so
+ * `.lp-video-el` letterboxes it instead of cropping or stretching it.
  */
 
 const FEATURES = [
@@ -78,11 +80,15 @@ export function LandingPage() {
             <h2 className="lp-section-title" id="lp-demo-title">See ICM Master in action</h2>
             <span className="lp-section-rule" aria-hidden="true" />
             <div className="lp-video" data-testid="landing-video" data-video-slot="16:9">
-              <div className="lp-video-placeholder">
-                <span className="lp-play" aria-hidden="true">▶</span>
-                <span className="lp-video-label">ICM Master demo</span>
-                <span className="lp-video-note">16:9 demonstration clip - coming soon</span>
-              </div>
+              <video
+                className="lp-video-el"
+                data-testid="landing-video-player"
+                controls
+                preload="metadata"
+                playsInline
+              >
+                <source src="/videos/icm-master-demo.mp4" type="video/mp4" />
+              </video>
             </div>
           </div>
         </section>
