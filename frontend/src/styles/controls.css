@@ -91,23 +91,37 @@
 }
 
 
-/* Header PAUSE as in the desktop reference: same compact blue box as LOG OUT,
-   green while paused, with a text label and the HOME / PAUSE / LOG OUT order.
-   Everything here is desktop only. Below the breakpoint the shared header keeps
-   the exact mobile rendering it had before: icon only, amber or green, and
-   HOME / LOG OUT / pause in the original DOM order. */
+/* Desktop header controls. LOG OUT is the reference box: 30px tall, 6px
+   radius, 12px bold text, 2px 12px padding. HOME (yellow) and PAUSE copy that
+   exact box, so all three buttons are the same size and shape. PAUSE is
+   orange, the paused RESUME state stays green and LOG OUT stays blue.
+   Everything here is desktop only, so the shared mobile header keeps the
+   rendering it had before: icon only, amber or green, untouched sizes. */
 @media (min-width: 960px) {
+  .header-right > .header-btn {
+    min-width: 79px;
+    min-height: 30px;
+    padding: 2px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: normal;
+  }
+
   .header-btn.header-pause {
-    background: #1565c0;
+    background: #e65100;
     color: #fff;
-    min-width: 84px;
-    padding: 0 12px;
-    font-size: 0.72rem;
-    letter-spacing: 0.5px;
   }
 
   .header-pause.header-icon-play {
     background: #2e7d32;
+  }
+
+  /* The table label and the username are header chrome, so they follow the
+     compact scale of the status bars instead of the 16px default. */
+  .tbl-label,
+  .header-user {
+    font-size: 0.78rem;
   }
 
   .header-right > .btn-logout {
