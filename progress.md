@@ -1244,3 +1244,93 @@ Not pushed: both commits are local on `fix/tournament-settings-500`.
   Frontend lint has one pre-existing error in `tests/useAutoNext.test.tsx`.
 - Committed locally, not pushed: pushing would trigger Render rebuilds for no
   code change, and this task says not to deploy the MCP server.
+
+
+## A16 - ICM MASTER public landing page (2026-09-23)
+
+Status: COMPLETE for the code, tests and documentation. Browser/live checks listed
+separately below. Branch `FIX-POKERTABLE-LAYOUT-TEST`; test frontend only;
+production untouched.
+
+Numbering: the owner-requested label is A16. Note that
+`prime-agent-spec/atomic_plan.md` already used A16 for the earlier hand-review
+task, so this entry is documented as "A16 (landing page)" there and no existing
+task was renamed, reordered or removed. The repository has no root-level
+`atomic_plan.md`; the atomic plan lives in `prime-agent-spec/atomic_plan.md` and
+this session's task list in `plan.md`, which this entry does not change.
+
+### Inspection (before any edit)
+| Area | Finding |
+| --- | --- |
+| Router | `frontend/src/App.tsx`, `HashRouter`; `/` = `HomePage`, plus `/table/:tableId`, `/auth/callback`, `/training`, `/ranges`, `/coach`, `/settings`, `/history`, `/statistics` |
+| Login screen | `frontend/src/pages/HomePage.tsx` unauthenticated branch: brand header + `LoginForm` (`data-testid="home-page"`) |
+| Sign-up flow | the existing `LoginForm` mode switch (`go-signup` / `go-signin`); there is NO separate signup route or component |
+| Authenticated app | the same `HomePage` authenticated branch (menu) then `/table/:tableId` |
+| Footer | `frontend/src/components/Copyright.tsx` (`app-footer`, version read from `/api/health`) |
+| Visual identity | `auth.css` measured palette (gold #fad15a, rule #fcf159, blue #086aec, bg #0e141a, line #2c373f, muted #99a8ba). Those tokens are scoped to `.auth-page` / `.login-panel`, so the landing page repeats the values in its own scope instead of editing `auth.css` |
+
+### Implementation
+- New `frontend/src/pages/LandingPage.tsx` (121 lines): header (ICM MASTER /
+  LOGIN / SIGN UP), hero ("Master your tournament decisions", supporting line,
+  START TRAINING + "WATCH HOW IT WORKS"), the 16:9 demo placeholder, PLAY /
+  REVIEW / IMPROVE, the final CTA, the `PRACTICE • IMPROVE • WIN` tagline and the
+  existing `Copyright` footer.
+- New `frontend/src/styles/landing.css` (184 lines): every rule scoped to
+  `.landing-page` / `.lp-*`, with desktop, tablet, mobile portrait and mobile
+  landscape blocks. No existing stylesheet changed.
+- Routing (`frontend/src/App.tsx`, +13/-1): `/` = `EntryPage` (landing without a
+  session, the existing home screen with one, so HOME and every existing deep
+  link keep their behaviour); new `/login` = the existing `HomePage`. No other
+  route touched.
+- Zero-touch authentication (owner decision): SIGN UP, LOGIN and START TRAINING
+  all link to `/login`; registration is reached with the login page's own
+  "Sign up" link. `LoginForm.tsx` and `HomePage.tsx` were restored byte-exactly
+  and are unmodified (`git diff HEAD` for both is empty).
+- `frontend/src/main.tsx` (+1): one `landing.css` import.
+- New `frontend/tests/landing.test.tsx` (7 tests).
+
+### Files changed
+- New: `frontend/src/pages/LandingPage.tsx`, `frontend/src/styles/landing.css`,
+  `frontend/tests/landing.test.tsx`
+- Modified: `frontend/src/App.tsx`, `frontend/src/main.tsx`
+- Documentation: this file, `prime-agent-spec/atomic_plan.md`,
+  `prime-agent-spec/progress.md`
+
+### Verification
+- `npx tsc --noEmit` clean; `npx oxlint --deny-warnings src tests` 0 warnings /
+  0 errors (53 files); `npx vitest run` 68 passed in 13 files (including the 7 new
+  landing tests); `vite build` succeeded.
+- Scope proof: `git diff HEAD --name-only` contains no `backend/` file, no
+  `LoginForm`, no `HomePage`, no OAuth/provider/Google file, and no poker-table,
+  seat, card, felt or game file. `main` is still `a0813fb`.
+- Not done: the local multi-viewport browser pass (the harness hung and was
+  stopped) and the live check on the test URL.
+
+### Implementation checklist
+- [x] Inspect existing routing
+- [x] Inspect existing login route
+- [x] Inspect existing signup route (it is a mode of the existing login screen)
+- [x] Create landing page
+- [x] Connect LOGIN to existing login (`/login`)
+- [x] Connect SIGN UP to existing signup flow (via `/login`, zero-touch)
+- [x] Connect START TRAINING to existing login (`/login`)
+- [x] Add hero section
+- [x] Add demo/video placeholder (16:9, ready for an MP4/WebM)
+- [x] Add PLAY / REVIEW / IMPROVE section
+- [x] Add final CTA
+- [x] Preserve existing NEXORA footer (existing `Copyright` component reused)
+- [x] Add responsive desktop design
+- [x] Add responsive tablet design
+- [x] Add responsive mobile portrait design
+- [x] Add responsive mobile landscape design
+- [x] Verify existing login unchanged (both auth files byte-identical to HEAD)
+- [x] Verify signup unchanged (same files; no auth component touched)
+- [x] Verify Google OAuth unchanged (no OAuth file in the diff; the landing page
+      does not touch providers or the callback)
+- [x] Verify poker table unchanged (no table component or table CSS in the diff)
+- [x] Verify poker functionality unchanged (no game or backend file in the diff)
+- [x] Build successfully
+- [x] Automated tests, type check and lint pass
+- [ ] Deploy test frontend (the test service rebuilds on push; the served assets
+      are checked after the push)
+- [ ] Test live URL (multi-viewport browser pass on the test URL)

@@ -1,0 +1,184 @@
+/* A16 - public ICM MASTER landing page.
+   Every rule is scoped to .landing-page / .lp-* so the poker table, the sign-in
+   screen and the app menu keep their own styles untouched. The palette repeats
+   the measured sign-in values (auth.css) so the landing page shares the existing
+   dark/gold/blue identity without editing that file. Layout is one column of
+   full-width bands; .lp-inner is the centred content column inside each band. */
+
+.landing-page {
+  --lp-gold: #fad15a;
+  --lp-gold-rule: #fcf159;
+  --lp-text: #e9eef5;
+  --lp-muted: #99a8ba;
+  --lp-line: #2c373f;
+  --lp-blue: #086aec;
+  display: flex; flex-direction: column;
+  max-width: none; padding: 0;
+  background: #0e141a; color: var(--lp-text);
+}
+
+/* ---- header: ICM MASTER left, LOGIN / SIGN UP right ---- */
+.lp-header {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 12px clamp(14px, 4vw, 48px);
+  background: rgba(14, 20, 26, 0.94);
+  border-bottom: 1px solid var(--lp-line);
+}
+
+.lp-brand {
+  margin: 0; color: var(--lp-gold);
+  font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+  font-weight: 800; letter-spacing: 2.6px; line-height: 1.1;
+  text-transform: uppercase;
+}
+
+.lp-nav { display: flex; align-items: center; gap: 10px; }
+
+/* ---- buttons: landing only, the shared .btn is left alone ---- */
+.lp-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 50px; padding: 12px 30px;
+  border: 1px solid transparent; border-radius: 10px;
+  font: inherit; font-size: 0.95rem; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+  transition: filter 120ms ease, background 120ms ease;
+}
+.lp-btn:hover { filter: brightness(1.08); }
+.lp-btn-primary { background: var(--lp-blue); color: #fff; }
+.lp-btn-ghost { background: transparent; border-color: var(--lp-gold); color: var(--lp-gold); }
+.lp-nav-btn { min-height: 40px; padding: 8px 18px; font-size: 0.8rem; }
+
+/* ---- hero ---- */
+.lp-main { flex: 1 0 auto; }
+.lp-hero { padding: clamp(46px, 8vw, 104px) clamp(16px, 4vw, 48px) clamp(30px, 5vw, 62px); text-align: center; }
+
+.lp-hero-title {
+  max-width: 20ch; margin: 0 auto; color: #f4f7fb;
+  font-size: clamp(1.8rem, 5.1vw, 3.35rem);
+  font-weight: 800; line-height: 1.08; letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.lp-hero-rule {
+  display: block; width: 107px; height: 4px;
+  margin: 22px auto 20px; border-radius: 3px; background: var(--lp-gold-rule);
+}
+
+.lp-hero-text {
+  max-width: 52ch; margin: 0 auto; color: var(--lp-muted);
+  font-size: clamp(1rem, 1.5vw, 1.15rem); line-height: 1.5;
+}
+
+.lp-cta-row { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 30px; }
+
+/* ---- section frame ---- */
+.lp-section { padding: clamp(34px, 6vw, 72px) clamp(16px, 4vw, 48px); }
+.lp-inner { width: 100%; max-width: 1080px; margin: 0 auto; }
+
+.lp-section-title {
+  margin: 0; color: var(--lp-gold); text-align: center;
+  font-size: clamp(1.1rem, 2.3vw, 1.6rem);
+  font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+}
+
+.lp-section-rule { width: 72px; height: 3px; margin: 14px auto 26px; border-radius: 3px; background: var(--lp-gold-rule); }
+
+/* ---- 16:9 demo slot: polished placeholder now, <video class="lp-video-el"> later ---- */
+.lp-video {
+  position: relative; width: 100%; aspect-ratio: 16 / 9;
+  border: 1px solid var(--lp-line); border-radius: 14px; overflow: hidden;
+  background:
+    radial-gradient(60% 70% at 50% 45%, rgba(28, 107, 79, 0.32), transparent 70%),
+    linear-gradient(160deg, #12242c 0%, #0e141a 55%, #131b23 100%);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+.lp-video-el { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+.lp-video-placeholder {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 12px; padding: 18px; text-align: center;
+  border: 1px dashed rgba(250, 209, 90, 0.3); border-radius: 13px;
+}
+
+.lp-play {
+  display: flex; align-items: center; justify-content: center;
+  width: 74px; height: 74px;
+  border: 2px solid var(--lp-gold); border-radius: 50%;
+  color: var(--lp-gold); font-size: 1.6rem; line-height: 1; text-indent: 5px;
+}
+
+.lp-video-label {
+  color: var(--lp-text); font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+  font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
+}
+
+.lp-video-note { color: var(--lp-muted); font-size: 0.8rem; letter-spacing: 0.6px; }
+
+/* ---- PLAY / REVIEW / IMPROVE ---- */
+.lp-features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.lp-feature { padding: 22px; border: 1px solid var(--lp-line); border-radius: 14px; background: #171d24; }
+
+.lp-feature-title {
+  margin: 0 0 10px; color: var(--lp-gold);
+  font-size: 1.05rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+}
+
+.lp-feature-text { margin: 0; color: var(--lp-muted); font-size: 0.92rem; line-height: 1.5; }
+
+/* ---- final call to action ---- */
+.lp-final {
+  padding: clamp(40px, 6vw, 82px) clamp(16px, 4vw, 48px);
+  border-top: 1px solid var(--lp-line); border-bottom: 1px solid var(--lp-line);
+  background: #11161c; text-align: center;
+}
+
+.lp-final-title {
+  max-width: 26ch; margin: 0 auto 26px; color: #f4f7fb;
+  font-size: clamp(1.15rem, 2.6vw, 1.8rem);
+  font-weight: 800; letter-spacing: 1px; line-height: 1.2; text-transform: uppercase;
+}
+
+/* ---- footer: existing Copyright markup, landing spacing only ---- */
+.lp-footer { padding: 0 clamp(16px, 4vw, 48px) 24px; }
+.lp-footer .app-footer { border-top-color: rgba(250, 209, 90, 0.22); color: var(--lp-gold); }
+
+.lp-tagline {
+  margin: 0; padding: 24px 0 0; color: #9dacbd;
+  font-size: 0.72rem; letter-spacing: 8px; text-indent: 8px;
+  text-align: center; text-transform: uppercase;
+}
+
+/* ---- responsive: tablet, mobile portrait, mobile landscape ---- */
+@media (max-width: 959px) {
+  .lp-features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 767px) and (max-aspect-ratio: 4/3) {
+  .lp-features { grid-template-columns: minmax(0, 1fr); }
+  .lp-nav-btn { padding: 8px 12px; }
+  .lp-hero { padding: 40px 16px 26px; }
+  .lp-hero-title { max-width: 16ch; }
+  .lp-cta-row { flex-direction: column; align-items: stretch; }
+  .lp-cta-row .lp-btn { width: 100%; }
+  .lp-play { width: 58px; height: 58px; font-size: 1.3rem; }
+  .lp-tagline { letter-spacing: 4px; text-indent: 4px; }
+}
+
+/* short rotated viewports: tighten the vertical rhythm only, so the hero,
+   the 16:9 slot and the CTAs all stay on screen. */
+@media (max-width: 959px) and (min-aspect-ratio: 5/4) {
+  .lp-hero { padding: 22px 16px 16px; }
+  .lp-hero-title { max-width: 30ch; font-size: 1.55rem; }
+  .lp-hero-rule { margin: 12px auto 10px; }
+  .lp-cta-row { margin-top: 14px; gap: 10px; }
+  .lp-btn { min-height: 40px; padding: 8px 16px; font-size: 0.8rem; }
+  .lp-section { padding: 22px 16px; }
+  .lp-section-rule { margin: 10px auto 16px; }
+  .lp-play { width: 52px; height: 52px; font-size: 1.2rem; }
+  .lp-features { gap: 12px; }
+  .lp-feature { padding: 14px; }
+  .lp-tagline { padding: 14px 0 0; }
+}

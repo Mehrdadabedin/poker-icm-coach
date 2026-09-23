@@ -385,6 +385,51 @@ Make this an incremental modification of the existing project. Before coding, ma
   Hand History dropdown, and review UX once those features are implemented.
   DO NOT IMPLEMENT NOW.
 
+## A16 — ICM MASTER public landing page (IMPLEMENTED)
+
+Numbering note: the A16 section above ("Optional hand review must not interrupt
+the live game") is a different, already-completed task. This entry is the new
+public landing page and keeps the owner-requested label; no existing task was
+renamed, reordered or removed.
+
+Goal: a professional public landing page for ICM MASTER that introduces the
+product and links into the EXISTING authentication flow, without changing the
+existing authentication UI/logic or the poker application.
+
+Scope:
+- New public landing page at `/` for a visitor without a session; a signed-in
+  user still gets the existing home screen at `/`.
+- Header: ICM MASTER (existing gold branding), LOGIN and SIGN UP.
+- Hero: "MASTER YOUR TOURNAMENT DECISIONS" with START TRAINING and
+  "WATCH HOW IT WORKS" (in-page smooth scroll, no new route).
+- Demo section "SEE ICM MASTER IN ACTION": polished 16:9 placeholder that can
+  later accept an MP4/WebM clip.
+- PLAY / REVIEW / IMPROVE section and a final START TRAINING call to action.
+- Responsive desktop, tablet, mobile portrait and mobile landscape.
+- Existing ICM MASTER visual identity and the existing NEXORA footer preserved
+  (`© 2026 NEXORA — Created by Mehrdad Abedin · v0.0.0+dev`).
+
+Strict exclusions (unchanged by this task): poker functionality and poker-table
+layout/CSS, authentication UI and logic, `LoginForm`, Google OAuth, backend and
+API, environment variables, Render configuration, dependencies, existing
+login/signup UI.
+
+Implementation notes:
+- Routing: `/` -> new `LandingPage` when no token, existing `HomePage` when a
+  token exists; new `/login` -> existing `HomePage`. No other route changed.
+- Zero-touch authentication: SIGN UP, LOGIN and START TRAINING all link to
+  `/login`; registration is reached with the login page's own "Sign up" link, so
+  no authentication component is modified.
+- `frontend/src/pages/LandingPage.tsx` (new), `frontend/src/styles/landing.css`
+  (new, `.landing-page` / `.lp-*` only), `frontend/src/App.tsx` (+13/-1),
+  `frontend/src/main.tsx` (+1 import), `frontend/tests/landing.test.tsx` (new).
+
+Deployment:
+- Branch `FIX-POKERTABLE-LAYOUT-TEST` only; test frontend
+  `https://poker-icm-coach-layout-test.onrender.com`. Production
+  `https://poker-icm-coach.onrender.com` untouched.
+
+
 ---
 NOTE: Google authentication, Facebook authentication, and Google/Facebook OAuth
 are intentionally OUT OF SCOPE and must not be added to this plan or the app.

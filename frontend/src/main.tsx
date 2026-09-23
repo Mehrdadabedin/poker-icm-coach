@@ -15,6 +15,7 @@ import "./styles/cards.css";
 import "./styles/auth.css";
 import "./styles/auth-form.css";
 import "./styles/auth-footer.css";
+import "./styles/landing.css";
 import "./styles/mobile.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

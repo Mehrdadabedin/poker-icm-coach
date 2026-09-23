@@ -41,6 +41,7 @@ Main requested changes:
 | A13 | Regression tests | 🟢 | Backend 394 passed / 4 skipped; frontend 32 passed; new auth/isolation/label/history + card/result/review/login suites. |
 | A14 | Deployment verification | 🟢 | Deployed frontend reachable; deployed backend preflight 200 + ACAO on errors for Render origin (verified live). Redeploy of this branch required for auth endpoints; multi-browser check listed as remaining step. |
 | A15 | Documentation | 🟢 | progress.md (this file) + repo progress.md updated; .env.example/.gitignore updated. |
+| A16 (landing page) | ICM MASTER public landing page | 🟢 | Owner-labelled A16, distinct from the A16 hand-review row above. Public landing page at `/` for a signed-out visitor (signed-in users still get the existing home screen), `/login` = the existing sign-in screen. Zero-touch auth: LOGIN/SIGN UP/START TRAINING link to `/login`, registration via the login page's own "Sign up" link. New `LandingPage.tsx` + `landing.css` + `tests/landing.test.tsx`; only existing changed files are `App.tsx` (+13/-1) and `main.tsx` (+1 import). tsc/oxlint clean, 68 frontend tests pass, build ok. NEXORA footer preserved. Test frontend only. |
 | A16 | Optional hand review must not interrupt the live game | 🟢 | Implemented with A10: compact result stays on table; review opens only on click; return to table; pause/play intact. |
 | A17 | Professional playing-card assets (OpenDecks CC0) | 🟢 | OpenDecks 52-card deck installed locally in BOTH PNG and SVG (frontend/public/cards/); production renderer now uses the PNG set (cards/<rank><suit>.png + back.png); CC0 license bundled; mapping layer scripts/import_opendecks_cards.py (validates 52/52 per format); hero seat container fit verified (no clip/overlap, desktop/tablet/mobile); semantic alt text; backend test_card_assets.py (6) + frontend A08/A17 suite. |
 | A18 | Registration-first authentication flow | 🟢 | SIGN IN / SIGN UP entry; username + password + confirm registration with validation; salted PBKDF2 password hashes; duplicate/short rejected; invalid sign-in 401; bearer-token session preserved; users.json best-effort persistence; login.test.tsx + backend auth tests; 400 backend / 37 frontend tests pass. |
@@ -119,6 +120,21 @@ The browser console/network screenshots show a POST action request returning HTT
 - No Google/Facebook/OAuth; no poker/ICM/card changes; A19-A25 stay PLANNED.
 
 ## Verification log
+
+### 2026-09-23 (A16 landing page)
+- New public landing page: `frontend/src/pages/LandingPage.tsx` (header, hero,
+  16:9 demo placeholder, PLAY/REVIEW/IMPROVE, final CTA, NEXORA footer via the
+  existing `Copyright` component) and `frontend/src/styles/landing.css`
+  (scoped to `.landing-page` / `.lp-*`; desktop, tablet, portrait, landscape).
+- Routing: `/` -> landing without a session / existing home screen with one;
+  `/login` -> existing `HomePage`. All other routes untouched.
+- Zero-touch authentication: SIGN UP, LOGIN and START TRAINING all link to
+  `/login`. `LoginForm.tsx` and `HomePage.tsx` are byte-identical to HEAD.
+- Verification: `tsc` clean, `oxlint --deny-warnings` 0/0, `vitest run` 68
+  passed (7 new landing tests), `vite build` ok. No backend, OAuth, poker-table,
+  game-logic or CSS-of-the-table file is in the diff. Production untouched.
+- Outstanding: local multi-viewport browser pass (harness hung, stopped) and the
+  live check on the test URL.
 
 ### 2026-09-03
 - A01 audit complete (architecture, endpoints, session model, Hero hard-coding, card assets, 400 root causes).
