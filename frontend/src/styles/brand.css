@@ -1,15 +1,16 @@
 /* Shared header branding: the existing ICM MASTER logo asset shown at a
    controlled header size. The source PNG is a 1254x1254 badge on a near-black
    background, so it is scaled down, kept square, and blended into the dark
-   header instead of drawing its own dark square. Header heights are unchanged:
-   the mark is always smaller than the row that contains it. */
+   header instead of drawing its own dark square. */
 
 .brand-logo {
   display: block;
   width: auto;
-  height: 34px;
+  height: 30px;
+  max-height: 30px;
   aspect-ratio: 1 / 1;
   object-fit: contain;
+  flex: 0 0 auto;
   mix-blend-mode: screen;
 }
 
@@ -26,13 +27,40 @@
   border: 0;
 }
 
-/* Table / home header row keeps its 42px desktop height. */
-.header-title .brand-logo { height: 34px; }
+/* Authenticated header (table + home): a 30px mark plus the row's 6px padding
+   keeps the header at its original 42px height. The title must never shrink to
+   zero width, or the crowded mobile row clips the mark away. */
+.header-title {
+  flex: 1 0 auto;
+  min-width: 0;
+}
 
-/* Landing page header. */
-.lp-brand .brand-logo { height: 34px; }
+.header-title .brand-logo { height: 30px; max-height: 30px; }
+
+/* Landing page header: unchanged size (34px desktop). */
+.lp-brand .brand-logo { height: 34px; max-height: 34px; }
 
 @media (max-width: 959px) {
-  .header-title .brand-logo { height: 40px; }
-  .lp-brand .brand-logo { height: 32px; }
+  /* Compact mark on phones; the 28px logo stays smaller than the 48px header
+     buttons, so the 60px mobile header height is unchanged. */
+  .header-title .brand-logo { height: 28px; max-height: 28px; }
+
+  /* Reclaim the space the mark needs from the right-hand text instead of from
+     the logo: the label and username truncate, the controls keep their size. */
+  .app-header .header-right {
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: flex-end;
+  }
+
+  .app-header .header-user,
+  .app-header .tbl-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Landing page header: unchanged size (32px mobile). */
+  .lp-brand .brand-logo { height: 32px; max-height: 32px; }
 }
