@@ -157,12 +157,11 @@ describe("ICM MASTER sign-in screen", () => {
       </MemoryRouter>,
     );
     expect(first.getByTestId("login-panel")).toBeInTheDocument();
-    // A19: the sign-in screen carries the shared brand mark at the top-left and
-    // still keeps the centred gold "ICM MASTER" title.
-    const mark = first.getByTestId("auth-brand-mark");
-    expect(mark.querySelector("img.brand-logo")).toHaveAttribute("src", "/Logo/logo.png");
-    expect(mark).toHaveTextContent("ICM MASTER");
+    // A25: the sign-in screen no longer renders the top-left mark. The centred
+    // logo is the only brand mark and keeps the accessible name.
+    expect(first.queryByTestId("auth-brand-mark")).toBeNull();
     expect(first.getByTestId("app-title")).toHaveTextContent("ICM MASTER");
+    expect(first.getByTestId("app-title").querySelector("img.brand-logo")).toHaveAttribute("src", "/Logo/logo.png");
     first.unmount();
 
     localStorage.setItem("icm_username", "Mehrdad");
