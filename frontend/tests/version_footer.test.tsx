@@ -1,7 +1,8 @@
-/* The footer shows the version the backend reports, and nothing when the
- * backend is unreachable: the app never invents a version of its own. */
+/* The footer is a static copyright line. The version it used to print from
+ * /api/health was removed with the rest of the version text (A23), so the footer
+ * must not ask the backend for one either. */
 import { describe, expect, it, vi } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 
 const health = vi.fn();
 vi.mock("../src/services/api", async (importOriginal) => ({
@@ -11,17 +12,17 @@ vi.mock("../src/services/api", async (importOriginal) => ({
 
 const { Copyright } = await import("../src/components/Copyright");
 
-describe("footer version", () => {
-  it("shows the version reported by /api/health", async () => {
-    health.mockResolvedValueOnce({ status: "ok", version: "1.4.0" });
+describe("footer copyright", () => {
+  it("shows the NEXORA line and no version", () => {
     render(<Copyright />);
-    await waitFor(() => expect(screen.getByTestId("app-version")).toHaveTextContent("v1.4.0"));
+    const footer = screen.getByTestId("app-footer");
+    expect(footer).toHaveTextContent("© 2026 NEXORA — Created by Mehrdad Abedin");
+    expect(screen.queryByTestId("app-version")).toBeNull();
+    expect(footer).not.toHaveTextContent("v0.");
   });
 
-  it("shows no version when the backend is unreachable", async () => {
-    health.mockRejectedValueOnce(new Error("offline"));
+  it("does not ask the backend for a version", () => {
     render(<Copyright />);
-    await waitFor(() => expect(health).toHaveBeenCalled());
-    expect(screen.queryByTestId("app-version")).toBeNull();
+    expect(health).not.toHaveBeenCalled();
   });
 });

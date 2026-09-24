@@ -1,16 +1,23 @@
-/* Shared header branding: the existing ICM MASTER logo asset shown at a
-   controlled header size. The source PNG is a 1254x1254 badge on a near-black
-   background, so it is scaled down and blended into the dark header with screen
-   instead of drawing its own dark square. Every header context crops the empty
-   band first (see below), so the CSS height is the visible artwork height. */
+/* Shared brand mark: the existing ICM MASTER asset (frontend/public/Logo/logo.png)
+   shown at ONE size everywhere it appears, so the brand has the same scale on the
+   landing page, the authenticated header and the sign-in screen.
+
+   The raw PNG is 1254x1254, but the artwork only fills a 1145x880 window at
+   (52,136): the lower 238 rows (19% of the file, including the tagline's empty
+   margin) and the side margins are empty background there is no alpha to trim.
+   A square box therefore showed a mark far smaller than its height. The box below
+   has the shape of that artwork window and the alignment picks the window out, so
+   the CSS height IS the visible artwork height, the tagline at the bottom of the
+   artwork is kept, and nothing is cropped or stretched. */
 
 .brand-logo {
   display: block;
   width: auto;
-  height: 30px;
-  max-height: 30px;
-  aspect-ratio: 1 / 1;
-  object-fit: contain;
+  height: 91px;
+  max-height: 91px;
+  aspect-ratio: 1254 / 880;
+  object-fit: cover;
+  object-position: 50% 36.4%;
   flex: 0 0 auto;
   mix-blend-mode: screen;
 }
@@ -28,48 +35,49 @@
   border: 0;
 }
 
-/* Authenticated header (table + home). The raw PNG is 1254x1254, but the artwork
-   only fills a 1145x880 window at (52,136): the lower 19% of the file (and the
-   margins) are empty background, so a square box always showed a much smaller
-   mark than its height. The box below has the shape of that artwork window and
-   the alignment picks the window out, so the CSS height IS the visible size of
-   the mark and no part of
-   the artwork is cut off. The title must never shrink to zero width, or the
-   crowded mobile row clips the mark away. */
+/* Authenticated header (table + home). The title must never shrink to zero
+   width, or the crowded mobile row clips the mark away. */
 .header-title {
   flex: 1 0 auto;
   min-width: 0;
 }
 
-.header-title .brand-logo {
-  height: 75px;
-  max-height: 75px;
-  aspect-ratio: 1254 / 880;
-  object-fit: cover;
-  object-position: 50% 36.4%;
+/* The sign-in screen's centred brand mark (A23/A24). Centred by the flex
+   heading. It is deliberately larger than the header mark because it has to show
+   the whole artwork READABLY, including the tagline at the bottom of the badge:
+   the tagline's glyphs are 37 of the artwork's 880 rows, so at 214px of artwork
+   they render ~9px tall. The header marks keep the shared 91px above. */
+.auth-brand-logo {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  line-height: 0;
 }
 
-/* Landing page header. Same empty-band crop as the authenticated header: the
-   raw PNG is 1254x1254 but its artwork only fills a 1145x880 window at (52,136),
-   so a plain square box shows a mark far smaller than its height. With the box
-   shaped like the artwork window and the alignment on that window, the CSS
-   height is the visible size. Nothing of the artwork is trimmed.
+.auth-brand-logo .brand-logo {
+  /* 305px wide is 214px of artwork after the 1254:880 crop. Width-driven so a
+     narrower screen shrinks the whole mark instead of cropping it. */
+  width: 305px;
+  max-width: 100%;
+  height: auto;
+  max-height: none;
+}
 
-   The landing header runs one step larger than the authenticated header and the
-   sign-in mark (which stay at 75px / 56px): 87px of visible artwork on desktop
-   and 66px on phones. */
-.lp-brand .brand-logo {
-  height: 87px;
-  max-height: 87px;
-  aspect-ratio: 1254 / 880;
-  object-fit: cover;
-  object-position: 50% 36.4%;
+/* A19: the same mark, pinned to the sign-in screen's top-left. Its containing
+   block is .home-page.auth-page, which is position: relative in styles/auth.css.
+   The left margin matches the landing header's. */
+.auth-brand-mark {
+  position: absolute;
+  top: 8px;
+  left: clamp(14px, 4vw, 48px);
+  margin: 0;
+  line-height: 0;
 }
 
 @media (max-width: 959px) {
-  /* Smaller mark on phones; those rules are below, next to each context. The
-     shared sizes are 75px of visible artwork on desktop and 56px on phones. */
-  .header-title .brand-logo { height: 56px; max-height: 56px; }
+  /* Phones get their own size from the same rule, so no context can drift to a
+     different scale. */
+  .brand-logo { height: 69px; max-height: 69px; }
 
   /* The row order stays LOGO -> label/username -> controls. The controls keep
      their own width (they used to absorb the squeeze and wrap), and the two text
@@ -89,31 +97,12 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-
-  /* Landing page header on phones: 66px of visible artwork. */
-  .lp-brand .brand-logo { height: 66px; max-height: 66px; }
 }
 
-
-/* A19: the brand mark on the sign-in screen (the sign-in page's top-left). Its
-   containing block is .home-page.auth-page, which is position: relative in
-   styles/auth.css. Left margin matches the landing header. */
-.auth-brand-mark {
-  position: absolute;
-  top: 8px;
-  left: clamp(14px, 4vw, 48px);
-  margin: 0;
-  line-height: 0;
-}
-
-.auth-brand-mark .brand-logo {
-  height: 75px;
-  max-height: 75px;
-  aspect-ratio: 1254 / 880;
-  object-fit: cover;
-  object-position: 50% 36.4%;
-}
-
-@media (max-width: 959px) {
-  .auth-brand-mark .brand-logo { height: 56px; max-height: 56px; }
+/* A24: on phones the sign-in screen's top-left mark and its centred mark are two
+   separate elements and they would overlap, so the sign-in column starts below
+   the mark (8px offset + 69px mark = 77px). Very short screens keep the
+   top-aligned behaviour they already had in auth-footer.css. */
+@media (max-width: 959px) and (min-height: 561px) {
+  .home-page.auth-page { padding-top: 88px; }
 }

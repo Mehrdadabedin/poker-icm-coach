@@ -34,7 +34,9 @@
   flex-direction: column;
   align-items: center;
   gap: calc(27 * var(--k));
-  margin-top: calc(66 * var(--k));
+  /* A24: trimmed from 66k, like the other branding gaps, to pay for the taller
+     brand mark without shrinking it. */
+  margin-top: calc(40 * var(--k));
 }
 
 .auth-legal-text {
@@ -56,7 +58,7 @@
 
 /* Copyright sits below the brand line: subdued, not gold, and out of the way. */
 .home-page.auth-page .app-footer {
-  margin-top: calc(24 * var(--k));
+  margin-top: calc(18 * var(--k));
   padding-top: 0;
   border-top: 0;
   color: var(--auth-gold);

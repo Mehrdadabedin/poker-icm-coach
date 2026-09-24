@@ -34,7 +34,11 @@
   background: #0e141a;
   max-width: none;
   gap: 0;
-  padding: calc(24 * var(--k)) calc(16 * var(--k)) calc(48 * var(--k));
+  /* A24: the sign-in screen carries a 214px brand mark where it used to carry a
+     47px title, so the page frame and the branding gaps give back some air and
+     the composition fits a laptop screen without scrolling. Nothing inside the
+     form or the provider pills is touched. */
+  padding: calc(16 * var(--k)) calc(16 * var(--k)) calc(30 * var(--k));
   justify-content: center;
   overflow-y: auto;
   /* A19: containing block for the sign-in brand mark (.auth-brand-mark rules
@@ -53,7 +57,7 @@
 /* ---- brand: gold title, short rule, subtitle ---- */
 .auth-brand {
   text-align: center;
-  margin-bottom: calc(78 * var(--k));
+  margin-bottom: calc(52 * var(--k));
 }
 
 .auth-title {

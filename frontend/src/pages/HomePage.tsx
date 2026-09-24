@@ -58,7 +58,10 @@ export function HomePage() {
         <p className="auth-brand-mark" data-testid="auth-brand-mark"><BrandLogo /></p>
         <div className="auth-shell">
           <header className="auth-brand">
-            <h1 className="auth-title" data-testid="app-title">ICM MASTER</h1>
+            {/* A23: the centred sign-in brand is the shared logo mark, so the
+                screen shows the same artwork as every other header. The heading
+                keeps its accessible name through the mark's hidden text. */}
+            <h1 className="auth-brand-logo" data-testid="app-title"><BrandLogo /></h1>
             <span className="auth-title-rule" aria-hidden="true" />
             <p className="auth-subtitle">9-player tournament practice with an ICM coach</p>
           </header>

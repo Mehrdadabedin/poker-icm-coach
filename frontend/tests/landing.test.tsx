@@ -93,7 +93,9 @@ describe("public landing page", () => {
     const footer = screen.getByTestId("app-footer");
     expect(footer).toHaveTextContent("NEXORA");
     expect(footer).toHaveTextContent("Created by Mehrdad Abedin");
-    expect(footer).toHaveTextContent("v0.0.0+dev");
+    // A23: the version was removed from the copyright line
+    expect(footer).not.toHaveTextContent("v0.");
+    expect(screen.queryByTestId("app-version")).toBeNull();
   });
 });
 
