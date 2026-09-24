@@ -65,12 +65,13 @@ describe("ICM MASTER sign-in screen", () => {
     expect(screen.getByTestId("password-input")).toHaveAttribute("placeholder", "Password");
     expect(screen.getByTestId("auth-submit")).toHaveTextContent("Sign in");
     expect(screen.getByTestId("password-toggle")).toHaveAttribute("aria-label", "Show password");
-    // the Google pill, sign-up prompt and brand line are present
+    // the Google pill and the sign-up prompt are present
     expect(screen.getByTestId("provider-google")).toHaveTextContent("Continue with Google");
     expect(screen.queryByTestId("provider-phone")).toBeNull();
     expect(screen.queryByTestId("provider-apple")).toBeNull();
     expect(screen.getByTestId("go-signup")).toHaveTextContent("Sign up");
-    expect(screen.getByText("PRACTICE \u2022 IMPROVE \u2022 WIN")).toBeInTheDocument();
+    // The tagline now lives in the centred logo artwork only.
+    expect(screen.queryByText("PRACTICE \u2022 IMPROVE \u2022 WIN")).toBeNull();
     expect(screen.queryByTestId("confirm-password-input")).toBeNull();
   });
 

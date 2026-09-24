@@ -9,7 +9,7 @@ import {
 } from "../services/api";
 import { ArrowRightIcon, EyeIcon, EyeOffIcon } from "./AuthIcons";
 import { AuthField } from "./AuthField";
-import { AuthLegal, AuthSwitch, SignedInNote, type AuthMode } from "./AuthFooter";
+import { AuthSwitch, SignedInNote, type AuthMode } from "./AuthFooter";
 import { AuthMessages } from "./AuthMessages";
 import { ProviderButtons } from "./ProviderButtons";
 
@@ -174,7 +174,6 @@ export function LoginForm({ onLogin }: LoginFormProps) {
       <AuthMessages error={error} notice={notice} success={success} />
       <AuthSwitch mode={mode} onSwitch={resetForm} />
       {mode === "signin" && <SignedInNote username={stored} />}
-      <AuthLegal />
     </div>
   );
 }
