@@ -1,4 +1,5 @@
 import { TableState } from "../models/game";
+import { BrandLogo } from "./BrandLogo";
 
 interface TableHeaderProps {
   state: TableState;
@@ -16,7 +17,7 @@ interface TableHeaderProps {
 export function TableHeader({ state, username, paused, handOver, isReview, onHome, onLogout, onTogglePause }: TableHeaderProps) {
   return (
     <div className="top-bar app-header" data-testid="app-header">
-      <h1 className="screen-title header-title" data-testid="app-title">ICM MASTER</h1>
+      <h1 className="screen-title header-title" data-testid="app-title"><BrandLogo /></h1>
       <div className="header-right">
         {state.tableLabel && (
           <span className="tbl-label" data-testid="table-label">TABLE {state.tableLabel}</span>

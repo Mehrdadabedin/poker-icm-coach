@@ -97,8 +97,9 @@
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
 }
 
-/* A17: the clip is 2:1 inside a 16:9 slot, so contain keeps its own aspect
-   ratio (letterboxed on the dark background) instead of cropping it. */
+/* A17: contain keeps a clip's own aspect ratio inside the 16:9 slot (letterboxed
+   on the dark background) instead of cropping or stretching it. The current
+   narrated clip is 16:9, so it fills the slot exactly. */
 .lp-video-el { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
 
 .lp-video-placeholder {

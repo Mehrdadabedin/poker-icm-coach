@@ -1,0 +1,38 @@
+/* Shared header branding: the existing ICM MASTER logo asset shown at a
+   controlled header size. The source PNG is a 1254x1254 badge on a near-black
+   background, so it is scaled down, kept square, and blended into the dark
+   header instead of drawing its own dark square. Header heights are unchanged:
+   the mark is always smaller than the row that contains it. */
+
+.brand-logo {
+  display: block;
+  width: auto;
+  height: 34px;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  mix-blend-mode: screen;
+}
+
+/* Accessible name for the mark without adding visible text. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Table / home header row keeps its 42px desktop height. */
+.header-title .brand-logo { height: 34px; }
+
+/* Landing page header. */
+.lp-brand .brand-logo { height: 34px; }
+
+@media (max-width: 959px) {
+  .header-title .brand-logo { height: 40px; }
+  .lp-brand .brand-logo { height: 32px; }
+}

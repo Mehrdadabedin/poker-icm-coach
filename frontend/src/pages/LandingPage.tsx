@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { BrandLogo } from "../components/BrandLogo";
 import { Copyright } from "../components/Copyright";
 
 /**
@@ -11,11 +12,12 @@ import { Copyright } from "../components/Copyright";
  * to registration. The sign-in component, the poker table and the app menu are
  * untouched.
  *
- * The demo block (A17) holds the bundled ICM MASTER demo clip from
- * `frontend/public/videos/icm-master-demo.mp4`, served as a static asset at
- * `/videos/icm-master-demo.mp4`. It is a plain HTML5 player: no autoplay, no
- * loop, no external host. The 16:9 container is unchanged; the clip is 2:1, so
- * `.lp-video-el` letterboxes it instead of cropping or stretching it.
+ * The demo block (A17) holds the bundled narrated ICM MASTER demo clip from
+ * `frontend/public/videos/ICM_MASTER_demo_narrated.mp4`, served as a static asset at
+ * `/videos/ICM_MASTER_demo_narrated.mp4`. It is a plain HTML5 player: no autoplay, no
+ * loop, no external host. The 16:9 container is unchanged and the narrated clip
+ * is 1920x1080, so it fills the slot exactly; `.lp-video-el` uses contain, which
+ * keeps any clip's own aspect ratio instead of cropping or stretching it.
  */
 
 const FEATURES = [
@@ -34,7 +36,7 @@ export function LandingPage() {
   return (
     <div className="page landing-page" data-testid="landing-page">
       <header className="lp-header">
-        <p className="lp-brand" data-testid="landing-brand">ICM MASTER</p>
+        <p className="lp-brand" data-testid="landing-brand"><BrandLogo /></p>
         <nav className="lp-nav" aria-label="Account">
           <Link className="lp-btn lp-nav-btn lp-btn-ghost" to="/login" data-testid="landing-login">
             LOGIN
@@ -87,7 +89,7 @@ export function LandingPage() {
                 preload="metadata"
                 playsInline
               >
-                <source src="/videos/icm-master-demo.mp4" type="video/mp4" />
+                <source src="/videos/ICM_MASTER_demo_narrated.mp4" type="video/mp4" />
               </video>
             </div>
           </div>

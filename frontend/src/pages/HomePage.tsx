@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { clearAuth, createTournament, getToken, getUsername, logout, me } from "../services/api";
 import { Copyright } from "../components/Copyright";
+import { BrandLogo } from "../components/BrandLogo";
 import { LoginForm } from "../components/LoginForm";
 
 /** HOME screen: username login (A03) then start a practice tournament or
@@ -67,7 +68,7 @@ export function HomePage() {
   return (
     <div className="page home-page" data-testid="home-page">
       <div className="top-bar app-header" data-testid="session-bar">
-        <h1 className="screen-title header-title" data-testid="app-title">ICM MASTER</h1>
+        <h1 className="screen-title header-title" data-testid="app-title"><BrandLogo /></h1>
         <div className="header-right">
           <span className="header-user">Playing as <b data-testid="session-username">{user}</b></span>
           <button className="btn btn-logout" onClick={() => void signOut()} data-testid="logout-btn">
