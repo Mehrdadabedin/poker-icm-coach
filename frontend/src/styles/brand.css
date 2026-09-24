@@ -1,7 +1,8 @@
 /* Shared header branding: the existing ICM MASTER logo asset shown at a
    controlled header size. The source PNG is a 1254x1254 badge on a near-black
-   background, so it is scaled down, kept square, and blended into the dark
-   header instead of drawing its own dark square. */
+   background, so it is scaled down and blended into the dark header with screen
+   instead of drawing its own dark square. The landing page keeps the whole
+   square file; the authenticated headers crop the empty band (see below). */
 
 .brand-logo {
   display: block;
@@ -27,31 +28,44 @@
   border: 0;
 }
 
-/* Authenticated header (table + home): a 30px mark plus the row's 6px padding
-   keeps the header at its original 42px height. The title must never shrink to
-   zero width, or the crowded mobile row clips the mark away. */
+/* Authenticated header (table + home). The raw PNG is 1254x1254, but the artwork
+   only fills a 1145x880 window at (52,136): the lower 19% of the file (and the
+   margins) are empty background, so a 30px box showed a mark of about 24px. The
+   box below has the shape of that artwork window and the alignment picks the
+   window out, so the CSS height IS the visible size of the mark and no part of
+   the artwork is cut off. The title must never shrink to zero width, or the
+   crowded mobile row clips the mark away. */
 .header-title {
   flex: 1 0 auto;
   min-width: 0;
 }
 
-.header-title .brand-logo { height: 30px; max-height: 30px; }
+.header-title .brand-logo {
+  height: 46px;
+  max-height: 46px;
+  aspect-ratio: 1254 / 880;
+  object-fit: cover;
+  object-position: 50% 36.4%;
+}
 
 /* Landing page header: unchanged size (34px desktop). */
 .lp-brand .brand-logo { height: 34px; max-height: 34px; }
 
 @media (max-width: 959px) {
-  /* Compact mark on phones; the 28px logo stays smaller than the 48px header
+  /* Slightly smaller mark on phones; 38px still stays under the 48px header
      buttons, so the 60px mobile header height is unchanged. */
-  .header-title .brand-logo { height: 28px; max-height: 28px; }
+  .header-title .brand-logo { height: 38px; max-height: 38px; }
 
-  /* Reclaim the space the mark needs from the right-hand text instead of from
-     the logo: the label and username truncate, the controls keep their size. */
+  /* The row order stays LOGO -> label/username -> controls. The controls keep
+     their own width (they used to absorb the squeeze and wrap), and the two text
+     spans give up the space the mark needs by truncating instead. */
   .app-header .header-right {
     flex: 1 1 auto;
     min-width: 0;
     justify-content: flex-end;
   }
+
+  .app-header .header-right > button { flex: 0 0 auto; }
 
   .app-header .header-user,
   .app-header .tbl-label {
