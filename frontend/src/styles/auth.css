@@ -37,6 +37,9 @@
   padding: calc(24 * var(--k)) calc(16 * var(--k)) calc(48 * var(--k));
   justify-content: center;
   overflow-y: auto;
+  /* A19: containing block for the sign-in brand mark (.auth-brand-mark rules
+     live in styles/brand.css). */
+  position: relative;
 }
 
 /* 716px wide column, exactly as measured in the mockup. */

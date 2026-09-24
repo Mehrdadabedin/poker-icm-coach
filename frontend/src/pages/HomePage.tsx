@@ -52,6 +52,10 @@ export function HomePage() {
     // The sign-in screen owns the full viewport: brand header, then the panel.
     return (
       <div className="page home-page auth-page" data-testid="home-page">
+        {/* A19: the same brand mark as the landing header, pinned to the
+            top-left. It is positioned absolutely so the centred gold title, the
+            panel and the footer keep their exact positions. */}
+        <p className="auth-brand-mark" data-testid="auth-brand-mark"><BrandLogo /></p>
         <div className="auth-shell">
           <header className="auth-brand">
             <h1 className="auth-title" data-testid="app-title">ICM MASTER</h1>

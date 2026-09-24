@@ -54,8 +54,8 @@
    like the artwork window and the alignment on that window, the CSS height is
    the visible size: 50px here. Nothing of the artwork is trimmed. */
 .lp-brand .brand-logo {
-  height: 50px;
-  max-height: 50px;
+  height: 58px;
+  max-height: 58px;
   aspect-ratio: 1254 / 880;
   object-fit: cover;
   object-position: 50% 36.4%;
@@ -87,5 +87,29 @@
 
   /* Landing page header on phones: 40px visible, so the 42px nav buttons still
      set the header height. */
-  .lp-brand .brand-logo { height: 40px; max-height: 40px; }
+  .lp-brand .brand-logo { height: 44px; max-height: 44px; }
+}
+
+
+/* A19: the brand mark on the sign-in screen (the sign-in page's top-left). Its
+   containing block is .home-page.auth-page, which is position: relative in
+   styles/auth.css. Left margin matches the landing header. */
+.auth-brand-mark {
+  position: absolute;
+  top: 8px;
+  left: clamp(14px, 4vw, 48px);
+  margin: 0;
+  line-height: 0;
+}
+
+.auth-brand-mark .brand-logo {
+  height: 52px;
+  max-height: 52px;
+  aspect-ratio: 1254 / 880;
+  object-fit: cover;
+  object-position: 50% 36.4%;
+}
+
+@media (max-width: 959px) {
+  .auth-brand-mark .brand-logo { height: 42px; max-height: 42px; }
 }
