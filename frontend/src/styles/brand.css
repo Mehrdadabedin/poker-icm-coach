@@ -48,8 +48,18 @@
   object-position: 50% 36.4%;
 }
 
-/* Landing page header: unchanged size (34px desktop). */
-.lp-brand .brand-logo { height: 34px; max-height: 34px; }
+/* Landing page header. Same empty-band crop as the authenticated header: the
+   raw PNG is 1254x1254 but its artwork only fills a 1145x880 window at (52,136),
+   so a plain 34px square box showed a mark of about 24px. With the box shaped
+   like the artwork window and the alignment on that window, the CSS height is
+   the visible size: 50px here. Nothing of the artwork is trimmed. */
+.lp-brand .brand-logo {
+  height: 50px;
+  max-height: 50px;
+  aspect-ratio: 1254 / 880;
+  object-fit: cover;
+  object-position: 50% 36.4%;
+}
 
 @media (max-width: 959px) {
   /* Slightly smaller mark on phones; 38px still stays under the 48px header
@@ -75,6 +85,7 @@
     white-space: nowrap;
   }
 
-  /* Landing page header: unchanged size (32px mobile). */
-  .lp-brand .brand-logo { height: 32px; max-height: 32px; }
+  /* Landing page header on phones: 40px visible, so the 42px nav buttons still
+     set the header height. */
+  .lp-brand .brand-logo { height: 40px; max-height: 40px; }
 }

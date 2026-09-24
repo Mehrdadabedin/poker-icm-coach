@@ -33,6 +33,13 @@
   text-transform: uppercase;
 }
 
+/* The desktop brand mark is 50px tall, which would push this row to 75px. 8px
+   vertical padding keeps the row at its previous height; the horizontal padding
+   (the left margin) and the phones' 12px padding are unchanged. */
+@media (min-width: 960px) {
+  .lp-header { padding-top: 8px; padding-bottom: 8px; }
+}
+
 .lp-nav { display: flex; align-items: center; gap: 10px; }
 
 /* ---- buttons: landing only, the shared .btn is left alone ---- */
