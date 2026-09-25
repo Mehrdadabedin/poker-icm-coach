@@ -99,9 +99,9 @@
    rendering it had before: icon only, amber or green, untouched sizes. */
 @media (min-width: 960px) {
   .header-right > .header-btn {
-    min-width: 79px;
-    min-height: 30px;
-    padding: 2px 12px;
+    min-width: 68px;
+    min-height: 26px;
+    padding: 2px 10px;
     border-radius: 6px;
     font-size: 0.75rem;
     font-weight: 700;
@@ -126,6 +126,32 @@
 
   .header-right > .btn-logout {
     order: 1;
+    min-height: 26px;
+    padding: 2px 10px;
+  }
+
+  /* Compact action bar. The four action buttons lose height and side padding so
+     the table page uses less vertical space and stops scrolling on laptop
+     screens. Colors, labels, order and behaviour are untouched, and phones keep
+     their own sizes from styles/mobile.css (a max-width block, so it wins there
+     and is not affected here). */
+  .hero-controls {
+    margin-top: 6px;
+    padding: 6px;
+  }
+
+  .hero-controls .hero-info {
+    margin-bottom: 6px;
+  }
+
+  .hero-controls .controls-row {
+    gap: 6px;
+  }
+
+  .hero-controls .controls-row .btn {
+    min-height: 36px;
+    min-width: 76px;
+    padding: 2px 10px;
   }
 }
 
