@@ -59,7 +59,6 @@ export function HomePage() {
                 keeps its accessible name through the mark's hidden text. */}
             <h1 className="auth-brand-logo" data-testid="app-title"><BrandLogo /></h1>
             <span className="auth-title-rule" aria-hidden="true" />
-            <p className="auth-subtitle">9-player tournament practice with an ICM coach</p>
           </header>
           <LoginForm onLogin={setUser} />
           <Copyright />
