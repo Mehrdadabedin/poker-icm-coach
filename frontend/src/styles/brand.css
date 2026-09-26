@@ -1,25 +1,23 @@
-/* Shared brand mark: the existing ICM MASTER asset (frontend/public/Logo/logo.png)
-   shown at ONE size everywhere it appears, so the brand has the same scale on the
-   landing page, the authenticated header and the sign-in screen.
+/* Shared brand mark: the logo asset (frontend/public/Logo/logo.png) shown at ONE
+   size everywhere it appears, so the brand has the same scale on the landing page,
+   the authenticated header and the sign-in screen.
 
-   The raw PNG is 1254x1254, but the artwork only fills a 1145x880 window at
-   (52,136): the lower 238 rows (19% of the file, including the tagline's empty
-   margin) and the side margins are empty background there is no alpha to trim.
-   A square box therefore showed a mark far smaller than its height. The box below
-   has the shape of that artwork window and the alignment picks the window out, so
-   the CSS height IS the visible artwork height, the tagline at the bottom of the
-   artwork is kept, and nothing is cropped or stretched. */
+   The raw PNG is 2170x725: a wide wordmark (spade mark plus word) on the same
+   near-black as the app shell; the blend below is lighten, so those flat background
+   pixels keep the shell's own shade and never show as a panel behind the mark.
+   The box keeps the file's own 2170:725 shape, so the artwork fills it exactly: the
+   CSS height IS the visible mark height, and nothing is cropped or stretched. */
 
 .brand-logo {
   display: block;
   width: auto;
   height: 91px;
   max-height: 91px;
-  aspect-ratio: 1254 / 880;
-  object-fit: cover;
-  object-position: 50% 36.4%;
+  aspect-ratio: 2170 / 725;
+  object-fit: contain;
+  object-position: center;
   flex: 0 0 auto;
-  mix-blend-mode: screen;
+  mix-blend-mode: lighten;
 }
 
 /* Accessible name for the mark without adding visible text. */
@@ -72,6 +70,20 @@
   left: clamp(14px, 4vw, 48px);
   margin: 0;
   line-height: 0;
+}
+
+/* A25: the top-left header marks (landing header + app header) sit one step above
+   the shared size so the tagline under the wordmark is comfortably readable at
+   header scale: 110px of the 2170x725 file renders the tagline glyphs ~13.5px tall.
+   Desktop only, and scoped to those two wrappers, so the phone rule below keeps the
+   smaller mark that fits the mobile row and the sign-in screen's own marks keep
+   their size. The header is a content-sized flex row, so it grows with the mark. */
+@media (min-width: 960px) {
+  .lp-brand .brand-logo,
+  .header-title .brand-logo {
+    height: 110px;
+    max-height: 110px;
+  }
 }
 
 @media (max-width: 959px) {
