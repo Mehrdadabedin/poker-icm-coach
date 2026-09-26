@@ -462,6 +462,44 @@ Deployment: branch `FIX-POKERTABLE-LAYOUT-TEST` and the test frontend only;
 production untouched.
 
 
+
+## A18 — Win / Lose Analysis inside the Hand History panel (IMPLEMENTED)
+
+Numbering note: A18 above ("Registration-first authentication flow") is a
+different, already-completed task from the earlier numbering pass; this entry is
+the next ID after A17 (landing video) in the owner-facing numbering. No existing
+task was renamed, reordered or removed.
+
+Goal: add a WIN / LOSE ANALYSIS view to the existing right-side HAND HISTORY
+panel of the live poker table, derived only from the authenticated table owner's
+real completed hands.
+
+Scope:
+- View switch in the existing HAND HISTORY panel head (native dropdown, default
+  HAND HISTORY). HIDE / SHOW stays and works on both views.
+- Data: existing GET /api/game/{tableId}/hands (per-user, per-table). No backend
+  change, no new endpoint, no new dependency.
+- Rendering: OVERALL PERFORMANCE (win/loss ring donuts, totals, win/loss rates,
+  profit/loss), WIN / LOSE BY BLIND LEVEL (green/red stacked bars, live-level
+  CURRENT badge), RESULTS BY POSITION (compact ring donuts). Inline SVG/CSS
+  only.
+- Derivation rules (frontend/src/models/winloss.ts): win = net > 0, loss =
+  net < 0, net == 0 neutral outside the split (win% + loss% = 100%); empty or
+  neutral-only levels/positions omitted. No hard-coded example values.
+
+Strict exclusions (unchanged): poker table, game engine, ICM, tournament/blind/
+timer, hero actions, pause/resume, authentication, session isolation, Review the
+Hand, Back to Table, WebMCP, GA4, cookie settings, landing page, mobile layout.
+
+Files: frontend/src/components/ActionHistory.tsx (head + view branch),
+TableSidebar.tsx (view state + read-only hands fetch), WinLoseAnalysis.tsx
+(new), frontend/src/models/winloss.ts (new), frontend/src/models/game.ts (type),
+frontend/src/styles/winloss.css (new), frontend/src/main.tsx (import),
+frontend/src/pages/TablePage.tsx (+3 props), tests/winloss.test.ts + .tsx (new).
+
+Deployment: branch FIX-POKERTABLE-LAYOUT-TEST only; not committed, not pushed.
+
+
 ---
 NOTE: Google authentication, Facebook authentication, and Google/Facebook OAuth
 are intentionally OUT OF SCOPE and must not be added to this plan or the app.

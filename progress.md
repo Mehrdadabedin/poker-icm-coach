@@ -1403,3 +1403,68 @@ reordered or removed.
 - Pre-existing working-tree items, not mine and not staged: modified
   `frontend/tsconfig.tsbuildinfo` (build artifact) and untracked
   `Adjustedpokertable.png` (reference image from an earlier task).
+
+
+## A18 - Win / Lose Analysis inside the Hand History panel (2026-10-09)
+
+Numbering note: .env.example already references an earlier "A18 (auth
+persistence)" concept from the atomic plan's first numbering pass; this entry is
+the next task ID after A17 (landing video) in progress.md's numbering and matches
+the owner-requested label. No existing task was renamed.
+
+### Source
+| Item | Value |
+| --- | --- |
+| Data source | GET /api/game/{tableId}/hands (existing route_meta.py endpoint) |
+| Data shape | HandHistoryEntry: handNumber, heroPosition, pot, winnerSeats, stage, net, heroDecision, coachRecommendation, grade, level, blindLevel |
+| Auth/session scope | require_user + get_session ownership check (table owner only) |
+| Screen target | Screenshot 1 (visual reference only; no mock values used) |
+
+### Implementation
+- Existing right-side HAND HISTORY panel becomes two-view: HAND HISTORY
+  (default) and WIN / LOSE ANALYSIS, selected with a native dropdown in the
+  panel head (`.history-view-select`). HIDE / SHOW button is untouched and works
+  on both views.
+- `frontend/src/components/ActionHistory.tsx`: head renders the dropdown only
+  when `onViewChange` is supplied (live table). The review screen and every
+  existing caller pass no `onViewChange` and keep the original h3 title and
+  history body byte-for-byte; the history body inside the new view branch is the
+  original code untouched.
+- `frontend/src/components/TableSidebar.tsx`: owns the view state (default
+  "history") and one read-only `GET /api/game/{tableId}/hands` fetch, fired only
+  while the analysis view is active, refreshed when the hand number advances.
+  The switch never starts a hand, pauses, resumes or alters any game/tournament
+  state: it only swaps local view state plus that single GET.
+- New `frontend/src/models/winloss.ts`: pure aggregation functions
+  (winLossTotals, blindLevelStats, positionStats, percent). Win = net > 0,
+  loss = net < 0, net == 0 is neutral and excluded from the split so
+  win% + loss% = 100% for every reported level/position; empty or neutral-only
+  levels/positions are omitted (never 0% / 0%).
+- New `frontend/src/components/WinLoseAnalysis.tsx`: OVERALL PERFORMANCE (WIN
+  and LOSS ring donuts, Total Hands, Wins, Losses, Win Rate, Loss Rate,
+  Profit/Loss), WIN / LOSE BY BLIND LEVEL (green/red horizontal bars, CURRENT
+  badge on the live level), RESULTS BY POSITION (compact ring donuts, ordered by
+  POSITIONS_9MAX). All charts are inline SVG + CSS: no chart dependency added.
+- New `frontend/src/styles/winloss.css` (`.wl-*` only; dark panel theme, gold
+  --accent, green #81c784 / red #ff8f8f reused from the hand history action
+  colors). Imported once in `frontend/src/main.tsx`.
+- `frontend/src/models/game.ts`: added the shared `HandHistoryEntry` type.
+- `frontend/src/pages/TablePage.tsx`: passes tableId, handNumber and current
+  level to the sidebar (+3 props only).
+
+### Verification (local)
+- `npx vitest run`: 103 passed in 17 files (13 new A18 tests in
+  tests/winloss.test.ts + tests/winloss.test.tsx; table_layout, table and review
+  suites untouched and green).
+- `npx tsc --noEmit` clean. `npx oxlint --deny-warnings`: only the 4 pre-existing
+  WebMCP errors (untracked prior work), none in A18 files.
+- `npm run build` ok (101 modules). Backend untouched; relevant backend subset
+  (api, auth isolation, settings/history, google auth, table lifecycle) 54
+  passed.
+- Not run: live browser pass. Visual layout of the new view still needs one
+  browser check on the test URL; renders inside the existing panel width.
+
+### Strict exclusions (unchanged)
+Poker table, seats, cards, dealing, betting, showdown, ICM engine, tournament/
+blind/timer logic, hero actions, Auto-next, authentication/OAuth, session
+isolation, WebMCP, GA4, cookie settings, landing page, mobile layout.

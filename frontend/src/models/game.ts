@@ -184,4 +184,11 @@ export function reviewResultMeta(review: HandReview): { title: string; subtitle:
 export function chipsInBB(stack: number, bigBlind: number): number {
   if (bigBlind <= 0) return 0;
   return Math.round((stack / bigBlind) * 10) / 10;
+}/** One completed hand served by GET /api/game/{tableId}/hands (owner only):
+ * net is the hero's chip result for the hand. */
+export interface HandHistoryEntry {
+  handNumber: number; heroPosition: string; pot: number; winnerSeats: number[];
+  stage: string; net: number; heroDecision: string | null;
+  coachRecommendation: string | null; grade: string | null;
+  level: number; blindLevel: string;
 }
