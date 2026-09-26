@@ -56,15 +56,23 @@
   background: var(--auth-gold-rule);
 }
 
-/* Copyright sits below the brand line: subdued, not gold, and out of the way. */
+/* Copyright: subdued, not gold, and out of the way. A27: on the sign-in screen it
+   is pinned to the page's bottom-right corner instead of sitting under the brand
+   line. The page is position: relative (styles/auth.css), and the insets match the
+   page frame's own padding so the line aligns with it. Wording, colour and font
+   size are unchanged. */
 .home-page.auth-page .app-footer {
-  margin-top: calc(18 * var(--k));
+  position: absolute;
+  right: calc(16 * var(--k));
+  bottom: calc(30 * var(--k));
+  width: auto;
+  margin-top: 0;
   padding-top: 0;
   border-top: 0;
   color: var(--auth-gold);
   font-size: calc(17 * var(--k));
   letter-spacing: calc(1 * var(--k));
-  text-align: center;
+  text-align: right;
 }
 
 /* Very short viewports (landscape phones): top-align so nothing is clipped.

@@ -79,7 +79,7 @@ export function LandingPage() {
 
         <section className="lp-section" id="lp-demo" aria-labelledby="lp-demo-title" data-testid="landing-demo">
           <div className="lp-inner">
-            <h2 className="lp-section-title" id="lp-demo-title">See ICM Master in action</h2>
+            <h2 className="lp-section-title" id="lp-demo-title">See ICM BOT in action</h2>
             <span className="lp-section-rule" aria-hidden="true" />
             <div className="lp-video" data-testid="landing-video" data-video-slot="16:9">
               <video

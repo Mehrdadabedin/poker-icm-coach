@@ -57,7 +57,10 @@
 /* ---- brand: gold title, short rule, subtitle ---- */
 .auth-brand {
   text-align: center;
-  margin-bottom: calc(52 * var(--k));
+  /* A27: the underline-to-provider-pill gap used to be 14k (the gold rule's own
+     bottom margin) + 52k (this margin). 20k here brings the Google area up so the
+     rule and the pills read as one block, without touching anything inside them. */
+  margin-bottom: calc(20 * var(--k));
 }
 
 .auth-title {
