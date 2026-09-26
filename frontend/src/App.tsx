@@ -1,4 +1,6 @@
+import { useEffect } from "react";
 import { HashRouter, Route, Routes } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { HomePage } from "./pages/HomePage";
 import { LandingPage } from "./pages/LandingPage";
 import { getToken } from "./services/api";
@@ -10,6 +12,8 @@ import { HistoryPage } from "./pages/HistoryPage";
 import { StatisticsPage } from "./pages/StatisticsPage";
 import { TrainingPage } from "./pages/TrainingPage";
 import { AuthCallbackPage } from "./pages/AuthCallbackPage";
+import { trackPageView } from "./analytics";
+import { AnalyticsConsentBanner } from "./components/AnalyticsConsentBanner";
 
 /** Public entry screen (A16): a visitor without a session gets the new landing
  * page; a signed-in user keeps the existing home screen, so HOME, the app menu
@@ -19,10 +23,22 @@ function EntryPage() {
   return getToken() ? <HomePage /> : <LandingPage />;
 }
 
+function AnalyticsPageView() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    trackPageView(pathname);
+  }, [pathname]);
+
+  return null;
+}
+
 /** Root router for the ICM Master application. */
 export function App() {
   return (
     <HashRouter>
+      <AnalyticsPageView />
+      <AnalyticsConsentBanner />
       <Routes>
         <Route path="/" element={<EntryPage />} />
         <Route path="/login" element={<HomePage />} />

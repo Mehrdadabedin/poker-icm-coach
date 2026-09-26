@@ -1,6 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { App } from "./App";
+import { initializeGoogleAnalytics } from "./analytics";
 import "./styles/base.css";
 import "./styles/seats.css";
 import "./styles/felt.css";
@@ -18,6 +19,9 @@ import "./styles/auth-footer.css";
 import "./styles/landing.css";
 import "./styles/brand.css";
 import "./styles/mobile.css";
+import "./styles/analytics-consent.css";
+
+initializeGoogleAnalytics();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
