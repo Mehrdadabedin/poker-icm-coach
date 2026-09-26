@@ -53,9 +53,10 @@
 }
 
 .auth-brand-logo .brand-logo {
-  /* 305px wide is 214px of artwork after the 1254:880 crop. Width-driven so a
-     narrower screen shrinks the whole mark instead of cropping it. */
-  width: 305px;
+  /* A28: the mark is 30% larger than it was (305px -> 396px), and still
+     width-driven so a narrower screen shrinks the whole mark instead of
+     cropping it. */
+  width: 396px;
   max-width: 100%;
   height: auto;
   max-height: none;

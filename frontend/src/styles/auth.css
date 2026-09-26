@@ -77,7 +77,11 @@
   width: calc(107 * var(--k));
   height: calc(5 * var(--k));
   border-radius: calc(3 * var(--k));
-  margin: calc(19 * var(--k)) auto calc(14 * var(--k));
+  /* A28: the artwork carries a ~27px empty band under its tagline at the new logo
+     size, so the old 19k top margin read as a large gap. Absorbing 19px of that
+     band leaves the rule ~8px under "PRACTICE - IMPROVE - WIN"; the gap down to
+     the Google pills keeps the spacing already approved. */
+  margin: -19px auto calc(14 * var(--k));
   background: var(--auth-gold-rule);
 }
 
