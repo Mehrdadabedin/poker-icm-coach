@@ -72,24 +72,23 @@
   line-height: 0;
 }
 
-/* A25: the top-left header marks (landing header + app header) sit one step above
-   the shared size so the tagline under the wordmark is comfortably readable at
-   header scale: 110px of the 2170x725 file renders the tagline glyphs ~13.5px tall.
-   Desktop only, and scoped to those two wrappers, so the phone rule below keeps the
-   smaller mark that fits the mobile row and the sign-in screen's own marks keep
-   their size. The header is a content-sized flex row, so it grows with the mark. */
+/* A25/A26: the top-left header marks (landing header + app header) are sized by this
+   rule on desktop and by the phone rule below on small screens; nothing else uses
+   them, so the sign-in screen's own marks keep their size. A26 shrank them ~40%
+   (66px of the 2170x725 file renders the tagline glyphs ~8px tall). The header is a
+   content-sized flex row, so it resizes with the mark. */
 @media (min-width: 960px) {
   .lp-brand .brand-logo,
   .header-title .brand-logo {
-    height: 110px;
-    max-height: 110px;
+    height: 66px;
+    max-height: 66px;
   }
 }
 
 @media (max-width: 959px) {
   /* Phones get their own size from the same rule, so no context can drift to a
      different scale. */
-  .brand-logo { height: 69px; max-height: 69px; }
+  .brand-logo { height: 41px; max-height: 41px; }
 
   /* The row order stays LOGO -> label/username -> controls. The controls keep
      their own width (they used to absorb the squeeze and wrap), and the two text
