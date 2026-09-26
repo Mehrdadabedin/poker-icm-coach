@@ -11,7 +11,9 @@ import { useAutoNext } from "../hooks/useAutoNext";
 import { useGame } from "../hooks/useGame";
 import { ActionKind, CoachAdvice, LegalAction } from "../models/game";
 import { useLabelPreferences } from "../services/preferences";
-import { clearAuth, coachAdvice, coachCompare, getToken, getUsername, logout } from "../services/api";
+import { clearAuth, coachAdvice, coachCompare, createTournament, getToken, getUsername, logout, nextHand as requestNextHand, request } from "../services/api";
+import type { HandHistoryEntry } from "../webmcp/registerGameTools";
+import { useGameWebMcp } from "../webmcp/useGameWebMcp";
 
 const REVIEW_SECONDS = 10;
 
@@ -64,7 +66,38 @@ export function TablePage() {
       const grade = await coachCompare(tableId).catch(() => null);
       setComparison(grade);
     }
+    return next;
   };
+
+  useGameWebMcp({
+    enabled: authed,
+    stateAvailable: state !== null,
+    tableId,
+    getState: () => state,
+    isPaused: () => paused,
+    countdown: () => countdown,
+    isReviewOpen: () => showReview,
+    act: onAction,
+    nextHand: async () => {
+      const next = await requestNextHand(tableId);
+      await refreshTable();
+      return next;
+    },
+    startNewHand: async () => {
+      const next = await createTournament(10);
+      navigate(`/table/${next.tableId}`);
+      return next;
+    },
+    getHandHistory: async () => {
+      const data = await request<{ hands: HandHistoryEntry[] }>(
+        `/api/game/${encodeURIComponent(tableId)}/hands`,
+      );
+      return data.hands;
+    },
+    pause,
+    resume,
+    showHandResult: () => setShowReview(true),
+  });
 
   const signOut = async () => {
     try {
@@ -164,6 +197,9 @@ export function TablePage() {
               heroSeat={state.heroSeat}
               nameBySeat={nameBySeat}
               coach={coach}
+              tableId={tableId}
+              handNumber={state.handNumber}
+              currentLevel={state.level}
               coachCollapsed={coachHidden}
               historyCollapsed={historyHidden}
               onToggleCoach={() => setCoachHidden((v) => !v)}
