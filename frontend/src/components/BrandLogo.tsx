@@ -1,8 +1,8 @@
 /**
  * Shared ICM MASTER logo mark for the top-left branding in every header.
  *
- * The existing asset `frontend/public/Logo/logo.png` (1254x1254 badge) is shown
- * at a controlled header size by `styles/brand.css`, never at its natural
+ * The shared asset `frontend/public/Logo/logo.png` (current artwork 2170x725) is
+ * shown at a controlled header size by `styles/brand.css`, never at its natural
  * dimensions. The image is decorative (`alt=""`) because the accessible name
  * comes from the visually hidden "ICM MASTER" text, so headings that use this
  * component keep the same accessible name and DOM text as the old wordmark.
