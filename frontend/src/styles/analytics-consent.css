@@ -64,7 +64,10 @@
 .analytics-cookie-settings {
   position: fixed;
   z-index: 999;
-  right: 12px;
+  /* bottom-LEFT: the copyright sits bottom-right, so the control must not
+     overlap it. Position only; the consent logic is unchanged. */
+  left: 12px;
+  right: auto;
   bottom: max(12px, env(safe-area-inset-bottom));
   background: #1d242c;
   color: var(--text, #e8e6e1);

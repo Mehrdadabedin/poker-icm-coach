@@ -15,9 +15,12 @@ import { Copyright } from "../components/Copyright";
  * The demo block (A17) holds the bundled narrated ICMBOT demo clip from
  * `frontend/public/videos/ICMBOT_demo_narrated.mp4`, served as a static asset at
  * `/videos/ICMBOT_demo_narrated.mp4`. It is a plain HTML5 player: no autoplay, no
- * loop, no external host. The 16:9 container is unchanged and the narrated clip
- * is 1920x1080, so it fills the slot exactly; `.lp-video-el` uses contain, which
- * keeps any clip's own aspect ratio instead of cropping or stretching it.
+ * loop, no external host. The clip itself is untouched and its first frame is
+ * white, so `poster` paints the dark ICMBOT brand frame (the logo over the
+ * clip's dark background) until the user starts playback. The 16:9 container is
+ * unchanged and the narrated clip is 1920x1080, so it fills the slot exactly;
+ * `.lp-video-el` uses contain, which keeps any clip's own aspect ratio instead
+ * of cropping or stretching it.
  */
 
 const FEATURES = [
@@ -88,6 +91,7 @@ export function LandingPage() {
                 controls
                 preload="metadata"
                 playsInline
+                poster="/videos/ICMBOT_poster.png"
               >
                 <source src="/videos/ICMBOT_demo_narrated.mp4" type="video/mp4" />
               </video>

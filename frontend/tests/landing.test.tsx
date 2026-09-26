@@ -65,6 +65,7 @@ describe("public landing page", () => {
     expect(player.tagName).toBe("VIDEO");
     expect(player).toHaveAttribute("controls");
     expect(player).toHaveAttribute("preload", "metadata");
+    expect(player).toHaveAttribute("poster", "/videos/ICMBOT_poster.png");
     expect(player).not.toHaveAttribute("autoplay");
     expect(player).not.toHaveAttribute("loop");
     expect(player.querySelector("source")).toHaveAttribute(
