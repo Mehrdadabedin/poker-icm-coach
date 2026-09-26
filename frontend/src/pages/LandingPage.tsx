@@ -12,9 +12,9 @@ import { Copyright } from "../components/Copyright";
  * to registration. The sign-in component, the poker table and the app menu are
  * untouched.
  *
- * The demo block (A17) holds the bundled narrated ICM MASTER demo clip from
- * `frontend/public/videos/ICM_MASTER_demo.mp4`, served as a static asset at
- * `/videos/ICM_MASTER_demo.mp4`. It is a plain HTML5 player: no autoplay, no
+ * The demo block (A17) holds the bundled narrated ICMBOT demo clip from
+ * `frontend/public/videos/ICMBOT_demo_narrated.mp4`, served as a static asset at
+ * `/videos/ICMBOT_demo_narrated.mp4`. It is a plain HTML5 player: no autoplay, no
  * loop, no external host. The 16:9 container is unchanged and the narrated clip
  * is 1920x1080, so it fills the slot exactly; `.lp-video-el` uses contain, which
  * keeps any clip's own aspect ratio instead of cropping or stretching it.
@@ -89,7 +89,7 @@ export function LandingPage() {
                 preload="metadata"
                 playsInline
               >
-                <source src="/videos/ICM_MASTER_demo.mp4" type="video/mp4" />
+                <source src="/videos/ICMBOT_demo_narrated.mp4" type="video/mp4" />
               </video>
             </div>
           </div>

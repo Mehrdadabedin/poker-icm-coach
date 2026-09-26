@@ -69,7 +69,7 @@ describe("public landing page", () => {
     expect(player).not.toHaveAttribute("loop");
     expect(player.querySelector("source")).toHaveAttribute(
       "src",
-      "/videos/ICM_MASTER_demo.mp4",
+      "/videos/ICMBOT_demo_narrated.mp4",
     );
     // no placeholder artwork and no external host is left behind
     expect(screen.queryByText(/coming soon/i)).toBeNull();
