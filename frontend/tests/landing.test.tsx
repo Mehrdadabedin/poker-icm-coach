@@ -46,8 +46,8 @@ describe("public landing page", () => {
     await openLanding();
     expect(screen.getByTestId("landing-page")).toBeInTheDocument();
     expect(screen.getByTestId("landing-brand")).toHaveTextContent("ICM MASTER");
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      /master your tournament decisions/i,
+    expect(screen.getByTestId("landing-hero-visual").querySelector("img")).toHaveAttribute(
+      "src", "/images/ICMBOT_target_hero.png",
     );
     expect(screen.getByTestId("landing-video")).toHaveAttribute("data-video-slot", "16:9");
     expect(screen.getByTestId("landing-features")).toHaveTextContent(/practice realistic/i);
@@ -75,6 +75,41 @@ describe("public landing page", () => {
     // no placeholder artwork and no external host is left behind
     expect(screen.queryByText(/coming soon/i)).toBeNull();
     expect(player.outerHTML).not.toMatch(/youtube|vimeo|http/i);
+  });
+
+  it("renders a clean header with brand and nav, and the hero visual", async () => {
+    await openLanding();
+    const header = document.querySelector(".lp-header");
+    expect(header).not.toBeNull();
+    // brand is present, no h1 in the header
+    expect(screen.getByTestId("landing-brand")).toHaveTextContent("ICM MASTER");
+    expect(header!.querySelector("h1")).toBeNull();
+    // nav links are present
+    expect(screen.getByTestId("landing-login")).toHaveAttribute("href", "/login");
+    expect(screen.getByTestId("landing-signup")).toHaveAttribute("href", "/login");
+    // hero visual exists with the correct artwork
+    const visual = screen.getByTestId("landing-hero-visual").querySelector("img");
+    expect(visual).not.toBeNull();
+    expect(visual?.getAttribute("src")).toBe("/images/ICMBOT_target_hero.png");
+    expect(screen.queryByRole("heading", { level: 1 })).toBeNull();
+  });
+
+  it("uses the target artwork as the hero with an interaction layer", async () => {
+    await openLanding();
+    const figure = screen.getByTestId("landing-hero-visual");
+    const img = figure.querySelector("img");
+    expect(img?.getAttribute("src")).toBe("/images/ICMBOT_target_hero.png");
+    // the visible copy lives in the artwork; the DOM mirrors it accessibly
+    expect(screen.getAllByText("PRACTICE WITH").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("ICM BOT").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("PRACTICE • IMPROVE • WIN").length).toBeGreaterThan(0);
+    // invisible hit areas keep the real actions clickable
+    const start = screen.getByTestId("landing-start-training");
+    expect(start.getAttribute("aria-label")).toBe("Start Training");
+    expect(start).toHaveAttribute("href", "/login");
+    const watch = screen.getByTestId("landing-watch-demo");
+    expect(watch.getAttribute("aria-label")).toBe("Watch How It Works");
+    expect(watch.getAttribute("type")).toBe("button");
   });
 
   it("links into the existing authentication flow only", async () => {

@@ -1,0 +1,45 @@
+/* A16 landing hero - the target artwork IS the hero (OPTION 2).
+   The hero shows the extracted hero band of docs/design/ICMBOT_landing_target.png
+   as ONE complete image (aspect preserved, full width). The visible copy and
+   buttons are inside the artwork; this file only styles the header, the figure,
+   and the two invisible hit areas that keep the real actions clickable. */
+.lp-header {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: center;
+}
+
+.lp-brand { justify-self: start; }
+
+.lp-nav { justify-self: end; }
+
+.lp-header-title {
+  margin: 0; min-width: 0; color: var(--lp-gold);
+  font-size: clamp(0.8rem, 1.3vw, 1.05rem);
+  font-weight: 800; letter-spacing: 1.8px; line-height: 1.2;
+  text-align: center; text-transform: uppercase;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* One complete hero image, full width, aspect preserved (1666:675). */
+.lp-hero {
+  position: relative; display: block; width: 100%; padding: 0; margin: 0;
+}
+.lp-hero-figure { display: block; line-height: 0; }
+.lp-hero-figure img { display: block; width: 100%; height: auto; }
+
+/* Invisible interaction layer over the artwork's buttons:
+   START TRAINING (blue button) and WATCH HOW IT WORKS (secondary). */
+.lp-hero-hit {
+  position: absolute; padding: 0; margin: 0; border: 0;
+  background: transparent; color: transparent; font: 0/0 arial;
+  cursor: pointer;
+}
+.lp-start-hit { left: 9%; top: 59.3%; width: 20%; height: 12.8%; }
+.lp-watch-hit { left: 8%; top: 76.9%; width: 23%; height: 16.5%; }
+
+@media (max-width: 959px) {
+  .lp-header-title { font-size: clamp(0.72rem, 1.5vw, 0.92rem); max-width: 26ch; }
+}
+
+@media (max-width: 767px) and (max-aspect-ratio: 4/3) {
+  .lp-header-title { display: none; }
+}

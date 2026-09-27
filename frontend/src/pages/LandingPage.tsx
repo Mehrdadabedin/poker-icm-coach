@@ -55,29 +55,35 @@ export function LandingPage() {
       </header>
 
       <main className="lp-main">
-        <section className="lp-hero" aria-labelledby="lp-hero-title">
-          <h1 className="lp-hero-title" id="lp-hero-title">Master your tournament decisions</h1>
-          <span className="lp-hero-rule" aria-hidden="true" />
-          <p className="lp-hero-text">
-            Train with realistic poker situations. Understand ICM. Make better decisions.
-          </p>
-          <div className="lp-cta-row">
-            <Link
-              className="lp-btn lp-btn-primary"
-              to="/login"
-              data-testid="landing-start-training"
-            >
-              START TRAINING
-            </Link>
-            <button
-              type="button"
-              className="lp-btn lp-btn-ghost"
-              onClick={watchDemo}
-              data-testid="landing-watch-demo"
-            >
-              <span aria-hidden="true">▶</span> WATCH HOW IT WORKS
-            </button>
+                <section className="lp-hero" aria-labelledby="lp-hero-title">
+          {/* The target artwork IS the hero: one complete image (only the hero
+              band was extracted from docs/design/ICMBOT_landing_target.png,
+              header and "SEE ICM BOT IN ACTION" excluded). The visible copy and
+              buttons live inside the artwork. This HTML adds only the
+              interaction layer: an accessible copy mirror and two invisible
+              hit areas over the artwork's buttons. */}
+          <div className="lp-hero-figure" data-testid="landing-hero-visual">
+            <img className="lp-hero-img" src="/images/ICMBOT_target_hero.png" alt="" />
           </div>
+          <div className="sr-only lp-hero-copy">
+            <p>PRACTICE WITH</p>
+            <p>ICM BOT</p>
+            <p>PRACTICE • IMPROVE • WIN</p>
+            <p>Train with realistic poker situations. Understand ICM. Make better decisions.</p>
+          </div>
+          <Link
+            className="lp-hero-hit lp-start-hit"
+            to="/login"
+            aria-label="Start Training"
+            data-testid="landing-start-training"
+          />
+          <button
+            type="button"
+            className="lp-hero-hit lp-watch-hit"
+            aria-label="Watch How It Works"
+            onClick={watchDemo}
+            data-testid="landing-watch-demo"
+          />
         </section>
 
         <section className="lp-section" id="lp-demo" aria-labelledby="lp-demo-title" data-testid="landing-demo">
