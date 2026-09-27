@@ -86,6 +86,10 @@
 
 /* ---- section frame ---- */
 .lp-section { padding: clamp(34px, 6vw, 72px) clamp(16px, 4vw, 48px); }
+/* A17: the demo block follows the artwork hero directly; only ITS top gap is
+   tightened so the section heading sits close under the hero image (default
+   .lp-section padding would push it too far). Other sections keep their layout. */
+#lp-demo { padding-top: clamp(12px, 1.6vw, 24px); }
 .lp-inner { width: 100%; max-width: 1080px; margin: 0 auto; }
 
 .lp-section-title {
