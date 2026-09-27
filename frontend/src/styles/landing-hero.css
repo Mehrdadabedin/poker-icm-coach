@@ -21,7 +21,12 @@
 
 /* One complete hero image, full width, aspect preserved (1666:675). */
 .lp-hero {
-  position: relative; display: block; width: 100%; padding: 0; margin: 0;
+  position: relative; display: block; width: 100%; padding: 0;
+  /* Tuck the artwork's built-in top band behind the sticky header so the header
+     border is the ONE separator and the scene starts directly under it. No
+     clipping: the hidden band renders behind the header (z-20 above). */
+  margin: -6.4% 0 0 0;
+  border-top: 0;
 }
 .lp-hero-figure { display: block; line-height: 0; }
 .lp-hero-figure img { display: block; width: 100%; height: auto; }
