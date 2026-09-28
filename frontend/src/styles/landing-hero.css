@@ -30,6 +30,11 @@
 }
 .lp-hero-figure {
   position: relative; display: block; line-height: 0;
+  /* Rounded bottom corners (8px). The figure clips ONLY itself so the artwork
+     follows the corners; top corners / width / height / artwork are unchanged. */
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  overflow: hidden;
 }
 .lp-hero-figure img { display: block; width: 100%; height: auto; }
 
@@ -42,16 +47,25 @@
    page-based tucks keep working as-is. */
 @media (min-width: 1140px) {
   .lp-hero { margin-top: 0; }
-  /* Displayed at 1080x613 (1665:945 preserved), centred, full artwork visible.
-     The width matches the demo video player's .lp-inner/.lp-video (1080px), so
-     both share the same left/right edges. */
+  /* Displayed at 1080 wide, centred - same left/right edges as the demo video
+     player. CSS-crop only the artwork's dark bottom margin (template rows
+     ~905-945): the image is scaled uniformly (object-fit: cover, no distortion)
+     and aligned to the top, so the bottom dark rows are not shown. The top strip
+     (rows 0-105) rides behind the header via the transform. */
   .lp-hero-figure {
     max-width: 1080px;
+    height: 587px;
     margin: 0 auto;
-    transform: translateY(-11.11%);
+    transform: translateY(-69px);
+  }
+  .lp-hero-figure img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
   }
   #lp-demo {
-    margin-top: -103px;
+    margin-top: -77px;
     padding-top: 24px;
   }
 }
