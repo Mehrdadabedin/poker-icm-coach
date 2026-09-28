@@ -28,8 +28,31 @@
   margin: -6.4% 0 0 0;
   border-top: 0;
 }
-.lp-hero-figure { display: block; line-height: 0; }
+.lp-hero-figure {
+  position: relative; display: block; line-height: 0;
+}
 .lp-hero-figure img { display: block; width: 100%; height: auto; }
+
+/* Desktop: the template artwork is 1665x945; shown at full page width it gets
+   too tall for the viewport. Cap the rendered width (aspect preserved, centred,
+   no crop, no stretch) so header + hero + the "SEE ICM BOT IN ACTION" heading
+   all fit without scrolling. The strip above the scene (rows 0-105 = 11.11% of
+   the image height) rides behind the header via a transform, and the demo block
+   below is pulled up by the matching amount; below 1140px the full-width
+   page-based tucks keep working as-is. */
+@media (min-width: 1140px) {
+  .lp-hero { margin-top: 0; }
+  /* Displayed at 1000x568 (1665:945 preserved), centred, full artwork visible. */
+  .lp-hero-figure {
+    max-width: 1000px;
+    margin: 0 auto;
+    transform: translateY(-11.11%);
+  }
+  #lp-demo {
+    margin-top: -96px;
+    padding-top: 24px;
+  }
+}
 
 /* Invisible interaction layer over the artwork's buttons:
    START TRAINING (blue button) and WATCH HOW IT WORKS (secondary). */

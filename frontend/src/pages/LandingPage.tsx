@@ -64,6 +64,21 @@ export function LandingPage() {
               hit areas over the artwork's buttons. */}
           <div className="lp-hero-figure" data-testid="landing-hero-visual">
             <img className="lp-hero-img" src="/images/ICMBOT_target_hero.png" alt="" />
+            {/* Hit areas live inside the figure so they stay aligned with the
+                artwork's buttons at any rendered image size. Invisible. */}
+            <Link
+              className="lp-hero-hit lp-start-hit"
+              to="/login"
+              aria-label="Start Training"
+              data-testid="landing-start-training"
+            />
+            <button
+              type="button"
+              className="lp-hero-hit lp-watch-hit"
+              aria-label="Watch How It Works"
+              onClick={watchDemo}
+              data-testid="landing-watch-demo"
+            />
           </div>
           <div className="sr-only lp-hero-copy">
             <p>PRACTICE WITH</p>
@@ -71,19 +86,6 @@ export function LandingPage() {
             <p>PRACTICE • IMPROVE • WIN</p>
             <p>Train with realistic poker situations. Understand ICM. Make better decisions.</p>
           </div>
-          <Link
-            className="lp-hero-hit lp-start-hit"
-            to="/login"
-            aria-label="Start Training"
-            data-testid="landing-start-training"
-          />
-          <button
-            type="button"
-            className="lp-hero-hit lp-watch-hit"
-            aria-label="Watch How It Works"
-            onClick={watchDemo}
-            data-testid="landing-watch-demo"
-          />
         </section>
 
         <section className="lp-section" id="lp-demo" aria-labelledby="lp-demo-title" data-testid="landing-demo">

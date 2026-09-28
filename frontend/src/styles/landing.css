@@ -86,10 +86,22 @@
 
 /* ---- section frame ---- */
 .lp-section { padding: clamp(34px, 6vw, 72px) clamp(16px, 4vw, 48px); }
-/* A17: the demo block follows the artwork hero directly; only ITS top gap is
-   tightened so the section heading sits close under the hero image (default
-   .lp-section padding would push it too far). Other sections keep their layout. */
-#lp-demo { padding-top: clamp(12px, 1.6vw, 24px); }
+/* A17: the demo block follows the artwork hero directly. The artwork has a
+   dark tail of its last ~40 rows below the table cards (inside the image,
+   40/1665 of the width), which reads as a large empty gap above the heading.
+   Tuck only the demo section up by that band so the heading sits ~20-30px
+   below the REAL hero content; other sections keep their layout. */
+#lp-demo {
+  /* The artwork has a dark tail of its last ~40 rows below the table cards
+     (inside the image, 40/1665 of the width). Tuck the demo section up by that
+     band and let it paint above the hero (the hero is position:relative, which
+     would otherwise cover the heading), so the heading sits ~20-30px below the
+     REAL hero content instead of below the dark tail. */
+  position: relative;
+  z-index: 1;
+  margin-top: -3.0%;
+  padding-top: clamp(12px, 1.6vw, 24px);
+}
 .lp-inner { width: 100%; max-width: 1080px; margin: 0 auto; }
 
 .lp-section-title {
