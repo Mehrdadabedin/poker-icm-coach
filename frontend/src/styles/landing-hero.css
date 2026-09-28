@@ -42,14 +42,16 @@
    page-based tucks keep working as-is. */
 @media (min-width: 1140px) {
   .lp-hero { margin-top: 0; }
-  /* Displayed at 1000x568 (1665:945 preserved), centred, full artwork visible. */
+  /* Displayed at 1080x613 (1665:945 preserved), centred, full artwork visible.
+     The width matches the demo video player's .lp-inner/.lp-video (1080px), so
+     both share the same left/right edges. */
   .lp-hero-figure {
-    max-width: 1000px;
+    max-width: 1080px;
     margin: 0 auto;
     transform: translateY(-11.11%);
   }
   #lp-demo {
-    margin-top: -96px;
+    margin-top: -103px;
     padding-top: 24px;
   }
 }
