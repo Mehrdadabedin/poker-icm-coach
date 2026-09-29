@@ -3,6 +3,7 @@ import { describe, expect, it, vi, beforeEach } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { BotProfilesPage } from "../src/pages/BotProfilesPage";
+import { HomePage } from "../src/pages/HomePage";
 import { OpponentChoicePage } from "../src/pages/OpponentChoicePage";
 
 const { createTournament } = vi.hoisted(() => ({
@@ -28,6 +29,7 @@ function renderFlow(initial = "/start") {
         <Route path="/start" element={<OpponentChoicePage />} />
         <Route path="/bot-profiles" element={<BotProfilesPage />} />
         <Route path="/table/:tableId" element={<div data-testid="table-stub" />} />
+        <Route path="/login" element={<HomePage />} />
       </Routes>
     </MemoryRouter>,
   );
@@ -141,6 +143,21 @@ describe("lineup builder (A27)", () => {
       expect(img).not.toBeNull();
       expect((img as HTMLImageElement).getAttribute("src")).toBe(src);
     }
+  });
+  it("shows session-expired message and redirects to login on 401", async () => {
+    const { AuthError } = await import("../src/services/api");
+    localStorage.setItem("icm_auth_token", "stale-token");
+    createTournament.mockRejectedValueOnce(new AuthError("Authentication required (API 401)"));
+    await loadChoice();
+    await click("opponents-choose");
+    for (let i = 0; i < 8; i += 1) await click("bot-profile-add-alex");
+    expect(screen.getByTestId("bot-profiles-total").textContent).toContain("8 / 8");
+    await click("add-bots-to-table");
+    expect(localStorage.getItem("icm_auth_token")).toBeNull();
+    expect(screen.getByTestId("auth-session-notice")).toHaveTextContent(
+      "Session expired — please log in again.",
+    );
+    expect(screen.getByTestId("auth-submit")).toBeInTheDocument(); // login form
   });
   it("BACK returns to the previous screen", async () => {
     await loadChoice();

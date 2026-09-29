@@ -12,7 +12,7 @@ import {
   lineupFromCounts,
   saveLineup,
 } from "../models/botProfiles";
-import { createTournament } from "../services/api";
+import { AuthError, clearAuth, createTournament } from "../services/api";
 
 function initialCounts(): Record<string, number> {
   const counts: Record<string, number> = {};
@@ -58,7 +58,14 @@ export function BotProfilesPage() {
       saveLineup(lineup);
       const state = await createTournament(10, undefined, lineup);
       navigate(`/table/${state.tableId}`);
-    } catch {
+    } catch (err) {
+      // A31: a stale session surfaces as HTTP 401. Show a clear message and
+      // send the user back to login instead of failing silently.
+      if (err instanceof AuthError) {
+        clearAuth();
+        navigate("/login", { state: { authNotice: "Session expired — please log in again." } });
+        return;
+      }
       setStarting(false);
     }
   };

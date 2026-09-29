@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { clearAuth, getToken, getUsername, logout, me } from "../services/api";
 import { Copyright } from "../components/Copyright";
 import { BrandLogo } from "../components/BrandLogo";
@@ -9,6 +9,8 @@ import { LoginForm } from "../components/LoginForm";
  * visit the tools. The authenticated username replaces "Hero" everywhere. */
 export function HomePage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const authNotice = (location.state as { authNotice?: string } | null)?.authNotice ?? null;
   const [user, setUser] = useState<string | null>(() => (getToken() ? getUsername() : null));
 
   // BUG 2 hardening: a stored token may be stale/invalid (backend restart,
@@ -54,6 +56,11 @@ export function HomePage() {
             <h1 className="auth-brand-logo" data-testid="app-title"><BrandLogo /></h1>
             <span className="auth-title-rule" aria-hidden="true" />
           </header>
+          {authNotice && (
+            <p className="auth-notice" role="alert" data-testid="auth-session-notice">
+              {authNotice}
+            </p>
+          )}
           <LoginForm onLogin={setUser} />
           <Copyright />
         </div>

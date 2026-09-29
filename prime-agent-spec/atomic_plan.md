@@ -636,5 +636,26 @@ tournament/betting/ICM/timers/hand history, A28 display names, table behavior.
 Images are used as-is (not regenerated or edited).
 
 ---
+
+## A31 — Fix silent 401 session failure on ADD BOTS TO TABLE (IN PROGRESS — this task)
+
+When ADD BOTS TO TABLE receives HTTP 401 (stale in-process session token), the
+frontend no longer swallows the error: it clears the local session, shows
+"Session expired — please log in again." on the existing login screen (carried
+via router state), and navigates to /login. Non-401 errors keep the previous
+behavior.
+
+Steps:
+- A31.1 Inspect the addBots/createTournament flow and the AuthError path.
+- A31.2 Handle only AuthError(401): clearAuth + navigate("/login", notice).
+- A31.3 Surface the notice on the existing login view (HomePage).
+- A31.4 Focused frontend test (401 -> message + login redirect).
+- A31.5 Run frontend tests, tsc, production build.
+
+Strict exclusions: poker engine, betting, dealing, blinds, ICM, timers, hand
+history, player/table/session IDs, BOT personalities, A28 display names, A29
+portraits, BOT profile layout, authentication system itself.
+
+---
 NOTE: Google authentication, Facebook authentication, and Google/Facebook OAuth
 are intentionally OUT OF SCOPE and must not be added to this plan or the app.

@@ -1750,3 +1750,16 @@ test, verify desktop/mobile.
 - Validation: frontend 119/119 (18 files), tsc clean, build PASSED (portraits
   in dist), backend test_bot_profiles green. Visual desktop 1440 + mobile 390:
   all four portraits load (430px), no horizontal overflow.
+
+
+## A31 - Fix silent 401 session failure (2026-09-29)
+
+Root cause confirmed (deployed layout-test site): backend keeps sessions
+in-process; a stale token makes POST /api/tournament return 401, which addBots
+swallowed silently. Fix: on AuthError(401) -> clearAuth() + navigate("/login",
+{state:{authNotice}}); HomePage login view renders the notice
+(.auth-notice, data-testid auth-session-notice). Non-401 errors unchanged.
+Files: frontend/src/pages/BotProfilesPage.tsx, frontend/src/pages/HomePage.tsx,
+frontend/src/services/api.ts (export AuthError), frontend/src/styles/
+auth-footer.css (.auth-notice), tests/botProfiles.test.tsx (+1 401 test).
+Validation: frontend 120/120 (18 files), tsc clean, build PASSED.
