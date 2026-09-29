@@ -8,6 +8,16 @@ from app.poker.card import card_model
 from app.services.hand_review import build_review
 
 
+def _player_profile(session, player) -> str | None:
+    """A28 profile identifier for a player, or None for the human seat and
+    sessions created without a custom BOT lineup/profile."""
+    if player.is_human:
+        return None
+    if session.bot_profiles is not None and 0 < player.seat <= len(session.bot_profiles):
+        return session.bot_profiles[player.seat - 1]
+    return session.bot_profile
+
+
 def build_state_view(session) -> dict:
     """Public JSON-able state; never leaks opponents' hole cards or future streets."""
     eng = session.engine
@@ -28,6 +38,7 @@ def build_state_view(session) -> dict:
             "isHero": p.is_human,
             "isDealer": p.seat == button,
             "sitsOut": p.sit_out or p.is_eliminated,
+            "profile": _player_profile(session, p),
             "holeCards": [card_model(c) for c in p.hole_cards] if p.is_human and p.hole_cards else None,
         })
     actor = eng.current_actor

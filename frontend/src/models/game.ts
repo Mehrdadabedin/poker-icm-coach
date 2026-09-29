@@ -18,6 +18,8 @@ export interface PlayerView {
   isHero: boolean;
   isDealer: boolean;
   sitsOut: boolean;
+  /** A28 profile identifier for BOT seats (e.g. "tag"), absent otherwise. */
+  profile?: string | null;
   holeCards?: Card[]; // only present for the hero
 }
 

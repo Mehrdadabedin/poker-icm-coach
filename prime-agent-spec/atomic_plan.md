@@ -657,5 +657,27 @@ history, player/table/session IDs, BOT personalities, A28 display names, A29
 portraits, BOT profile layout, authentication system itself.
 
 ---
+
+## A35 — Add BOT profile portraits inside existing poker-table seats (IN PROGRESS — this task)
+
+Visual-only: small circular BOT portrait (30px desktop / 28px mobile) rendered
+inside each existing BOT seat via the A28 profile identifier, with a per-profile
+colored ring; the human seat is untouched and the seat box/placement/layout are
+unchanged. The backend now exposes each player's A28 profile identifier
+(additive `profile` field on the player state).
+
+Steps:
+- A35.1 Inspect PlayerView/state and seat rendering.
+- A35.2 Expose the per-player A28 profile in the state view (backend, additive).
+- A35.3 Map profile -> portrait/color (reuse botProfiles assets) and render the
+  image inside non-hero seats (absolute, no layout change).
+- A35.4 Focused tests (per-profile portrait, repeated profile, hero excluded).
+- A35.5 Frontend tests, tsc, build; visual desktop 1440 + mobile 390.
+
+Strict exclusions: dealing, betting, blinds, ICM, timers, hand history, seat/
+player/table IDs, authentication, BOT personalities, A28/A29/A31 intact,
+poker table geometry.
+
+---
 NOTE: Google authentication, Facebook authentication, and Google/Facebook OAuth
 are intentionally OUT OF SCOPE and must not be added to this plan or the app.

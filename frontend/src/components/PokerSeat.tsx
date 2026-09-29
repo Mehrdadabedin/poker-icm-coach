@@ -1,4 +1,5 @@
 import { Card, PlayerView, formatChips } from "../models/game";
+import { botProfilePortrait } from "../models/botProfiles";
 import { CardView } from "./CardView";
 
 interface PokerSeatProps {
@@ -12,6 +13,7 @@ interface PokerSeatProps {
 
 /** One seat on the poker table: stack, position, bet, cards, indicators. */
 export function PokerSeat({ player, active, lastAction, status, revealCards, revealHand }: PokerSeatProps) {
+  const portrait = player.isHero ? null : (player.profile ? botProfilePortrait(player.profile) : null);
   const classes = [
     "seat",
     player.isHero ? "seat-hero" : "",
@@ -29,6 +31,15 @@ export function PokerSeat({ player, active, lastAction, status, revealCards, rev
         <span className="dealer-button" data-testid={`dealer-${player.seat}`}>
           D
         </span>
+      )}
+      {portrait && (
+        <img
+          className="seat-bot-portrait"
+          src={portrait.src}
+          alt={`${portrait.alt} bot profile`}
+          style={{ borderColor: portrait.color }}
+          draggable={false}
+        />
       )}
       <div className="seat-position">
         {player.position} {player.position === "SB" || player.position === "BB" ? "•" : ""}

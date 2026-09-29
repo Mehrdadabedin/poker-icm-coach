@@ -123,3 +123,11 @@ export function lineupFromCounts(counts: Record<string, number>): string[] {
   }
   return lineup;
 }
+
+
+/** Portrait + identity colour for a backend profile name (A35). Returns null
+ * for unknown/random profiles so those seats keep the current presentation. */
+export function botProfilePortrait(backend: string): { src: string; color: string; alt: string } | null {
+  const profile = BOT_PROFILES.find((p) => p.backend === backend);
+  return profile ? { src: profile.avatar.portrait, color: profile.avatar.color, alt: profile.name } : null;
+}

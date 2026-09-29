@@ -1763,3 +1763,20 @@ Files: frontend/src/pages/BotProfilesPage.tsx, frontend/src/pages/HomePage.tsx,
 frontend/src/services/api.ts (export AuthError), frontend/src/styles/
 auth-footer.css (.auth-notice), tests/botProfiles.test.tsx (+1 401 test).
 Validation: frontend 120/120 (18 files), tsc clean, build PASSED.
+
+
+## A35 - Add BOT profile portraits inside existing poker-table seats (2026-09-29)
+
+Visual-only. Backend state view now includes an additive per-player `profile`
+(A28 identifier; None for human/default tables) via game_state_view + the
+PlayerStateModel schema. Frontend: PlayerView.profile; botProfilePortrait()
+reuses the four portrait assets; PokerSeat renders an absolute 30px (28px
+mobile) circular portrait in the top-right of non-hero seats with the profile's
+ring color. Human seat and seat geometry unchanged.
+Files: backend/app/services/game_state_view.py, backend/app/schemas/
+game_schemas.py, backend/tests/test_bot_profiles.py, frontend/src/models/game.ts,
+frontend/src/models/botProfiles.ts, frontend/src/components/PokerSeat.tsx,
+frontend/src/styles/seats.css, frontend/tests/table.test.tsx, docs.
+Validation: frontend 121/121 (18 files), tsc clean, build PASSED; visual
+desktop 1440x900 + mobile 390x844 (8 portraits, hero excluded, no overflow,
+no text overlap, seat boxes unchanged).

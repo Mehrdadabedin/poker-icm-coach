@@ -139,25 +139,13 @@ def test_decide_uses_the_seat_specific_personality() -> None:
     assert seen["name"] == "balanced"
 
 
-# ---------------- A28: profile display names at the table ----------------
-
-def _bot_names(client) -> list[str]:
-    session = session_store.get(client.post(
-        "/api/tournament", json={"players": 9, "ante_mode": "bba",
-                                 "fast_mode": 1.0}).json()["tableId"])
-    assert session is not None
-    return [p.name for p in session.tournament.players]
-
-
-def _create(client, extra: dict) -> tuple[list[str], list[str]]:
+def _create(client, extra):
     r = client.post("/api/tournament",
                     json={"players": 9, "ante_mode": "bba", "fast_mode": 1.0,
                           **extra})
     assert r.status_code == 200, r.text
-    session = session_store.get(r.json()["tableId"])
-    assert session is not None
-    return ([p.name for p in session.tournament.players][1:],
-            session.owner)
+    s = session_store.get(r.json()["tableId"])
+    return [p.name for p in s.tournament.players][1:], s.owner
 
 
 def test_lineup_names_number_per_profile_occurrence() -> None:
@@ -183,15 +171,30 @@ def test_lineup_identity_stays_unique() -> None:
     bots = session_store.get(r.json()["tableId"]).tournament.players[1:]
     assert [p.seat for p in bots] == list(range(1, 9))
     assert len({id(p) for p in bots}) == 8
-    assert len({(p.seat, p.name) for p in bots}) == 8
 
 
 def test_no_lineup_keeps_bot_names() -> None:
-    names = _bot_names(login_client("NamesDefault"))
-    assert names[0] == "NamesDefault"
-    assert names[1:] == [f"Bot {i}" for i in range(1, 9)]
+    names, owner = _create(login_client("NamesDefault"), {})
+    assert names == [f"Bot {i}" for i in range(1, 9)] and owner == "NamesDefault"
 
 
 def test_single_profile_names_all_bots() -> None:
     names, _ = _create(login_client("NamesSingle"), {"profile": "tag"})
     assert names == [f"Alex {i}" for i in range(1, 9)]
+
+
+def test_state_exposes_per_player_profile() -> None:
+    lineup = ["tag", "tag", "lag", "lag", "tight_passive",
+              "tight_passive", "loose_passive", "loose_passive"]
+    players = login_client("StateProfiles").post(
+        "/api/tournament", json={"players": 9, "ante_mode": "bba",
+                                 "fast_mode": 1.0, "bots": lineup}).json()["players"]
+    assert players[0]["profile"] is None
+    assert [p["profile"] for p in players[1:]] == lineup
+
+
+def test_state_profile_none_for_default_table() -> None:
+    players = login_client("StateDefault").post(
+        "/api/tournament", json={"players": 9, "ante_mode": "bba",
+                                 "fast_mode": 1.0}).json()["players"]
+    assert all(p["profile"] is None for p in players)
