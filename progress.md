@@ -1588,3 +1588,100 @@ bot-profile default path keeps the previous adaptive personality.
 
 Remaining issues: the pre-existing 200-line audit failures described above;
 nothing else outstanding. Working tree not staged/committed/pushed.
+
+
+## A27 - Multi-BOT Profile Selection and Practice Opponent Builder (2026-09-29)
+
+Task: extend A26 BOT PROFILES from one selection to a full 8-BOT opponent
+builder. START PRACTICE first shows RANDOM OPPONENTS / CHOOSE OPPONENTS; CHOOSE
+opens the BOT PROFILES builder (add/remove counts, max 8, repeats allowed); the
+complete lineup is sent to table creation; RANDOM keeps the existing behaviour.
+
+Branch: FIX-POKERTABLE-LAYOUT-TEST.
+Current commit: 82cde7f (A26 feat committed + pushed).
+Starting git status: modified frontend/tsconfig.tsbuildinfo (build artifact);
+untracked docs/design/, docs/webmcp.md, icmbot-hero*.png, webmcp.test.ts,
+logo.png (pre-existing).
+
+Files inspected:
+- prime-agent-spec/atomic_plan.md (A26 added; next ID A27)
+- progress.md (A26 entry)
+- frontend/src/models/botProfiles.ts (A26: 4 profiles + single selection,
+  localStorage icm_bot_profile)
+- frontend/src/pages/BotProfilesPage.tsx (A26 single-select cards)
+- frontend/src/pages/HomePage.tsx (START PRACTICE -> createTournament(10,
+  profile?.backend))
+- frontend/src/services/api.ts (createTournament(profile?))
+- frontend/src/App.tsx (routes; /bot-profiles)
+- backend/app/api/routes_game.py (POST /api/tournament profile validation)
+- backend/app/schemas/game_schemas.py (TournamentCreateRequest.profile)
+- backend/app/services/game_session.py (bot_profile -> provider.personality)
+- backend/app/ai/personalities.py (10 archetypes) + ai_framework.py
+  (AIDecisionProvider holds ONE personality; needs per-seat extension)
+- frontend tests (botProfiles.test.tsx, landing.test.tsx, version_footer)
+- backend tests (test_bot_profiles.py, ai/test_personalities.py)
+
+Planned steps (atomic_plan A27.1..A27.15): inspect / START PRACTICE choice /
+RANDOM preserved / CHOOSE flow / multi-bot builder / repeats allowed / max 8 /
+add-remove controls / connect lineup to table creation / UI (BACK top-right) /
+tests / tsc / build / backend tests / regression.
+
+
+### A27 progress
+- Backend (A27.6/A27.9): per-seat personalities. AIDecisionProvider gained
+  `seat_personalities` and uses the seat's profile during decide() (restoring
+  afterwards); personalities.personalities_for_seats() builds one fresh profile
+  copy per seat; TournamentCreateRequest gained optional `bots: list[str]`;
+  POST /api/tournament validates exactly 8 known names and forwards to
+  GameSession (bot_profiles); GameSession maps seats 1..8. game_session.py kept
+  at exactly 200 lines. Backend tests: +6 (composition, repeats, wrong count,
+  unknown name, no-bots default, per-seat decide). 24/24 pass in
+  test_bot_profiles + test_personalities.
+
+
+### A27 implementation results (2026-09-29)
+
+Flow: HOME -> START PRACTICE -> CHOOSE YOUR OPPONENTS (RANDOM OPPONENTS /
+CHOOSE OPPONENTS). RANDOM keeps the legacy A26 single-profile path (or the
+default random setup); CHOOSE opens the BOT PROFILES lineup builder.
+
+Backend:
+- AIDecisionProvider gained `seat_personalities`; decide() uses the seat's
+  profile when one is mapped (restoring after the call; single-threaded under
+  the session lock). personalities.personalities_for_seats() builds fresh
+  per-seat profile copies (independent adaptive state).
+- TournamentCreateRequest gained optional `bots: list[str]` (max 8);
+  POST /api/tournament validates exactly 8 known archetype names (422
+  otherwise) and forwards to GameSession.bot_profiles; GameSession maps seats
+  1..8 to personalities. `profile` (A26) unchanged; no bots/profile -> previous
+  default behaviour (fully backward compatible). game_session.py kept to 200
+  lines.
+- Backend tests: +6 (composition per-seat, repeats as separate instances,
+  wrong count 422, unknown name 422, no-bots default, per-seat decide). Full
+  suite: 536 passed, 3 failed (pre-existing 200-line audit: TablePage.tsx,
+  webmcp files, base.css, auth.css, landing.css), 4 skipped.
+
+Frontend:
+- New OpponentChoicePage (/start): CHOOSE YOUR OPPONENTS screen; RANDOM
+  (legacy createTournament with stored A26 profile) and CHOOSE (-> /bot-profiles).
+- HomePage START PRACTICE now navigates to /start (no longer creates directly).
+- BotProfilesPage rebuilt as the builder: + / - counters per profile, count
+  never < 0, total never > 8, OPPONENTS N / 8, YOUR OPPONENTS summary,
+  ADD BOTS TO TABLE (requires exactly 8; "Please select 8 opponents to fill the
+  tournament." otherwise), BACK top-right (returns to previous screen).
+- botProfiles.ts: lineup model (icm_bot_lineup), MAX_BOTS = 8, lineupFromCounts.
+- api.ts createTournament(fastMode, profile?, bots?).
+- Tests: frontend +12 new (choice, random legacy, choose -> builder, counts,
+  repeats, max 8, exact-8 requirement, example lineup payload, BACK, menu,
+  footer). Full frontend suite: 117 passed / 18 files.
+
+Validation: tsc clean; production build PASSED; desktop + mobile (390px)
+rendered with no horizontal overflow; visual flow verified end-to-end
+(choice -> builder counts -> BACK to /start).
+
+Poker engine untouched: dealing, betting, rotation, Button/SB/BB, tournament,
+ICM, timers, hand history, auth, sessions, layout are unchanged; only the AI
+provider's personality selection became per-seat when a lineup is supplied.
+
+git status: A27 changes are uncommitted (not staged). atomic_plan.md A27 and
+this progress entry are part of the working-tree changes. Nothing pushed.

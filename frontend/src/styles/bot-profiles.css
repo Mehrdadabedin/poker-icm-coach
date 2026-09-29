@@ -59,3 +59,63 @@
 @media (max-width: 640px) {
   .bot-profiles-grid { grid-template-columns: 1fr; max-width: 340px; }
 }
+
+
+/* ---- A27: header bar (title + BACK top-right) ---- */
+.bot-profiles-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; max-width: 960px; margin: 0 auto;
+}
+.bot-profiles-bar .screen-title { margin-bottom: 0; }
+.bot-profile-back {
+  flex: 0 0 auto; min-height: 32px; padding: 4px 16px;
+  border: 1px solid var(--accent, #f2c14e); border-radius: 8px;
+  background: transparent; color: var(--accent, #f2c14e);
+  font: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px;
+  cursor: pointer;
+}
+.bot-profile-back:hover { background: rgba(242, 193, 78, 0.12); }
+
+/* ---- A27: add/remove counters ---- */
+.bot-profile-counter {
+  display: flex; align-items: center; gap: 10px; margin-top: 6px;
+}
+.bot-profile-counter button {
+  width: 32px; height: 32px; border: 1px solid rgba(21, 101, 192, 0.35);
+  border-radius: 8px; background: #10161d; color: var(--text, #e8e6e1);
+  font-size: 1.1rem; line-height: 1; cursor: pointer;
+}
+.bot-profile-counter button:hover:not(:disabled) { border-color: var(--accent, #f2c14e); }
+.bot-profile-counter button:disabled { opacity: 0.35; cursor: not-allowed; }
+.bot-profile-count {
+  min-width: 24px; text-align: center; font-weight: 800; color: var(--accent, #f2c14e);
+}
+
+/* ---- A27: total + summary ---- */
+.bot-profiles-total {
+  margin: 22px 0 0; text-align: center; font-weight: 800;
+  letter-spacing: 2px; color: var(--accent, #f2c14e);
+}
+.bot-profiles-summary {
+  display: flex; flex-direction: column; gap: 6px; align-items: center;
+  max-width: 640px; margin: 12px auto 0; padding: 14px;
+  border: 1px solid rgba(21, 101, 192, 0.25); border-radius: 12px;
+  background: #171d24; color: var(--text, #e8e6e1); font-size: 0.88rem;
+}
+.bot-profiles-error {
+  max-width: 640px; margin: 12px auto 0; text-align: center;
+  color: #ff8f8f; font-size: 0.88rem;
+}
+.bot-profiles-page .btn-primary { display: block; margin: 18px auto 0; }
+
+/* ---- A27: CHOOSE YOUR OPPONENTS screen ---- */
+.opponent-choice {
+  display: flex; flex-direction: column; gap: 14px; align-items: center;
+  max-width: 420px; margin: 0 auto;
+}
+.opponent-choice .btn { width: 100%; }
+
+@media (max-width: 640px) {
+  .bot-profiles-bar { flex-direction: column; align-items: stretch; }
+  .bot-profile-back { align-self: flex-end; }
+}

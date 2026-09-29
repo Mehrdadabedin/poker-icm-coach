@@ -25,14 +25,28 @@ class AIDecisionProvider:
         rng: random.Random | None = None,
         strategy: StrategyFn | None = None,
         personality: PersonalityProfile | None = None,
+        seat_personalities: dict[int, PersonalityProfile] | None = None,
     ) -> None:
         self.rng = rng if rng is not None else random.Random()
         self.strategy = strategy if strategy is not None else self._fallback_strategy
         self.personality = personality if personality is not None else adaptive_profile()
+        # A27: optional per-seat profiles (a custom BOT lineup). When a seat has
+        # an entry it is used for that seat's decisions only; other seats keep
+        # `personality`.
+        self.seat_personalities = seat_personalities or {}
 
     def decide(self, ctx: DecisionContext) -> Action:
-        suggested = self.strategy(ctx, self)
-        return clamp_to_legal(suggested, ctx.legal_actions, ctx, self.rng)
+        personality = self.seat_personalities.get(ctx.seat, self.personality)
+        # Strategies read provider.personality, so surface the seat's profile
+        # for the call and restore afterwards (decisions are single-threaded
+        # under the session lock).
+        saved = self.personality
+        self.personality = personality
+        try:
+            suggested = self.strategy(ctx, self)
+            return clamp_to_legal(suggested, ctx.legal_actions, ctx, self.rng)
+        finally:
+            self.personality = saved
 
     def _fallback_strategy(self, ctx: DecisionContext, provider: AIDecisionProvider) -> Action:
         """Default poker strategy: preflop AI before the flop, postflop AI after."""

@@ -1,10 +1,13 @@
-/* A26 — BOT PROFILES: main menu entry, page rendering, selection persistence,
- * and profile forwarding on table creation. The footer no longer shows NEXORA. */
+/* A27: opponent choice + multi-BOT lineup builder (START PRACTICE flow). */
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { act, render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { BotProfilesPage } from "../src/pages/BotProfilesPage";
+import { OpponentChoicePage } from "../src/pages/OpponentChoicePage";
 
-const createTournament = vi.fn(async () => ({ tableId: "T0" }));
+const { createTournament } = vi.hoisted(() => ({
+  createTournament: vi.fn(async () => ({ tableId: "T1" })),
+}));
 vi.mock("../src/services/api", async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   getToken: () => localStorage.getItem("icm_auth_token"),
@@ -17,99 +20,144 @@ vi.mock("../src/services/api", async (importOriginal) => ({
   createTournament,
 }));
 
-async function openHome() {
-  const { HomePage } = await import("../src/pages/HomePage");
-  render(
-    <MemoryRouter>
-      <HomePage />
+function renderFlow(initial = "/start") {
+  return render(
+    <MemoryRouter initialEntries={[initial]}>
+      <Routes>
+        <Route path="/" element={<div data-testid="home-page" />} />
+        <Route path="/start" element={<OpponentChoicePage />} />
+        <Route path="/bot-profiles" element={<BotProfilesPage />} />
+        <Route path="/table/:tableId" element={<div data-testid="table-stub" />} />
+      </Routes>
     </MemoryRouter>,
   );
-  await act(async () => undefined);
-  return screen;
 }
 
-async function openProfiles() {
-  const { BotProfilesPage } = await import("../src/pages/BotProfilesPage");
-  render(
-    <MemoryRouter>
-      <BotProfilesPage />
-    </MemoryRouter>,
-  );
-  await act(async () => undefined);
-  return screen;
+function loadChoice() {
+  return renderFlow();
 }
+
+const click = async (testid: string) => act(async () => screen.getByTestId(testid).click());
 
 beforeEach(() => localStorage.clear());
 beforeEach(() => createTournament.mockClear());
 
-// The home page requires a stored session: seed the token so the menu shows.
-function seedSession() {
-  localStorage.setItem("icm_auth_token", "t-1");
-  localStorage.setItem("icm_username", "Mehrdad");
-}
-
-describe("main menu (A26)", () => {
-  it("shows BOT PROFILES and hides TRAINING", async () => {
-    seedSession();
-    const screen = await openHome();
-    expect(screen.getByTestId("menu-bot-profiles")).toBeInTheDocument();
-    expect(screen.queryByText("TRAINING")).toBeNull();
+describe("START PRACTICE choice (A27)", () => {
+  it("renders RANDOM and CHOOSE options", async () => {
+    await loadChoice();
+    expect(screen.getByTestId("opponents-random")).toHaveTextContent("RANDOM OPPONENTS");
+    expect(screen.getByTestId("opponents-choose")).toHaveTextContent("CHOOSE OPPONENTS");
+  });
+  it("RANDOM keeps the legacy path with the stored single profile", async () => {
+    localStorage.setItem("icm_bot_profile", "alex");
+    await loadChoice();
+    await click("opponents-random");
+    expect(createTournament).toHaveBeenCalledWith(10, "tag");
+  });
+  it("RANDOM sends no profile when none is stored", async () => {
+    await loadChoice();
+    await click("opponents-random");
+    expect(createTournament).toHaveBeenCalledWith(10, undefined);
+  });
+  it("CHOOSE opens BOT PROFILES", async () => {
+    await loadChoice();
+    await click("opponents-choose");
+    expect(screen.getByTestId("bot-profiles-page")).toBeInTheDocument();
   });
 });
 
-describe("BOT PROFILES page (A26)", () => {
-  it("renders the four profiles with avatars, styles and selectable state", async () => {
-    localStorage.setItem("icm_bot_profile", "sarah");
-    const screen = await openProfiles();
-    expect(screen.getByTestId("bot-profiles-page")).toBeInTheDocument();
+describe("lineup builder (A27)", () => {
+  it("shows the four personalities", async () => {
+    await loadChoice();
+    await click("opponents-choose");
     for (const id of ["alex", "sarah", "david", "emma"]) {
       expect(screen.getByTestId(`bot-profile-${id}`)).toBeInTheDocument();
     }
-    expect(screen.getByText("Alex")).toBeInTheDocument();
-    expect(screen.getByText("Tight-Aggressive")).toBeInTheDocument();
-    expect(screen.getByText("Loose-Aggressive")).toBeInTheDocument();
-    expect(screen.getByText("Tight-Passive")).toBeInTheDocument();
-    expect(screen.getByText("Loose-Passive")).toBeInTheDocument();
-    // Sarah was pre-selected and is visually indicated
-    expect(screen.getByTestId("bot-profile-sarah").classList.contains("selected")).toBe(true);
-    expect(screen.getByTestId("bot-profiles-current").textContent).toContain("SELECTED: Sarah");
   });
-
-  it("selecting a profile persists it and updates the indication", async () => {
-    const screen = await openProfiles();
-    await act(async () => {
-      screen.getByTestId("bot-profile-david").click();
-    });
-    expect(localStorage.getItem("icm_bot_profile")).toBe("david");
-    expect(screen.getByTestId("bot-profile-david").classList.contains("selected")).toBe(true);
-    expect(screen.getByTestId("bot-profiles-current").textContent).toContain("SELECTED: David");
+  it("adds/removes with counts and never goes negative", async () => {
+    await loadChoice();
+    await click("opponents-choose");
+    await click("bot-profile-add-alex");
+    await click("bot-profile-add-alex");
+    expect(screen.getByTestId("bot-profile-count-alex").textContent).toBe("2");
+    await click("bot-profile-remove-alex");
+    await click("bot-profile-remove-alex");
+    expect(screen.getByTestId("bot-profile-count-alex").textContent).toBe("0");
+    expect((screen.getByTestId("bot-profile-remove-alex") as HTMLButtonElement).disabled).toBe(true);
+  });
+  it("allows repeats of one profile up to 8 and stops at 8", async () => {
+    await loadChoice();
+    await click("opponents-choose");
+    for (let i = 0; i < 9; i += 1) await click("bot-profile-add-alex");
+    expect(screen.getByTestId("bot-profile-count-alex").textContent).toBe("8");
+    expect(screen.getByTestId("bot-profiles-total").textContent).toContain("8 / 8");
+    expect((screen.getByTestId("bot-profile-add-alex") as HTMLButtonElement).disabled).toBe(true);
+  });
+  it("requires exactly 8 before starting the table", async () => {
+    await loadChoice();
+    await click("opponents-choose");
+    await click("bot-profile-add-alex");
+    await click("add-bots-to-table");
+    expect(screen.getByTestId("bot-profiles-error")).toHaveTextContent(
+      "Please select 8 opponents to fill the tournament.",
+    );
+    expect(createTournament).not.toHaveBeenCalled();
+  });
+  it("sends the example lineup (2 Alex + 1 Sarah + 3 David + 2 Emma)", async () => {
+    await loadChoice();
+    await click("opponents-choose");
+    const add = (id: string, n: number) =>
+      act(async () => {
+        for (let i = 0; i < n; i += 1) screen.getByTestId(`bot-profile-add-${id}`).click();
+      });
+    await add("alex", 2);
+    await add("sarah", 1);
+    await add("david", 3);
+    await add("emma", 2);
+    const summary = screen.getByTestId("bot-profiles-summary").textContent ?? "";
+    expect(summary).toContain("Alex — Tight-Aggressive × 2");
+    expect(summary).toContain("David — Tight-Passive × 3");
+    expect(screen.getByTestId("bot-profiles-total").textContent).toContain("8 / 8");
+    await click("add-bots-to-table");
+    expect(createTournament).toHaveBeenCalledWith(10, undefined, [
+      "tag", "tag", "lag", "tight_passive", "tight_passive",
+      "tight_passive", "loose_passive", "loose_passive",
+    ]);
+    expect(screen.getByTestId("table-stub")).toBeInTheDocument();
+    expect(JSON.parse(localStorage.getItem("icm_bot_lineup") ?? "[]")).toHaveLength(8);
+  });
+  it("BACK returns to the previous screen", async () => {
+    await loadChoice();
+    await click("opponents-choose");
+    await click("bot-profiles-back");
+    expect(screen.getByTestId("opponent-choice-page")).toBeInTheDocument();
   });
 });
 
-describe("profile -> table creation (A26)", () => {
-  it("forwards the selected backend profile when starting practice", async () => {
-    seedSession();
-    localStorage.setItem("icm_bot_profile", "emma");
-    const screen = await openHome();
-    const { getSelectedProfile } = await import("../src/models/botProfiles");
-    expect(getSelectedProfile()?.backend).toBe("loose_passive");
-    await act(async () => {
-      screen.getByTestId("start-practice").click();
-    });
-    expect(createTournament).toHaveBeenCalledWith(10, "loose_passive");
-  });
-
-  it("starts practice without a profile when none is selected", async () => {
-    seedSession();
-    const screen = await openHome();
-    await act(async () => {
-      screen.getByTestId("start-practice").click();
-    });
-    expect(createTournament).toHaveBeenCalledWith(10, undefined);
+describe("main menu (A26 preserved)", () => {
+  it("shows BOT PROFILES, hides TRAINING, START PRACTICE opens choice", async () => {
+    localStorage.setItem("icm_auth_token", "t-1");
+    localStorage.setItem("icm_username", "Mehrdad");
+    const { HomePage } = await import("../src/pages/HomePage");
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/start" element={<OpponentChoicePage />} />
+          <Route path="/bot-profiles" element={<BotProfilesPage />} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    await act(async () => undefined);
+    expect(screen.getByTestId("menu-bot-profiles")).toBeInTheDocument();
+    expect(screen.queryByText("TRAINING")).toBeNull();
+    await click("start-practice");
+    expect(createTournament).not.toHaveBeenCalled();
+    expect(screen.getByTestId("opponent-choice-page")).toBeInTheDocument();
   });
 });
 
-describe("footer (A26)", () => {
+describe("footer (A26 preserved)", () => {
   it("renders the new copyright without NEXORA", async () => {
     const { Copyright } = await import("../src/components/Copyright");
     render(<Copyright />);

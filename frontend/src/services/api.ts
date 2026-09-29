@@ -107,13 +107,18 @@ export function googleSignInUrl(): string {
   return `${API_BASE}/api/auth/google/start?redirect_uri=${encodeURIComponent(redirect)}`;
 }
 
-export function createTournament(fastMode = 10, profile?: string): Promise<TableState> {
+export function createTournament(fastMode = 10, profile?: string, bots?: string[]): Promise<TableState> {
   // Stack/blinds/duration come from the runtime tournament settings
   // (editable on the Tournament Settings screen); fast mode may be passed.
-  // A26: an optional BOT profile personality is forwarded to the backend.
+  // A26/A27: an optional BOT profile (legacy single) or an explicit lineup
+  // (per-seat personalities) is forwarded to the backend.
   return request<TableState>("/api/tournament", {
     method: "POST",
-    body: JSON.stringify({ players: 9, fast_mode: fastMode, ...(profile ? { profile } : {}) }),
+    body: JSON.stringify({
+      players: 9, fast_mode: fastMode,
+      ...(profile ? { profile } : {}),
+      ...(bots && bots.length ? { bots } : {}),
+    }),
   });
 }
 

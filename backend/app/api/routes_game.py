@@ -60,6 +60,22 @@ def create_tournament(request: TournamentCreateRequest,
         except KeyError as exc:
             raise HTTPException(status_code=422, detail="unknown bot profile") from exc
         bot_profile = request.profile
+    # A27: optional explicit BOT lineup. Exactly 8 personalities (one per
+    # opponent seat); each name must be a known archetype.
+    bot_profiles: list[str] | None = None
+    if request.bots is not None:
+        from app.ai.personalities import profile_for
+
+        if len(request.bots) != 8:
+            raise HTTPException(status_code=422,
+                                detail="bots must contain exactly 8 profiles")
+        for name in request.bots:
+            try:
+                profile_for(name)
+            except KeyError as exc:
+                raise HTTPException(status_code=422,
+                                    detail=f"unknown bot profile: {name}") from exc
+        bot_profiles = request.bots
     session = GameSession(
         fast_mode=fast,
         starting_stack=starting_stack,
@@ -70,6 +86,7 @@ def create_tournament(request: TournamentCreateRequest,
         table_label=session_store.next_label(),
         history_dir=settings.history_dir,
         bot_profile=bot_profile,
+        bot_profiles=bot_profiles,
     )
     session.start()
     session_store.add(session)

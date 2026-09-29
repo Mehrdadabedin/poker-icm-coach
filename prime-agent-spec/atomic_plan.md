@@ -548,5 +548,43 @@ creation (backward compatible).
 Deployment: branch FIX-POKERTABLE-LAYOUT-TEST only; not committed, not pushed.
 
 ---
+
+## A27 — Multi-BOT Profile Selection and Practice Opponent Builder (IN PROGRESS — this task)
+
+Extends A26: START PRACTICE first asks RANDOM OPPONENTS or CHOOSE OPPONENTS;
+CHOOSE opens BOT PROFILES, which becomes a multi-BOT lineup builder (add/remove
+counts per personality, max 8 = all opponent seats, same personality may repeat).
+The complete lineup is sent to table creation so each BOT seat gets its own
+personality; RANDOM keeps the existing behaviour exactly.
+
+Planned steps:
+- A27.1 Inspect existing A26 BOT profile and table-creation architecture.
+- A27.2 Add the opponent-selection choice to START PRACTICE (new /start screen).
+- A27.3 Preserve RANDOM opponents behaviour exactly (legacy single-profile path).
+- A27.4 Add the CHOOSE OPPONENTS flow (opens BOT PROFILES).
+- A27.5 Extend BOT PROFILES from single selection to a multi-BOT builder.
+- A27.6 Allow multiple instances of the same BOT profile.
+- A27.7 Enforce maximum 8 BOT opponents (and minimum 0 per profile).
+- A27.8 Add BOT counts and add/remove controls (+/-).
+- A27.9 Connect the selected BOT composition to table creation (backend per-seat
+  personalities via an optional `bots` list on POST /api/tournament).
+- A27.10 Update navigation/UI for BOT PROFILES (BACK top-right).
+- A27.11 Add regression + feature tests (frontend + backend).
+- A27.12 Run TypeScript checks.
+- A27.13 Run the production build.
+- A27.14 Run backend tests.
+- A27.15 Verify existing poker functionality is unchanged.
+
+Strict exclusions (unchanged): dealing, deck, betting, fold/call/check/raise,
+all-in, pot, rotation, seats, Button/SB/BB, blinds, tournament progression, ICM,
+timers, pause/play, fast mode, authentication, sessions, hand history, review,
+card assets, table layout, existing random BOT behaviour. Existing default paths
+(no `bots`/`profile` supplied) behave exactly as before. The only additions are
+additive optional request fields and per-seat personality plumbing on the AI
+provider (no engine/rule changes).
+
+Deployment: branch FIX-POKERTABLE-LAYOUT-TEST only; not committed, not pushed.
+
+---
 NOTE: Google authentication, Facebook authentication, and Google/Facebook OAuth
 are intentionally OUT OF SCOPE and must not be added to this plan or the app.

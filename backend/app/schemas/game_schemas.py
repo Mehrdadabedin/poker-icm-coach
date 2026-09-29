@@ -161,3 +161,5 @@ class TournamentCreateRequest(BaseModel):
     fast_mode: float = Field(default=1.0, ge=1.0)
     # A26: optional BOT profile personality applied to the table's bots.
     profile: str | None = Field(default=None, max_length=40)
+    # A27: optional explicit BOT lineup (personality per opponent seat, max 8).
+    bots: list[str] | None = Field(default=None, max_length=8)

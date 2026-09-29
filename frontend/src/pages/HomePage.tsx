@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { clearAuth, createTournament, getToken, getUsername, logout, me } from "../services/api";
-import { getSelectedProfile } from "../models/botProfiles";
+import { clearAuth, getToken, getUsername, logout, me } from "../services/api";
 import { Copyright } from "../components/Copyright";
 import { BrandLogo } from "../components/BrandLogo";
 import { LoginForm } from "../components/LoginForm";
@@ -10,7 +9,6 @@ import { LoginForm } from "../components/LoginForm";
  * visit the tools. The authenticated username replaces "Hero" everywhere. */
 export function HomePage() {
   const navigate = useNavigate();
-  const [starting, setStarting] = useState(false);
   const [user, setUser] = useState<string | null>(() => (getToken() ? getUsername() : null));
 
   // BUG 2 hardening: a stored token may be stale/invalid (backend restart,
@@ -39,15 +37,9 @@ export function HomePage() {
     setUser(null);
   };
 
-  const startPractice = async () => {
-    setStarting(true);
-    try {
-      const profile = getSelectedProfile();
-      const state = await createTournament(10, profile?.backend); // fast mode for practice
-      navigate(`/table/${state.tableId}`);
-    } catch {
-      setStarting(false);
-    }
+  const startPractice = () => {
+    // A27: START PRACTICE now opens the opponent-choice screen.
+    navigate("/start");
   };
 
   if (!user) {
@@ -82,8 +74,8 @@ export function HomePage() {
       </div>
       <p className="home-tagline">9-player tournament practice with an ICM coach</p>
       <div className="home-menu">
-        <button className="btn btn-primary" onClick={startPractice} disabled={starting} data-testid="start-practice">
-          {starting ? "STARTING…" : "START PRACTICE"}
+        <button className="btn btn-primary" onClick={startPractice} data-testid="start-practice">
+          START PRACTICE
         </button>
         <button className="btn" onClick={() => navigate("/bot-profiles")} data-testid="menu-bot-profiles">BOT PROFILES</button>
         <button className="btn" onClick={() => navigate("/ranges")}>RANGES</button>

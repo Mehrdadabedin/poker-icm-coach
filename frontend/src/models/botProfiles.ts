@@ -77,3 +77,49 @@ export function setSelectedProfileId(id: string): void {
 export function clearSelectedProfile(): void {
   localStorage.removeItem(STORAGE_KEY);
 }
+
+
+// ---- A27: opponent lineup (multi-BOT selection) -------------------------------
+
+/** Maximum opponent bots for the 9-player tournament (1 human + 8 bots). */
+export const MAX_BOTS = 8;
+
+const LINEUP_KEY = "icm_bot_lineup";
+
+/** Saved lineup as ordered backend personality names (seat 1..n), length <= 8. */
+export function getLineup(): string[] {
+  try {
+    const raw = localStorage.getItem(LINEUP_KEY);
+    if (!raw) return [];
+    const value: unknown = JSON.parse(raw);
+    return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+export function getLineupTotal(): number {
+  return getLineup().length;
+}
+
+/** Persist the lineup and clear the legacy single-profile so RANDOM stays
+ * coherent with the last explicit choice. */
+export function saveLineup(bots: string[]): void {
+  localStorage.setItem(LINEUP_KEY, JSON.stringify(bots.slice(0, MAX_BOTS)));
+  clearSelectedProfile();
+}
+
+export function clearLineup(): void {
+  localStorage.removeItem(LINEUP_KEY);
+}
+
+/** Expand per-profile counts into an ordered lineup of backend names
+ * (e.g. { alex: 2, sarah: 1, david: 3, emma: 2 } -> 8 entries). */
+export function lineupFromCounts(counts: Record<string, number>): string[] {
+  const lineup: string[] = [];
+  for (const profile of BOT_PROFILES) {
+    const count = counts[profile.id] ?? 0;
+    for (let i = 0; i < count; i += 1) lineup.push(profile.backend);
+  }
+  return lineup;
+}

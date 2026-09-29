@@ -7,7 +7,7 @@ bounded to [0, 1].
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 
 @dataclass(slots=True)
@@ -100,3 +100,15 @@ def assign_personalities(count: int) -> list[str]:
     """Cycle through the eight archetypes for `count` computer seats."""
     pool = [p.name for p in profiles()]
     return [pool[i % len(pool)] for i in range(count)]
+
+
+def personalities_for_seats(bot_names: list[str]) -> dict[int, PersonalityProfile]:
+    """Map each bot seat (1..n) to a fresh copy of its personality (A27).
+
+    The copies keep additive history (results) independent between seats so
+    adaptive profiles never leak across bot instances.
+    """
+    return {
+        seat: replace(profile_for(name), results=list(profile_for(name).results))
+        for seat, name in enumerate(bot_names, start=1)
+    }

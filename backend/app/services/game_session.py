@@ -39,7 +39,8 @@ class GameSession:
                  owner: str | None = None,
                  table_label: str | None = None,
                  hero_name: str = "Hero",
-                 history_dir: str | None = None, bot_profile: str | None = None) -> None:
+                 history_dir: str | None = None, bot_profile: str | None = None,
+                 bot_profiles: list[str] | None = None) -> None:
         self.session_id = session_id or uuid.uuid4().hex[:12]
         self.owner = owner  # authenticated username that owns this tournament
         self.table_label = table_label or self.session_id
@@ -59,6 +60,11 @@ class GameSession:
         if bot_profile is not None:
             from app.ai.personalities import profile_for
             self.provider.personality = profile_for(bot_profile)
+        # A27: per-seat BOT lineup (seat 1..8 each get their own personality).
+        self.bot_profiles = bot_profiles
+        if bot_profiles is not None:
+            from app.ai.personalities import personalities_for_seats
+            self.provider.seat_personalities = personalities_for_seats(bot_profiles)
         self.engine: HandEngine | None = None
         self.timer: TournamentTimer | None = None
         self.fast_mode = fast_mode
@@ -66,18 +72,12 @@ class GameSession:
         self.coach = Coach()
         self.coach_mode = "advanced"
         self._last_hero_action: str | None = None
-        # The hero's decision point, captured before the action is applied.
-        # Grading used to rebuild it afterwards, by which time the hero had
-        # acted and the bots had answered, so it scored a call against advice
-        # for a different spot, often a different street. The request is stored
-        # rather than the recommendation because building it is arithmetic,
-        # while recommending runs equity simulations: doing that here would
-        # make every fold pay for a grade nobody asked for, under the lock.
+        # Store the hero's pre-action decision point as the request (rebuilding
+        # after grading would score a different spot; recommending runs equity).
         self._last_hero_request: CoachRequest | None = None
         self._lock = threading.RLock()
-        self._history_file: hand_history.HistoryFileStore = hand_history.HistoryFileStore(
-            self.history_dir, self.session_id
-        )
+        self._history_file = hand_history.HistoryFileStore(
+            self.history_dir, self.session_id)
 
     def start(self) -> None:
         with self._lock:
