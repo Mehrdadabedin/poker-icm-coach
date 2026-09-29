@@ -1468,3 +1468,123 @@ the owner-requested label. No existing task was renamed.
 Poker table, seats, cards, dealing, betting, showdown, ICM engine, tournament/
 blind/timer logic, hero actions, Auto-next, authentication/OAuth, session
 isolation, WebMCP, GA4, cookie settings, landing page, mobile layout.
+
+
+## A26 - BOT Profiles + Navigation Cleanup + NEXORA Removal (2026-09-29 12:07 CEST)
+
+Task: add four selectable human-style BOT profiles connected to table creation,
+remove TRAINING from the main menu, add BOT PROFILES to the main menu, remove
+visible NEXORA branding, and set the footer to "© 2026 — Created by Mehrdad Abedin".
+
+Branch: FIX-POKERTABLE-LAYOUT-TEST.
+
+Starting git status (before implementation):
+- modified: frontend/tsconfig.tsbuildinfo (build artifact)
+- untracked: docs/design/, docs/webmcp.md, frontend/public/images/icmbot-hero*.png,
+  frontend/tests/webmcp.test.ts, logo.png (all pre-existing)
+
+Files inspected (architecture):
+- prime-agent-spec/atomic_plan.md (A-numbering; next ID = A26)
+- progress.md (task numbering/conventions; TOC 001-061 + A16/A17/A18 entries)
+- frontend/src/App.tsx (routes) — HomePage owns the main menu; /training route exists
+- frontend/src/pages/HomePage.tsx — main menu: START PRACTICE, TRAINING, RANGES,
+  ICM COACH, TOURNAMENT SETTINGS, HAND HISTORY, STATISTICS; startPractice calls
+  createTournament(10)
+- frontend/src/components/Copyright.tsx — "© 2026 NEXORA — Created by Mehrdad Abedin"
+  (the ONLY user-facing NEXORA occurrence; used by every page incl. landing)
+- frontend/src/services/api.ts — createTournament posts {players:9, fast_mode}
+- frontend/src/services/preferences.ts — existing localStorage/in-memory pattern
+- backend/app/api/routes_game.py — POST /api/tournament -> GameSession
+- backend/app/schemas/game_schemas.py — TournamentCreateRequest
+- backend/app/services/game_session.py — builds AIDecisionProvider (single
+  adaptive personality today); bots are not individually profiled in the live
+  engine
+- backend/app/ai/personalities.py — 8 archetypes (tight, aggressive, tag, loose,
+  lag, passive, balanced, adaptive); no exact tight-passive / loose-passive
+- backend/app/ai/ai_framework.py — AIDecisionProvider(personality=...)
+- backend/tests/ai/test_personalities.py — asserts exactly 8 profiles (must be
+  updated when the two new archetypes are added)
+- frontend/tests/landing.test.tsx + version_footer.test.tsx — assert the NEXORA
+  footer (must be updated)
+- TrainingPage.tsx — kept intact; only the menu entry is removed
+
+Planned steps (from atomic_plan A26-1..A26-13): inspect / remove TRAINING from
+menu / add BOT PROFILES to menu / build profiles page / define 4 profiles /
+connect profile to table creation / persist selection / remove NEXORA / update
+footer tests / tsc / tests / build / regression verification.
+
+
+### Implementation results (A26, completed 2026-09-29)
+
+Branch: FIX-POKERTABLE-LAYOUT-TEST.
+
+Files changed (working tree, not committed):
+- backend/app/ai/personalities.py — added the two missing archetypes
+  "tight_passive" (vpip 0.15, aggression 0.18) and "loose_passive"
+  (vpip 0.55, aggression 0.20); existing 8 archetypes unchanged.
+- backend/app/schemas/game_schemas.py — TournamentCreateRequest gains optional
+  `profile: str | None = None` (max 40 chars; backward compatible).
+- backend/app/api/routes_game.py — create_tournament validates the optional
+  profile (422 "unknown bot profile") and forwards it to GameSession.
+- backend/app/services/game_session.py — GameSession(bot_profile=...) sets the
+  AI provider personality from profile_for(name); default remains adaptive, so
+  existing behaviour is unchanged.
+- backend/tests/ai/test_personalities.py — 8 -> 10 profile assertions + two
+  behavioural tests for the new archetypes.
+- backend/tests/test_bot_profiles.py (new) — profile wiring, tight-passive
+  wiring, no-profile default, unknown-profile 422.
+- frontend/src/models/botProfiles.ts (new) — 4 profiles
+  (Alex/Tight-Aggressive->tag, Sarah/Loose-Aggressive->lag,
+  David/Tight-Passive->tight_passive, Emma/Loose-Passive->loose_passive),
+  avatar initials + colours, localStorage persistence (icm_bot_profile).
+- frontend/src/pages/BotProfilesPage.tsx (new) — BOT PROFILES screen with 4
+  responsive cards, avatar, name, style, description and SELECTED state.
+- frontend/src/pages/HomePage.tsx — TRAINING menu button removed; BOT PROFILES
+  button added; START PRACTICE forwards the selected profile backend name.
+- frontend/src/App.tsx — new route /bot-profiles.
+- frontend/src/services/api.ts — createTournament(fastMode, profile?) sends the
+  optional profile field.
+- frontend/src/components/Copyright.tsx — footer changed from
+  "© 2026 NEXORA — Created by Mehrdad Abedin" to
+  "© 2026 — Created by Mehrdad Abedin". NEXORA removed repo-wide (sources and
+  rebuilt assets; grep clean). TrainingPage + /training route preserved intact.
+- frontend/src/styles/bot-profiles.css (new) — scoped styles, desktop + mobile.
+- frontend/src/main.tsx — imports bot-profiles.css.
+- tests: frontend/tests/botProfiles.test.tsx (new, 6 tests),
+  version_footer.test.tsx + landing.test.tsx footer assertions updated to the
+  new copyright text.
+
+BOT profiles implemented: Alex (Tight-Aggressive), Sarah (Loose-Aggressive),
+David (Tight-Passive), Emma (Loose-Passive); local initials avatars (no external
+assets, generic non-identifying).
+
+Profile -> table creation: selection stored in localStorage (icm_bot_profile);
+START PRACTICE / training calls pass profile?.backend into POST
+/api/tournament {players, fast_mode, profile}; backend maps the name to the AI
+personality via personalities.profile_for and applies it to the bots' decision
+provider at session start. All existing poker/engine logic untouched; the only
+API change is the additive optional `profile` field.
+
+NEXORA removal: footer only (the sole user-facing occurrence); repo-wide grep
+clean; rebuilt dist clean.
+
+Tests executed:
+- Frontend full suite: 18 files, 111 passed (was 105; +6 new).
+- Backend full suite: 530 passed, 3 failed, 4 skipped. The 3 failures are
+  the pre-existing 200-line audit checks (test_project_setup
+  test_code_files_under_200_lines[ts]/[tsx] and test_github_audit): files
+  TablePage.tsx (213), src/webmcp/registerGameTools.ts (380),
+  tests/webmcp.test.ts (434), styles/base.css (204), styles/auth.css (204),
+  styles/landing.css (213). None of these files are modified by this task
+  (verified via git status); they already violated the 200-line rule at task
+  start. game_session.py (my change) was trimmed to exactly 200 lines, so the
+  [py] audit check now passes.
+- TypeScript: npx tsc --noEmit clean.
+- Lint: oxlint not installed in this environment (pre-existing env limitation).
+- Production build: PASSED (vite); dist rebuilt.
+
+Regression: table/game/tournament/AI suites green (see backend subset above);
+bot-profile default path keeps the previous adaptive personality.
+
+Remaining issues: the pre-existing 200-line audit failures described above;
+nothing else outstanding. Working tree not staged/committed/pushed.

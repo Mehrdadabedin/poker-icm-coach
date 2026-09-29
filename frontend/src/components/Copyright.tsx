@@ -2,7 +2,7 @@
 export function Copyright() {
   return (
     <footer className="app-footer" data-testid="app-footer">
-      © 2026 NEXORA — Created by Mehrdad Abedin
+      © 2026 — Created by Mehrdad Abedin
     </footer>
   );
 }

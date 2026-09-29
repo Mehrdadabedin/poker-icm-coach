@@ -159,3 +159,5 @@ class TournamentCreateRequest(BaseModel):
     blind_level_minutes: int | None = Field(default=None, ge=1)
     ante_mode: str = "bba"
     fast_mode: float = Field(default=1.0, ge=1.0)
+    # A26: optional BOT profile personality applied to the table's bots.
+    profile: str | None = Field(default=None, max_length=40)

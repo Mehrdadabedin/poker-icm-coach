@@ -39,7 +39,7 @@ class GameSession:
                  owner: str | None = None,
                  table_label: str | None = None,
                  hero_name: str = "Hero",
-                 history_dir: str | None = None) -> None:
+                 history_dir: str | None = None, bot_profile: str | None = None) -> None:
         self.session_id = session_id or uuid.uuid4().hex[:12]
         self.owner = owner  # authenticated username that owns this tournament
         self.table_label = table_label or self.session_id
@@ -55,6 +55,10 @@ class GameSession:
         self.hero_seat = 0
         self.rng = rng if rng is not None else random.Random()
         self.provider = AIDecisionProvider(rng=self.rng)
+        self.bot_profile = bot_profile
+        if bot_profile is not None:
+            from app.ai.personalities import profile_for
+            self.provider.personality = profile_for(bot_profile)
         self.engine: HandEngine | None = None
         self.timer: TournamentTimer | None = None
         self.fast_mode = fast_mode

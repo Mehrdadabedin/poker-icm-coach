@@ -50,6 +50,16 @@ def create_tournament(request: TournamentCreateRequest,
     # max(1.0, float(...)), so a bool always collapses to 1.0 and silently
     # discards whatever multiplier the client asked for.
     fast = request.fast_mode
+    # A26: optional BOT profile (validated here so unknown names fail cleanly).
+    bot_profile: str | None = None
+    if request.profile is not None:
+        from app.ai.personalities import profile_for
+
+        try:
+            profile_for(request.profile)
+        except KeyError as exc:
+            raise HTTPException(status_code=422, detail="unknown bot profile") from exc
+        bot_profile = request.profile
     session = GameSession(
         fast_mode=fast,
         starting_stack=starting_stack,
@@ -59,6 +69,7 @@ def create_tournament(request: TournamentCreateRequest,
         hero_name=user,
         table_label=session_store.next_label(),
         history_dir=settings.history_dir,
+        bot_profile=bot_profile,
     )
     session.start()
     session_store.add(session)

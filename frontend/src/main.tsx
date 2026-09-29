@@ -21,6 +21,7 @@ import "./styles/landing-hero.css";
 import "./styles/brand.css";
 import "./styles/mobile.css";
 import "./styles/analytics-consent.css";
+import "./styles/bot-profiles.css";
 import "./styles/winloss.css";
 
 initializeGoogleAnalytics();

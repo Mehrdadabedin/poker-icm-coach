@@ -501,5 +501,52 @@ Deployment: branch FIX-POKERTABLE-LAYOUT-TEST only; not committed, not pushed.
 
 
 ---
+
+## A26 — BOT Profiles + Navigation Cleanup + NEXORA Removal (IN PROGRESS — this task)
+
+Numbering note: next available ID after A25 in this file's numbering pass. The
+owner-requested sub-step labels (A01-A13) collide with the original A01-A15
+baseline tasks, so the steps below use A26-1..A26-13 in the same order.
+
+Goal: add four selectable human-style BOT profiles that drive the existing BOT
+personality at table creation; remove TRAINING from the main menu; add BOT
+PROFILES to the main menu; remove visible NEXORA branding (footer only) and keep
+the copyright line "© 2026 — Created by Mehrdad Abedin".
+
+Planned steps (each independently verifiable):
+- A26-1 Inspect navigation, footer, BOT configuration and table-creation
+  architecture (done first, recorded in progress.md).
+- A26-2 Remove TRAINING from the main menu ONLY (route/page files preserved).
+- A26-3 Add BOT PROFILES to the main menu.
+- A26-4 Build the BOT PROFILES page (four profile cards, desktop + mobile).
+- A26-5 Define the four profiles (Tight-Aggressive, Loose-Aggressive,
+  Tight-Passive, Loose-Passive) with avatars, style, description and a backend
+  personality identifier.
+- A26-6 Connect selection to table creation: add an optional `profile` field to
+  POST /api/tournament and map it onto the AI provider's personality; add the
+  two missing archetypes (tight_passive, loose_passive) to personalities.py.
+- A26-7 Persist the selected profile with localStorage (existing client-side
+  session/config mechanism).
+- A26-8 Remove NEXORA from the footer; footer text becomes
+  "© 2026 — Created by Mehrdad Abedin".
+- A26-9 Update footer assertions in the existing tests.
+- A26-10 Run TypeScript checks (frontend tsc --noEmit).
+- A26-11 Run existing tests (frontend full suite + backend personality/lifecycle
+  subset).
+- A26-12 Run the production build.
+- A26-13 Regression verification of existing poker functionality (table tests,
+  backend game/tournament/personality tests stay green).
+
+Strict exclusions (unchanged): poker rules, betting, dealing, hand evaluation,
+ICM, tournament/blind/timer, button movement, SB/BB, player rotation/seating,
+BOT action timing, pause/play, authentication, logout, user sessions, hand
+history, review-hand, table/session IDs, existing API behaviour, CORS, card
+assets, mobile/desktop table layout, WebMCP, GA4, cookie settings, landing page.
+The only API change is the OPTIONAL additive `profile` field on tournament
+creation (backward compatible).
+
+Deployment: branch FIX-POKERTABLE-LAYOUT-TEST only; not committed, not pushed.
+
+---
 NOTE: Google authentication, Facebook authentication, and Google/Facebook OAuth
 are intentionally OUT OF SCOPE and must not be added to this plan or the app.

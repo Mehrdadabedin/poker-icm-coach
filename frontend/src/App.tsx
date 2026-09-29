@@ -11,6 +11,7 @@ import { SettingsPage } from "./pages/SettingsPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { StatisticsPage } from "./pages/StatisticsPage";
 import { TrainingPage } from "./pages/TrainingPage";
+import { BotProfilesPage } from "./pages/BotProfilesPage";
 import { AuthCallbackPage } from "./pages/AuthCallbackPage";
 import { trackPageView } from "./analytics";
 import { AnalyticsConsentBanner } from "./components/AnalyticsConsentBanner";
@@ -45,6 +46,7 @@ export function App() {
         <Route path="/table/:tableId" element={<TablePage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
         <Route path="/training" element={<TrainingPage />} />
+        <Route path="/bot-profiles" element={<BotProfilesPage />} />
         <Route path="/ranges" element={<RangesPage />} />
         <Route path="/coach" element={<CoachPage />} />
         <Route path="/settings" element={<SettingsPage />} />

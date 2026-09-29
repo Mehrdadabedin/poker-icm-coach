@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { clearAuth, createTournament, getToken, getUsername, logout, me } from "../services/api";
+import { getSelectedProfile } from "../models/botProfiles";
 import { Copyright } from "../components/Copyright";
 import { BrandLogo } from "../components/BrandLogo";
 import { LoginForm } from "../components/LoginForm";
@@ -41,7 +42,8 @@ export function HomePage() {
   const startPractice = async () => {
     setStarting(true);
     try {
-      const state = await createTournament(10); // fast mode for practice
+      const profile = getSelectedProfile();
+      const state = await createTournament(10, profile?.backend); // fast mode for practice
       navigate(`/table/${state.tableId}`);
     } catch {
       setStarting(false);
@@ -83,7 +85,7 @@ export function HomePage() {
         <button className="btn btn-primary" onClick={startPractice} disabled={starting} data-testid="start-practice">
           {starting ? "STARTING…" : "START PRACTICE"}
         </button>
-        <button className="btn" onClick={() => navigate("/training")}>TRAINING</button>
+        <button className="btn" onClick={() => navigate("/bot-profiles")} data-testid="menu-bot-profiles">BOT PROFILES</button>
         <button className="btn" onClick={() => navigate("/ranges")}>RANGES</button>
         <button className="btn" onClick={() => navigate("/coach")}>ICM COACH</button>
         <button className="btn" onClick={() => navigate("/settings")}>TOURNAMENT SETTINGS</button>

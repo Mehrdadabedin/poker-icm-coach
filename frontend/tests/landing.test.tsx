@@ -124,10 +124,11 @@ describe("public landing page", () => {
     expect(screen.queryByTestId("password-input")).toBeNull();
   });
 
-  it("keeps the existing NEXORA footer", async () => {
+  it("keeps the author copyright footer", async () => {
     await openLanding();
     const footer = screen.getByTestId("app-footer");
-    expect(footer).toHaveTextContent("NEXORA");
+    expect(footer).toHaveTextContent("© 2026 — Created by Mehrdad Abedin");
+    expect(footer).not.toHaveTextContent("NEXORA");
     expect(footer).toHaveTextContent("Created by Mehrdad Abedin");
     // A23: the version was removed from the copyright line
     expect(footer).not.toHaveTextContent("v0.");
