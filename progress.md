@@ -1685,3 +1685,68 @@ provider's personality selection became per-seat when a lineup is supplied.
 
 git status: A27 changes are uncommitted (not staged). atomic_plan.md A27 and
 this progress entry are part of the working-tree changes. Nothing pushed.
+
+
+## A28 - Display BOT profile names at the poker table (2026-09-29)
+
+Branch: FIX-POKERTABLE-LAYOUT-TEST (HEAD 5ddbf66, A27 committed+pushed).
+Starting status: modified frontend/tsconfig.tsbuildinfo; untracked docs/design/,
+docs/webmcp.md, icmbot-hero*.png, webmcp.test.ts, logo.png (pre-existing).
+Files inspected: backend/app/tournament/tournament.py (build_default_tournament
+names bots "Bot N"), backend/app/services/game_session.py (session init),
+backend/app/ai/personalities.py (archetypes), backend/app/services/
+game_state_view.py (state exposes player.name), frontend/src/components/
+PokerSeat.tsx (renders player.name), tests/table.test.tsx (PokerTable renders
+seat names from state).
+Plan: backend display-name mapping + per-profile numbering; apply to BOT seats
+only when a lineup/profile is given; random mode unchanged; tests; tsc; build.
+
+
+### A28 implementation results (2026-09-29)
+
+Files changed (working tree, uncommitted):
+- backend/app/ai/personalities.py — PROFILE_DISPLAY_NAMES (tag->Alex, lag->Sarah,
+  tight_passive->David, loose_passive->Emma) + display_bot_names() numbering
+  per profile occurrence (Alex 1, Alex 2, ...).
+- backend/app/services/game_session.py — when a custom lineup (bot_profiles) or
+  single profile (bot_profile) is supplied, the 8 BOT seats get the profile
+  display names; random mode (no lineup/profile) leaves "Bot N" unchanged.
+  File kept at exactly 200 lines.
+- backend/tests/test_bot_profiles.py — +5 A28 tests (per-occurrence numbering,
+  repeats, identity uniqueness, no-lineup fallback, single-profile case).
+- frontend/tests/table.test.tsx — +1 PokerTable test rendering profile names.
+- prime-agent-spec/atomic_plan.md (A28), progress.md (this entry).
+
+Display-name implementation: cosmetic rename at session creation, only for
+custom lineups/profile. Per-profile counters (not seat numbers). Player/seat/
+session IDs, hand-history identity and all engine logic unchanged; the human
+seat keeps the authenticated username.
+
+Tests: frontend full suite 118 passed / 18 files; backend full suite
+541 passed, 3 failed (pre-existing 200-line audit on untouched files), 4
+skipped; tsc clean; production build PASSED. Visual (real browser, API-stub):
+seat names render Alice / Alex 1..2 / Sarah 1 / David 1..3 / Emma 1..2 at
+1440x900; no seat-layout change needed.
+
+
+## A29 - Integrate BOT profile portrait images (2026-09-29)
+
+Branch: FIX-POKERTABLE-LAYOUT-TEST (HEAD 5ddbf66).
+Assets: the four 430x430 portraits are at docs/design/ and were copied into the
+app location frontend/public/images/bot-profiles/ (docs/design untouched).
+Plan: replace the initials/avatar circles in BotProfilesPage with the portrait
+images, keep colored identity + all existing card controls, update the focused
+test, verify desktop/mobile.
+
+
+### A29 implementation results (2026-09-29)
+- The four 430x430 portraits (docs/design/*.png) were copied into the app
+  location frontend/public/images/bot-profiles/ (docs/design untouched).
+- BotProfilesPage avatar: initials circle replaced with <img class=bot-portrait>
+  (object-fit cover, round avatar with 3px coloured ring per profile: green/blue/
+  purple/red). botProfiles.ts BotAvatar {portrait, color}; paths updated.
+- Focused test: builder cards render the four portrait srcs. Tables/landing/
+  footer tests unchanged.
+- Validation: frontend 119/119 (18 files), tsc clean, build PASSED (portraits
+  in dist), backend test_bot_profiles green. Visual desktop 1440 + mobile 390:
+  all four portraits load (430px), no horizontal overflow.

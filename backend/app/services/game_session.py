@@ -19,16 +19,14 @@ from app.strategy.coach import Coach, CoachRequest
 from app.tournament.tournament import build_default_tournament
 from app.tournament.tournament_timer import TournamentTimer
 
-
 class GameSession:
     """Owns one tournament table; drives bots; exposes safe state snapshots.
 
-    Every public entry point holds `_lock`. REST handlers and the table
-    WebSocket both reach one session from threadpool threads, so without it
-    two callers pass the same guard and act on the table twice — two
-    concurrent next_hand() calls used to deal a second hand over the first,
-    losing chips. The lock is reentrant because grade_hero() calls
-    coach_advice(); the private helpers only ever run under a public method.
+    Every public entry point holds `_lock`; REST handlers and the table
+    WebSocket reach one session from threadpool threads. Without it two callers
+    pass the same guard and act twice — concurrent next_hand() calls dealt a
+    second hand over the first, losing chips. The lock is reentrant because
+    grade_hero() calls coach_advice(); helpers only run under public methods.
     """
 
     def __init__(self, session_id: str | None = None, fast_mode: float = 1.0,
@@ -60,11 +58,15 @@ class GameSession:
         if bot_profile is not None:
             from app.ai.personalities import profile_for
             self.provider.personality = profile_for(bot_profile)
-        # A27: per-seat BOT lineup (seat 1..8 each get their own personality).
         self.bot_profiles = bot_profiles
         if bot_profiles is not None:
             from app.ai.personalities import personalities_for_seats
             self.provider.seat_personalities = personalities_for_seats(bot_profiles)
+        lineup = bot_profiles or ([bot_profile] * 8 if bot_profile else None)
+        if lineup:
+            from app.ai.personalities import display_bot_names
+            for seat, disp in enumerate(display_bot_names(lineup), start=1):
+                self.tournament.players[seat].name = disp
         self.engine: HandEngine | None = None
         self.timer: TournamentTimer | None = None
         self.fast_mode = fast_mode
@@ -72,12 +74,10 @@ class GameSession:
         self.coach = Coach()
         self.coach_mode = "advanced"
         self._last_hero_action: str | None = None
-        # Store the hero's pre-action decision point as the request (rebuilding
-        # after grading would score a different spot; recommending runs equity).
+        # Keep the request so grading scores the spot the hero actually faced.
         self._last_hero_request: CoachRequest | None = None
         self._lock = threading.RLock()
-        self._history_file = hand_history.HistoryFileStore(
-            self.history_dir, self.session_id)
+        self._history_file = hand_history.HistoryFileStore(self.history_dir, self.session_id)
 
     def start(self) -> None:
         with self._lock:
@@ -148,7 +148,7 @@ class GameSession:
             self.last_seen = time.time()  # an engaged table is never abandoned
             self.timer.tick()  # advance expired blind levels / breaks on every view
             if self.engine.is_complete and not self.timer.running:
-                self.timer.resume()  # the level clock runs through the result screen
+                self.timer.resume()  # level clock runs through the result screen
             return build_state_view(self)
 
     def coach_advice(self) -> dict:

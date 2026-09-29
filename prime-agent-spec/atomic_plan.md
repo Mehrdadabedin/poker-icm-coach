@@ -586,5 +586,55 @@ provider (no engine/rule changes).
 Deployment: branch FIX-POKERTABLE-LAYOUT-TEST only; not committed, not pushed.
 
 ---
+
+## A28 — Display BOT profile names at the poker table (IN PROGRESS — this task)
+
+When a custom BOT lineup/profile is supplied, the visible BOT names become the
+profile's human name with a per-profile occurrence number (Alex 1, Alex 2,
+Sarah 1, David 1..3, Emma 1..2), instead of "Bot N". Random mode (no
+lineup/profile) keeps "Bot N" exactly. Cosmetic only: player/seat/session IDs,
+hand-history identity and all engine logic are unchanged.
+
+Steps:
+- A28.1 Inspect A27 lineup -> player construction and seat name rendering.
+- A28.2 Add display-name mapping + per-profile numbering helper (backend).
+- A28.3 Apply display names to the 8 BOT seats when a lineup/profile is given
+  (random mode untouched).
+- A28.4 Add backend naming tests (repeat profiles, mixed lineup, no-lineup
+  fallback, single-profile case, identity uniqueness).
+- A28.5 Add a table display test for the profile names.
+- A28.6 Run frontend + backend tests, tsc, production build.
+- A28.7 Visual check of a lineup table (names fit existing seats).
+
+Strict exclusions (unchanged): dealing, betting, fold/call/check/raise, all-in,
+pot, player rotation, Button/SB/BB, blinds, tournament progression, ICM, timers,
+pause/play, hand history, review, authentication, session/table/player IDs,
+layout. Default random path unchanged.
+
+---
+
+## A29 — Integrate BOT profile portrait images (IN PROGRESS — this task)
+
+Use the four finished portrait assets (frontend/public/images/bot-profiles/
+alex.png, sarah.png, david.png, emma.png) as the avatars in the BOT PROFILES
+cards, replacing the initials circles. Keep names, styles, descriptions,
+counters, summary, ADD BOTS TO TABLE and BACK; preserve each profile's colored
+identity (green/blue/purple/red). Cosmetic only.
+
+Steps:
+- A29.1 Inspect the A27 BOT PROFILES card rendering.
+- A29.2 Ensure the four portraits are served from frontend/public/images/
+  bot-profiles/ .
+- A29.3 Render the portrait image in each card (consistent circular
+  presentation, coloured border/background retained).
+- A29.4 Update the focused frontend test to assert the portrait src.
+- A29.5 Run frontend tests, tsc, build; relevant backend subset.
+- A29.6 Visual check desktop + mobile (no horizontal overflow).
+
+Strict exclusions: poker engine, player/seat/session IDs, authentication,
+tournament/betting/ICM/timers/hand history, A28 display names, table behavior.
+Images are used as-is (not regenerated or edited).
+
+---
 NOTE: Google authentication, Facebook authentication, and Google/Facebook OAuth
 are intentionally OUT OF SCOPE and must not be added to this plan or the app.

@@ -8,9 +8,9 @@
  */
 
 export interface BotAvatar {
-  /** Two-letter initials shown inside the avatar circle. */
-  initials: string;
-  /** Distinct background colour per profile (kept small and generic). */
+  /** Portrait image path served from /images/bot-profiles/. */
+  portrait: string;
+  /** Distinct identity colour per profile (used for the avatar ring). */
   color: string;
 }
 
@@ -30,7 +30,7 @@ export const BOT_PROFILES: BotProfile[] = [
     name: "Alex",
     style: "Tight-Aggressive",
     description: "Plays few hands but bets and raises them hard. A sharp, pressure-applying opponent.",
-    avatar: { initials: "AX", color: "#2e7d32" },
+    avatar: { portrait: "/images/bot-profiles/alex.png", color: "#2e7d32" },
     backend: "tag",
   },
   {
@@ -38,7 +38,7 @@ export const BOT_PROFILES: BotProfile[] = [
     name: "Sarah",
     style: "Loose-Aggressive",
     description: "Involves herself in many pots and keeps the pressure on with frequent aggression.",
-    avatar: { initials: "SA", color: "#086aec" },
+    avatar: { portrait: "/images/bot-profiles/sarah.png", color: "#086aec" },
     backend: "lag",
   },
   {
@@ -46,7 +46,7 @@ export const BOT_PROFILES: BotProfile[] = [
     name: "David",
     style: "Tight-Passive",
     description: "Very selective with hands, rarely raises, and calls rather than betting out.",
-    avatar: { initials: "DV", color: "#7b1fa2" },
+    avatar: { portrait: "/images/bot-profiles/david.png", color: "#7b1fa2" },
     backend: "tight_passive",
   },
   {
@@ -54,7 +54,7 @@ export const BOT_PROFILES: BotProfile[] = [
     name: "Emma",
     style: "Loose-Passive",
     description: "Loves to see flops and mostly calls; lets others take the lead in betting.",
-    avatar: { initials: "EM", color: "#c62828" },
+    avatar: { portrait: "/images/bot-profiles/emma.png", color: "#c62828" },
     backend: "loose_passive",
   },
 ];

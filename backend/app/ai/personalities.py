@@ -112,3 +112,28 @@ def personalities_for_seats(bot_names: list[str]) -> dict[int, PersonalityProfil
         seat: replace(profile_for(name), results=list(profile_for(name).results))
         for seat, name in enumerate(bot_names, start=1)
     }
+
+
+# A28: human-style display names for the four BOT profiles. Anything not listed
+# falls back to the archetype name itself.
+PROFILE_DISPLAY_NAMES: dict[str, str] = {
+    "tag": "Alex",
+    "lag": "Sarah",
+    "tight_passive": "David",
+    "loose_passive": "Emma",
+}
+
+
+def display_bot_names(bot_names: list[str]) -> list[str]:
+    """Profile display names numbered per profile occurrence.
+
+    ["tag", "tag"] -> ["Alex 1", "Alex 2"]; a mixed lineup numbers each
+    profile separately (Alex 1, David 1, Alex 2, ...).
+    """
+    seen: dict[str, int] = {}
+    names: list[str] = []
+    for backend in bot_names:
+        seen[backend] = seen.get(backend, 0) + 1
+        base = PROFILE_DISPLAY_NAMES.get(backend, backend)
+        names.append(f"{base} {seen[backend]}")
+    return names

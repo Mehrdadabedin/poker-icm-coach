@@ -82,10 +82,14 @@ export function BotProfilesPage() {
             <div key={profile.id} className="bot-profile-card" data-testid={`bot-profile-${profile.id}`}>
               <span
                 className="bot-avatar"
-                style={{ backgroundColor: profile.avatar.color }}
-                aria-hidden="true"
+                style={{ backgroundColor: profile.avatar.color, borderColor: profile.avatar.color }}
               >
-                {profile.avatar.initials}
+                <img
+                  className="bot-portrait"
+                  src={profile.avatar.portrait}
+                  alt={profile.name}
+                  draggable={false}
+                />
               </span>
               <b className="bot-profile-name">{profile.name}</b>
               <span className="bot-profile-style">{profile.style}</span>

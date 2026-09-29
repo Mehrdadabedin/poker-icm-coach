@@ -1,10 +1,4 @@
-"""A26: BOT profile wiring at tournament creation.
-
-The optional `profile` field on POST /api/tournament must reach the AI
-provider's personality, and unknown profile names must fail cleanly. The
-default (no profile) keeps the existing adaptive personality so prior
-behaviour is unchanged.
-"""
+"""A26/A27/A28: BOT profile wiring, lineups and display names at creation."""
 from __future__ import annotations
 
 from app.ai.personalities import profile_for
@@ -143,3 +137,61 @@ def test_decide_uses_the_seat_specific_personality() -> None:
     provider.decide(SimpleNamespace(seat=5, legal_actions=[check],
                                     stack=0, current_bet=0, contribution=0))
     assert seen["name"] == "balanced"
+
+
+# ---------------- A28: profile display names at the table ----------------
+
+def _bot_names(client) -> list[str]:
+    session = session_store.get(client.post(
+        "/api/tournament", json={"players": 9, "ante_mode": "bba",
+                                 "fast_mode": 1.0}).json()["tableId"])
+    assert session is not None
+    return [p.name for p in session.tournament.players]
+
+
+def _create(client, extra: dict) -> tuple[list[str], list[str]]:
+    r = client.post("/api/tournament",
+                    json={"players": 9, "ante_mode": "bba", "fast_mode": 1.0,
+                          **extra})
+    assert r.status_code == 200, r.text
+    session = session_store.get(r.json()["tableId"])
+    assert session is not None
+    return ([p.name for p in session.tournament.players][1:],
+            session.owner)
+
+
+def test_lineup_names_number_per_profile_occurrence() -> None:
+    lineup = ["tag", "tight_passive", "tag", "loose_passive",
+              "lag", "tight_passive", "tight_passive", "loose_passive"]
+    names, owner = _create(login_client("NamesLineup"), {"bots": lineup})
+    assert [owner, *names] == ["NamesLineup", "Alex 1", "David 1", "Alex 2",
+                               "Emma 1", "Sarah 1", "David 2", "David 3",
+                               "Emma 2"]
+
+
+def test_repeat_same_profile_names_are_numbered() -> None:
+    names, _ = _create(login_client("NamesRepeat"), {"bots": ["tag"] * 8})
+    assert names == [f"Alex {i}" for i in range(1, 9)]
+
+
+def test_lineup_identity_stays_unique() -> None:
+    lineup = ["tag", "tag", "lag", "tight_passive", "tight_passive",
+              "tight_passive", "loose_passive", "loose_passive"]
+    r = login_client("NamesIdentity").post(
+        "/api/tournament", json={"players": 9, "ante_mode": "bba",
+                                 "fast_mode": 1.0, "bots": lineup})
+    bots = session_store.get(r.json()["tableId"]).tournament.players[1:]
+    assert [p.seat for p in bots] == list(range(1, 9))
+    assert len({id(p) for p in bots}) == 8
+    assert len({(p.seat, p.name) for p in bots}) == 8
+
+
+def test_no_lineup_keeps_bot_names() -> None:
+    names = _bot_names(login_client("NamesDefault"))
+    assert names[0] == "NamesDefault"
+    assert names[1:] == [f"Bot {i}" for i in range(1, 9)]
+
+
+def test_single_profile_names_all_bots() -> None:
+    names, _ = _create(login_client("NamesSingle"), {"profile": "tag"})
+    assert names == [f"Alex {i}" for i in range(1, 9)]

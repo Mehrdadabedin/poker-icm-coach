@@ -126,6 +126,22 @@ describe("lineup builder (A27)", () => {
     expect(screen.getByTestId("table-stub")).toBeInTheDocument();
     expect(JSON.parse(localStorage.getItem("icm_bot_lineup") ?? "[]")).toHaveLength(8);
   });
+
+  it("shows the portrait image for every profile", async () => {
+    await loadChoice();
+    await click("opponents-choose");
+    const expected = {
+      alex: "/images/bot-profiles/alex.png",
+      sarah: "/images/bot-profiles/sarah.png",
+      david: "/images/bot-profiles/david.png",
+      emma: "/images/bot-profiles/emma.png",
+    };
+    for (const [id, src] of Object.entries(expected)) {
+      const img = screen.getByTestId(`bot-profile-${id}`).querySelector("img");
+      expect(img).not.toBeNull();
+      expect((img as HTMLImageElement).getAttribute("src")).toBe(src);
+    }
+  });
   it("BACK returns to the previous screen", async () => {
     await loadChoice();
     await click("opponents-choose");

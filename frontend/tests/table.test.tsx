@@ -49,6 +49,18 @@ describe("PokerTable", () => {
   });
 });
 
+
+  it("renders profile-based BOT display names", () => {
+    const names = ["Alex 1", "Alex 2", "Sarah 1", "David 1", "David 2", "David 3", "Emma 1", "Emma 2"];
+    const state = sampleTableState();
+    state.players = state.players.map((p, i) => (i === 0 ? p : { ...p, name: names[i - 1] }));
+    render(<PokerTable state={state} />);
+    for (const name of names) {
+      expect(screen.getByText(name)).toBeInTheDocument();
+    }
+    expect(screen.getByText("Alice")).toBeInTheDocument(); // human seat unchanged
+  });
+
 describe("TablePage", () => {
   it("renders the screen with title (API mock)", async () => {
     vi.mock("../src/services/api", async (importOriginal) => ({
