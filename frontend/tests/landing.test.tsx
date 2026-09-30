@@ -40,7 +40,15 @@ async function openLanding() {
 }
 
 describe("public landing page", () => {
-  beforeEach(() => localStorage.clear());
+  beforeEach(() => {
+    localStorage.clear();
+    // jsdom has no media engine: give play() a conforming promise so the
+    // landing video overlay behaves like a real browser (play fires 'play').
+    vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
+      this.dispatchEvent(new Event("play"));
+      return Promise.resolve();
+    });
+  });
 
   it("renders the brand, hero, demo slot, features and final CTA", async () => {
     await openLanding();
@@ -59,22 +67,46 @@ describe("public landing page", () => {
     );
   });
 
-  it("plays the bundled demo clip with plain HTML5 controls", async () => {
+  it("plays the BOT PROFILES demo clip with the ICMBOT poster overlay", async () => {
     await openLanding();
     const player = screen.getByTestId("landing-video-player");
     expect(player.tagName).toBe("VIDEO");
     expect(player).toHaveAttribute("controls");
     expect(player).toHaveAttribute("preload", "metadata");
-    expect(player).toHaveAttribute("poster", "/videos/ICMBOT_poster.png");
+    expect(player).toHaveAttribute("poster", "/videos/ICMBOT_video_poster.png");
     expect(player).not.toHaveAttribute("autoplay");
     expect(player).not.toHaveAttribute("loop");
     expect(player.querySelector("source")).toHaveAttribute(
       "src",
-      "/videos/ICMBOT_demo_narrated.mp4",
+      "/videos/ICM_BOT_demo_bot_profiles_narrated.mp4",
     );
     // no placeholder artwork and no external host is left behind
     expect(screen.queryByText(/coming soon/i)).toBeNull();
     expect(player.outerHTML).not.toMatch(/youtube|vimeo|http/i);
+
+    // The poster overlay uses the new poster and is visible before playback.
+    const overlay = screen.getByTestId("landing-video-poster");
+    expect(overlay.querySelector("img")).toHaveAttribute(
+      "src",
+      "/videos/ICMBOT_video_poster.png",
+    );
+
+    // Clicking the overlay starts playback and hides the poster.
+    fireEvent.click(overlay);
+    expect(screen.queryByTestId("landing-video-poster")).toBeNull();
+
+    // Pausing shows the poster again and keeps the playback position.
+    fireEvent.pause(player);
+    expect(screen.getByTestId("landing-video-poster")).toBeInTheDocument();
+    expect(player).toHaveProperty("currentTime", 0); // jsdom cannot advance time
+
+    // Clicking the poster resumes playback and hides it again.
+    fireEvent.click(screen.getByTestId("landing-video-poster"));
+    expect(screen.queryByTestId("landing-video-poster")).toBeNull();
+
+    // The clip ending brings the poster back.
+    fireEvent.ended(player);
+    expect(screen.getByTestId("landing-video-poster")).toBeInTheDocument();
   });
 
   it("renders a clean header with brand and nav, and the hero visual", async () => {

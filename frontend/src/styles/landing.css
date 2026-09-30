@@ -127,6 +127,21 @@
    narrated clip is 16:9, so it fills the slot exactly. */
 .lp-video-el { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
 
+/* A17 poster overlay: sits above the video but leaves the native control
+   strip reachable, so pausing shows the brand frame without blocking the
+   player controls. Covers the video itself; clicking resumes playback. */
+.lp-video-poster {
+  position: absolute; left: 0; right: 0; top: 0; bottom: 48px;
+  width: 100%; border: 0; padding: 0; background: #000;
+  cursor: pointer; z-index: 2;
+}
+.lp-video-poster img {
+  /* cover: the poster artwork is centered with wide margins, so the slight
+     vertical crop from excluding the native control strip never clips the
+     ICM BOT branding. */
+  display: block; width: 100%; height: 100%; object-fit: cover;
+}
+
 .lp-video-placeholder {
   position: absolute; inset: 0;
   display: flex; flex-direction: column; align-items: center; justify-content: center;

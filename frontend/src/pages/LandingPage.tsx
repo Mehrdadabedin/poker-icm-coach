@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { BrandLogo } from "../components/BrandLogo";
 import { Copyright } from "../components/Copyright";
@@ -12,15 +13,14 @@ import { Copyright } from "../components/Copyright";
  * to registration. The sign-in component, the poker table and the app menu are
  * untouched.
  *
- * The demo block (A17) holds the bundled narrated ICMBOT demo clip from
- * `frontend/public/videos/ICMBOT_demo_narrated.mp4`, served as a static asset at
- * `/videos/ICMBOT_demo_narrated.mp4`. It is a plain HTML5 player: no autoplay, no
- * loop, no external host. The clip itself is untouched and its first frame is
- * white, so `poster` paints the dark ICMBOT brand frame (the logo over the
- * clip's dark background) until the user starts playback. The 16:9 container is
- * unchanged and the narrated clip is 1920x1080, so it fills the slot exactly;
- * `.lp-video-el` uses contain, which keeps any clip's own aspect ratio instead
- * of cropping or stretching it.
+ * The demo block (A17) holds the bundled narrated BOT PROFILES demo clip
+ * (`frontend/public/videos/ICM_BOT_demo_bot_profiles_narrated.mp4`, served at
+ * `/videos/ICM_BOT_demo_bot_profiles_narrated.mp4`). It is a plain HTML5
+ * player: no autoplay, no loop, no external host. The clip opens with the
+ * ICMBOT poster frame, and a poster overlay shows the same artwork before
+ * first play, on pause (without seeking), and after the clip ends, so the
+ * brand frame stays visible whenever playback is not running. The 16:9
+ * container and `.lp-video-el` contain sizing are unchanged.
  */
 
 const FEATURES = [
@@ -36,6 +36,22 @@ function watchDemo() {
 }
 
 export function LandingPage() {
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [showPoster, setShowPoster] = useState(true);
+
+  // Poster overlay: visible before first play, on pause (position preserved),
+  // and after the clip ends. Clicking it starts or resumes playback; the
+  // native controls stay reachable below it.
+  const startPlayback = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    setShowPoster(false);
+    const started = video.play();
+    if (started && typeof started.catch === "function") {
+      started.catch(() => setShowPoster(true));
+    }
+  };
+
   return (
     <div className="page landing-page" data-testid="landing-page">
       <header className="lp-header">
@@ -99,10 +115,25 @@ export function LandingPage() {
                 controls
                 preload="metadata"
                 playsInline
-                poster="/videos/ICMBOT_poster.png"
+                poster="/videos/ICMBOT_video_poster.png"
+                ref={videoRef}
+                onPlay={() => setShowPoster(false)}
+                onPause={() => setShowPoster(true)}
+                onEnded={() => setShowPoster(true)}
               >
-                <source src="/videos/ICMBOT_demo_narrated.mp4" type="video/mp4" />
+                <source src="/videos/ICM_BOT_demo_bot_profiles_narrated.mp4" type="video/mp4" />
               </video>
+              {showPoster && (
+                <button
+                  type="button"
+                  className="lp-video-poster"
+                  data-testid="landing-video-poster"
+                  aria-label="Play ICM BOT demo video"
+                  onClick={startPlayback}
+                >
+                  <img src="/videos/ICMBOT_video_poster.png" alt="" draggable={false} />
+                </button>
+              )}
             </div>
           </div>
         </section>
