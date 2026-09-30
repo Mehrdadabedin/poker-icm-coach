@@ -59,6 +59,7 @@ detected with the standard `min-aspect-ratio` media query.
   .table-felt .board {
     position: static; order: -1; flex: 0 0 100%;
     margin: 0 0 2px; justify-content: center;
+    transform: none;
   }
   .table-felt .board .playing-card { width: 32px; }
 
