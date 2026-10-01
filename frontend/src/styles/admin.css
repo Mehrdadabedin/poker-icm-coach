@@ -164,3 +164,35 @@
   border: 1px solid rgba(46, 125, 50, 0.5);
   color: #a5d6a7;
 }
+.admin-change-notice {
+  margin: 14px 0;
+  padding: 12px;
+  background: rgba(242, 193, 78, 0.1);
+  border: 1px solid rgba(242, 193, 78, 0.4);
+  border-radius: 10px;
+  color: var(--accent);
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.admin-change-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.admin-change-field input {
+  min-height: 42px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #0f1318;
+  color: var(--text);
+}
+
+.admin-change-error {
+  color: #ffd7d7;
+  font-size: 0.8rem;
+}

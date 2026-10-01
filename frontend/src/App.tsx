@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { HashRouter, Route, Routes } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import { AdminChangePasswordPage } from "./pages/AdminChangePasswordPage";
 import { AdminPage } from "./pages/AdminPage";
 import { HomePage } from "./pages/HomePage";
 import { LandingPage } from "./pages/LandingPage";
@@ -45,6 +46,7 @@ export function App() {
       <Routes>
         <Route path="/" element={<EntryPage />} />
         <Route path="/login" element={<HomePage />} />
+        <Route path="/change-password" element={<AdminChangePasswordPage />} />
         <Route path="/admin/:section?" element={<AdminPage />} />
         <Route path="/table/:tableId" element={<TablePage />} />
         <Route path="/auth/callback" element={<AuthCallbackPage />} />

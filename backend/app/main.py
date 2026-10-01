@@ -1,6 +1,8 @@
 """FastAPI application entry point with REST + WebSocket."""
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.concurrency import run_in_threadpool
@@ -15,10 +17,21 @@ from app.core.config import settings
 from app.core.version import app_version
 from app.services.auth import auth_store
 from app.services.session_store import session_store
+from app.services.user_registry_admin import bootstrap_admin
 
 VERSION = app_version()
 
-app = FastAPI(title="ICM Master API", version=VERSION)
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    """Startup: create the initial Admin account once (idempotent), so no
+    manual users.json edit or env admin identity is required for the demo.
+    Tests use TestClient without lifespan, so this never writes in-test."""
+    bootstrap_admin()
+    yield
+
+
+app = FastAPI(title="ICM Master API", version=VERSION, lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origin_list,

@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     # Initial Admin identities (A01): comma-separated usernames granted
     # Admin level on this deployment. Usernames only; no secrets.
     admin_usernames: str = ""
+    # Bootstrap password for the initial Admin account (created once, hashed,
+    # forced to change on first login). Override per deployment; never logged.
+    admin_bootstrap_password: str = "admin1234"
 
     # Google sign-in. Only read from the environment; never logged or returned.
     # Both values are required before the provider is advertised as available.

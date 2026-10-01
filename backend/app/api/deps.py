@@ -39,4 +39,6 @@ def require_admin(authorization: str = Header(default="")) -> str:
     user = require_user(authorization)
     if not auth_registry.is_admin(user):
         raise HTTPException(status_code=403, detail="admin access required")
+    if auth_registry.requires_password_change(user):
+        raise HTTPException(status_code=403, detail="admin password change required")
     return user

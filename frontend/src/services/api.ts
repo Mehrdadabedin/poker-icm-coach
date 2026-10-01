@@ -69,13 +69,23 @@ export function register(
   );
 }
 
-export function login(
-  username: string,
-  password: string,
-): Promise<{ token: string; username: string }> {
-  return authRequest<{ token: string; username: string }>("/api/auth/login", {
-    username,
-    password,
+export interface LoginResult {
+  token: string;
+  username: string;
+  /** Server-computed account flags (Admin correction): never a client claim. */
+  admin?: boolean;
+  must_change_password?: boolean;
+}
+
+export function login(username: string, password: string): Promise<LoginResult> {
+  return authRequest<LoginResult>("/api/auth/login", { username, password });
+}
+
+/** Force-change the bootstrap Admin password on first login (authenticated). */
+export function changePassword(newPassword: string): Promise<{ changed: boolean }> {
+  return request<{ changed: boolean }>("/api/auth/change-password", {
+    method: "POST",
+    body: JSON.stringify({ new_password: newPassword }),
   });
 }
 
@@ -87,11 +97,7 @@ export function me(): Promise<{ username: string }> {
   return request<{ username: string }>("/api/auth/me");
 }
 
-export interface AuthProviders {
-  google: boolean;
-  apple: boolean;
-  phone: boolean;
-}
+export interface AuthProviders { google: boolean; apple: boolean; phone: boolean; }
 
 /** Third-party sign-in providers the backend has configured (public). */
 export function getAuthProviders(): Promise<AuthProviders> {
@@ -105,8 +111,7 @@ export function googleSignInUrl(): string {
 }
 
 export function createTournament(fastMode = 10, profile?: string, bots?: string[]): Promise<TableState> {
-  // Stack/blinds/duration come from runtime tournament settings; an optional
-  // BOT profile or explicit lineup (A26/A27) is forwarded to the backend.
+  // Stack/blinds/duration from runtime settings; optional BOT lineup (A26/A27).
   return request<TableState>("/api/tournament", {
     method: "POST",
     body: JSON.stringify({
@@ -156,7 +161,7 @@ export function coachCompare(tableId: string) {
 }
 
 export function rangeGrid(position: string, stackBb: number) {
-  // "UTG+1" must be encoded: a raw + in a query string decodes to a space.
+  // "UTG+1" must be encoded: a raw + in a query decodes to a space.
   return request<{ position: string; stack_bb: number; grid: string[][] }>(
     `/api/ranges?position=${encodeURIComponent(position)}&stack_bb=${stackBb}`,
   );
@@ -171,27 +176,15 @@ export function health(): Promise<Health> {
   return request<Health>("/api/health");
 }
 
-export interface AdminSummary {
-  total_registered_accounts: number;
-  local_accounts: number;
-  google_accounts: number;
-}
+export interface AdminSummary { total_registered_accounts: number; local_accounts: number; google_accounts: number; }
 
 /** Admin-only metrics (A03): doubles as the Admin page's access probe. */
 export function adminSummary(): Promise<AdminSummary> {
   return request<AdminSummary>("/api/admin/users/summary");
 }
-export interface AdminUserRow {
-  username: string;
-  provider: string; // "local" | "google"
-}
+export interface AdminUserRow { username: string; provider: string; } // "local" | "google"
 
-export interface AdminUsersResponse {
-  users: AdminUserRow[];
-  total: number;
-  limit: number;
-  offset: number;
-}
+export interface AdminUsersResponse { users: AdminUserRow[]; total: number; limit: number; offset: number; }
 
 /** Admin-only safe user list (A03), bounded by the backend's max page size. */
 export function adminUsers(limit = 200, offset = 0): Promise<AdminUsersResponse> {

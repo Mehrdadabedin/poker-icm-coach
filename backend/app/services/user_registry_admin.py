@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from app.core.config import settings
 from app.services.user_registry import UserRegistry, auth_registry
 
 LOCAL = "local"
@@ -33,6 +34,26 @@ def _provider_name(provider: str | None) -> str:
 
 def _snapshot(registry: UserRegistry | None) -> list[tuple[str, str | None]]:
     return list((registry or auth_registry).account_snapshot())
+
+
+ADMIN_USERNAME = "Admin"
+
+
+def bootstrap_admin(
+    registry: UserRegistry | None = None,
+    bootstrap_password: str | None = None,
+) -> bool:
+    """Create the initial Admin account once (deterministic, idempotent).
+
+    Runs at application startup. The bootstrap password is hashed with the
+    app's PBKDF2 scheme and the account is forced to change it on first
+    login; the plaintext password is never stored, returned or logged.
+    """
+    reg = registry or auth_registry
+    password = (
+        bootstrap_password if bootstrap_password is not None else settings.admin_bootstrap_password
+    )
+    return reg.bootstrap_admin(password)
 
 
 def total_registered_accounts(registry: UserRegistry | None = None) -> int:

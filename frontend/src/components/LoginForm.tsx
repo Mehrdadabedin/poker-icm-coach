@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   getAuthProviders,
   getUsername,
@@ -22,6 +23,7 @@ const MIN_PASSWORD_LENGTH = 8;
 /** Credential sign-in first, with the provider pills on top and sign-up behind
  * "Don't have an account? Sign up". */
 export function LoginForm({ onLogin }: LoginFormProps) {
+  const navigate = useNavigate();
   const [mode, setMode] = useState<AuthMode>("signin");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -89,6 +91,16 @@ export function LoginForm({ onLogin }: LoginFormProps) {
       } else {
         const auth = await login(name, password);
         saveAuth(auth.token, auth.username);
+        // Backend-declared account level (Admin correction): the backend
+        // decides Admin and forced-change state; the client only routes.
+        if (auth.must_change_password) {
+          navigate("/change-password");
+          return;
+        }
+        if (auth.admin) {
+          navigate("/admin");
+          return;
+        }
         onLogin(auth.username);
       }
     } catch (e) {
