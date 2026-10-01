@@ -22,6 +22,9 @@ class Settings(BaseSettings):
     history_dir: str = "data/history"
     auth_users_file: str = "data/users.json"
     auth_sessions_file: str = "data/sessions.json"
+    # Initial Admin identities (A01): comma-separated usernames granted
+    # Admin level on this deployment. Usernames only; no secrets.
+    admin_usernames: str = ""
 
     # Google sign-in. Only read from the environment; never logged or returned.
     # Both values are required before the provider is advertised as available.

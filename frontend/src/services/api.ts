@@ -93,25 +93,20 @@ export interface AuthProviders {
   phone: boolean;
 }
 
-/** Which third-party sign-in providers the backend has configured.
- * Public endpoint: it only reports availability, it never returns secrets. */
+/** Third-party sign-in providers the backend has configured (public). */
 export function getAuthProviders(): Promise<AuthProviders> {
   return request<AuthProviders>("/api/auth/providers");
 }
 
-/** URL that starts the server-side Google OAuth flow. The backend validates
- * the callback origin against its CORS allowlist and returns the browser here
- * with the session token. */
+/** URL to start the server-side Google OAuth flow (origin-validated). */
 export function googleSignInUrl(): string {
   const redirect = `${window.location.origin}/#/auth/callback`;
   return `${API_BASE}/api/auth/google/start?redirect_uri=${encodeURIComponent(redirect)}`;
 }
 
 export function createTournament(fastMode = 10, profile?: string, bots?: string[]): Promise<TableState> {
-  // Stack/blinds/duration come from the runtime tournament settings
-  // (editable on the Tournament Settings screen); fast mode may be passed.
-  // A26/A27: an optional BOT profile (legacy single) or an explicit lineup
-  // (per-seat personalities) is forwarded to the backend.
+  // Stack/blinds/duration come from runtime tournament settings; an optional
+  // BOT profile or explicit lineup (A26/A27) is forwarded to the backend.
   return request<TableState>("/api/tournament", {
     method: "POST",
     body: JSON.stringify({
@@ -172,7 +167,33 @@ export interface Health {
   version: string;
 }
 
-/** Liveness plus the running backend version, the app's only version source. */
 export function health(): Promise<Health> {
   return request<Health>("/api/health");
+}
+
+export interface AdminSummary {
+  total_registered_accounts: number;
+  local_accounts: number;
+  google_accounts: number;
+}
+
+/** Admin-only metrics (A03): doubles as the Admin page's access probe. */
+export function adminSummary(): Promise<AdminSummary> {
+  return request<AdminSummary>("/api/admin/users/summary");
+}
+export interface AdminUserRow {
+  username: string;
+  provider: string; // "local" | "google"
+}
+
+export interface AdminUsersResponse {
+  users: AdminUserRow[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+/** Admin-only safe user list (A03), bounded by the backend's max page size. */
+export function adminUsers(limit = 200, offset = 0): Promise<AdminUsersResponse> {
+  return request<AdminUsersResponse>(`/api/admin/users?limit=${limit}&offset=${offset}`);
 }

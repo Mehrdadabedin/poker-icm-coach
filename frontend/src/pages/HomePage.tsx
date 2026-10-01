@@ -90,6 +90,7 @@ export function HomePage() {
         <button className="btn" onClick={() => navigate("/settings")}>TOURNAMENT SETTINGS</button>
         <button className="btn" onClick={() => navigate("/history")}>HAND HISTORY</button>
         <button className="btn" onClick={() => navigate("/statistics")}>STATISTICS</button>
+        <button className="btn" onClick={() => navigate("/admin")} data-testid="menu-admin">ADMIN</button>
       </div>
       <Copyright />
     </div>

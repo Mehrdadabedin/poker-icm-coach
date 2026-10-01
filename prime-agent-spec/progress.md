@@ -53,6 +53,13 @@ Main requested changes:
 | A23 | Hand History table dropdown | 🟡 | PLANNED — NOT IMPLEMENTED |
 | A24 | Hand History / review UX refinement | 🟡 | PLANNED — NOT IMPLEMENTED |
 | A25 | Regression/acceptance tests for future features | 🟡 | PLANNED — NOT IMPLEMENTED |
+| A30 | Admin A01 — Secure Admin access / authorization | 🟢 | Backend `require_admin` dependency on the existing bearer token; admin identity via `ADMIN_USERNAMES` config or persisted `admin` flag; tests `backend/tests/test_admin_auth.py`; plan: admin.md. |
+| A32 | Admin A02 — UserRegistry read-only helpers | 🟢 | Safe snapshot, provider-aware totals and listing in `app/services/user_registry_admin.py`; tests `backend/tests/test_admin_registry.py`; plan: admin.md. |
+| A33 | Admin A03 — Protected Admin Users API | 🟢 | Admin-only `GET /api/admin/users` + `GET /api/admin/users/summary` in `app/api/routes_admin.py`; tests `backend/tests/test_admin_api.py`; plan: admin.md. |
+| A34 | Admin A04 — Admin dashboard shell | 🟢 | Admin shell page, section navigation and placeholders in `frontend/src/pages/AdminPage.tsx`; backend access probe via A03 summary; tests `frontend/tests/admin.test.tsx`; plan: admin.md. |
+| A36 | Admin A05 — Dashboard user metrics | 🟢 | Dashboard renders live Total/Google/Local counts from A03 summary API in `AdminPage.tsx`; tests cover loading/zero/error/401/403; plan: admin.md. |
+| A37 | Admin A06 — Users list + search | 🟢 | Safe account list and client-side search in `frontend/src/components/AdminUsersView.tsx`, consumed via A03 `GET /api/admin/users`; tests `frontend/tests/admin_users.test.tsx`; plan: admin.md. |
+| A38 | Admin A07 — Extensible Admin sections | 🟢 | Centralized typed section registry `frontend/src/components/AdminSections.tsx` drives shell navigation/content; future sections are one registry entry; tests `frontend/tests/admin_sections.test.tsx`; plan: admin.md. |
 
 ## Known evidence from the supplied screenshots
 

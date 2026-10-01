@@ -15,6 +15,7 @@ import re
 import threading
 from pathlib import Path
 
+from app.core.config import settings
 from app.services.auth import normalize_username
 
 logger = logging.getLogger(__name__)
@@ -24,11 +25,9 @@ USERNAME_MAX_LENGTH = 24
 EXTERNAL_PROVIDERS = ("google",)
 _PBKDF2_ROUNDS = 200_000
 
-# An email local part is not a username: keep only the characters
-# normalize_username accepts, then trim to the allowed length.
+# An email local part is not a username; keep only allowed characters.
 _USERNAME_UNSAFE_RE = re.compile(r"[^A-Za-z0-9_\- ]+")
-# Fixed decoy salt: an unknown username still pays for one PBKDF2 derivation,
-# so response time does not tell an attacker which usernames are registered.
+# Decoy salt: unknown usernames still pay one derivation (no timing oracle).
 _DECOY_SALT = b"\x00" * 16
 
 
@@ -46,16 +45,10 @@ def username_from_email(email: str) -> str:
 
 
 class UserRegistry:
-    """Registered users: username -> salted PBKDF2-SHA256 password hash.
-
-    - register(username, password) validates and stores a hashed credential.
-    - verify(username, password) returns True only for a registered user with a
-      matching password (constant-time compare, constant-time miss). An entry
-      with no credential (an external identity) always returns False.
-    - register_external links a Google account to a local username; the entry
-      keeps no salt/hash, so it is unreachable by password login.
-    - Best-effort JSON persistence to `users_file` (blank disables it).
-    """
+    """Registered users: username -> salted PBKDF2-SHA256 hash or an external
+    identity {provider, subject, email} (Google). register/verify use constant
+    time; external entries have no hash and are unreachable by password.
+    Best-effort JSON persistence to `users_file` (blank disables it)."""
 
     def __init__(self, users_file: str = "") -> None:
         # username -> {"salt","hash"} for a password account, or
@@ -176,5 +169,30 @@ class UserRegistry:
                 return candidate
         raise ValueError("could not allocate a username")
 
+
+
+    def is_admin(self, username: str) -> bool:
+        """Admin level (A01): persisted ``admin: true`` flag or a username in
+        ``settings.admin_usernames``. Usernames only, never credentials."""
+        with self._lock:
+            if (self._users.get(username) or {}).get("admin") is True:
+                return True
+        try:
+            names = {
+                normalize_username(raw) for raw in (settings.admin_usernames or "").split(",")
+                if raw.strip()
+            }
+        except ValueError:
+            return False
+        return username in names
+
+
+    def account_snapshot(self) -> list[tuple[str, str | None]]:
+        """A02 safe rows: (username, provider) per account, no credentials."""
+        with self._lock:
+            return sorted(
+                (name, (entry or {}).get("provider"))
+                for name, entry in self._users.items()
+            )
 
 auth_registry = UserRegistry()
