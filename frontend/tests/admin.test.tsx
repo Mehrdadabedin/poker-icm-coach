@@ -138,6 +138,7 @@ describe("Admin shell navigation (A04)", () => {
     renderAdmin();
     await flush();
     expect(screen.getByTestId("admin-nav")).toBeInTheDocument();
+    expect(screen.getByTestId("admin-logout")).toHaveTextContent("LOG OUT");
     for (const id of SECTIONS) {
       expect(screen.getByTestId(`admin-nav-${id}`).textContent).toContain(NAV_LABELS[id]);
     }

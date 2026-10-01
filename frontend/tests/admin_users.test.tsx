@@ -9,7 +9,7 @@ import { AdminPage } from "../src/pages/AdminPage";
 import type { AdminUserRow } from "../src/services/api";
 import { AuthError } from "../src/services/api";
 
-const { adminSummary, adminUsers } = vi.hoisted(() => ({
+const { adminSummary, adminUsers, logout } = vi.hoisted(() => ({
   adminSummary: vi.fn(async () => ({
     total_registered_accounts: 0,
     local_accounts: 0,
@@ -18,6 +18,7 @@ const { adminSummary, adminUsers } = vi.hoisted(() => ({
   adminUsers: vi.fn(async (limit?: number, offset?: number) => ({
     users: [] as AdminUserRow[], total: 0, limit: limit ?? 200, offset: offset ?? 0,
   })),
+  logout: vi.fn(async () => ({ ok: true })),
 }));
 
 vi.mock("../src/services/api", async (importOriginal) => ({
@@ -30,6 +31,7 @@ vi.mock("../src/services/api", async (importOriginal) => ({
   },
   adminSummary,
   adminUsers,
+  logout,
 }));
 
 const USERS: AdminUserRow[] = [
@@ -59,6 +61,8 @@ beforeEach(() => {
   adminSummary.mockResolvedValue({ total_registered_accounts: 3, local_accounts: 1, google_accounts: 2 });
   adminUsers.mockReset();
   adminUsers.mockResolvedValue({ users: USERS, total: USERS.length, limit: 200, offset: 0 });
+  logout.mockReset();
+  logout.mockResolvedValue({ ok: true });
 });
 
 describe("Admin Users view (A06)", () => {
@@ -162,6 +166,18 @@ describe("Admin Users view (A06)", () => {
       expect(screen.queryByText(new RegExp(forbidden, "i"))).toBeNull();
     }
     fetchSpy.mockRestore();
+  });
+
+  it("renders the Admin LOG OUT button and signs out via the existing flow", async () => {
+    renderUsers();
+    await flush();
+    const button = screen.getByTestId("admin-logout");
+    expect(button).toHaveTextContent("LOG OUT");
+    fireEvent.click(button);
+    await flush();
+    expect(logout).toHaveBeenCalledTimes(1);
+    expect(localStorage.getItem("icm_auth_token")).toBeNull();
+    expect(screen.getByTestId("login-page")).toBeInTheDocument();
   });
 
   it("keeps dashboard metrics and other sections working after Users", async () => {

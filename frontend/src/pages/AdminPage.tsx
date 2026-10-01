@@ -2,17 +2,16 @@
 
 A04: shell layout and section navigation (driven by the A07 section
 registry). A05: the Dashboard section displays live metrics from the
-protected Admin summary API (GET /api/admin/users/summary). The backend is
-the security boundary: the probe result decides between ready, forbidden
-(403) and failure; a 401 clears the stale session and redirects to login.
-Only the API summary is shown - never a frontend-computed count, never
-users.json.
+protected Admin summary API. A-ADM: top-right LOG OUT uses the existing
+logout flow. The backend is the security boundary: the probe result decides
+between ready, forbidden (403) and failure; a 401 clears the stale session.
+Only the API summary is shown - never a frontend-computed count.
 */
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ADMIN_SECTIONS, findAdminSection } from "../components/AdminSections";
 import { Copyright } from "../components/Copyright";
-import { AdminSummary, AuthError, adminSummary, clearAuth } from "../services/api";
+import { AdminSummary, AuthError, adminSummary, clearAuth, logout } from "../services/api";
 
 type ProbeResult =
   | { status: "ok"; summary: AdminSummary }
@@ -37,11 +36,34 @@ type View =
   | { status: "forbidden" }
   | { status: "failure" };
 
+/** Top bar shared by every Admin page state: brand title + LOG OUT. */
+function AdminHeader({ onLogout }: { onLogout: () => void }) {
+  return (
+    <div className="admin-header">
+      <h1 className="screen-title">ADMIN</h1>
+      <button type="button" className="btn btn-small" onClick={onLogout} data-testid="admin-logout">
+        LOG OUT
+      </button>
+    </div>
+  );
+}
+
 export function AdminPage() {
   const navigate = useNavigate();
   const params = useParams();
   const section = findAdminSection(params.section);
   const [view, setView] = useState<View>({ status: "checking" });
+
+  // Sign out of the Admin area via the existing application logout flow.
+  const logoutNow = async () => {
+    try {
+      await logout();
+    } catch {
+      // clear locally even if the server session already timed out
+    }
+    clearAuth();
+    navigate("/login");
+  };
 
   useEffect(() => {
     adminProbe()
@@ -67,7 +89,7 @@ export function AdminPage() {
   if (view.status === "checking") {
     return (
       <div className="page admin-page" data-testid="admin-page">
-        <h1 className="screen-title">ADMIN</h1>
+        <AdminHeader onLogout={() => void logoutNow()} />
         <p className="note" data-testid="admin-loading">Loading…</p>
         <Copyright />
       </div>
@@ -78,7 +100,7 @@ export function AdminPage() {
     const refused = view.status === "forbidden";
     return (
       <div className="page admin-page" data-testid="admin-page">
-        <h1 className="screen-title">ADMIN</h1>
+        <AdminHeader onLogout={() => void logoutNow()} />
         {refused ? (
           <div className="admin-denied" data-testid="admin-denied" role="alert">
             <b>Admin access required</b>
@@ -100,7 +122,7 @@ export function AdminPage() {
 
   return (
     <div className="page admin-page" data-testid="admin-page">
-      <h1 className="screen-title">ADMIN</h1>
+      <AdminHeader onLogout={() => void logoutNow()} />
       <div className="admin-shell">
         <nav className="admin-nav" data-testid="admin-nav" aria-label="Admin sections">
           {ADMIN_SECTIONS.map((entry) => (
