@@ -138,10 +138,30 @@ describe("Admin shell navigation (A04)", () => {
     renderAdmin();
     await flush();
     expect(screen.getByTestId("admin-nav")).toBeInTheDocument();
-    expect(screen.getByTestId("admin-logout")).toHaveTextContent("LOG OUT");
+    const home = screen.getByTestId("admin-home");
+    expect(home).toHaveTextContent("HOME");
+    expect(home.className).toContain("admin-home-btn");
+    const adminLogout = screen.getByTestId("admin-logout");
+    expect(adminLogout).toHaveTextContent("LOG OUT");
+    expect(adminLogout.className).toContain("admin-logout-btn");
+    // HOME sits immediately to the left of LOG OUT in the same actions row
+    expect(home.parentElement).toBe(adminLogout.parentElement);
+    const siblings = [...home.parentElement!.children];
+    expect(siblings.indexOf(home)).toBeLessThan(siblings.indexOf(adminLogout));
     for (const id of SECTIONS) {
       expect(screen.getByTestId(`admin-nav-${id}`).textContent).toContain(NAV_LABELS[id]);
     }
+  });
+
+  it("HOME navigates to the home dashboard and keeps the admin session", async () => {
+    localStorage.setItem("icm_auth_token", "t-keep");
+    localStorage.setItem("icm_username", "Mehrdad");
+    renderAdmin();
+    await flush();
+    fireEvent.click(screen.getByTestId("admin-home"));
+    await flush();
+    expect(screen.getByTestId("home-page")).toBeInTheDocument();
+    expect(localStorage.getItem("icm_auth_token")).toBe("t-keep");
   });
 
   it("keeps section navigation working with metrics visible", async () => {

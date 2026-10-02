@@ -36,14 +36,30 @@ type View =
   | { status: "forbidden" }
   | { status: "failure" };
 
-/** Top bar shared by every Admin page state: brand title + LOG OUT. */
+/** Top bar shared by every Admin page state: brand title + HOME | LOG OUT. */
 function AdminHeader({ onLogout }: { onLogout: () => void }) {
+  const navigate = useNavigate();
   return (
     <div className="admin-header">
       <h1 className="screen-title">ADMIN</h1>
-      <button type="button" className="btn btn-small" onClick={onLogout} data-testid="admin-logout">
-        LOG OUT
-      </button>
+      <div className="admin-actions">
+        <button
+          type="button"
+          className="btn btn-small admin-home-btn"
+          onClick={() => navigate("/")}
+          data-testid="admin-home"
+        >
+          HOME
+        </button>
+        <button
+          type="button"
+          className="btn btn-small admin-logout-btn"
+          onClick={onLogout}
+          data-testid="admin-logout"
+        >
+          LOG OUT
+        </button>
+      </div>
     </div>
   );
 }

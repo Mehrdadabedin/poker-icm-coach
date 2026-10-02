@@ -95,19 +95,9 @@
   border-radius: 10px;
 }
 
-.admin-metric-label {
-  font-size: 0.72rem;
-  letter-spacing: 0.5px;
-  color: var(--muted);
-  text-transform: uppercase;
-}
+.admin-metric-label { font-size: 0.72rem; letter-spacing: 0.5px; color: var(--muted); text-transform: uppercase; }
 
-.admin-metric-value {
-  font-size: 2rem;
-  font-weight: 800;
-  color: var(--accent);
-  line-height: 1;
-}
+.admin-metric-value { font-size: 2rem; font-weight: 800; color: var(--accent); line-height: 1; }
 .admin-search {
   width: min(360px, 100%);
   min-height: 40px;
@@ -169,7 +159,6 @@
   font-size: 0.78rem;
   color: var(--muted);
 }
-
 .admin-change-field input {
   min-height: 42px;
   padding: 6px 10px;
@@ -184,6 +173,24 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+}
+
+.admin-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-home-btn {
+  background: var(--accent);
+  color: #241c05;
+  border-color: rgba(242, 193, 78, 0.6);
+}
+
+.admin-logout-btn {
+  background: #1565c0;
+  color: #fff;
+  border-color: rgba(21, 101, 192, 0.6);
 }
 
 .admin-change-error {
