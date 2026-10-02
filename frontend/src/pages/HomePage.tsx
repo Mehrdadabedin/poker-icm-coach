@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { clearAuth, getToken, getUsername, logout, me } from "../services/api";
+import { adminSummary, clearAuth, getToken, getUsername, logout, me } from "../services/api";
 import { Copyright } from "../components/Copyright";
 import { BrandLogo } from "../components/BrandLogo";
 import { LoginForm } from "../components/LoginForm";
@@ -12,11 +12,27 @@ export function HomePage() {
   const location = useLocation();
   const authNotice = (location.state as { authNotice?: string } | null)?.authNotice ?? null;
   const [user, setUser] = useState<string | null>(() => (getToken() ? getUsername() : null));
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // BUG 2 hardening: a stored token may be stale/invalid (backend restart,
   // expiry, credentials changed). Validate it on load; if the backend rejects
   // it, clear the saved session and show the login form instead of leaving the
   // user in a broken half-authenticated state.
+  // Server-declared Admin check (visible menu only; the backend stays the
+  // boundary). 403 for normal users, so only Admins see the ADMIN entry.
+  const token = getToken();
+  useEffect(() => {
+    if (!token) {
+      setIsAdmin(false);
+      return;
+    }
+    let cancelled = false;
+    adminSummary()
+      .then(() => { if (!cancelled) setIsAdmin(true); })
+      .catch(() => { if (!cancelled) setIsAdmin(false); });
+    return () => { cancelled = true; };
+  }, [token]);
+
   useEffect(() => {
     if (!getToken()) return;
     me()
@@ -90,7 +106,9 @@ export function HomePage() {
         <button className="btn" onClick={() => navigate("/settings")}>TOURNAMENT SETTINGS</button>
         <button className="btn" onClick={() => navigate("/history")}>HAND HISTORY</button>
         <button className="btn" onClick={() => navigate("/statistics")}>STATISTICS</button>
-        <button className="btn" onClick={() => navigate("/admin")} data-testid="menu-admin">ADMIN</button>
+        {isAdmin && (
+          <button className="btn" onClick={() => navigate("/admin")} data-testid="menu-admin">ADMIN</button>
+        )}
       </div>
       <Copyright />
     </div>

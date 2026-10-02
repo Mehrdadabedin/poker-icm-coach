@@ -183,7 +183,7 @@ describe("App routing remains intact (A04)", () => {
     expect(screen.getByTestId("admin-nav")).toBeInTheDocument();
   });
 
-  it("keeps existing routes working and exposes the ADMIN menu entry", async () => {
+  it("keeps existing routes working and exposes the ADMIN menu entry for an Admin", async () => {
     localStorage.setItem("icm_auth_token", "t-1");
     localStorage.setItem("icm_username", "Mehrdad");
     window.location.hash = "#/";
@@ -193,5 +193,30 @@ describe("App routing remains intact (A04)", () => {
     expect(screen.getByTestId("home-page")).toBeInTheDocument();
     expect(screen.getByTestId("start-practice")).toBeInTheDocument();
     expect(screen.getByTestId("menu-admin")).toBeInTheDocument();
+  });
+
+  it("hides the ADMIN menu entry from a normal user", async () => {
+    adminSummary.mockRejectedValue(new Error("API 403: admin access required"));
+    localStorage.setItem("icm_auth_token", "t-1");
+    localStorage.setItem("icm_username", "Mehrdad");
+    window.location.hash = "#/";
+    const { App } = await import("../src/App");
+    render(<App />);
+    await flush();
+    expect(screen.getByTestId("home-page")).toBeInTheDocument();
+    expect(screen.getByTestId("start-practice")).toBeInTheDocument();
+    expect(screen.queryByTestId("menu-admin")).toBeNull();
+  });
+
+  it("opens the Admin dashboard when an Admin clicks the menu entry", async () => {
+    localStorage.setItem("icm_auth_token", "t-1");
+    localStorage.setItem("icm_username", "Mehrdad");
+    window.location.hash = "#/";
+    const { App } = await import("../src/App");
+    render(<App />);
+    await flush();
+    fireEvent.click(screen.getByTestId("menu-admin"));
+    await flush();
+    expect(screen.getByTestId("admin-nav")).toBeInTheDocument();
   });
 });

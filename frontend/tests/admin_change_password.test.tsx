@@ -7,11 +7,16 @@ import { AdminChangePasswordPage } from "../src/pages/AdminChangePasswordPage";
 import { HomePage } from "../src/pages/HomePage";
 import { AuthError } from "../src/services/api";
 
-const { login, changePassword } = vi.hoisted(() => ({
+const { login, changePassword, adminSummary } = vi.hoisted(() => ({
   login: vi.fn(async () => ({
     token: "t-1", username: "Admin", admin: true, must_change_password: true,
   })),
   changePassword: vi.fn(async () => ({ changed: true })),
+  adminSummary: vi.fn(async () => ({
+    total_registered_accounts: 0,
+    local_accounts: 0,
+    google_accounts: 0,
+  })),
 }));
 
 vi.mock("../src/services/api", async (importOriginal) => ({
@@ -30,6 +35,7 @@ vi.mock("../src/services/api", async (importOriginal) => ({
   me: vi.fn(async () => ({ username: "Admin" })),
   login,
   changePassword,
+  adminSummary,
 }));
 
 function renderChange() {
@@ -71,6 +77,12 @@ beforeEach(() => {
   });
   changePassword.mockReset();
   changePassword.mockResolvedValue({ changed: true });
+  adminSummary.mockReset();
+  adminSummary.mockResolvedValue({
+    total_registered_accounts: 0,
+    local_accounts: 0,
+    google_accounts: 0,
+  });
 });
 
 describe("Admin change-password page", () => {
@@ -131,6 +143,12 @@ describe("post-login routing from backend flags", () => {
   beforeEach(() => {
     localStorage.clear();
     login.mockReset();
+    adminSummary.mockReset();
+    adminSummary.mockResolvedValue({
+      total_registered_accounts: 0,
+      local_accounts: 0,
+      google_accounts: 0,
+    });
   });
 
   it("sends a pending-change Admin to the change-password screen", async () => {
@@ -149,10 +167,12 @@ describe("post-login routing from backend flags", () => {
     await waitFor(() => expect(screen.getByTestId("admin-stub")).toBeInTheDocument());
   });
 
-  it("keeps normal users on the normal dashboard", async () => {
+  it("keeps normal users on the normal dashboard without the ADMIN menu", async () => {
     login.mockResolvedValue({ token: "t-1", username: "Mehrdad", admin: false, must_change_password: false });
+    adminSummary.mockRejectedValue(new Error("API 403: admin access required"));
     renderLogin();
     fill();
     await waitFor(() => expect(screen.getByTestId("start-practice")).toBeInTheDocument());
+    expect(screen.queryByTestId("menu-admin")).toBeNull();
   });
 });
