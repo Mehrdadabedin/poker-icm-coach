@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { HandResult } from "../components/HandResult";
 import { HandReview } from "../components/HandReview";
 import { HeroControls } from "../components/HeroControls";
@@ -7,9 +7,10 @@ import { LoginForm } from "../components/LoginForm";
 import { PokerTable } from "../components/PokerTable";
 import { TableHeader } from "../components/TableHeader";
 import { TableSidebar } from "../components/TableSidebar";
+import { TournamentWinner } from "../components/TournamentWinner";
 import { useAutoNext } from "../hooks/useAutoNext";
 import { useGame } from "../hooks/useGame";
-import { ActionKind, CoachAdvice, LegalAction } from "../models/game";
+import { ActionKind, CoachAdvice, LegalAction, tournamentChampion } from "../models/game";
 import { useLabelPreferences } from "../services/preferences";
 import { clearAuth, coachAdvice, coachCompare, createTournament, getToken, getUsername, logout, nextHand as requestNextHand, request } from "../services/api";
 import type { HandHistoryEntry } from "../webmcp/registerGameTools";
@@ -17,10 +18,33 @@ import { useGameWebMcp } from "../webmcp/useGameWebMcp";
 
 const REVIEW_SECONDS = 10;
 
+/** Development-only winner preview trigger. Always false for production
+ * builds (import.meta.env.DEV is false there) and when the query parameter
+ * is absent, so real tournament behavior is never affected. */
+export function winnerPreviewEnabled(isDev: boolean, param: string | null): boolean {
+  return isDev && param === "true";
+}
+
+/** Winner plaque name. Dev preview: the ?testWinnerName parameter (else the
+ * signed-in username fallback). Real tournament: the champion's own name -
+ * never the authenticated user. */
+export function resolveWinnerName(
+  previewWinner: boolean,
+  previewName: string,
+  championName: string | null,
+  fallback: string,
+): string {
+  if (previewWinner) {
+    return previewName || fallback;
+  }
+  return championName || fallback;
+}
+
 /** Live table: compact result + optional Review the Hand (A10/A11/A16). */
 export function TablePage() {
   const { tableId = "" } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [authed, setAuthed] = useState<boolean>(() => !!getToken());
   const [showReview, setShowReview] = useState(false);
   const { state, error, act, nextHand, acting, refresh: refreshTable } = useGame(tableId);
@@ -136,6 +160,19 @@ export function TablePage() {
   const hero = state.players.find((p) => p.isHero);
   const handOver = state.phase === "handOver" && !!state.review;
   const isReview = handOver && showReview;
+  // Existing tournament state: the sole survivor is the champion (hero or
+  // any BOT), so Alex/a BOT finishing first also triggers the presentation.
+  const champion = tournamentChampion(state);
+  // DEV preview only: reuses the exact winner branch; no effect in builds.
+  const previewWinner = winnerPreviewEnabled(import.meta.env.DEV, searchParams.get("testWinner"));
+  const previewName = searchParams.get("testWinnerName") ?? "";
+  const winnerName = resolveWinnerName(
+    previewWinner,
+    previewName,
+    champion?.name ?? null,
+    state.username ?? getUsername() ?? "",
+  );
+  const showWinner = previewWinner || champion !== null;
   const nameBySeat = new Map(state.players.map((pl) => [pl.seat, pl.name]));
 
   return (
@@ -161,7 +198,12 @@ export function TablePage() {
         />
       ) : (
         <>
-          <PokerTable state={state}>
+          <PokerTable
+            state={state}
+            overlay={showWinner ? (
+              <TournamentWinner username={winnerName ?? ""} />
+            ) : undefined}
+          >
             {handOver && state.review ? (
               <HandResult
                 review={state.review}

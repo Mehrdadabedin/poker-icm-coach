@@ -5,6 +5,8 @@ import { PokerSeat } from "./PokerSeat";
 interface PokerTableProps {
   state: TableState;
   children?: React.ReactNode;
+  /** Optional overlay rendered over the felt (tournament winner screen). */
+  overlay?: React.ReactNode;
 }
 
 const ACT_LABEL: Record<string, string> = {
@@ -17,7 +19,7 @@ const ACT_LABEL: Record<string, string> = {
 };
 
 /** The 9-seat poker table: seats, community board, pot, header info. */
-export function PokerTable({ state, children }: PokerTableProps) {
+export function PokerTable({ state, children, overlay }: PokerTableProps) {
   const sorted = [...state.players].sort((a, b) => a.seat - b.seat);
   const isReview = state.phase === "handOver" && !!state.review;
   const review = state.review ?? null;
@@ -98,6 +100,7 @@ export function PokerTable({ state, children }: PokerTableProps) {
             <CardView key={i} card={c} />
           ))}
         </div>
+        {overlay}
       </div>
       {children}
     </div>

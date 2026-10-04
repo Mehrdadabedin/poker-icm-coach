@@ -1,0 +1,51 @@
+/* Tournament winner screen: absolute overlay inside the existing poker-table
+ * felt (.table-felt already sets position: relative). The artwork keeps its
+ * aspect (object-fit contain) and the username overlays the empty plaque.
+ * Rendered only when the tournament state says the current user won, or in
+ * development via ?testWinner=true. */
+.tournament-winner {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg, #14181d);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.tournament-winner-content {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 106%;
+  height: 106%;
+  transform: translate(-50%, -50%);
+}
+
+.tournament-winner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.tournament-winner-name {
+  position: absolute;
+  left: 39.3%;
+  top: 57.7%;
+  width: 23.8%;
+  height: 5.7%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #f2c14e;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+  font-size: clamp(0.7rem, 2vw, 2rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: center;
+  pointer-events: none;
+}

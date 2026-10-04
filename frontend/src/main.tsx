@@ -24,6 +24,7 @@ import "./styles/analytics-consent.css";
 import "./styles/admin.css";
 import "./styles/bot-profiles.css";
 import "./styles/winloss.css";
+import "./styles/winner.css";
 
 initializeGoogleAnalytics();
 
