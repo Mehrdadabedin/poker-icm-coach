@@ -681,3 +681,35 @@ poker table geometry.
 ---
 NOTE: Google authentication, Facebook authentication, and Google/Facebook OAuth
 are intentionally OUT OF SCOPE and must not be added to this plan or the app.
+
+### A39 — Hero all-in loss / re-entry cutoff / BOT auto-finish (IMPLEMENTED)
+Re-entry is available only through Level 5, and only by explicit player choice.
+- Levels 1-5: an all-in hero reaching zero chips is NOT auto-restored; the
+  table shows the re-entry modal (CONTINUE TOURNAMENT -> exactly 45,000 at the
+  same level via POST /api/game/{id}/reentry; START NEW GAME -> existing home
+  flow). BOT re-entries during levels 1-5 stay automatic.
+- Level >5: zero chips eliminates the hero permanently (no re-entry) and the
+  remaining BOTs auto-finish the existing tournament (accelerated auto-next,
+  review not auto-opened) until the existing champion state is produced and the
+  existing TournamentWinner screen shows the actual champion name.
+- Acceptance: L1-L5 re-entry available; no automatic 45,000 restore for the
+  hero; CONTINUE TOURNAMENT restores exactly 45,000 and continues; START NEW
+  GAME exits via the existing flow; L>5 permanent elimination; BOT auto-finish
+  without NEXT/REVIEW clicks; existing champion state used (no new formula);
+  existing winner screen intact; normal hero gameplay unchanged; no
+  poker/ICM/BOT/tournament rewrite.
+
+### A40 — Tournament endgame reliability / deep all-in stall (IMPLEMENTED)
+When a hand leaves zero or one active player, the tournament must finish
+through the existing state instead of starting another hand.
+- Root cause: `hand_setup.blind_seats` looped forever with a single active
+  seat (next_hand started a new hand after the elimination that left one
+  player); extreme deep-all-in endgames could also mis-settle.
+- Fix: `GameSession.next_hand` stops when toggling <=1 active player (status
+  -> finished, lone survivor = existing champion state); `blind_seats` now
+  raises ValueError for fewer than two seats instead of spinning.
+- Acceptance: 2-player all-in run-out settles; two-player and deep all-in
+  endgames finish without IndexError or hang; a BOT champion reaches the
+  existing `finished`/champion state with its real name; hero-only survivor
+  finishes too; normal multi-player hands and all existing behaviour are
+  unchanged; poker/ICM/BOT/tournament rules untouched.

@@ -60,6 +60,8 @@ Main requested changes:
 | A36 | Admin A05 — Dashboard user metrics | 🟢 | Dashboard renders live Total/Google/Local counts from A03 summary API in `AdminPage.tsx`; tests cover loading/zero/error/401/403; plan: admin.md. |
 | A37 | Admin A06 — Users list + search | 🟢 | Safe account list and client-side search in `frontend/src/components/AdminUsersView.tsx`, consumed via A03 `GET /api/admin/users`; tests `frontend/tests/admin_users.test.tsx`; plan: admin.md. |
 | A38 | Admin A07 — Extensible Admin sections | 🟢 | Centralized typed section registry `frontend/src/components/AdminSections.tsx` drives shell navigation/content; future sections are one registry entry; tests `frontend/tests/admin_sections.test.tsx`; plan: admin.md. |
+| A39 | Hero all-in loss / re-entry cutoff / BOT auto-finish | 🟢 | Re-entry L1-L5 via explicit player choice; no auto 45k restore; L>5 permanent elimination; BOT-only auto-finish to existing champion; tests backend `test_reentry.py`, frontend `reentry.test.tsx`; plan: atomic_plan.md A39. |
+| A40 | Tournament endgame reliability / deep all-in stall | 🟢 | Hand engine no longer starts a hand with <=1 active seat; `blind_seats` guards <2 seats; bots-only endgames reach `finished` + champion; tests `backend/tests/tournament/test_endgame.py`; plan: atomic_plan.md A40. |
 
 ## Known evidence from the supplied screenshots
 

@@ -20,6 +20,10 @@ def in_hand_seats(players: list[Player]) -> set[int]:
 
 def blind_seats(button: int, seats: set[int], num_seats: int) -> tuple[int, int]:
     """SB/BB seats relative to the button; heads-up the button posts SB."""
+    if len(seats) < 2:
+        # A hand cannot start with fewer than two active players (endgame).
+        # Before this guard a one-seat call spun forever in the loop below.
+        raise ValueError("a hand needs at least two active players")
     if len(seats) == 2:
         sb = button if button in seats else next(iter(seats))
         bb = next(s for s in seats if s != sb)

@@ -102,14 +102,18 @@ class GameSession:
                 raise ValueError("current hand is still in progress")
             self._record_and_persist()
             self._apply_reentry_or_eliminate()
-            mark_finished(self)  # hero busted with no re-entry left (issue #5)
+            mark_finished(self)
+            if sum(1 for p in self.tournament.players
+                   if not p.is_eliminated and not p.sit_out) <= 1:
+                # Endgame: one player remains; do not start another hand.
+                self.status = "finished"
+                return
             self._begin_hand(first=False)
 
     def phase(self) -> str:
         if self.engine is None:
             return "idle"
         return "handOver" if self.engine.is_complete else "playing"
-
     def hero_action(self, kind: str, amount: int | None = None) -> None:
         with self._lock:
             assert self.engine is not None
