@@ -1889,3 +1889,24 @@ TournamentWinner, their hooks and CSS), backend game engine files.
 
 git status: all A47 work committed on feat/landing-a47; backend data/
 users.json created by the local screenshot run stays gitignored.
+
+Second pass (2026-10-11, mockup-matched; PR #22 merged into
+FIX-POKERTABLE-LAYOUT-TEST first and the mockup measured with Playwright):
+- Hero image re-cropped to x 772-1665 (baked text ends at x=758, aces start
+  at x=793; both aces fully visible), 12px edge blend instead of the 200px
+  fade.
+- Header section links are now buttons that smooth-scroll via scrollToSection
+  with scroll-margin-top on the sections: the app is a HashRouter, so
+  href="#faq" would change the route. Vitest proves clicking FAQ scrolls and
+  leaves location.hash unchanged.
+- Header + hero content on a ~1240px centred column; hero buttons and the
+  "Practice only..." line match the mockup (left-aligned under the buttons).
+- Final CTA is one rounded card (#12151C, 1px #2B3142 border, 24px radius):
+  heading "PLAY YOUR FIRST TOURNAMENT TODAY.", sub "Nine players. One
+  champion. Will it be you?", gold START TRAINING FREE + white Continue with
+  Google pill (with the Google G), champion artwork filling the right half
+  (object-fit cover). Footer is a single row: gold tagline left, Privacy /
+  Terms / Cookie settings centre, "© 2026 ICMBOT. Practice only. No
+  real-money gambling." right; stacks on phones.
+- og:url and og:image (and twitter:image) now use https://icmbot.one
+  (og image at /images/og-1200x630.jpg); Archivo 900 added to the font link.
