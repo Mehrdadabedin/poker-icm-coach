@@ -11,7 +11,7 @@ from app.game.actions import Action, ActionType
 from app.game.hand_engine import HandEngine
 from app.game.positions import position_labels
 from app.services import hand_history
-from app.services.elimination import apply_reentry_or_elimination
+from app.services.elimination import apply_reentry_or_elimination, is_final_hand
 from app.services.game_state_view import build_state_view
 from app.services.hand_history import HandHistoryRecord, HandHistoryStore
 from app.services.session_coach import advice_dict, coach_request, grade_last_action
@@ -91,15 +91,19 @@ class GameSession:
                 raise ValueError("tournament is not active")
             if self.phase() != "handOver":
                 raise ValueError("current hand is still in progress")
-            self._record_and_persist()
-            self._apply_reentry_or_eliminate()
-            mark_finished(self)
-            if sum(1 for p in self.tournament.players
-                   if not p.is_eliminated and not p.sit_out) <= 1:
-                # Endgame: one player remains; do not start another hand.
-                self.status = "finished"
-                return
-            self._begin_hand(first=False)
+            self._settle_hand()
+            if self.status == "active":
+                self._begin_hand(first=False)
+
+    def _settle_hand(self) -> None:
+        """Record the hand, apply re-entry/elimination, and finish the
+        tournament when one player remains (no new hand starts)."""
+        self._record_and_persist()
+        self._apply_reentry_or_eliminate()
+        mark_finished(self)
+        if sum(1 for p in self.tournament.players
+               if not p.is_eliminated and not p.sit_out) <= 1:
+            self.status = "finished"
 
     def phase(self) -> str:
         if self.engine is None:
@@ -134,12 +138,16 @@ class GameSession:
         if self.engine.is_complete:
             assert self.timer is not None
             self.timer.pause()
+            # Finish now, not on the next next_hand(): the client stops calling
+            # it once the champion screen shows, and the clock must stop too.
+            if is_final_hand(self):
+                self._settle_hand()
     def state(self) -> dict:
         with self._lock:
             assert self.engine is not None and self.timer is not None
             self.last_seen = time.time()
             self.timer.tick()
-            if self.engine.is_complete and not self.timer.running:
+            if self.engine.is_complete and not self.timer.running and self.status == "active":
                 self.timer.resume()
             return build_state_view(self)
 

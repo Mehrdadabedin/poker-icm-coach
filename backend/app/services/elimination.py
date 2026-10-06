@@ -47,3 +47,14 @@ def apply_reentry_or_elimination(session: GameSession) -> None:
     for offset, (seat, _) in enumerate(busted):
         if seat == session.hero_seat:
             session.hero_finish_place = alive + 1 + offset
+
+
+def is_final_hand(session: GameSession) -> bool:
+    """The completed hand leaves at most one player with chips and nobody can
+    re-enter (BOTs re-enter through Level 5, A39)."""
+    assert session.tournament is not None
+    if session.tournament.level_index < session.REENTRY_LEVELS:
+        return False
+    holders = sum(1 for p in session.tournament.players
+                  if not p.is_eliminated and p.stack > 0)
+    return holders <= 1
