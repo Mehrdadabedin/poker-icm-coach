@@ -55,11 +55,9 @@ async function grayAt(t, x, y) {
 }
 
 const failures = [];
-// The hands scene is held open for its whole line at the hero's first
-// decision and then plays two silent hands before the review line; that
-// intended gameplay silence measured 9.0s (check run 2026-10-12), so the
-// gate uses 10s. Audio is never moved or slowed to pass.
-const SILENCE_LIMIT = Number(process.env.SILENCE_LIMIT ?? "10");
+// One hand plays between the hands line and the review line; audio is
+// never moved or slowed to pass this gate.
+const SILENCE_LIMIT = Number(process.env.SILENCE_LIMIT ?? "5");
 const total = await durationOf(mp4);
 
 // 1. no padding grey anywhere in the frame corners

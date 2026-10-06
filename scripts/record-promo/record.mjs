@@ -31,7 +31,7 @@ const { chromium } = require("playwright");
 
 const API = process.env.ICMBOT_API_URL ?? "http://localhost:8000";
 const APP = process.env.ICMBOT_APP_URL ?? "http://localhost:5173";
-const HAND_COUNT = 2;
+const HAND_COUNT = 1;
 const RECORDING_DIR = process.env.PROMO_DIR ?? "/tmp/icmbot-promo";
 const NARRATION = JSON.parse(fs.readFileSync(new URL("narration.json", import.meta.url).pathname, "utf8"));
 
@@ -233,15 +233,16 @@ async function main() {
   markBase = Date.now();
   mark("hero");
   await sleep(1400);
-  await holdUntil(marks.hero + sceneLen("hero") + 1.0);
+  await holdUntil(marks.hero + sceneLen("hero") + 0.55);
 
-  // Quiz: scroll straight from the hero, never returning to it.
+  // Quiz: scroll straight from the hero, never returning to it. Tight so the
+  // hero->quiz silence stays well under the 5s gate.
   await page.evaluate(() => document.getElementById("lp-quiz")?.scrollIntoView({ behavior: "smooth" }));
-  await sleep(1500);
+  await sleep(1200);
   await page.getByTestId("landing-quiz-call").click();
   await page.waitForSelector('[data-testid="landing-quiz-answer"]');
   mark("quiz");
-  await sleep(900);
+  await sleep(800);
   await holdUntil(marks.quiz + sceneLen("quiz"));
 
   // Login straight from the quiz (sticky header), no scene back to the hero.
@@ -287,7 +288,7 @@ async function main() {
       if (!current) { await sleep(300); continue; }
       if (current.phase === "handOver") {
         await callTool(page, "pause_game");
-        await sleep(1200);
+        await sleep(700);
         if (!final) await callTool(page, "next_hand");
         return;
       }
@@ -295,13 +296,13 @@ async function main() {
         const rec = await coachRecommendation(page);
         const action = actionFor(rec, current) ?? fallbackAction(current);
         if (action) { await callTool(page, action.name, action.input); acted += 1; }
-        // Optional: linger on the first hand where the coach asks for a real
-        // decision (RAISE / 3-BET / CALL) instead of folding immediately.
+        // Brief breath after each decision (short lingers keep the single
+        // hand's silent gameplay inside the 5s line gap).
         if (!lingered && ["RAISE", "3-BET", "CALL", "BET"].includes(rec)) {
           lingered = true;
-          await sleep(2600);
+          await sleep(1200);
         } else {
-          await sleep(1400);
+          await sleep(800);
         }
         continue;
       }
@@ -309,7 +310,7 @@ async function main() {
     }
     await waitFor(page, (s) => s && s.phase === "handOver", 60_000, "hand completion");
     await callTool(page, "pause_game");
-    await sleep(1200);
+    await sleep(700);
     if (!final) await callTool(page, "next_hand");
   }
   for (let i = 0; i < HAND_COUNT; i++) {
@@ -355,16 +356,16 @@ async function main() {
   const escapeHtml = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const captionStyle = `<style>html,body{margin:0;background:transparent}
       .cap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-      max-width:1800px;white-space:normal;text-align:center;
-      font:700 34px/1.35 "DejaVu Sans",sans-serif;color:#fff;}</style>`;
+      width:min(1800px,100%);max-width:1800px;white-space:normal;text-align:center;
+      font:700 32px/1.2 "DejaVu Sans",sans-serif;color:#fff;}</style>`;
   const measurePage = await captionBrowser.newPage({ viewport: { width: 1920, height: 300 } });
   async function wrappedLines(text) {
     // Render the text as per-word spans with the SAME caption styling and
     // group the words by their rendered row: that is the real wrap.
     const words = escapeHtml(text).split(" ");
     await measurePage.setContent(`<!doctype html><style>html,body{margin:0}
-      #c{position:absolute;left:90px;top:40px;max-width:1800px;white-space:normal;
-      text-align:center;font:700 34px/1.35 "DejaVu Sans",sans-serif;padding:0}</style>
+      #c{position:absolute;left:0;top:40px;width:min(1800px,100%);max-width:1800px;
+      white-space:normal;text-align:center;font:700 32px/1.2 "DejaVu Sans",sans-serif;padding:0}</style>
       <div id="c">${words.map((w) => `<span>${w}</span>`).join("<span> </span>")}</div>`);
     return measurePage.evaluate(() => {
       const rows = new Map();
@@ -378,12 +379,15 @@ async function main() {
   }
   const cues = [];
   for (const [i, line] of lines.entries()) {
+    // The on-screen caption may differ from the spoken line (narration.json
+    // "caption"); piper always speaks "line".
+    const captionText = line.caption ?? line.line;
     // Fallback: only when the real wrap exceeds 2 lines, split at the
     // sentence boundary nearest the middle instead of clipping.
-    const wrapped = await wrappedLines(line.line);
-    let pieces = [line.line];
+    const wrapped = await wrappedLines(captionText);
+    let pieces = [captionText];
     if (wrapped.length > 2) {
-      const words = line.line.split(" ");
+      const words = captionText.split(" ");
       const wordBoundary = wrapped.slice(0, Math.ceil(wrapped.length / 2)).join(" ").split(" ").length;
       let splitAt = wordBoundary - 1;
       for (let w = wordBoundary - 1; w >= 0; w -= 1) {
@@ -400,10 +404,19 @@ async function main() {
     for (const [pi, piece] of pieces.entries()) {
       const capPage = await captionBrowser.newPage({ viewport: { width: 1920, height: 108 } });
       await capPage.setContent(`<!doctype html><div class="cap">${escapeHtml(piece)}</div>${captionStyle}`);
+      const size = await capPage.locator(".cap").evaluate((el) => {
+        const b = el.getBoundingClientRect();
+        return { w: b.width, h: b.height };
+      });
+      // The 108px strip clips anything over ~2 lines: fail hard here because
+      // the cropped PNG cannot reveal that a line was cut.
+      if (size.h > 96) {
+        throw new Error(`caption "${piece}" renders ${size.h.toFixed(0)}px tall (>96)`);
+      }
       const file = `cap-${String(i).padStart(2, "0")}-${pi}.png`;
       await capPage.screenshot({ path: `${captionDir}/${file}`, omitBackground: true });
       await capPage.close();
-      parts.push({ text: piece, file, frac0: pi / pieces.length, frac1: (pi + 1) / pieces.length });
+      parts.push({ text: piece, file, frac0: pi / pieces.length, frac1: (pi + 1) / pieces.length, height: size.h });
     }
     cues.push({ id: line.id, dur: line.dur, parts });
   }
