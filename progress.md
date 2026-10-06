@@ -1919,3 +1919,44 @@ Task: Step 1 fits the landing hero above the fold on short desktop viewports
 scripts/record-promo/ that drives the app through its WebMCP tools, records
 1920x1080, and encodes an H.264 MP4 under 10 MB with captions and a WebP
 poster, wired into the landing demo slot.
+
+### A48 implementation results (2026-10-11)
+
+Step 1 (hero fold, one commit): `.lp-hero` is now 16px/40px vertical
+padding; `.lp-hero-inner` is a full-width box with `padding-inline:
+clamp(20px, 4vw, 48px)`, `gap: 48px`, `align-items: center`; above 900px
+`.lp-hero-img` uses `height: clamp(340px, calc(100svh - var(--lp-header-h,
+77px) - 56px), 560px)` with `object-fit: cover`, `object-position: 0% 50%`
+and a 16px radius; below 900px the natural aspect stays. The header height
+is exposed as `--lp-header-h` on `.landing-page` and reused for
+scroll-margin-top. Browser-verified at 1245x650 (hero bottom at the fold,
+copy 48px from the left, both aces visible), 1440x900 and 375x812
+(unchanged image sizing, zero horizontal scroll).
+
+Step 2 (promo video, one commit): `scripts/record-promo/` is a reproducible
+Playwright recorder. It starts backend (uvicorn :8000) and vite dev (:5173)
+when down, creates a `Hero` account through POST /api/auth/register with a
+random password (stored only in the gitignored
+scripts/record-promo/.venv/hero-credentials.json), injects a stand-in
+document.modelContext.registerTool before the app loads (tools collected on
+window.__webmcp), and drives the table ONLY through get_game_state / fold /
+check / call / bet / all_in / next_hand / show_hand_result, following the
+coach panel recommendation every turn. The recording (1920x1080) covers:
+landing hero -> TRY ONE SPOT reveal -> sign-in -> choose opponents -> 4
+hands with the coach panel and the moving dealer button -> hand review ->
+sidebar OVERALL PERFORMANCE -> champion screen (dev-only ?testWinner=true
+&testWinnerName=Hero) with START NEW SESSION. The cookie consent is preset
+to denied in localStorage (never clicked). The static ffmpeg (imageio-
+ffmpeg in scripts/record-promo/.venv, no drawtext support) concatenates the
+8 transparent caption overlays rendered by Playwright with the overlay
+filter (enable=between), trims the initial blank webm frames, encodes H.264
+MP4 (libx264 preset slow, CRF loop under 10 MB) and extracts the champion
+frame as the WebP poster. Outputs are wired into the landing demo slot
+(frontend/public/videos/ICMBOT_promo.mp4 + ICMBOT_promo_poster.webp); the
+old clip and its poster were deleted; `npm run record:promo` re-runs the
+whole pipeline. Result: 1:04, 8 captions, 3.0 MB MP4, 69 KB poster.
+
+Validation: backend 610 passed / 4 skipped (ruff + mypy clean); frontend
+208 passed (tsc, oxlint, vite build clean); the recorder ran end-to-end
+twice (reproducible) and the promo verified frame-by-frame (hero, quiz,
+hands, review, sidebar, champion).

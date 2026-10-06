@@ -838,7 +838,7 @@ fallbacks), and the page must work at 375 px with no horizontal scroll.
   frontend vitest + tsc + oxlint + build, 200-line audit).
 
 
-### A48 — Landing hero fold fix + reproducible promo video (IN PROGRESS)
+### A48 — Landing hero fold fix + reproducible promo video (IMPLEMENTED)
 Two steps, tested live in a browser.
 - Step 1 (hero fold): the hero must end above the fold on short desktop
   heights. `.lp-hero` gets padding-top 16px / padding-bottom 40px (was
