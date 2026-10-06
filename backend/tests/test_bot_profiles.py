@@ -3,7 +3,6 @@ from __future__ import annotations
 
 from app.ai.personalities import profile_for
 from app.services.session_store import session_store
-
 from tests.api_helpers import login_client
 
 

@@ -1,0 +1,103 @@
+/* Sign-in provider pills and the "or" separator. Split from auth.css
+   (200-line cap); imported right after it. --k comes from auth.css. */
+
+/* ---- provider pills ---- */
+.auth-providers {
+  display: flex;
+  flex-direction: column;
+  gap: calc(24 * var(--k));
+}
+
+/* The mark and the label sit centred in the pill, the arrow is pinned to the
+   right edge, which is what the mockup shows (label centre 540 vs pill centre
+   512, arrow centre 58px from the right edge). */
+.auth-provider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(30 * var(--k));
+  width: 100%;
+  height: calc(91 * var(--k));
+  padding: 0 calc(56 * var(--k));
+  border: calc(1 * var(--k)) solid transparent;
+  border-radius: 999px;
+  font-family: inherit;
+  font-size: calc(30 * var(--k));
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.auth-provider-dark {
+  background: #020203;
+  border-color: #41474c;
+  color: #fff;
+}
+
+.auth-provider-light {
+  background: #fff;
+  color: var(--auth-ink);
+}
+
+.auth-provider-dark:hover {
+  background: #121317;
+}
+
+.auth-provider-light:hover {
+  background: #eef0f3;
+}
+
+.auth-provider-mark,
+.auth-provider-end {
+  display: flex;
+  align-items: center;
+}
+
+/* Mark sizes come from the mockup: each brand glyph has its own ink box. */
+.ico-phone {
+  width: calc(54 * var(--k));
+  height: calc(54 * var(--k));
+}
+
+.ico-google {
+  width: calc(50 * var(--k));
+  height: calc(50 * var(--k));
+}
+
+.ico-apple {
+  width: calc(62 * var(--k));
+  height: calc(62 * var(--k));
+}
+
+.auth-provider-end {
+  position: absolute;
+  right: calc(38 * var(--k));
+}
+
+.ico-arrow {
+  width: calc(42 * var(--k));
+  height: calc(42 * var(--k));
+}
+
+.auth-provider-label {
+  text-align: center;
+}
+
+/* ---- "or" separator: rule, word, rule ---- */
+.auth-or {
+  display: flex;
+  align-items: center;
+  gap: calc(20 * var(--k));
+  height: calc(20 * var(--k));
+  margin-top: calc(9 * var(--k));
+  color: var(--auth-or, #8c9aae);
+  font-size: calc(25 * var(--k));
+}
+
+.auth-or::before,
+.auth-or::after {
+  content: "";
+  flex: 1 1 auto;
+  height: calc(1 * var(--k));
+  background: var(--auth-rule);
+}

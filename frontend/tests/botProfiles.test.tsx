@@ -40,6 +40,10 @@ function loadChoice() {
 }
 
 const click = async (testid: string) => act(async () => screen.getByTestId(testid).click());
+const add = (id: string, n: number) =>
+  act(async () => {
+    for (let i = 0; i < n; i += 1) screen.getByTestId(`bot-profile-add-${id}`).click();
+  });
 
 beforeEach(() => localStorage.clear());
 beforeEach(() => createTournament.mockClear());
@@ -108,10 +112,6 @@ describe("lineup builder (A27)", () => {
   it("sends the example lineup (2 Alex + 1 Sarah + 3 David + 2 Emma)", async () => {
     await loadChoice();
     await click("opponents-choose");
-    const add = (id: string, n: number) =>
-      act(async () => {
-        for (let i = 0; i < n; i += 1) screen.getByTestId(`bot-profile-add-${id}`).click();
-      });
     await add("alex", 2);
     await add("sarah", 1);
     await add("david", 3);
@@ -171,7 +171,6 @@ describe("main menu (A26 preserved)", () => {
   it("shows BOT PROFILES, hides TRAINING, START PRACTICE opens choice", async () => {
     localStorage.setItem("icm_auth_token", "t-1");
     localStorage.setItem("icm_username", "Mehrdad");
-    const { HomePage } = await import("../src/pages/HomePage");
     render(
       <MemoryRouter initialEntries={["/"]}>
         <Routes>

@@ -46,15 +46,17 @@ export function getAnalyticsConsent(): AnalyticsConsent | null {
   return currentConsent ?? readStoredConsent();
 }
 
+// gtag.js reads the Arguments object from dataLayer; a rest-parameter array is
+// not recognised, so this stays a plain function using `arguments`.
+function queueGtag(): void {
+  window.dataLayer?.push(arguments);
+}
+
 function initializeConsentMode(): void {
   if (consentModeInitialized) return;
 
   window.dataLayer = window.dataLayer ?? [];
-  window.gtag =
-    window.gtag ??
-    function gtag() {
-      window.dataLayer?.push(arguments);
-    };
+  window.gtag = window.gtag ?? queueGtag;
   window.gtag("consent", "default", DENIED_CONSENT);
   consentModeInitialized = true;
 }

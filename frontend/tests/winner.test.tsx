@@ -21,10 +21,10 @@ describe("winnerPreviewEnabled (development-only trigger)", () => {
   });
 });
 
-describe("tournamentChampion (existing tournament-finished state)", () => {
-  const player = (seat: number, name: string, sitsOut = false, isHero = false) =>
-    ({ seat, name, sitsOut, isHero } as never);
+const player = (seat: number, name: string, sitsOut = false, isHero = false) =>
+  ({ seat, name, sitsOut, isHero } as never);
 
+describe("tournamentChampion (existing tournament-finished state)", () => {
   it("returns the survivor when the current user wins", () => {
     const champion = tournamentChampion({ playersRemaining: 1, players: [player(0, "micky", false, true)] });
     expect(champion?.name).toBe("micky");
