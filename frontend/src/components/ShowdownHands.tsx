@@ -1,14 +1,27 @@
 import { ReviewShowdown } from "../models/game";
 import { CardView } from "./CardView";
+import { PlayingCard } from "./PlayingCard";
 
 interface ShowdownHandsProps {
   showdown: ReviewShowdown[];
   foldedSeats: number[];
   nameBySeat: Map<number, string>;
+  heroSeat: number;
 }
 
-/** Reveals at showdown: winners' cards + WON/LOST; folded players hidden. */
-export function ShowdownHands({ showdown, foldedSeats, nameBySeat }: ShowdownHandsProps) {
+/** A mucked opponent hand: two backs, never fake faces. */
+function MuckedCards({ label }: { label: string }) {
+  return (
+    <div className="reveal-cards reveal-mucked" role="img" aria-label={label} data-testid="mucked-cards">
+      <PlayingCard faceDown className="card-small" />
+      <PlayingCard faceDown className="card-small" />
+    </div>
+  );
+}
+
+/** Reveals at showdown: winners' cards + WON/LOST; mucked opponent hands
+ * (folded, or a walk nobody had to show) as card backs. */
+export function ShowdownHands({ showdown, foldedSeats, nameBySeat, heroSeat }: ShowdownHandsProps) {
   return (
     <div className="reveal-section" data-testid="reveal-section">
       <h3>SHOWDOWN HANDS</h3>
@@ -25,8 +38,10 @@ export function ShowdownHands({ showdown, foldedSeats, nameBySeat }: ShowdownHan
                   <CardView key={i} card={c} small />
                 ))}
               </div>
-            ) : (
+            ) : s.isHero ? (
               <div className="reveal-cards reveal-hidden">Walk — hand not revealed</div>
+            ) : (
+              <MuckedCards label="Walk — hand not revealed" />
             )}
             <div className="reveal-hand">{s.handName ?? "No showdown"}</div>
             <div className={`reveal-result ${s.won ? "reveal-won-label" : "reveal-lost-label"}`}>
@@ -37,7 +52,9 @@ export function ShowdownHands({ showdown, foldedSeats, nameBySeat }: ShowdownHan
         {foldedSeats.map((seat) => (
           <div key={seat} className="reveal-player reveal-folded">
             <div className="reveal-name">{nameBySeat.get(seat) ?? `Seat ${seat}`}</div>
-            <div className="reveal-cards reveal-hidden">Folded — hand not revealed</div>
+            {seat === heroSeat
+              ? <div className="reveal-cards reveal-hidden">Folded — hand not revealed</div>
+              : <MuckedCards label="Folded — hand not revealed" />}
             <div className="reveal-hand">FOLDED</div>
           </div>
         ))}
