@@ -313,6 +313,11 @@ async function main() {
     await sleep(600);
   }
 
+  // Hold the hands scene open until its line (+0.5s) is really over, so the
+  // review caption can neither overlap the hands caption nor start before
+  // the hands scene that carries it.
+  await holdUntil(marks.hands + sceneLen("hands") + 0.5);
+
   // Review + sidebar performance (the sidebar renders between hands).
   await waitFor(page, (s) => s && s.phase === "handOver", 30_000, "final review");
   mark("review");
