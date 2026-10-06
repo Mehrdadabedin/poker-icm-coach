@@ -49,6 +49,7 @@ async function table() {
 const baseState = {
   tableId: "A",
   handNumber: 3,
+  playersRemaining: 9, // one listed player alone would read as a finished tournament
   players: [{ seat: 0, name: "Hero", isHero: true, position: "BTN", stack: 10_000 }],
   communityCards: [],
   pot: 560,

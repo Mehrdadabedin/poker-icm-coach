@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { resolveWinnerName, winnerPreviewEnabled } from "./endgame";
+import { winnerPreviewEnabled } from "./endgame";
+import { endgameOverlays } from "./endgameOverlays";
 import { LiveTableView } from "../components/LiveTableView";
 import { LoginForm } from "../components/LoginForm";
-import { ReentryModal } from "../components/ReentryModal";
-import { TournamentWinner } from "../components/TournamentWinner";
 import { useAutoNext } from "../hooks/useAutoNext";
 import { useAutoFinish } from "../hooks/useAutoFinish";
 import { useGame } from "../hooks/useGame";
@@ -44,6 +43,8 @@ export function TablePage() {
   const actions = useTableActions({ tableId, refresh: refreshTable, navigate, lineup });
   const hero = state?.players.find((p) => p.isHero);
   const champion = state ? tournamentChampion(state) : null;
+  const previewWinner = winnerPreviewEnabled(import.meta.env.DEV, searchParams.get("testWinner"));
+  const championShown = previewWinner || champion !== null;
   const heroPendingReentry = !!hero?.awaitingReentry;
   const heroOut = !!hero && hero.sitsOut && !heroPendingReentry;
   const eliminationModalOpen = heroPendingReentry || (heroOut && !watchToEnd);
@@ -78,14 +79,14 @@ export function TablePage() {
   }, [state?.waitingForHero, state?.handNumber, state?.phase, state?.street,
       state?.actionLog?.length, tableId]);
   useEffect(() => {
-    if (state?.phase === "handOver" && !showReview && champion === null && !eliminationModalOpen) {
+    if (state?.phase === "handOver" && !showReview && !championShown && !eliminationModalOpen) {
       start();
     } else if (state?.phase !== "handOver") {
       stop();
       setShowReview(false);
     }
     return () => stop();
-  }, [state?.phase, state?.handNumber, showReview, start, stop, champion, eliminationModalOpen]);
+  }, [state?.phase, state?.handNumber, showReview, start, stop, championShown, eliminationModalOpen]);
 
   // A46: a coach-grade banner must not survive the hand it graded.
   useEffect(() => setComparison(null), [state?.handNumber]);
@@ -145,32 +146,24 @@ export function TablePage() {
     return <div className="loading-box">Connecting to the table…</div>;
   }
 
-  const previewWinner = winnerPreviewEnabled(import.meta.env.DEV, searchParams.get("testWinner"));
-  const previewName = searchParams.get("testWinnerName") ?? "";
-  const winnerName = resolveWinnerName(
+  const { cover, overlay } = endgameOverlays({
+    state,
+    champion,
     previewWinner,
-    previewName,
-    champion?.name ?? null,
-    state.username ?? getUsername() ?? "",
-  );
-  const showWinner = previewWinner || champion !== null;
-  const showEliminatedModal = heroPendingReentry || (eliminationModalOpen && !showWinner);
-  const overlay = showWinner ? (
-    <TournamentWinner username={winnerName ?? ""} place={state.heroFinishPlace} />
-  ) : showEliminatedModal ? (
-    <ReentryModal
-      available={heroPendingReentry}
-      finishPlace={state.heroFinishPlace}
-      onContinue={actions.continueReentry}
-      onWatch={() => setWatchToEnd(true)}
-      onNewGame={actions.startNewGame}
-    />
-  ) : undefined;
+    previewName: searchParams.get("testWinnerName") ?? "",
+    fallbackName: state.username ?? getUsername() ?? "",
+    heroPendingReentry,
+    eliminationModalOpen,
+    onContinue: actions.continueReentry,
+    onWatch: () => setWatchToEnd(true),
+    onNewGame: () => void actions.startNewGame(),
+  });
 
   return (
     <LiveTableView
       state={state}
       overlay={overlay}
+      cover={cover}
       coach={coach}
       comparison={comparison}
       countdown={countdown}

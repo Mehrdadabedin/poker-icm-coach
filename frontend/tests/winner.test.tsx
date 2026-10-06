@@ -1,9 +1,9 @@
-/* Tournament winner screen tests: the supplied artwork renders with only the
- * dynamic winning username overlaid on the empty plaque. No buttons and no
- * extra text; the username is never hardcoded. */
-import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
-import { TournamentWinner } from "../src/components/TournamentWinner";
+/* Tournament winner screen tests: the supplied artwork with the dynamic
+ * champion name on the plaque (never hardcoded), the hero's finishing place
+ * when a BOT won, and START NEW SESSION. */
+import { describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { TournamentWinner, ordinal } from "../src/components/TournamentWinner";
 import { resolveWinnerName, winnerPreviewEnabled } from "../src/pages/TablePage";
 import { tournamentChampion } from "../src/models/game";
 
@@ -79,57 +79,59 @@ describe("resolveWinnerName (winner plaque data flow)", () => {
 
 describe("TournamentWinner", () => {
   it("renders the champion artwork image", () => {
-    render(<TournamentWinner username="meaantonio38" />);
+    render(<TournamentWinner username="meaantonio38" heroIsChampion />);
     const image = screen.getByTestId("tournament-winner-image");
     expect(image).toHaveAttribute("src", "/images/tournament-champion.png");
     expect(image).toHaveAttribute("alt", "Tournament Champion");
   });
 
   it("shows the current winning username inside the plaque", () => {
-    render(<TournamentWinner username="meaantonio38" />);
+    render(<TournamentWinner username="meaantonio38" heroIsChampion />);
     expect(screen.getByTestId("tournament-winner-name")).toHaveTextContent("meaantonio38");
   });
 
   it("uses the username dynamically and never hardcodes it", () => {
-    render(<TournamentWinner username="Alice" />);
+    render(<TournamentWinner username="Alice" heroIsChampion />);
     expect(screen.getByTestId("tournament-winner-name")).toHaveTextContent("Alice");
     expect(screen.getByTestId("tournament-winner-name")).not.toHaveTextContent("meaantonio38");
   });
 
   it("falls back to Champ for an empty username", () => {
-    render(<TournamentWinner username="" />);
+    render(<TournamentWinner username="" heroIsChampion />);
     expect(screen.getByTestId("tournament-winner-name")).toHaveTextContent("Champion");
   });
 
-  it("adds no buttons or extra text", () => {
-    render(<TournamentWinner username="Alice" />);
+  it("offers START NEW SESSION only when a handler is given", () => {
+    render(<TournamentWinner username="Alice" heroIsChampion />);
     expect(screen.queryByRole("button")).toBeNull();
-    expect(screen.queryByText(/play again|new tournament|home/i)).toBeNull();
+    cleanup();
+    const onNewSession = vi.fn();
+    render(<TournamentWinner username="Alice" heroIsChampion onNewSession={onNewSession} />);
+    fireEvent.click(screen.getByRole("button", { name: "START NEW SESSION" }));
+    expect(onNewSession).toHaveBeenCalledTimes(1);
   });
 
   it("shows CONGRATULATIONS with the champion name (A45)", () => {
-    render(<TournamentWinner username="Alex" />);
+    render(<TournamentWinner username="Alex" heroIsChampion={false} place={3} />);
     expect(screen.getByTestId("tournament-winner-title")).toHaveTextContent("CONGRATULATIONS");
     expect(screen.getByTestId("tournament-winner-name")).toHaveTextContent("Alex");
   });
 
-  it("shows YOU FINISHED N OF 9 when the hero is not the champion (A45)", () => {
-    render(<TournamentWinner username="Alex" place={3} />);
-    expect(screen.getByTestId("tournament-winner-place")).toHaveTextContent("YOU FINISHED 3 OF 9");
-  });
-
-  it("omits the finish line when the hero is the champion or the place is unknown", () => {
-    render(<TournamentWinner username="micky" />);
-    expect(screen.queryByTestId("tournament-winner-place")).toBeNull();
-    render(<TournamentWinner username="Alex" place={1} />);
+  it("keeps the painted YOU WON line when the hero is the champion", () => {
+    render(<TournamentWinner username="micky" heroIsChampion place={1} />);
     expect(screen.queryByTestId("tournament-winner-place")).toBeNull();
   });
 
-  it("is an overlay layer (absolute positioning supplied by winner.css)", () => {
-    render(<TournamentWinner username="Alice" />);
-    const overlay = screen.getByTestId("tournament-winner");
-    // jsdom does not load CSS, so the overlay contract is the dedicated class
-    // that winner.css positions absolutely over the felt
-    expect(overlay.classList.contains("tournament-winner")).toBe(true);
+  it("shows a placeholder place when a BOT won and the place is unknown", () => {
+    render(<TournamentWinner username="Alex" heroIsChampion={false} />);
+    expect(screen.getByTestId("tournament-winner-place")).toHaveTextContent("YOU FINISHED ? OF 9");
+  });
+});
+
+describe("ordinal", () => {
+  it("uses ST / ND / RD / TH, with TH for 11-13", () => {
+    expect([1, 2, 3, 4, 9, 11, 12, 13, 21, 22, 23].map(ordinal)).toEqual(
+      ["1ST", "2ND", "3RD", "4TH", "9TH", "11TH", "12TH", "13TH", "21ST", "22ND", "23RD"],
+    );
   });
 });

@@ -10,6 +10,8 @@ import type { ReactNode } from "react";
 export interface LiveTableViewProps {
   state: TableState;
   overlay?: ReactNode;
+  /** Champion screen: covers the table and replaces the hand result. */
+  cover?: ReactNode;
   coach: CoachAdvice | null;
   comparison: Record<string, string> | null;
   countdown: number | null;
@@ -36,7 +38,7 @@ export interface LiveTableViewProps {
 /** The live table scene: header, felt (or review), and side panels. */
 export function LiveTableView(props: LiveTableViewProps) {
   const {
-    state, overlay, coach, comparison, countdown, paused, acting, showLabels,
+    state, overlay, cover, coach, comparison, countdown, paused, acting, showLabels,
     showResultLabels, nameBySeat, coachCollapsed, historyCollapsed, reviewOpen,
     username, onHome, onLogout, onTogglePause, onReview, onNext, onBackReview,
     onAction, onToggleCoach, onToggleHistory,
@@ -68,8 +70,8 @@ export function LiveTableView(props: LiveTableViewProps) {
         />
       ) : (
         <>
-          <PokerTable state={state} overlay={overlay}>
-            {handOver && state.review ? (
+          <PokerTable state={state} overlay={overlay} cover={cover}>
+            {cover ? null : handOver && state.review ? (
               <HandResult
                 review={state.review}
                 username={state.username}
