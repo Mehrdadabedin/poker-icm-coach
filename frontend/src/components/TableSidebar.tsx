@@ -22,19 +22,18 @@ interface TableSidebarProps {
  * On desktop .table-cols is display: contents, so the panels become grid items
  * of .table-page and land on the right and the left of the poker table.
  *
- * The HAND HISTORY panel gained a view switch (A18): its default stays HAND
- * HISTORY, and WIN / LOSE ANALYSIS only fetches the table owner's completed
- * hands (one read-only GET) when that view is selected. The switch never
- * touches game, table, timer or history data. */
+ * The HAND HISTORY panel has a view switch (A18): the default HAND HISTORY
+ * view shows OVERALL PERFORMANCE above the history, RESULTS BY POSITION the
+ * breakdowns. Both read the table owner's completed hands (one read-only
+ * GET). The switch never touches game, table, timer or history data. */
 export function TableSidebar({ actions, heroSeat, nameBySeat, coach, tableId, handNumber, currentLevel,
                               coachCollapsed, historyCollapsed, onToggleCoach, onToggleHistory }: TableSidebarProps) {
   const [view, setView] = useState<HistoryView>("history");
   const [hands, setHands] = useState<HandHistoryEntry[] | null>(null);
 
-  // Read-only, per-table: refresh on view activation and when a hand completes
-  // (handNumber advances), never while the history view is showing.
+  // Read-only, per-table: fetch when handNumber advances (a hand completed),
+  // not on the 350 ms state poll and not on a view switch.
   useEffect(() => {
-    if (view !== "analysis") return;
     let cancelled = false;
     request<{ hands: HandHistoryEntry[] }>(`/api/game/${encodeURIComponent(tableId)}/hands`)
       .then((data) => {
@@ -46,7 +45,7 @@ export function TableSidebar({ actions, heroSeat, nameBySeat, coach, tableId, ha
     return () => {
       cancelled = true;
     };
-  }, [view, tableId, handNumber]);
+  }, [tableId, handNumber]);
 
   return (
     <div className="table-cols">
@@ -57,10 +56,7 @@ export function TableSidebar({ actions, heroSeat, nameBySeat, coach, tableId, ha
         collapsed={historyCollapsed}
         onToggle={onToggleHistory}
         view={view}
-        onViewChange={(next) => {
-          setHands(null);
-          setView(next);
-        }}
+        onViewChange={setView}
         hands={hands}
         currentLevel={currentLevel}
       />

@@ -2,7 +2,9 @@ import { formatChips, HandHistoryEntry } from "../models/game";
 import { blindLevelStats, percent, positionStats, winLossTotals } from "../models/winloss";
 
 /**
- * A18 — WIN / LOSE ANALYSIS view inside the existing right-side panel.
+ * A18 — win / lose statistics inside the existing right-side panel.
+ * OVERALL PERFORMANCE heads the default HAND HISTORY view; the RESULTS BY
+ * POSITION view holds the position and blind-level breakdowns.
  * Read-only: renders derived numbers from the table owner's completed hands.
  * All statistics come from ../models/winloss; no value here is hard-coded.
  */
@@ -105,23 +107,29 @@ function ByPosition({ hands }: { hands: readonly HandHistoryEntry[] }) {
   );
 }
 
+function Placeholder({ loading }: { loading?: boolean }) {
+  return loading
+    ? <p className="wl-empty" data-testid="wl-loading">Loading completed hands…</p>
+    : <p className="wl-empty" data-testid="wl-empty">No completed hands yet.</p>;
+}
+
+/** Top of the default HAND HISTORY view: rings and totals. */
+export function OverallPerformance({ hands, loading }: { hands: readonly HandHistoryEntry[]; loading?: boolean }) {
+  if (loading || hands.length === 0) return <Placeholder loading={loading} />;
+  return <Overall totals={winLossTotals(hands)} />;
+}
+
+/** The RESULTS BY POSITION view: position rings, then blind levels. */
 export function WinLoseAnalysis({ hands, currentLevel, loading }: {
   hands: readonly HandHistoryEntry[];
   currentLevel?: number;
   loading?: boolean;
 }) {
-  if (loading) {
-    return <p className="wl-empty" data-testid="wl-loading">Loading completed hands…</p>;
-  }
-  if (hands.length === 0) {
-    return <p className="wl-empty" data-testid="wl-empty">No completed hands yet.</p>;
-  }
-  const totals = winLossTotals(hands);
+  if (loading || hands.length === 0) return <Placeholder loading={loading} />;
   return (
     <div className="wl-analysis" data-testid="win-lose-analysis">
-      <Overall totals={totals} />
-      <ByBlindLevel hands={hands} currentLevel={currentLevel} />
       <ByPosition hands={hands} />
+      <ByBlindLevel hands={hands} currentLevel={currentLevel} />
     </div>
   );
 }

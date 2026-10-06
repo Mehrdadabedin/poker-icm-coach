@@ -1,5 +1,5 @@
 import { ACTION_LABEL, formatChips, HandHistoryEntry, ReviewAction, TableAction } from "../models/game";
-import { WinLoseAnalysis } from "./WinLoseAnalysis";
+import { OverallPerformance, WinLoseAnalysis } from "./WinLoseAnalysis";
 
 export type HistoryView = "history" | "analysis";
 
@@ -35,10 +35,10 @@ interface ActionHistoryProps {
  * list away while the panel title stays; the review omits it. Recording, order
  * and every entry are untouched, only the presentation collapses.
  *
- * The live table can also switch the body to the WIN / LOSE ANALYSIS view
- * (onViewChange + view + hands): a pure presentation switch, the history body
- * below stays byte-for-byte the original. Without onViewChange this component
- * renders exactly as before (the review screen). */
+ * On the live table (onViewChange + view + hands) the default view puts
+ * OVERALL PERFORMANCE above the history, and RESULTS BY POSITION swaps the
+ * body for the position and blind-level breakdowns. Without onViewChange this
+ * component renders the history alone (the review screen). */
 
 export function ActionHistory({ actions, heroSeat, nameBySeat, collapsed = false, onToggle,
                              view = "history", onViewChange, hands = null, currentLevel }: ActionHistoryProps) {
@@ -62,7 +62,7 @@ export function ActionHistory({ actions, heroSeat, nameBySeat, collapsed = false
               aria-label="Side panel view"
             >
               <option value="history">HAND HISTORY</option>
-              <option value="analysis">WIN / LOSE ANALYSIS</option>
+              <option value="analysis">RESULTS BY POSITION</option>
             </select>
           </label>
         ) : (
@@ -78,6 +78,7 @@ export function ActionHistory({ actions, heroSeat, nameBySeat, collapsed = false
         <WinLoseAnalysis hands={hands ?? []} currentLevel={currentLevel} loading={hands === null} />
       ) : (
         <>
+      {!collapsed && onViewChange && <OverallPerformance hands={hands ?? []} loading={hands === null} />}
       {!collapsed && blindPosts.length > 0 && (
         <div className="history-line history-blind">
           <span className="history-street-dot">·</span>

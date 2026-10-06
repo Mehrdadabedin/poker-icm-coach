@@ -52,32 +52,38 @@ const switchTo = (value: string) =>
 describe("hand history panel two-view switch (A18)", () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it("keeps HAND HISTORY as the default and renders the existing entries", () => {
+  it("defaults to HAND HISTORY: OVERALL PERFORMANCE on top, the history under it", () => {
     render(<Panel />);
     expect(screen.getByTestId("history-view-select")).toHaveValue("history");
-    expect(screen.getByText("PRE-FLOP")).toBeInTheDocument();
-    expect(screen.getByText("Bot 2", { exact: false })).toBeInTheDocument();
-    expect(screen.queryByTestId("win-lose-analysis")).not.toBeInTheDocument();
-  });
-
-  it("offers exactly the two view options", () => {
-    render(<Panel />);
-    const options = screen.getByTestId("history-view-select").querySelectorAll("option");
-    expect([...options].map((o) => o.textContent)).toEqual(["HAND HISTORY", "WIN / LOSE ANALYSIS"]);
-  });
-
-  it("shows real-data analytics when WIN / LOSE ANALYSIS is selected", () => {
-    render(<Panel />);
-    switchTo("analysis");
-    expect(screen.getByTestId("win-lose-analysis")).toBeInTheDocument();
-    expect(screen.getByTestId("wl-overall")).toBeInTheDocument();
+    const overall = screen.getByTestId("wl-overall");
+    expect(overall).toHaveTextContent("OVERALL PERFORMANCE");
     expect(screen.getByTestId("wl-total-hands")).toHaveTextContent("3");
     expect(screen.getByTestId("wl-wins")).toHaveTextContent("2");
     expect(screen.getByTestId("wl-losses")).toHaveTextContent("1");
     expect(screen.getByTestId("wl-win-rate")).toHaveTextContent("67%");
     expect(screen.getByTestId("wl-profit")).toHaveTextContent("+125 chips");
-    expect(screen.getByTestId("wl-level-2")).toHaveAttribute("data-current", "true");
+    const preflop = screen.getByText("PRE-FLOP");
+    expect(overall.compareDocumentPosition(preflop) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.getByText("Bot 2", { exact: false })).toBeInTheDocument();
+    expect(screen.queryByText("RESULTS BY POSITION", { selector: "h4" })).toBeNull();
+    expect(screen.queryByTestId("wl-blind-levels")).toBeNull();
+  });
+
+  it("offers exactly the two view options", () => {
+    render(<Panel />);
+    const options = screen.getByTestId("history-view-select").querySelectorAll("option");
+    expect([...options].map((o) => o.textContent)).toEqual(["HAND HISTORY", "RESULTS BY POSITION"]);
+  });
+
+  it("RESULTS BY POSITION shows both breakdowns without OVERALL PERFORMANCE", () => {
+    render(<Panel />);
+    switchTo("analysis");
+    expect(screen.getByTestId("wl-positions")).toHaveTextContent("RESULTS BY POSITION");
     expect(screen.getByTestId("wl-position-MP")).toBeInTheDocument();
+    expect(screen.getByTestId("wl-blind-levels")).toHaveTextContent("WIN / LOSE BY BLIND LEVEL");
+    expect(screen.getByTestId("wl-level-2")).toHaveAttribute("data-current", "true");
+    expect(screen.queryByTestId("wl-overall")).toBeNull();
+    expect(screen.queryByText("PRE-FLOP")).toBeNull();
   });
 
   it("returns to the same Hand History when selected again", () => {
@@ -87,6 +93,15 @@ describe("hand history panel two-view switch (A18)", () => {
     expect(screen.getByTestId("history-view-select")).toHaveValue("history");
     expect(screen.getByText("PRE-FLOP")).toBeInTheDocument();
     expect(screen.queryByTestId("win-lose-analysis")).not.toBeInTheDocument();
+  });
+
+  it("HIDE folds the default view, OVERALL PERFORMANCE included", () => {
+    render(<Panel />);
+    fireEvent.click(screen.getByTestId("history-toggle"));
+    expect(screen.queryByTestId("wl-overall")).toBeNull();
+    expect(screen.queryByText("PRE-FLOP")).toBeNull();
+    fireEvent.click(screen.getByTestId("history-toggle"));
+    expect(screen.getByTestId("wl-overall")).toBeInTheDocument();
   });
 
   it("keeps HIDE / SHOW on both views: body folds, head with selector stays", () => {
@@ -113,14 +128,25 @@ describe("hand history panel two-view switch (A18)", () => {
 describe("TableSidebar fetch (A18)", () => {
   beforeEach(() => request.mockReset());
 
-  it("fetches the owner's hands only for the analysis view, one read-only GET", async () => {
+  const sidebar = (handNumber: number) => (
+    <TableSidebar actions={actions} heroSeat={0} nameBySeat={names} coach={null}
+      tableId="t-1" handNumber={handNumber} currentLevel={2} />
+  );
+
+  it("fetches once per hand for the default view, not per poll or view switch", async () => {
     request.mockResolvedValue({ hands });
-    render(<TableSidebar actions={actions} heroSeat={0} nameBySeat={names} coach={null}
-      tableId="t-1" handNumber={2} currentLevel={2} />);
-    expect(request).not.toHaveBeenCalled();
-    fireEvent.change(screen.getByTestId("history-view-select"), { target: { value: "analysis" } });
-    await waitFor(() => expect(request).toHaveBeenCalledTimes(1));
+    const { rerender } = render(sidebar(2));
+    await waitFor(() => expect(screen.getByTestId("wl-overall")).toBeInTheDocument());
+    expect(request).toHaveBeenCalledTimes(1);
     expect(request.mock.calls[0][0]).toBe("/api/game/t-1/hands");
-    await waitFor(() => expect(screen.getByTestId("win-lose-analysis")).toBeInTheDocument());
+
+    rerender(sidebar(2)); // a 350 ms poll with the same hand
+    rerender(sidebar(2));
+    fireEvent.change(screen.getByTestId("history-view-select"), { target: { value: "analysis" } });
+    expect(screen.getByTestId("win-lose-analysis")).toBeInTheDocument();
+    expect(request, "refetched without a new hand").toHaveBeenCalledTimes(1);
+
+    rerender(sidebar(3));
+    await waitFor(() => expect(request).toHaveBeenCalledTimes(2));
   });
 });
