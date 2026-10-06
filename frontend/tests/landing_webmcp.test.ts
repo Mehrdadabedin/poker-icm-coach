@@ -50,17 +50,25 @@ describe("landing WebMCP adapter", () => {
     registration?.cleanup();
   });
 
-  it("explains the pinned quiz spot without exposing account data", async () => {
+  it("explains the pinned bubble spot without exposing account data", async () => {
     const { tools } = installModelContext();
     const { actions } = landingActions();
     const registration = registerLandingTools(actions);
     await registration?.ready;
 
     const result = (await tools.find((tool) => tool.name === "explain_icm")!
-      .execute({})) as { recommendedAction: string; reasoning: string; confidence: number };
+      .execute({})) as {
+      spot: string[];
+      recommendedAction: string;
+      alternativeAction: string;
+      icmPressure: string;
+      explanation: string;
+    };
+    expect(result.spot).toContain("4 left, 3 paid.");
     expect(result.recommendedAction).toBe("FOLD");
-    expect(result.reasoning).toBe(LANDING_QUIZ_FACTS.reasoning);
-    expect(result.confidence).toBe(0.65);
+    expect(result.alternativeAction).toBe("CALL");
+    expect(result.icmPressure).toBe("VERY HIGH");
+    expect(result.explanation).toBe(LANDING_QUIZ_FACTS.explanation);
     expect(JSON.stringify(result)).not.toContain("token");
     expect(JSON.stringify(result)).not.toContain("username");
     registration?.cleanup();

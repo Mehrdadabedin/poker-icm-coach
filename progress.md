@@ -1810,14 +1810,16 @@ under src/landing/, each well under 200 lines):
   page background. The old invisible click areas are removed.
 - Video section "SEE ICM BOT IN ACTION": the current player and poster stay
   (ICM_BOT_demo_bot_profiles_narrated.mp4 + ICMBOT_video_poster.png).
-- TRY ONE SPOT quiz: A♥Q♠ in the big blind, 25 BB, 18 BB left / 17 BB paid,
-  chip leader shoved from the SB, two short stacks under 5 BB. CALL and FOLD
-  both reveal the coach's answer, which comes from the real backend
-  coach/ICM engine (Coach() on the exact CoachRequest) and is pinned by
-  backend/tests/test_landing_spot.py: FOLD, alt CALL, 65% confidence,
-  "AQo equity ~33% below required 54%. ICM pressure MEDIUM." with the engine
-  detail rows (equity 33%, pot odds 48%, ICM pressure / risk premium MEDIUM,
-  stack 450 chips (18.0 BB), effective stack 425 chips (17.0 BB)).
+- TRY ONE SPOT quiz (v2 after PR review; v1's 18-BB A♥Q♠ spot was not
+  reachable on a 9-player table): a real bubble spot — 4 players left, 3 paid
+  (the engine's BUBBLE stage), payouts 50/30/20, hero KJo 14 BB in the big
+  blind, chip leader (40 BB) shoved from the SB, short stack at 3 BB. CALL
+  and FOLD both reveal the coach's answer, computed by the real backend
+  engine (Coach() on the exact CoachRequest) and pinned by
+  backend/tests/test_landing_spot.py: FOLD (ICM pressure VERY HIGH), and the
+  reveal shows only the action, the ICM pressure, a plain 1-2 sentence
+  explanation and whether the pick matched the coach (no "Est. equity", no
+  raw reasoning string).
 - THE COACH: real Playwright screenshot of the live table with the coach
   panel (demo user "Hero", backend + built frontend running locally), saved
   as public/images/table-coach.webp at 44 KB, plus the three points (one

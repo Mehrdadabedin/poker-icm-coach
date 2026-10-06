@@ -1,37 +1,32 @@
 /**
- * A47 — "TRY ONE SPOT": the one tournament spot the landing quiz reveals.
- *
- * The answer is NOT a guess. It is the output of the backend coach/ICM engine
- * for this exact CoachRequest, pinned by backend/tests/test_landing_spot.py
- * (A♥Q♠ in the big blind, 25 BB blinds, 18 BB left, 17 BB paid, the chip
- * leader shoved from the SB, two short stacks under 5 BB). Change the spot
- * here only together with that test.
+ * A47 — "TRY ONE SPOT": the one tournament spot the landing quiz reveals (v2,
+ * a real bubble spot). The answer is NOT a guess: it is the output of the
+ * backend coach/ICM engine for this exact CoachRequest, pinned by
+ * backend/tests/test_landing_spot.py (4 left / 3 paid = BUBBLE stage, payouts
+ * 50/30/20, hero KJo 14 BB in the big blind, chip leader (40 BB) shoved from
+ * the SB, short stack at 3 BB). Change the spot here only with that test.
  */
 
 export interface LandingQuizFacts {
   recommendedAction: string;
   alternativeAction: string;
-  confidence: number;
-  reasoning: string;
-  factRows: Array<{ label: string; value: string }>;
+  icmPressure: string;
+  explanation: string;
 }
 
-export const LANDING_SPOT =
-  "A♥ Q♠ in the big blind \u00b7 25 BB blinds \u00b7 18 BB left in your stack " +
-  "\u00b7 17 BB paid in the pot \u00b7 the chip leader shoved from the SB \u00b7 " +
-  "two short stacks under 5 BB elsewhere";
+export const LANDING_SPOT: string[] = [
+  "4 left, 3 paid.",
+  "You: K♠ J♥ — 14 BB in the big blind.",
+  "Chip leader (40 BB) shoves from the small blind.",
+  "Short stack has 3 BB.",
+];
 
 export const LANDING_QUIZ_FACTS: LandingQuizFacts = {
   recommendedAction: "FOLD",
   alternativeAction: "CALL",
-  confidence: 0.65,
-  reasoning: "AQo equity ~33% below required 54%. ICM pressure MEDIUM.",
-  factRows: [
-    { label: "Est. equity", value: "33%" },
-    { label: "Pot odds", value: "48%" },
-    { label: "ICM pressure", value: "MEDIUM" },
-    { label: "Risk premium", value: "MEDIUM" },
-    { label: "Stack", value: "450 chips (18.0 BB)" },
-    { label: "Effective stack", value: "425 chips (17.0 BB)" },
-  ],
+  icmPressure: "VERY HIGH",
+  explanation:
+    "You are on the bubble: 4 players left and only 3 paid. Calling the shove " +
+    "is roughly break-even in chips but loses tournament equity (ICM EV is " +
+    "negative), so the coach folds and keeps your 14 BB for the next spot.",
 };

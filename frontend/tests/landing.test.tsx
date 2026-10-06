@@ -1,8 +1,6 @@
-/* A47 frontend tests: the rebuilt ICMBOT landing page. The entry route and
- * the unchanged sign-in / sign-up screens stay in landing_entry.test.tsx.
- * The quiz answer copy is pinned by backend/tests/test_landing_spot.py. */
+/* A47 frontend tests: the rebuilt ICMBOT landing page. Entry/sign-in screens
+ * stay in landing_entry.test.tsx; the quiz answer is pinned by the backend test. */
 import { describe, expect, it, vi, beforeEach } from "vitest";
-
 let scrolled = false;
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -14,8 +12,7 @@ vi.mock("../src/services/api", async (importOriginal) => ({
   clearAuth: vi.fn(() => {
     localStorage.removeItem("icm_auth_token");
     localStorage.removeItem("icm_username");
-  }),
-  health: vi.fn(async () => ({ status: "ok", version: "0.0.0+dev" })),
+  }),  health: vi.fn(async () => ({ status: "ok", version: "0.0.0+dev" })),
   me: vi.fn(async () => ({ username: "Mehrdad" })),
   getAuthProviders: vi.fn(async () => ({ google: false, apple: false, phone: false })),
   googleSignInUrl: vi.fn(() => "https://api.test/api/auth/google/start"),
@@ -23,12 +20,8 @@ vi.mock("../src/services/api", async (importOriginal) => ({
 
 async function openLanding() {
   const { LandingPage } = await import("../src/pages/LandingPage");
-  render(
-    <MemoryRouter>
-      <LandingPage />
-    </MemoryRouter>,
-  );
-  await act(async () => undefined); // let the providers lookup and footer settle
+  render(<MemoryRouter><LandingPage /></MemoryRouter>);
+  await act(async () => undefined); // let the providers lookup settle
   return screen;
 }
 
@@ -100,19 +93,32 @@ describe("public landing page (A47 rebuild)", () => {
     );
   });
 
-  it("lets both quiz buttons reveal the pinned coach answer", async () => {
+  it("shows the bubble spot and lets both quiz buttons reveal the coach answer", async () => {
     await openLanding();
+    const card = screen.getByTestId("landing-quiz-card");
+    for (const line of [
+      "4 left, 3 paid.",
+      "K♠ J♥",
+      "Chip leader (40 BB) shoves from the small blind.",
+      "Short stack has 3 BB.",
+    ]) {
+      expect(card.textContent).toContain(line);
+    }
     fireEvent.click(screen.getByTestId("landing-quiz-call"));
     const answer = screen.getByTestId("landing-quiz-answer");
-    expect(answer.textContent).toContain("FOLD");
-    expect(answer.textContent).toContain("65% confident");
-    expect(answer.textContent).toContain("AQo equity ~33% below required 54%. ICM pressure MEDIUM.");
-    expect(answer.textContent).toContain("Pot odds");
-    expect(answer.textContent).toContain("MEDIUM");
-    expect(answer.textContent).toContain("Alternative: CALL");
-    // FOLD reveals the same engine answer
+    expect(answer.textContent).toContain("The coach says FOLD");
+    expect(answer.textContent).toContain("ICM pressure VERY HIGH");
+    expect(answer.textContent).toContain("on the bubble");
+    expect(answer.textContent).toContain("You picked CALL — the coach folds.");
+    // no raw engine strings or forbidden numbers on the reveal
+    expect(answer.textContent).not.toContain("Est. equity");
+    expect(answer.textContent).not.toContain("~33% below required");
+    // FOLD reveals the same answer and reports the match
     fireEvent.click(screen.getByTestId("landing-quiz-fold"));
-    expect(screen.getByTestId("landing-quiz-answer").textContent).toContain("FOLD");
+    const again = screen.getByTestId("landing-quiz-answer");
+    expect(again.textContent).toContain("The coach says FOLD");
+    expect(again.textContent).toContain("You picked FOLD — matches the coach.");
+    expect(screen.queryByText(/Same answer from the engine every time/)).toBeNull();
   });
 
   it("shows the real coach screenshot and the three points", async () => {
@@ -185,7 +191,6 @@ describe("public landing page (A47 rebuild)", () => {
     await openLanding();
     expect(screen.queryByTestId("landing-google")).toBeNull();
   });
-
   it("offers Continue with Google only when /api/auth/providers says google", async () => {
     const { getAuthProviders } = await import("../src/services/api");
     vi.mocked(getAuthProviders).mockResolvedValueOnce({ google: true, apple: false, phone: false });

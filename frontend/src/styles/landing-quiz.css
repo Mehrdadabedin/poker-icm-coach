@@ -25,11 +25,14 @@
 
 .lp-quiz-spot {
   margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
   color: var(--lp-text);
   font-size: 1rem;
   line-height: 1.5;
   text-align: center;
 }
+.lp-quiz-spot li { margin: 2px 0; }
 
 .lp-quiz-prompt {
   margin: 0 0 16px;
@@ -69,6 +72,20 @@
   font-size: 1.05rem;
 }
 
+.lp-quiz-pressure {
+  display: inline-block;
+  margin: 0 0 0 10px;
+  padding: 2px 10px;
+  border: 1px solid var(--lp-gold);
+  border-radius: 999px;
+  color: var(--lp-gold);
+  font-family: var(--lp-head);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
 .lp-quiz-reason {
   margin: 0 0 14px;
   color: var(--lp-muted);
@@ -87,4 +104,10 @@
 }
 .lp-quiz-fact dd { margin: 0 0 0; color: var(--lp-text); font-weight: 700; }
 
-.lp-quiz-note { margin: 12px 0 0; color: var(--lp-muted); font-size: 0.85rem; }
+.lp-quiz-match {
+  margin: 12px 0 0;
+  color: var(--lp-gold);
+  font-family: var(--lp-head);
+  font-weight: 800;
+  font-size: 0.95rem;
+}

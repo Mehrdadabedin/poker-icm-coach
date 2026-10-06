@@ -38,7 +38,7 @@ export function buildLandingTools(actions: LandingToolActions): WebMcpTool[] {
     {
       name: "explain_icm",
       description:
-        "Explains what the ICM coach recommends for the landing-page quiz spot, " +
+        "Explains what the ICM coach recommends for the landing-page bubble spot, " +
         "with the same answer the backend engine test pins.",
       inputSchema: noInput,
       annotations: readOnly,
@@ -46,9 +46,8 @@ export function buildLandingTools(actions: LandingToolActions): WebMcpTool[] {
         spot: LANDING_SPOT,
         recommendedAction: LANDING_QUIZ_FACTS.recommendedAction,
         alternativeAction: LANDING_QUIZ_FACTS.alternativeAction,
-        reasoning: LANDING_QUIZ_FACTS.reasoning,
-        confidence: LANDING_QUIZ_FACTS.confidence,
-        facts: LANDING_QUIZ_FACTS.factRows,
+        icmPressure: LANDING_QUIZ_FACTS.icmPressure,
+        explanation: LANDING_QUIZ_FACTS.explanation,
       }),
     },
   ];

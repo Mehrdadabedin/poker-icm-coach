@@ -798,12 +798,15 @@ fallbacks), and the page must work at 375 px with no horizontal scroll.
   background. The invisible click areas over the old artwork are removed.
 - Video section "SEE ICM BOT IN ACTION" right under the hero; keep the current
   player and poster (a new video replaces the file later).
-- "TRY ONE SPOT" quiz: A♥Q♠ in the big blind, 25 BB, 18 left / 17 paid, the
-  chip leader shoved from the SB, two short stacks under 5 BB elsewhere.
-  CALL / FOLD buttons reveal the coach's answer, which comes from the backend
+- "TRY ONE SPOT" quiz (v2, fixed after PR review): a real bubble spot for
+  this app — 4 players left, 3 paid (the engine's BUBBLE stage), payouts
+  50/30/20, hero KJo 14 BB in the big blind, the chip leader (40 BB) shuffled
+  from the SB, one short stack at 3 BB. CALL / FOLD reveal the coach's answer:
+  the action, the ICM pressure and a plain 1-2 sentence explanation, plus
+  whether the pick matched the coach. The answer comes from the backend
   coach/ICM engine for this exact spot and is pinned by a test
   (backend/tests/test_landing_spot.py); the copy is written from the engine
-  result, never a guess.
+  result, never a guess, and shows no raw reasoning string or "Est. equity".
 - "THE COACH": a real screenshot of the table with the coach panel (Playwright,
   demo user "Hero", WebP under 150 KB) plus 3 points: one clear action, the
   reason in one line, and the tournament picture (ICM pressure, bubble, stack
