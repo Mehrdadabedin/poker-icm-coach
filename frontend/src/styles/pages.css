@@ -124,7 +124,8 @@
   color: var(--muted);
 }
 
-.settings-grid input[type="number"] {
+.settings-grid input[type="number"],
+.settings-grid select {
   min-height: 42px;
   border-radius: 8px;
   border: 1px solid #444;

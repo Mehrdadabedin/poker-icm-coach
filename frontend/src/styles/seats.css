@@ -150,12 +150,6 @@
   border-color: #4f2683;
 }
 
-.seat-hidden-cards {
-  color: var(--muted);
-  font-size: 0.7rem;
-  letter-spacing: 2px;
-}
-
 .seat-reveal-hand {
   font-size: 0.56rem;
   color: #d8f5e6;

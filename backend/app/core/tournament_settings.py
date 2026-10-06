@@ -22,6 +22,7 @@ class TournamentSettings:
     fast_mode: bool = False
     show_action_labels: bool = True
     show_result_labels: bool = True
+    card_back: str = "blue"  # "blue" | "red"; vocabulary on SettingsUpdate
 
     def to_dict(self) -> dict:
         return {
@@ -32,6 +33,7 @@ class TournamentSettings:
             "fastMode": self.fast_mode,
             "showActionLabels": self.show_action_labels,
             "showResultLabels": self.show_result_labels,
+            "cardBack": self.card_back,
         }
 
     def update(self, **kwargs: object) -> None:

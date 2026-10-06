@@ -101,6 +101,7 @@ export function HandReview({ review, coach, comparison, totalPlayers, nameBySeat
         showdown={review.showdown}
         foldedSeats={review.foldedSeats}
         nameBySeat={nameBySeat}
+        heroSeat={review.heroSeat}
       />
 
       <div className="review-history-block">

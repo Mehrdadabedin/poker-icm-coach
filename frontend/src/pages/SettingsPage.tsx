@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { request } from "../services/api";
 import { Copyright } from "../components/Copyright";
 import { HomeButton } from "../components/HomeButton";
-import type { SettingsPayload as Settings } from "../services/preferences";
+import { invalidateDisplayPreferences } from "../services/preferences";
+import type { CardBack, SettingsPayload as Settings } from "../services/preferences";
 
 /** SETTINGS screen: editable tournament defaults that affect new tournaments. */
 export function SettingsPage() {
@@ -13,7 +14,7 @@ export function SettingsPage() {
     request<Settings>("/api/settings").then(setSettings).catch(() => undefined);
   }, []);
 
-  const patch = (key: keyof Settings, value: number | boolean) => {
+  const patch = (key: keyof Settings, value: number | boolean | CardBack) => {
     setSettings((prev) => (prev ? { ...prev, [key]: value } : prev));
     setSaved(false);
   };
@@ -25,6 +26,7 @@ export function SettingsPage() {
         method: "PUT",
         body: JSON.stringify(settings),
       });
+      invalidateDisplayPreferences();
       setSaved(true);
     } catch {
       setSaved(false);
@@ -76,6 +78,15 @@ export function SettingsPage() {
       data-testid="settings-show-result-labels" />
     SHOW RESULT LABELS
   </label>
+          <label>
+            CARD BACK
+            <select value={settings.cardBack ?? "blue"}
+              onChange={(e) => patch("cardBack", e.target.value === "red" ? "red" : "blue")}
+              data-testid="settings-card-back">
+              <option value="blue">Blue</option>
+              <option value="red">Red</option>
+            </select>
+          </label>
   <div className="settings-actions">
             <button className="btn btn-primary" onClick={save} data-testid="settings-save">SAVE SETTINGS</button>
             <span className="note">{saved ? "Saved — next practice session uses these values." : "Defaults shown; SAVE to apply."}</span>

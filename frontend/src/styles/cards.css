@@ -48,3 +48,16 @@
   .result-cards-cell .playing-card,
   .result-board-cell .playing-card { width: 42px; }
 }
+
+/* BOT hole cards before showdown: compact backs, so a seat with cards is
+   barely taller than one without and side seats never overlap. Specificity
+   (0,5,0) beats the mobile.css seat-card sizes. */
+.table-felt .seat .seat-cards .playing-card.seat-card-back {
+  width: 24px;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
+}
+
+@media (max-width: 959px) and (min-aspect-ratio: 5/4) {
+  .table-felt .seat .seat-cards .playing-card.seat-card-back { width: 15px; }
+}

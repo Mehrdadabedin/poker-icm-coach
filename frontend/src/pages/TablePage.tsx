@@ -10,7 +10,7 @@ import { useGame } from "../hooks/useGame";
 import { useTableActions } from "../hooks/useTableActions";
 import type { ActionKind, CoachAdvice } from "../models/game";
 import { tournamentChampion } from "../models/game";
-import { useLabelPreferences } from "../services/preferences";
+import { useDisplayPreferences } from "../services/preferences";
 import { clearAuth, coachAdvice, coachCompare, getToken, getUsername, request } from "../services/api";
 import type { HandHistoryEntry } from "../webmcp/registerGameTools";
 import { useGameWebMcp } from "../webmcp/useGameWebMcp";
@@ -32,7 +32,7 @@ export function TablePage() {
   const [coachHidden, setCoachHidden] = useState(false);
   const [historyHidden, setHistoryHidden] = useState(false);
   const [comparison, setComparison] = useState<Record<string, string> | null>(null);
-  const { actionLabels, resultLabels } = useLabelPreferences();
+  const { actionLabels, resultLabels } = useDisplayPreferences();
   const lineup = useMemo(() => {
     const profiles = (state?.players ?? [])
       .filter((p) => !p.isHero)
