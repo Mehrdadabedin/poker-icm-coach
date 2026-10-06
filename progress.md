@@ -1780,3 +1780,14 @@ frontend/src/styles/seats.css, frontend/tests/table.test.tsx, docs.
 Validation: frontend 121/121 (18 files), tsc clean, build PASSED; visual
 desktop 1440x900 + mobile 390x844 (8 portraits, hero excluded, no overflow,
 no text overlap, seat boxes unchanged).
+
+## A47 - ICMBOT landing page rebuild (2026-10-11)
+
+Task: rebuild the public landing page from the A47 spec as split components,
+with the new ICMBOT identity: dark palette, Archivo/Instrument Sans, a cropped
+robot hero, the pinned "TRY ONE SPOT" coach quiz, a real table+coach
+screenshot, the four bot profiles, nine WHAT YOU GET cards, FAQ, final CTA with
+conditional Continue with Google, landing-only WebMCP tools
+(watch_demo/start_training/explain_icm), SEO index.html, and a cleaned
+public/videos directory. All gates must stay green; every touched source file
+stays within the 200-line cap.

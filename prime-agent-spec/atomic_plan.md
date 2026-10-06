@@ -779,3 +779,47 @@ outlive the hand it graded.
 - `registerGameTools.ts:368` console.error removed (registration failures are
   silently dropped); the file is split into webmcpTypes/webmcpTools/
   webmcpViews so every touched source file stays within the 200-line cap.
+### A47 — ICMBOT landing page rebuild (IMPLEMENTED)
+Rebuild the public landing page from the A47 spec (RGBA reference) and split it
+into components, each under the 200-line cap. The palette is dark (#07080A /
+#0C0E13 bands, cards #12151C with #232836 borders, gold #F2B33D, blue
+#0B6CF0), Archivo headings + Instrument Sans body (Google Fonts, system
+fallbacks), and the page must work at 375 px with no horizontal scroll.
+
+- Header: solid #07080A (nothing shows through), logo left, links "What is
+  ICM" / "How it works" / "Opponents" / "FAQ" hidden on phones, LOGIN (gold
+  outline) and SIGN UP (blue #0B6CF0) right.
+- Hero, two columns. Left: kicker "TOURNAMENT POKER TRAINER", h1 "MASTER YOUR
+  TOURNAMENT DECISIONS", the 8-bot/ICM-coach sub line, START TRAINING FREE
+  (gold -> /login) and WATCH DEMO (outline, scrolls to the video), and the
+  "Practice only, no real money" line. Right: crop
+  public/images/ICMBOT_target_hero.png to x 640-1665, y 106-905 (no baked
+  text), save as public/images/hero-robot.webp, fade the left edge into the
+  background. The invisible click areas over the old artwork are removed.
+- Video section "SEE ICM BOT IN ACTION" right under the hero; keep the current
+  player and poster (a new video replaces the file later).
+- "TRY ONE SPOT" quiz: A♥Q♠ in the big blind, 25 BB, 18 left / 17 paid, the
+  chip leader shoved from the SB, two short stacks under 5 BB elsewhere.
+  CALL / FOLD buttons reveal the coach's answer, which comes from the backend
+  coach/ICM engine for this exact spot and is pinned by a test
+  (backend/tests/test_landing_spot.py); the copy is written from the engine
+  result, never a guess.
+- "THE COACH": a real screenshot of the table with the coach panel (Playwright,
+  demo user "Hero", WebP under 150 KB) plus 3 points: one clear action, the
+  reason in one line, and the tournament picture (ICM pressure, bubble, stack
+  band, risk premium, pot odds, SPR).
+- "HOW IT WORKS" (sign up or Google / choose opponents / play and get graded
+  PREFERRED / ACCEPTABLE / SUBOPTIMAL), "YOUR OPPONENTS" (the 4 bot profiles
+  from models/botProfiles.ts with portrait, style, description), "WHAT YOU GET"
+  (9 cards), FAQ (real money? ICM knowledge? phone? exact items, no "free"
+  question), final CTA with Continue with Google only when
+  /api/auth/providers says google, and the footer (tagline, Privacy, Terms,
+  Cookie settings, "© 2026 ICMBOT. Practice only.").
+- Landing-only WebMCP tools watch_demo / start_training / explain_icm using
+  the same register pattern as src/webmcp.
+- index.html: title "ICMBOT", meta description, Open Graph tags with a
+  1200x630 image, user-scalable=no removed.
+- Delete the unused videos in public/videos (keep only the one the page uses
+  and its poster); convert the large PNGs used here to WebP.
+- Update the landing tests. Run all gates (backend pytest + ruff + mypy,
+  frontend vitest + tsc + oxlint + build, 200-line audit).
