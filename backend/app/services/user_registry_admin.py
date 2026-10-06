@@ -7,13 +7,17 @@ protected Admin APIs).
 """
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 
 from app.core.config import settings
 from app.services.user_registry import UserRegistry, auth_registry
 
+logger = logging.getLogger(__name__)
+
 LOCAL = "local"
 GOOGLE = "google"
+ADMIN_BOOTSTRAP_MIN_LENGTH = 12
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,11 +52,19 @@ def bootstrap_admin(
     Runs at application startup. The bootstrap password is hashed with the
     app's PBKDF2 scheme and the account is forced to change it on first
     login; the plaintext password is never stored, returned or logged.
+    A blank or short password skips creation, so no deployment gets an Admin
+    with a guessable shipped default.
     """
     reg = registry or auth_registry
     password = (
         bootstrap_password if bootstrap_password is not None else settings.admin_bootstrap_password
     )
+    if len(password) < ADMIN_BOOTSTRAP_MIN_LENGTH:
+        logger.warning(
+            "Admin bootstrap skipped: ADMIN_BOOTSTRAP_PASSWORD is %s (needs at least %d characters)",
+            "empty" if not password else "too short", ADMIN_BOOTSTRAP_MIN_LENGTH,
+        )
+        return False
     return reg.bootstrap_admin(password)
 
 

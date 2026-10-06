@@ -26,8 +26,9 @@ class Settings(BaseSettings):
     # Admin level on this deployment. Usernames only; no secrets.
     admin_usernames: str = ""
     # Bootstrap password for the initial Admin account (created once, hashed,
-    # forced to change on first login). Override per deployment; never logged.
-    admin_bootstrap_password: str = "admin1234"
+    # forced to change on first login). No default: blank or shorter than 12
+    # characters skips creating Admin. Set per deployment; never logged.
+    admin_bootstrap_password: str = ""
 
     # Google sign-in. Only read from the environment; never logged or returned.
     # Both values are required before the provider is advertised as available.
