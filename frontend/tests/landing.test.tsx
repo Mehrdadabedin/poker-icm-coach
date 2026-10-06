@@ -42,9 +42,9 @@ describe("public landing page (A47 rebuild)", () => {
     for (const needle of ["--lp-bg: #07080a", ".lp-header", "background: var(--lp-bg);"]) { expect(landingCss).toContain(needle); }
     expect(screen.getByTestId("landing-brand")).toBeInTheDocument();
     const navButtons = header.querySelectorAll("button.lp-nav-link");
-    expect(navButtons).toHaveLength(4);
+    expect(navButtons).toHaveLength(5);
     expect(Array.from(navButtons).map((b) => b.textContent)).toEqual([
-      "What is ICM", "How it works", "Opponents", "FAQ",
+      "What is ICM", "The Coach", "How it works", "Opponents", "FAQ",
     ]);
     expect(screen.getByTestId("landing-login")).toHaveAttribute("href", "/login");
     expect(screen.getByTestId("landing-signup")).toHaveAttribute("href", "/login");

@@ -4,6 +4,7 @@ import { scrollToSection } from "./scrollTo";
 
 const NAV_LINKS = [
   { label: "What is ICM", target: "lp-quiz" },
+  { label: "The Coach", target: "lp-coach" },
   { label: "How it works", target: "lp-how" },
   { label: "Opponents", target: "lp-opponents" },
   { label: "FAQ", target: "lp-faq" },

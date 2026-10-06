@@ -867,3 +867,18 @@ Two steps, tested live in a browser.
   the landing demo slot points at them, the old clip and poster are
   deleted, and `npm run record:promo` re-runs the whole pipeline from an
   empty state.
+
+Second pass (2026-10-11, post-merge with branded card backs):
+- Header gains a "The Coach" button (What is ICM / The Coach / How it works
+  / Opponents / FAQ), scrolling to #lp-coach.
+- THE COACH screenshot retaken with a real bot lineup (Alex/Sarah/David/
+  Emma portraits and face-down branded card backs).
+- TRY ONE SPOT cards start face down (cards/back.png) and flip when the
+  section scrolls into view.
+- Promo re-record: 1280x720 viewport at deviceScaleFactor 1.5 (1920x1080
+  output), quiz goes straight to login (no second pass over the hero),
+  exactly one caption at a time tied to its scene mark, and REQUIRED female
+  narration via piper-tts (en_US-hfc_female-medium, fallback
+  en_US-amy-medium) driven by scripts/record-promo/narration.json; audio is
+  AAC 128 kbps loudnorm ~-16 LUFS, no music, each scene held at least its
+  line +0.5s.

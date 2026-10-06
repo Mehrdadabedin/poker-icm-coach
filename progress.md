@@ -1960,3 +1960,17 @@ Validation: backend 610 passed / 4 skipped (ruff + mypy clean); frontend
 208 passed (tsc, oxlint, vite build clean); the recorder ran end-to-end
 twice (reproducible) and the promo verified frame-by-frame (hero, quiz,
 hands, review, sidebar, champion).
+
+Second pass (2026-10-11): after merging FIX-POKERTABLE-LAYOUT-TEST (branded
+card backs + face-down BOT cards), the header gained "The Coach" (nav order:
+What is ICM / The Coach / How it works / Opponents / FAQ); the THE COACH
+screenshot was retaken with a bot-profile lineup so seats show
+Alex/Sarah/David/Emma portraits and face-down card backs (54 KB WebP); the
+TRY ONE SPOT cards start face down and flip when the section scrolls into
+view; and the promo was re-recorded at 1280x720 x1.5 device scale (1920x1080
+output), going straight from the quiz into login (the hero no longer
+appears twice), with exactly one caption per scene at its scene mark.
+Narration is REQUIRED female piper-tts voice en_US-hfc_female-medium
+(fallback en_US-amy-medium), scripted in scripts/record-promo/narration.json,
+AAC 128 kbps loudnorm ~-16 LUFS, no music. Final: 1:07, 2.7 MB MP4, 89 KB
+poster.
