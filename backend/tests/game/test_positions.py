@@ -1,13 +1,18 @@
 """Position mapping tests (Atomic Part 005)."""
 from __future__ import annotations
 
+import random
+
 import pytest
 
+from app.game.actions import Action, ActionType
 from app.game.positions import (
     POSITION_ORDER,
     all_positions,
     position_for,
+    position_labels,
 )
+from app.services.game_session import GameSession
 
 
 def test_nine_positions_clockwise() -> None:
@@ -137,3 +142,54 @@ def test_dealer_advances_in_seat_index_order() -> None:
     for exp in expected:
         assert dealer == exp
         dealer = next_button(dealer, 9, set(range(9)))
+
+
+def _play_out(s: GameSession, guard: int = 5000) -> None:
+    """Advance the current hand to completion (hero folds when asked)."""
+    steps = 0
+    while not s.engine.is_complete and steps < guard:
+        actor = s.engine.current_actor
+        if actor is None:
+            break
+        player = s.tournament.players[actor]
+        if player.is_human:
+            s.engine.act(actor, Action(ActionType.FOLD))
+        else:
+            s.engine.advance_bot(actor)
+        steps += 1
+    assert s.engine.is_complete, "hand did not complete"
+
+
+def test_position_labels_short_handed_rings() -> None:
+    """A43: 8 and 7 active seats drop early positions and keep the CO."""
+    labels8 = position_labels(button=0, active_seats=set(range(8)), num_seats=9)
+    assert labels8 == {0: "BTN", 1: "SB", 2: "BB", 3: "UTG", 4: "UTG+1",
+                       5: "LJ", 6: "HJ", 7: "CO"}
+    labels7 = position_labels(button=0, active_seats=set(range(7)), num_seats=9)
+    assert labels7 == {0: "BTN", 1: "SB", 2: "BB", 3: "UTG", 4: "LJ",
+                       5: "HJ", 6: "CO"}
+
+
+def test_position_labels_omit_inactive_seats() -> None:
+    """A43: busted seat gets no label, CO is present, exactly 8 labels."""
+    labels = position_labels(button=0, active_seats={0, 1, 2, 3, 4, 5, 6, 7}, num_seats=9)
+    assert len(labels) == 8
+    assert 8 not in labels
+    assert "CO" in labels.values()
+
+
+def test_state_view_positions_only_active_players() -> None:
+    """A43: the state view labels exactly the 8 active players; the busted
+    seat has position None."""
+    s = GameSession(starting_stack=10_000, rng=random.Random(3))
+    s.start()
+    _play_out(s)
+    busted = s.tournament.players[3]
+    busted.is_eliminated = True
+    busted.sit_out = True
+    state = s.state()
+    views = {p["seat"]: p for p in state["players"]}
+    assert views[3]["position"] is None
+    active = [p for p in state["players"] if not p["sitsOut"]]
+    assert len(active) == 8
+    assert "CO" in [p["position"] for p in active]

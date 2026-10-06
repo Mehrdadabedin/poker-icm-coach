@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 
 from app.game.actions import legal_actions
 from app.game.decision_provider import DecisionContext
-from app.game.positions import position_for
+from app.game.positions import position_labels
 
 if TYPE_CHECKING:  # pragma: no cover - import cycle guard
     from app.game.hand_engine import HandEngine
@@ -21,6 +21,11 @@ def build_context(engine: HandEngine, seat: int) -> DecisionContext:
     tournament = engine.tournament
     player = tournament.players[seat]
     street = engine._street
+    positions = position_labels(
+        engine.button,
+        {p.seat for p in tournament.players if not p.is_eliminated and not p.sit_out},
+        len(tournament.players),
+    )
     contribution = street.contributions.get(seat, 0)
     big_blind = tournament.current_blind_level().big
     return DecisionContext(
@@ -37,6 +42,6 @@ def build_context(engine: HandEngine, seat: int) -> DecisionContext:
             street.current_bet, contribution, player.stack, big_blind,
             street.last_raise, can_raise=street.may_raise(seat, big_blind),
         ),
-        position=position_for(engine.button, seat, len(tournament.players)),
+        position=positions.get(seat, ""),
         action_history=[(a.seat, a.action, a.amount) for a in engine._log],
     )

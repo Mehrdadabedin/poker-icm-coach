@@ -12,7 +12,7 @@ export interface PlayerView {
   name: string;
   stack: number;
   stackInBB: number;
-  position: string;
+  position: string | null;
   bet: number;
   folded: boolean;
   isHero: boolean;

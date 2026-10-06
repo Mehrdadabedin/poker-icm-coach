@@ -10,7 +10,7 @@ from __future__ import annotations
 from app.ai.ai_framework import pot_odds
 from app.ai.postflop_ai import equity_estimate
 from app.game.hand_setup import blind_seats
-from app.game.positions import position_for
+from app.game.positions import position_labels
 from app.poker.card import Card
 from app.strategy.bubble import bubble_pressure, detect_stage
 from app.strategy.coach import _preflop_equity
@@ -107,7 +107,7 @@ def build_explanations(session, result, level, pressure: str) -> list[dict]:
         hole = list(result.hole_cards.get(a.seat, []))
         equity = _equity(hole, street, board) if len(hole) == 2 else 0.0
         stack_bb = round(max(0, start.get(a.seat, 0) - cum.get(a.seat, 0)) / max(1, level.big), 1)
-        pos = position_for(result.button, a.seat, len(players))
+        pos = position_labels(result.button, set(hand), len(players)).get(a.seat, "")
         out.append({
             "seat": a.seat, "name": players[a.seat].name, "action": a.action,
             "amount": a.amount, "street": street, "position": pos,

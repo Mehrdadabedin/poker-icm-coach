@@ -727,3 +727,20 @@ The dealer button must land on the previous hand's small blind every hand.
 - Acceptance: next-hand BTN == this-hand SB; hero cycle BB -> SB -> BTN -> CO;
   dealer/position tests rewritten to the correct ring; dealing, betting and
   blind amounts untouched; backend + frontend suites green.
+
+### A43 — Positions only for players with cards; busted players leave the table (IMPLEMENTED)
+Labels are computed over the ACTIVE seats only (not eliminated, not sitting
+out), clockwise from the button.
+- Added `positions.position_labels(button, active_seats, num_seats) ->
+  dict[int, str]`; inactive seats get no label (None in the state view).
+- Short-handed rings drop early positions first and always keep the blinds
+  and CO: 8 -> BTN SB BB UTG UTG+1 LJ HJ CO; 7 -> BTN SB BB UTG LJ HJ CO;
+  6/5/4/3/2 unchanged. Every label exists in `preflop_ranges.py` /
+  `baseline_ranges.py`.
+- Every `position_for` production caller switched to the active-aware
+  version: game_state_view, decision_context, session_coach, game_session
+  (history record), hand_review and bot_review (hand participant seats).
+- Frontend: an eliminated BOT is not rendered on the felt at all (no seat
+  box, no OUT badge, no position); the hero seat stays visible.
+- Acceptance: 8 players left -> exactly 8 labels, none on the busted seat,
+  CO present; short ring labels drive the existing range/coach lookups.

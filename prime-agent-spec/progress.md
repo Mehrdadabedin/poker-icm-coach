@@ -63,6 +63,7 @@ Main requested changes:
 | A39 | Hero all-in loss / re-entry cutoff / BOT auto-finish | 🟢 | Re-entry L1-L5 via explicit player choice; no auto 45k restore; L>5 permanent elimination; BOT-only auto-finish to existing champion; tests backend `test_reentry.py`, frontend `reentry.test.tsx`; plan: atomic_plan.md A39. |
 | A40 | Tournament endgame reliability / deep all-in stall | 🟢 | Hand engine no longer starts a hand with <=1 active seat; `blind_seats` guards <2 seats; bots-only endgames reach `finished` + champion; tests `backend/tests/tournament/test_endgame.py`; plan: atomic_plan.md A40. |
 | A42 | Dealer button direction | 🟢 | `next_button` advances +1 (next-hand BTN = this-hand SB); felt CSS mirrored so increasing seat index runs clockwise; seeded multi-hand test pins the hero cycle BB->SB->BTN->CO; tests `test_dealer_button.py`/`test_positions.py`; plan: atomic_plan.md A42. |
+| A43 | Positions only for active players; busted BOTs leave the felt | 🟢 | `position_labels` labels only active seats; 8/7-handed rings drop early positions and keep CO; all `position_for` callers active-aware; frontend hides eliminated BOT seats; tests `test_positions.py`; plan: atomic_plan.md A43. |
 
 ## Known evidence from the supplied screenshots
 

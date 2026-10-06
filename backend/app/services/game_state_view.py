@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from app.game.actions import legal_actions
 from app.game.hand_setup import in_hand_seats
-from app.game.positions import position_for
+from app.game.positions import position_labels
 from app.poker.card import card_model
 from app.services.hand_review import build_review
 
@@ -25,6 +25,9 @@ def build_state_view(session) -> dict:
     street_contrib = eng._street.contributions
     level = tournament.current_blind_level()
     button = tournament.button
+    active_seats = {p.seat for p in tournament.players
+                    if not p.is_eliminated and not p.sit_out}
+    positions = position_labels(button, active_seats, len(tournament.players))
     players = []
     for p in tournament.players:
         players.append({
@@ -32,7 +35,7 @@ def build_state_view(session) -> dict:
             "name": p.name,
             "stack": p.stack,
             "stackInBB": round(p.stack / max(1, level.big), 1),
-            "position": position_for(button, p.seat, len(tournament.players)),
+            "position": positions.get(p.seat),
             "bet": street_contrib.get(p.seat, 0),
             "folded": p.folded,
             "isHero": p.is_human,

@@ -34,7 +34,7 @@ class PlayerStateModel(BaseModel):
     name: str
     stack: int
     stackInBB: float
-    position: str
+    position: str | None
     bet: int
     folded: bool
     isHero: bool

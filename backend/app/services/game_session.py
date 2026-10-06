@@ -9,7 +9,7 @@ import uuid
 from app.ai.ai_framework import AIDecisionProvider
 from app.game.actions import Action, ActionType
 from app.game.hand_engine import HandEngine
-from app.game.positions import position_for
+from app.game.positions import position_labels
 from app.services import hand_history
 from app.services.game_state_view import build_state_view
 from app.services.hand_history import HandHistoryRecord, HandHistoryStore
@@ -18,7 +18,6 @@ from app.services.session_store import mark_finished
 from app.strategy.coach import Coach, CoachRequest
 from app.tournament.tournament import build_default_tournament
 from app.tournament.tournament_timer import TournamentTimer
-
 
 class GameSession:
     """Owns one table; every public entry takes self._lock (reentrant)."""
@@ -111,12 +110,10 @@ class GameSession:
             self.timer.pause()
             request = coach_request(self)
             self.engine.act(actor, action)
-            self._last_hero_action = f"{kind.upper()}"
-            self._last_hero_request = request
+            self._last_hero_action, self._last_hero_request = f"{kind.upper()}", request
             self._advance_bots()
             if not self.engine.is_complete:
-                assert self.timer is not None
-                self.timer.resume()
+                self.timer.resume()  # timer asserted non-null above
 
     def _advance_bots(self, guard: int = 5000) -> None:
         assert self.engine is not None
@@ -179,13 +176,16 @@ class GameSession:
         result = self.engine.result
         if result is None:
             return
+        positions = position_labels(self.tournament.button,
+                                    {p2.seat for p2 in self.tournament.active_players()},
+                                    len(self.tournament.players))
         hero = self.tournament.players[self.hero_seat]
         level = self.tournament.current_blind_level()
         start = result.starting_stacks.get(self.hero_seat, hero.stack)
         record = HandHistoryRecord(
             hand_number=result.hand_number,
             hero_cards=list(hero.hole_cards),
-            hero_position=position_for(self.tournament.button, self.hero_seat, len(self.tournament.players)),
+            hero_position=positions.get(self.hero_seat, ""),
             community_cards=list(result.community_cards),
             starting_stack=start, ending_stack=hero.stack,
             blind_level=f"{level.small}/{level.big}",

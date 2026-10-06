@@ -7,7 +7,7 @@ cards revealed. Bot decision explanations live in bot_review.py.
 from __future__ import annotations
 
 from app.game.hand_setup import blind_seats
-from app.game.positions import position_for
+from app.game.positions import position_labels
 from app.poker.card import card_model
 from app.poker.hand_evaluator import best_hand
 from app.poker.hand_rank import CATEGORY_NAMES, HandCategory
@@ -115,7 +115,8 @@ def build_review(session) -> dict | None:
         "heroSeat": hero, "heroCards": [card_model(c) for c in result.hole_cards.get(hero, [])],
         "heroStart": hero_start, "heroEnd": hero_end,
         "heroNet": hero_end - hero_start, "heroWon": hero_won, "chop": chop,
-        "heroPosition": position_for(result.button, hero, len(players)),
+        "heroPosition": position_labels(result.button, set(hand_seats),
+                                        len(players)).get(hero, ""),
         "heroRankBefore": rb.index(hero_start) + 1, "heroRankAfter": ra.index(hero_end) + 1,
         "winners": winners, "foldedSeats": list(result.folded), "allInSeats": all_in,
         "showdown": showdown, "actions": actions,

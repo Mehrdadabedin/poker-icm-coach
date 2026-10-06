@@ -20,7 +20,10 @@ const ACT_LABEL: Record<string, string> = {
 
 /** The 9-seat poker table: seats, community board, pot, header info. */
 export function PokerTable({ state, children, overlay }: PokerTableProps) {
-  const sorted = [...state.players].sort((a, b) => a.seat - b.seat);
+  // A43: an eliminated BOT leaves the felt entirely; the hero seat stays.
+  const sorted = [...state.players]
+    .filter((pl) => !pl.sitsOut || pl.isHero)
+    .sort((a, b) => a.seat - b.seat);
   const isReview = state.phase === "handOver" && !!state.review;
   const review = state.review ?? null;
 
