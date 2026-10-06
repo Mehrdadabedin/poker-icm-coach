@@ -42,9 +42,9 @@ describe("public landing page (A47 rebuild)", () => {
     for (const needle of ["--lp-bg: #07080a", ".lp-header", "background: var(--lp-bg);"]) { expect(landingCss).toContain(needle); }
     expect(screen.getByTestId("landing-brand")).toBeInTheDocument();
     const navButtons = header.querySelectorAll("button.lp-nav-link");
-    expect(navButtons).toHaveLength(4);
+    expect(navButtons).toHaveLength(5);
     expect(Array.from(navButtons).map((b) => b.textContent)).toEqual([
-      "What is ICM", "How it works", "Opponents", "FAQ",
+      "What is ICM", "The Coach", "How it works", "Opponents", "FAQ",
     ]);
     expect(screen.getByTestId("landing-login")).toHaveAttribute("href", "/login");
     expect(screen.getByTestId("landing-signup")).toHaveAttribute("href", "/login");
@@ -83,12 +83,12 @@ describe("public landing page (A47 rebuild)", () => {
     await openLanding();
     const player = screen.getByTestId("landing-video-player");
     expect(player.tagName).toBe("VIDEO");
-    expect(player).toHaveAttribute("poster", "/videos/ICMBOT_video_poster.png");
+    expect(player).toHaveAttribute("poster", "/videos/ICMBOT_promo_poster.webp");
     expect(player.querySelector("source")).toHaveAttribute(
-      "src", "/videos/ICM_BOT_demo_bot_profiles_narrated.mp4",
+      "src", "/videos/ICMBOT_promo.mp4",
     );
     expect(screen.getByTestId("landing-video-poster").querySelector("img")).toHaveAttribute(
-      "src", "/videos/ICMBOT_video_poster.png",
+      "src", "/videos/ICMBOT_promo_poster.webp",
     );
   });
 

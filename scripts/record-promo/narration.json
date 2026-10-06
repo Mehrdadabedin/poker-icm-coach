@@ -1,0 +1,31 @@
+{
+  "voice": "en_US-hfc_female-medium",
+  "voiceFallback": "en_US-amy-medium",
+  "scenes": [
+    {
+      "id": "hero",
+      "line": "Meet ICMBOT, your tournament poker coach."
+    },
+    {
+      "id": "quiz",
+      "line": "Four left, three paid, and the chip leader shoves. Call or fold? The coach folds. On the bubble, chips are not money."
+    },
+    {
+      "id": "opponents",
+      "line": "Choose your opponents: tight, loose, aggressive or passive."
+    },
+    {
+      "id": "hands",
+      "line": "Before every decision, the coach tells you what to do and why, with ICM pressure, stack size and pot odds in one panel."
+    },
+    {
+      "id": "review",
+      "line": "After each hand, review it and track your overall performance."
+    },
+    {
+      "id": "champion",
+      "line": "Outlast eight bots and take the title. Practice, improve, win. Start training free at icmbot dot one.",
+      "caption": "Outlast eight bots and take the title. Practice, improve, win. Start training free at icmbot.one"
+    }
+  ]
+}

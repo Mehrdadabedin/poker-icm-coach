@@ -5,6 +5,9 @@
    rule is scoped to .landing-page / .lp-* so the rest of the app is untouched. */
 
 .landing-page {
+  /* measured desktop header height (52px mark + paddings); the hero image
+     cover size is derived from it instead of a hard-coded number */
+  --lp-header-h: 77px;
   --lp-gold: #f2b33d;
   --lp-blue: #0b6cf0;
   --lp-bg: #07080a;
@@ -85,7 +88,7 @@
 .lp-nav-btn { min-height: 40px; padding: 8px 18px; font-size: 0.82rem; }
 
 /* the sticky header sits above the sections it scrolls to */
-.lp-section, .lp-hero { scroll-margin-top: 96px; }
+.lp-section, .lp-hero { scroll-margin-top: calc(var(--lp-header-h, 77px) + 19px); }
 
 /* hide the section links on phones; the account buttons stay */
 @media (max-width: 959px) {

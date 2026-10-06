@@ -1910,3 +1910,82 @@ FIX-POKERTABLE-LAYOUT-TEST first and the mockup measured with Playwright):
   real-money gambling." right; stacks on phones.
 - og:url and og:image (and twitter:image) now use https://icmbot.one
   (og image at /images/og-1200x630.jpg); Archivo 900 added to the font link.
+
+## A48 - Landing hero fold fix + reproducible promo video (2026-10-11)
+
+Task: Step 1 fits the landing hero above the fold on short desktop viewports
+(1245x650) via the CSS above and exposes the sticky header height as
+--lp-header-h; Step 2 builds a reproducible Playwright promo recorder in
+scripts/record-promo/ that drives the app through its WebMCP tools, records
+1920x1080, and encodes an H.264 MP4 under 10 MB with captions and a WebP
+poster, wired into the landing demo slot.
+
+### A48 implementation results (2026-10-11)
+
+Step 1 (hero fold, one commit): `.lp-hero` is now 16px/40px vertical
+padding; `.lp-hero-inner` is a full-width box with `padding-inline:
+clamp(20px, 4vw, 48px)`, `gap: 48px`, `align-items: center`; above 900px
+`.lp-hero-img` uses `height: clamp(340px, calc(100svh - var(--lp-header-h,
+77px) - 56px), 560px)` with `object-fit: cover`, `object-position: 0% 50%`
+and a 16px radius; below 900px the natural aspect stays. The header height
+is exposed as `--lp-header-h` on `.landing-page` and reused for
+scroll-margin-top. Browser-verified at 1245x650 (hero bottom at the fold,
+copy 48px from the left, both aces visible), 1440x900 and 375x812
+(unchanged image sizing, zero horizontal scroll).
+
+Step 2 (promo video, one commit): `scripts/record-promo/` is a reproducible
+Playwright recorder. It starts backend (uvicorn :8000) and vite dev (:5173)
+when down, creates a `Hero` account through POST /api/auth/register with a
+random password (stored only in the gitignored
+scripts/record-promo/.venv/hero-credentials.json), injects a stand-in
+document.modelContext.registerTool before the app loads (tools collected on
+window.__webmcp), and drives the table ONLY through get_game_state / fold /
+check / call / bet / all_in / next_hand / show_hand_result, following the
+coach panel recommendation every turn. The recording (1920x1080) covers:
+landing hero -> TRY ONE SPOT reveal -> sign-in -> choose opponents -> 4
+hands with the coach panel and the moving dealer button -> hand review ->
+sidebar OVERALL PERFORMANCE -> champion screen (dev-only ?testWinner=true
+&testWinnerName=Hero) with START NEW SESSION. The cookie consent is preset
+to denied in localStorage (never clicked). The static ffmpeg (imageio-
+ffmpeg in scripts/record-promo/.venv, no drawtext support) concatenates the
+8 transparent caption overlays rendered by Playwright with the overlay
+filter (enable=between), trims the initial blank webm frames, encodes H.264
+MP4 (libx264 preset slow, CRF loop under 10 MB) and extracts the champion
+frame as the WebP poster. Outputs are wired into the landing demo slot
+(frontend/public/videos/ICMBOT_promo.mp4 + ICMBOT_promo_poster.webp); the
+old clip and its poster were deleted; `npm run record:promo` re-runs the
+whole pipeline. Result: 1:04, 8 captions, 3.0 MB MP4, 69 KB poster.
+
+Validation: backend 610 passed / 4 skipped (ruff + mypy clean); frontend
+208 passed (tsc, oxlint, vite build clean); the recorder ran end-to-end
+twice (reproducible) and the promo verified frame-by-frame (hero, quiz,
+hands, review, sidebar, champion).
+
+Second pass (2026-10-11): after merging FIX-POKERTABLE-LAYOUT-TEST (branded
+card backs + face-down BOT cards), the header gained "The Coach" (nav order:
+What is ICM / The Coach / How it works / Opponents / FAQ); the THE COACH
+screenshot was retaken with a bot-profile lineup so seats show
+Alex/Sarah/David/Emma portraits and face-down card backs (54 KB WebP); the
+TRY ONE SPOT cards start face down and flip when the section scrolls into
+view; and the promo was re-recorded at 1280x720 x1.5 device scale (1920x1080
+output), going straight from the quiz into login (the hero no longer
+appears twice), with exactly one caption per scene at its scene mark.
+Narration is REQUIRED female piper-tts voice en_US-hfc_female-medium
+(fallback en_US-amy-medium), scripted in scripts/record-promo/narration.json,
+AAC 128 kbps loudnorm ~-16 LUFS, no music. Final: 1:07, 2.7 MB MP4, 89 KB
+poster.
+
+Third pass (2026-10-11): promo recorder/encoder rebuilt per frame review.
+The recording is the native 1280x720 surface (recordVideo.size 1280x720)
+upscaled to 1920x1080 (lanczos) after the lead trim inside encode.mjs; cues
+are exactly marks+0.45 in the post-trim timeline (voice and captions no
+longer lag); captions wrap (40px/1.25, max-width 1500px, 1920x220 page,
+y=H-h-40) and only actual 3-line wraps split into two cues; the champion
+screen is held for its line + 1.5s (no START NEW SESSION click); 2 hands
+with review->champion dead air removed (analysis.png during the review
+hold) keep every inter-line silence under 4s; loudnorm audio is resampled
+to 48 kHz AAC 128k. check.mjs (run at the end of npm run record:promo)
+verifies no padding grey at (1900,40)/(1900,1060), caption bboxes <=1800px,
+48 kHz audio at -17..-15 LUFS and no >4s line gaps, and renders the labelled
+contact sheet. Final: 43s, 3.0 MB MP4, 93 KB poster, voice
+en_US-hfc_female-medium.

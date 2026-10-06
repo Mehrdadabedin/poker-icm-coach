@@ -836,3 +836,67 @@ fallbacks), and the page must work at 375 px with no horizontal scroll.
   and its poster); convert the large PNGs used here to WebP.
 - Update the landing tests. Run all gates (backend pytest + ruff + mypy,
   frontend vitest + tsc + oxlint + build, 200-line audit).
+
+
+### A48 — Landing hero fold fix + reproducible promo video (IMPLEMENTED)
+Two steps, tested live in a browser.
+- Step 1 (hero fold): the hero must end above the fold on short desktop
+  heights. `.lp-hero` gets padding-top 16px / padding-bottom 40px (was
+  ~75px top); `.lp-hero-inner` becomes a full-width box with
+  `padding-inline: clamp(20px, 4vw, 48px)`, `gap: 48px`, `align-items:
+  center`; above 900px `.lp-hero-img` is a fixed-height cover
+  `clamp(340px, calc(100svh - var(--lp-header-h, 77px) - 56px), 560px)`
+  with `object-position: 0% 50%` and a 16px radius so both aces stay
+  visible; below 900px the image keeps its natural aspect. The header
+  height is exposed as `--lp-header-h` instead of a hard-coded 77px.
+  Verified at 1245x650 (hero bottom above the fold, text 48px from the
+  left, aces fully visible), 1440x900 and 375x812 (unchanged, no
+  horizontal scroll).
+- Step 2 (promo video): `scripts/record-promo/` Playwright recorder that
+  drives the running app (backend + vite dev) only through the WebMCP
+  tools (a stand-in document.modelContext injected via addInitScript,
+  tools collected on window.__webmcp), following the coach panel each
+  turn. It records 1920x1080, ~60-75s: landing hero -> TRY ONE SPOT
+  reveal -> login -> opponent choice -> 4-5 hands (coach panel, dealer
+  button BB -> SB -> BTN) -> hand review -> sidebar overall performance ->
+  champion screen (dev-only ?testWinner=true&testWinnerName=Hero). The
+  cookie consent is pre-set in localStorage (no banner clicks). ffmpeg
+  produces an H.264 MP4 under 10 MB with one burned-in caption per scene
+  and a WebP poster; optional piper-tts voice-over only if it installs;
+  no music. Output lands in public/videos/ICMBOT_promo.mp4 (+ poster),
+  the landing demo slot points at them, the old clip and poster are
+  deleted, and `npm run record:promo` re-runs the whole pipeline from an
+  empty state.
+
+Second pass (2026-10-11, post-merge with branded card backs):
+- Header gains a "The Coach" button (What is ICM / The Coach / How it works
+  / Opponents / FAQ), scrolling to #lp-coach.
+- THE COACH screenshot retaken with a real bot lineup (Alex/Sarah/David/
+  Emma portraits and face-down branded card backs).
+- TRY ONE SPOT cards start face down (cards/back.png) and flip when the
+  section scrolls into view.
+- Promo re-record: 1280x720 viewport at deviceScaleFactor 1.5 (1920x1080
+  output), quiz goes straight to login (no second pass over the hero),
+  exactly one caption at a time tied to its scene mark, and REQUIRED female
+  narration via piper-tts (en_US-hfc_female-medium, fallback
+  en_US-amy-medium) driven by scripts/record-promo/narration.json; audio is
+  AAC 128 kbps loudnorm ~-16 LUFS, no music, each scene held at least its
+  line +0.5s.
+Third pass (recorder/encoder fixes, frames verified numerically):
+- recordVideo.size is now the NATIVE 1280x720 surface; encode scales to
+  1920x1080 right after the trim (lanczos) so the frame is never the
+  grey-padded 1280x720 box. Poster comes from the scaled stream.
+- Cue time is exactly (marks[id] - heroAt) + 0.45 in the POST-TRIM timeline
+  (the trim resets timestamps; no trim added twice): the voice is no longer
+  2.4s late.
+- Captions wrap at 40px/1.25 with max-width 1500px on a 1920x220 page and
+  overlay at y=H-h-40; only lines that really wrap past 2 lines split into
+  two cues at a sentence boundary. Quiz/hands/champion no longer clip.
+- The champion scene holds the overlay for the full line + 1.5s and the
+  video ends there (no START NEW SESSION click).
+- 2 hands instead of 4; review -> champion dead air removed (analysis.png is
+  taken during the review hold); every inter-line silence is <= 4s.
+- Loudnorm audio is resampled back to 48 kHz (AAC 128k).
+- scripts/record-promo/check.mjs guards the result (no padding grey pixels,
+  caption bboxes <= 1800px, audio present at 48 kHz with I in -17..-15 LUFS,
+  no >4s silence between lines) and writes the labelled contact sheet.
