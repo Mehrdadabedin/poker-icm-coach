@@ -9,10 +9,8 @@ vi.mock("../src/services/api", async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   getToken: vi.fn(() => localStorage.getItem("icm_auth_token")),
   getUsername: vi.fn(() => localStorage.getItem("icm_username")),
-  clearAuth: vi.fn(() => {
-    localStorage.removeItem("icm_auth_token");
-    localStorage.removeItem("icm_username");
-  }),  health: vi.fn(async () => ({ status: "ok", version: "0.0.0+dev" })),
+  clearAuth: vi.fn(() => localStorage.clear()),
+  health: vi.fn(async () => ({ status: "ok", version: "0.0.0+dev" })),
   me: vi.fn(async () => ({ username: "Mehrdad" })),
   getAuthProviders: vi.fn(async () => ({ google: false, apple: false, phone: false })),
   googleSignInUrl: vi.fn(() => "https://api.test/api/auth/google/start"),
@@ -21,40 +19,43 @@ vi.mock("../src/services/api", async (importOriginal) => ({
 async function openLanding() {
   const { LandingPage } = await import("../src/pages/LandingPage");
   render(<MemoryRouter><LandingPage /></MemoryRouter>);
-  await act(async () => undefined); // let the providers lookup settle
+  await act(async () => undefined);
   return screen;
 }
 
 describe("public landing page (A47 rebuild)", () => {
   beforeEach(() => {
     localStorage.clear();
-    // jsdom has no media engine: give play() a conforming promise so the
-    // landing video overlay behaves like a real browser.
-    vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
-      this.dispatchEvent(new Event("play"));
-      return Promise.resolve();
-    });
     scrolled = false;
+    // jsdom has no media engine: play() gets a conforming promise for the overlay.
+    vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) { this.dispatchEvent(new Event("play")); return Promise.resolve(); });
     Element.prototype.scrollIntoView = () => {
       scrolled = true;
     };
   });
 
-  it("renders a solid header with brand, section links and account buttons", async () => {
+  it("renders a solid header with brand, section buttons and account buttons", async () => {
     await openLanding();
     const header = screen.getByTestId("landing-header");
     expect(header).toHaveClass("lp-header");
     const landingCss = (await import("fs")).readFileSync("src/styles/landing.css", "utf8");
-    expect(landingCss).toContain("--lp-bg: #07080a");
-    expect(landingCss).toContain(".lp-header");
-    expect(landingCss).toContain("background: var(--lp-bg);");
+    for (const needle of ["--lp-bg: #07080a", ".lp-header", "background: var(--lp-bg);"]) { expect(landingCss).toContain(needle); }
     expect(screen.getByTestId("landing-brand")).toBeInTheDocument();
-    for (const label of ["What is ICM", "How it works", "Opponents", "FAQ"]) {
-      expect(header.querySelectorAll("a.lp-nav-link").length).toBe(4);
-      expect(header.textContent).toContain(label);
-    }
+    const navButtons = header.querySelectorAll("button.lp-nav-link");
+    expect(navButtons).toHaveLength(4);
+    expect(Array.from(navButtons).map((b) => b.textContent)).toEqual([
+      "What is ICM", "How it works", "Opponents", "FAQ",
+    ]);
     expect(screen.getByTestId("landing-login")).toHaveAttribute("href", "/login");
     expect(screen.getByTestId("landing-signup")).toHaveAttribute("href", "/login");
+  });
+
+  it("scrolls to the FAQ section on click without changing the route", async () => {
+    await openLanding();
+    const hashBefore = window.location.hash;
+    fireEvent.click(screen.getByRole("button", { name: "FAQ" }));
+    expect(scrolled).toBe(true);
+    expect(window.location.hash).toBe(hashBefore);
   });
 
   it("renders the two-column hero with the H1 and real buttons", async () => {
@@ -84,24 +85,18 @@ describe("public landing page (A47 rebuild)", () => {
     expect(player.tagName).toBe("VIDEO");
     expect(player).toHaveAttribute("poster", "/videos/ICMBOT_video_poster.png");
     expect(player.querySelector("source")).toHaveAttribute(
-      "src",
-      "/videos/ICM_BOT_demo_bot_profiles_narrated.mp4",
+      "src", "/videos/ICM_BOT_demo_bot_profiles_narrated.mp4",
     );
     expect(screen.getByTestId("landing-video-poster").querySelector("img")).toHaveAttribute(
-      "src",
-      "/videos/ICMBOT_video_poster.png",
+      "src", "/videos/ICMBOT_video_poster.png",
     );
   });
 
   it("shows the bubble spot and lets both quiz buttons reveal the coach answer", async () => {
     await openLanding();
     const card = screen.getByTestId("landing-quiz-card");
-    for (const line of [
-      "4 left, 3 paid.",
-      "K♠ J♥",
-      "Chip leader (40 BB) shoves from the small blind.",
-      "Short stack has 3 BB.",
-    ]) {
+    for (const line of ["4 left, 3 paid.", "K♠ J♥",
+                        "Chip leader (40 BB) shoves from the small blind.", "Short stack has 3 BB."]) {
       expect(card.textContent).toContain(line);
     }
     fireEvent.click(screen.getByTestId("landing-quiz-call"));
@@ -172,9 +167,12 @@ describe("public landing page (A47 rebuild)", () => {
     expect(screen.queryByText(/Is it free/i)).toBeNull();
   });
 
-  it("renders the final CTA, footer and the champion image", async () => {
+  it("renders the final CTA card, footer and the champion image", async () => {
     await openLanding();
+    const card = screen.getByTestId("landing-final-card");
+    expect(card).toHaveClass("lp-final-card");
     expect(screen.getByText("PLAY YOUR FIRST TOURNAMENT TODAY.")).toBeInTheDocument();
+    expect(screen.getByText("Nine players. One champion. Will it be you?")).toBeInTheDocument();
     expect(screen.getByTestId("landing-final-start").textContent).toContain("START TRAINING FREE");
     expect(screen.getByTestId("landing-champion-img")).toHaveAttribute(
       "src",
@@ -184,17 +182,16 @@ describe("public landing page (A47 rebuild)", () => {
     for (const label of ["Privacy", "Terms", "Cookie settings"]) {
       expect(footer.textContent).toContain(label);
     }
-    expect(footer.textContent).toContain("© 2026 ICMBOT. Practice only.");
+    for (const needle of ["PRACTICE · IMPROVE · WIN", "© 2026 ICMBOT. Practice only. No real-money gambling."]) { expect(footer.textContent).toContain(needle); }
   });
 
-  it("hides Continue with Google when the backend does not advertise it", async () => {
+  it("shows Continue with Google only when the backend advertises the provider", async () => {
     await openLanding();
     expect(screen.queryByTestId("landing-google")).toBeNull();
-  });
-  it("offers Continue with Google only when /api/auth/providers says google", async () => {
     const { getAuthProviders } = await import("../src/services/api");
     vi.mocked(getAuthProviders).mockResolvedValueOnce({ google: true, apple: false, phone: false });
     await openLanding();
     expect(screen.getByTestId("landing-google")).toBeInTheDocument();
+    expect(screen.getByTestId("landing-google").textContent).toContain("Continue with Google");
   });
 });

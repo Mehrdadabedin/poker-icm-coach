@@ -27,14 +27,22 @@
   font-family: var(--lp-body);
 }
 
-/* ---- header: solid band, brand left, links + account right ---- */
+/* ---- header: sticky solid band, content on a ~1240px centred grid ---- */
 .lp-header {
+  position: sticky; top: 0; z-index: 50;
   background: var(--lp-bg);  /* solid: nothing shows through */
+  border-bottom: 1px solid var(--lp-card-border);
+  padding: 12px 0;
+}
+
+.lp-header-inner {
+  max-width: 1240px;
+  margin: 0 auto;
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 14px;
-  padding: 12px clamp(14px, 4vw, 48px);
+  padding: 0 clamp(14px, 4vw, 48px);
 }
 
 .lp-brand { justify-self: start; margin: 0; }
@@ -46,6 +54,10 @@
   font-family: var(--lp-body);
   font-size: 0.92rem;
   text-decoration: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
 }
 .lp-nav-link:hover { color: var(--lp-text); }
 
@@ -54,8 +66,9 @@
 /* ---- buttons ---- */
 .lp-btn {
   display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px;
   min-height: 46px; padding: 10px 22px;
-  border: 1px solid transparent; border-radius: 10px;
+  border: 1px solid transparent; border-radius: 12px;
   font: inherit; font-family: var(--lp-head); font-size: 0.92rem; font-weight: 700;
   letter-spacing: 0.4px; cursor: pointer;
   text-decoration: none;
@@ -65,15 +78,27 @@
 
 .lp-btn-primary { background: var(--lp-blue); color: #fff; }
 .lp-btn-ghost { background: transparent; border-color: var(--lp-gold); color: var(--lp-gold); }
-.lp-btn-gold { background: var(--lp-gold); color: #14140c; font-weight: 800; }
+.lp-btn-gold { background: var(--lp-gold); color: #14110a; font-weight: 800; }
 .lp-btn-outline { background: transparent; border-color: var(--lp-card-border); color: var(--lp-text); }
 .lp-btn-xl { min-height: 54px; padding: 13px 30px; font-size: 1rem; }
+.lp-btn-google { background: #ffffff; color: #1f1f1f; }
 .lp-nav-btn { min-height: 40px; padding: 8px 18px; font-size: 0.82rem; }
+
+/* the sticky header sits above the sections it scrolls to */
+.lp-section, .lp-hero { scroll-margin-top: 96px; }
 
 /* hide the section links on phones; the account buttons stay */
 @media (max-width: 959px) {
   .lp-nav-links { display: none; }
-  .lp-header { grid-template-columns: auto 1fr; }
+  .lp-header-inner { grid-template-columns: auto 1fr; }
   .lp-nav { justify-self: end; }
   .lp-btn-xl { width: 100%; }
+}
+
+/* the mockup's header mark is 52px tall (the shared app mark is 66px) */
+@media (min-width: 960px) {
+  .landing-page .lp-header .lp-brand .brand-logo {
+    height: 52px;
+    max-height: 52px;
+  }
 }

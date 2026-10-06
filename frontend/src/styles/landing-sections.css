@@ -6,7 +6,7 @@
 
 .lp-section { padding: clamp(34px, 6vw, 72px) clamp(16px, 4vw, 48px); }
 
-.lp-inner { width: 100%; max-width: 1120px; margin: 0 auto; }
+.lp-inner { width: 100%; max-width: 1240px; margin: 0 auto; }
 .lp-narrow { max-width: 860px; }
 
 .lp-section-title {

@@ -793,11 +793,19 @@ fallbacks), and the page must work at 375 px with no horizontal scroll.
   TOURNAMENT DECISIONS", the 8-bot/ICM-coach sub line, START TRAINING FREE
   (gold -> /login) and WATCH DEMO (outline, scrolls to the video), and the
   "Practice only, no real money" line. Right: crop
-  public/images/ICMBOT_target_hero.png to x 860-1665 (the baked text band
-  ends near x 825; the first crop at 640 showed letter edges), y 106-905 (no
-  baked text), save as public/images/hero-robot.webp, fade the left edge
-  ~200px into the background. The invisible click areas over the old artwork
-  are removed.
+  public/images/ICMBOT_target_hero.png to x 772-1665 (baked text ends at
+  x 758 and the aces start at x 793, so both aces stay fully visible),
+  y 106-905, save as public/images/hero-robot.webp with at most a 12px edge
+  blend (no 200px fade). The invisible click areas over the old artwork are
+  removed. Second pass (post-#22 review, matched against the mockup): header
+  nav links became smooth scroll buttons (the app is a HashRouter, so
+  anchors would change the route) with scroll-margin-top for the sticky
+  header; header + hero content sit on a ~1240px centred column; the final
+  CTA is one rounded card (#12151C, 1px #2B3142, 24px radius) with the
+  champion artwork filling the right half; the footer is a single row
+  (tagline left / links centre / copyright right, stacked on phones);
+  og:url and og:image use https://icmbot.one; the "Practice only..." line is
+  left-aligned under the hero buttons.
 - Video section "SEE ICM BOT IN ACTION" right under the hero; keep the current
   player and poster (a new video replaces the file later).
 - "TRY ONE SPOT" quiz (v2, fixed after PR review): a real bubble spot for

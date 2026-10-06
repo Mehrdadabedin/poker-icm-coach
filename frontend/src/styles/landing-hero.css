@@ -1,13 +1,19 @@
-/* A47 hero: two columns. Left is real HTML copy with the H1 and actions;
-   right is the cropped robot artwork whose left edge fades into the band.
-   The old baked-text artwork and its invisible hit areas are gone. */
+/* A47 hero: two columns inside a ~1240px centred container. Left is real
+   HTML copy with the H1 and actions; right is the cropped robot artwork
+   (hero-robot.webp) with a 12px left blend. The old baked-text artwork and
+   its invisible hit areas are gone. */
 
 .lp-hero {
+  padding: clamp(30px, 6vw, 76px) 0;
+}
+
+.lp-hero-inner {
+  max-width: 1240px;
+  margin: 0 auto;
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-  gap: clamp(20px, 4vw, 44px);
+  gap: clamp(20px, 4vw, 48px);
   align-items: center;
-  padding: clamp(30px, 6vw, 76px) clamp(16px, 4vw, 48px);
 }
 
 .lp-hero-copy { min-width: 0; }
@@ -24,12 +30,12 @@
 
 .lp-hero-title {
   margin: 0 0 16px;
-  max-width: 16ch;
+  max-width: 14ch;
   color: var(--lp-text);
   font-family: var(--lp-head);
-  font-size: clamp(1.9rem, 5vw, 3.1rem);
-  font-weight: 800;
-  line-height: 1.06;
+  font-size: clamp(2.2rem, 4.8vw, 4.25rem);
+  font-weight: 900;
+  line-height: 1.04;
 }
 
 .lp-hero-sub {
@@ -42,13 +48,14 @@
 }
 
 .lp-hero-actions { display: flex; flex-wrap: wrap; gap: 14px; }
+.lp-hero-actions .lp-btn { min-height: 56px; padding: 13px 30px; font-size: 0.98rem; }
 
 .lp-hero-legal {
   margin: 18px 0 0;
   color: var(--lp-muted);
   font-size: 0.85rem;
   letter-spacing: 0.3px;
-  text-align: center;
+  text-align: left;
 }
 
 .lp-hero-visual { min-width: 0; }
@@ -57,16 +64,10 @@
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 12px;
 }
 
 /* phones: one column, copy first, robot below full width */
 @media (max-width: 959px) {
-  .lp-hero { grid-template-columns: minmax(0, 1fr); }
+  .lp-hero-inner { grid-template-columns: minmax(0, 1fr); }
   .lp-hero-actions .lp-btn { width: 100%; }
-}
-
-/* desktop: cap the robot so the two columns keep a balanced height */
-@media (min-width: 1140px) {
-  .lp-hero-img { max-width: 560px; margin: 0 auto; }
 }
