@@ -137,6 +137,12 @@ export function sendAction(
   });
 }
 
+/** Explicit hero re-entry (A39): restores the starting stack at the same
+ * blind level after a Level 1-5 bust. Returns the refreshed table state. */
+export function reentry(tableId: string): Promise<TableState> {
+  return request<TableState>(`/api/game/${tableId}/reentry`, { method: "POST" });
+}
+
 export function nextHand(tableId: string): Promise<TableState> {
   return request<TableState>(`/api/game/${tableId}/next-hand`, { method: "POST" });
 }

@@ -38,6 +38,7 @@ def build_state_view(session) -> dict:
             "isHero": p.is_human,
             "isDealer": p.seat == button,
             "sitsOut": p.sit_out or p.is_eliminated,
+            "awaitingReentry": p.awaiting_reentry,
             "profile": _player_profile(session, p),
             "holeCards": [card_model(c) for c in p.hole_cards] if p.is_human and p.hole_cards else None,
         })

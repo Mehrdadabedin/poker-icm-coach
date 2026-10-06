@@ -109,6 +109,18 @@ def game_action(table_id: str, request: ActionRequest,
     return session.state()
 
 
+@router.post("/game/{table_id}/reentry", response_model=GameStateModel)
+def reentry(table_id: str, user: str = Depends(require_user)) -> dict:
+    """Explicit hero re-entry (A39): restores the starting stack at the same
+    blind level when the hero busted at level 5 or earlier."""
+    session = get_session(table_id, user)
+    try:
+        session.reentry()
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return session.state()
+
+
 @router.post("/game/{table_id}/next-hand", response_model=GameStateModel)
 def next_hand(table_id: str, user: str = Depends(require_user)) -> dict:
     session = get_session(table_id, user)

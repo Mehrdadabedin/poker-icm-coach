@@ -19,31 +19,22 @@ from app.strategy.coach import Coach, CoachRequest
 from app.tournament.tournament import build_default_tournament
 from app.tournament.tournament_timer import TournamentTimer
 
-class GameSession:
-    """Owns one tournament table; drives bots; exposes safe state snapshots.
 
-    Every public entry point holds `_lock`; REST handlers and the table
-    WebSocket reach one session from threadpool threads. Without it two callers
-    pass the same guard and act twice — concurrent next_hand() calls dealt a
-    second hand over the first, losing chips. The lock is reentrant because
-    grade_hero() calls coach_advice(); helpers only run under public methods.
-    """
+class GameSession:
+    """Owns one table; every public entry takes self._lock (reentrant)."""
+    REENTRY_LEVELS = 5  # re-entry available only through Level 5 (index < 5)
 
     def __init__(self, session_id: str | None = None, fast_mode: float = 1.0,
-                 rng: random.Random | None = None,
-                 starting_stack: int = 45_000,
-                 small_blind: int = 100, big_blind: int = 100,
-                 level_minutes: int = 20,
-                 owner: str | None = None,
-                 table_label: str | None = None,
-                 hero_name: str = "Hero",
-                 history_dir: str | None = None, bot_profile: str | None = None,
-                 bot_profiles: list[str] | None = None) -> None:
+                 rng: random.Random | None = None, starting_stack: int = 45_000,
+                 small_blind: int = 100, big_blind: int = 100, level_minutes: int = 20,
+                 owner: str | None = None, table_label: str | None = None,
+                 hero_name: str = "Hero", history_dir: str | None = None,
+                 bot_profile: str | None = None, bot_profiles: list[str] | None = None) -> None:
         self.session_id = session_id or uuid.uuid4().hex[:12]
         self.owner = owner  # authenticated username that owns this tournament
         self.table_label = table_label or self.session_id
         self.created_at = time.time()
-        self.status = "active"  # active | finished | abandoned (issue #5)
+        self.status = "active"
         self.last_seen = self.created_at
         self.idle_timeout = 30 * 60
         self.history_dir = history_dir or ""
@@ -52,13 +43,13 @@ class GameSession:
             starting_stack=starting_stack, small_blind=small_blind,
             big_blind=big_blind, level_minutes=level_minutes, hero_name=hero_name)
         self.hero_seat = 0
-        self.rng = rng if rng is not None else random.Random()
+        self.rng = rng or random.Random()
         self.provider = AIDecisionProvider(rng=self.rng)
         self.bot_profile = bot_profile
+        self.bot_profiles = bot_profiles
         if bot_profile is not None:
             from app.ai.personalities import profile_for
             self.provider.personality = profile_for(bot_profile)
-        self.bot_profiles = bot_profiles
         if bot_profiles is not None:
             from app.ai.personalities import personalities_for_seats
             self.provider.seat_personalities = personalities_for_seats(bot_profiles)
@@ -74,7 +65,6 @@ class GameSession:
         self.coach = Coach()
         self.coach_mode = "advanced"
         self._last_hero_action: str | None = None
-        # Keep the request so grading scores the spot the hero actually faced.
         self._last_hero_request: CoachRequest | None = None
         self._lock = threading.RLock()
         self._history_file = hand_history.HistoryFileStore(self.history_dir, self.session_id)
@@ -87,13 +77,9 @@ class GameSession:
 
     def _begin_hand(self, first: bool = False) -> None:
         assert self.engine is not None and self.timer is not None
-        self._last_hero_action = None  # never grade this hand against the last
-        self._last_hero_request = None
+        self._last_hero_action = self._last_hero_request = None
         self.engine.start_hand()
-        if first:
-            self.timer.start()
-        else:
-            self.timer.resume()
+        (self.timer.start if first else self.timer.resume)()
         self._advance_bots()
 
     def next_hand(self) -> None:
@@ -145,39 +131,49 @@ class GameSession:
         if self.engine.is_complete:
             assert self.timer is not None
             self.timer.pause()
-
     def state(self) -> dict:
         with self._lock:
             assert self.engine is not None and self.timer is not None
-            self.last_seen = time.time()  # an engaged table is never abandoned
-            self.timer.tick()  # advance expired blind levels / breaks on every view
+            self.last_seen = time.time()
+            self.timer.tick()
             if self.engine.is_complete and not self.timer.running:
-                self.timer.resume()  # level clock runs through the result screen
+                self.timer.resume()
             return build_state_view(self)
 
     def coach_advice(self) -> dict:
         with self._lock:
             return advice_dict(self.coach.recommend(coach_request(self)))
-
     def grade_hero(self) -> dict | None:
-        """Test mode: compare last hero action vs coach recommendation."""
         with self._lock:
             return grade_last_action(self.coach, self._last_hero_action, self._last_hero_request)
 
-    REENTRY_LEVELS = 3  # levels 1-3 get a fresh stack on bust
-
     def _apply_reentry_or_eliminate(self) -> None:
-        """Bust-out rule: 45k reset during levels 1-3, elimination from level 4."""
+        """A39: BOTs re-enter through Level 5; the hero is parked awaiting
+        re-entry (or eliminated after L5), never auto-restored."""
         assert self.tournament is not None
         level = self.tournament.level_index
         for player in self.tournament.players:
             if player.is_eliminated or player.stack > 0:
                 continue
             if level < self.REENTRY_LEVELS:
-                player.stack = self.tournament_starting_stack
+                if player.is_human:
+                    player.awaiting_reentry = True
+                    player.sit_out = True
+                else:
+                    player.stack = self.tournament_starting_stack
             else:
                 player.eliminate()
-
+                player.awaiting_reentry = False
+    def reentry(self) -> None:
+        """A39 hero re-entry: starting stack, same level."""
+        with self._lock:
+            assert self.tournament is not None
+            hero = self.tournament.players[self.hero_seat]
+            if not hero.awaiting_reentry or self.tournament.level_index >= self.REENTRY_LEVELS:
+                raise ValueError("re-entry is not available")
+            hero.awaiting_reentry = False
+            hero.sit_out = False
+            hero.stack = self.tournament_starting_stack
     def _record_and_persist(self) -> None:
         assert self.engine is not None
         result = self.engine.result

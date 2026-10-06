@@ -40,6 +40,7 @@ class PlayerStateModel(BaseModel):
     isHero: bool
     isDealer: bool
     sitsOut: bool
+    awaitingReentry: bool = False
     profile: str | None = None
     holeCards: list[CardModel] | None = None
 
