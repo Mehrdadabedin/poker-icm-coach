@@ -7,17 +7,20 @@ translate(-50%, -50%). The seat-index order is wired so that INCREASING index
 1 upper-right, 2 right, ... 8 upper-left), matching the +1 dealer-button
 rotation in backend/app/game/dealer_button.py. The hero seat (0) anchors the
 top of the ring.
+
+Seats are keyed by seat number (data-seat), not DOM order: busted BOTs are
+removed from the DOM (A43), and nth-child would shift every later seat.
 */
 
-.seat:nth-child(1) { left: 49.4%; top: 16.5%; transform: translate(-50%, -50%); }
-.seat:nth-child(2) { left: 76.6%; top: 24.3%; transform: translate(-50%, -50%); }
-.seat:nth-child(3) { left: 90.4%; top: 44.2%; transform: translate(-50%, -50%); }
-.seat:nth-child(4) { left: 85.6%; top: 66.8%; transform: translate(-50%, -50%); }
-.seat:nth-child(5) { left: 64.4%; top: 81.5%; transform: translate(-50%, -50%); }
-.seat:nth-child(6) { left: 36.8%; top: 81.5%; transform: translate(-50%, -50%); }
-.seat:nth-child(7) { left: 15.6%; top: 66.8%; transform: translate(-50%, -50%); }
-.seat:nth-child(8) { left: 10.8%; top: 44.2%; transform: translate(-50%, -50%); }
-.seat:nth-child(9) { left: 24.6%; top: 24.3%; transform: translate(-50%, -50%); }
+.seat[data-seat="0"] { left: 49.4%; top: 16.5%; transform: translate(-50%, -50%); }
+.seat[data-seat="1"] { left: 76.6%; top: 24.3%; transform: translate(-50%, -50%); }
+.seat[data-seat="2"] { left: 90.4%; top: 44.2%; transform: translate(-50%, -50%); }
+.seat[data-seat="3"] { left: 85.6%; top: 66.8%; transform: translate(-50%, -50%); }
+.seat[data-seat="4"] { left: 64.4%; top: 81.5%; transform: translate(-50%, -50%); }
+.seat[data-seat="5"] { left: 36.8%; top: 81.5%; transform: translate(-50%, -50%); }
+.seat[data-seat="6"] { left: 15.6%; top: 66.8%; transform: translate(-50%, -50%); }
+.seat[data-seat="7"] { left: 10.8%; top: 44.2%; transform: translate(-50%, -50%); }
+.seat[data-seat="8"] { left: 24.6%; top: 24.3%; transform: translate(-50%, -50%); }
 
 @media (max-width: 640px) {
   .seat {

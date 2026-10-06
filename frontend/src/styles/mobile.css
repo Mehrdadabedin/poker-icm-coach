@@ -1,10 +1,10 @@
 /* Phase 3-6, 9 — responsive mobile / tablet table layout.
 
-Desktop uses absolute nth-child seat placement on a 16:9 oval felt
+Desktop uses absolute data-seat placement on a 16:9 oval felt
 (placement.css). On PORTRAIT phones and tablets we keep the compact centered
 flex layout (board row + players wrap). In LANDSCAPE we reuse the exact
 DESKTOP composition — the same 16:9 oval felt with its percentage-based
-nth-child seats — and simply size/centre it for the short rotated viewport,
+data-seat positions — and simply size/centre it for the short rotated viewport,
 scaling the seat boxes proportionally so nothing overlaps.
 
 `orientation: landscape` is not reliable in browsers, so landscape is
@@ -42,7 +42,7 @@ detected with the standard `min-aspect-ratio` media query.
   .table-wrap { width: 100%; }
 
   /* One centered column; the board takes the first full row, then players
-     wrap 3-per-row. Neutralize the desktop nth-child absolute coordinates. */
+     wrap 3-per-row. Neutralize the desktop data-seat absolute coordinates. */
   .table-felt {
     display: flex;
     flex-direction: row;
@@ -107,7 +107,7 @@ detected with the standard `min-aspect-ratio` media query.
 
 /* ---- LANDSCAPE phones & small tablets (<=959px, wider than tall) ----
    Reuse the DESKTOP table composition: the 16:9 oval felt with its
-   percentage-based nth-child seat positions, sized from the available
+   percentage-based data-seat positions, sized from the available
    landscape height (100vh minus the header/status and the action strip) and
    centered. Seat/card sizes are scaled proportionally so all 9 players and
    the hero hole cards stay visible without overlapping, and the action
@@ -120,7 +120,7 @@ detected with the standard `min-aspect-ratio` media query.
     position: relative;
     /* Balanced LANDSCAPE width: the table uses ~82% of the viewport width,
        leaving comfortable space around the complete playable interface while
-       keeping the wide horizontal oval. nth-child seat positions are
+       keeping the wide horizontal oval. data-seat positions are
        percentage-based and scale with the container. Height uses the same
        measured chrome reserve (~102px for header, status and the action
        strip) so all UI stays on screen. */
@@ -140,7 +140,7 @@ detected with the standard `min-aspect-ratio` media query.
   }
   .table-felt .board .playing-card { width: 38px; }
 
-  /* nth-child seat positions are percentage-based and scale with the felt;
+  /* data-seat positions are percentage-based and scale with the felt;
      only the seat boxes are scaled so neighbours never touch. */
   .table-felt .seat {
     position: absolute;

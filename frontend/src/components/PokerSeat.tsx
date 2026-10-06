@@ -26,7 +26,7 @@ export function PokerSeat({ player, active, lastAction, status, revealCards, rev
     .join(" ");
 
   return (
-    <div className={classes} data-testid={`seat-${player.seat}`} data-active={active} data-status={status ?? ""}>
+    <div className={classes} data-testid={`seat-${player.seat}`} data-seat={player.seat} data-active={active} data-status={status ?? ""}>
       {player.isDealer && (
         <span className="dealer-button" data-testid={`dealer-${player.seat}`}>
           D
