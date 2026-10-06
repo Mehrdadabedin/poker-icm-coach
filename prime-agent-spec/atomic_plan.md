@@ -836,3 +836,34 @@ fallbacks), and the page must work at 375 px with no horizontal scroll.
   and its poster); convert the large PNGs used here to WebP.
 - Update the landing tests. Run all gates (backend pytest + ruff + mypy,
   frontend vitest + tsc + oxlint + build, 200-line audit).
+
+
+### A48 — Landing hero fold fix + reproducible promo video (IN PROGRESS)
+Two steps, tested live in a browser.
+- Step 1 (hero fold): the hero must end above the fold on short desktop
+  heights. `.lp-hero` gets padding-top 16px / padding-bottom 40px (was
+  ~75px top); `.lp-hero-inner` becomes a full-width box with
+  `padding-inline: clamp(20px, 4vw, 48px)`, `gap: 48px`, `align-items:
+  center`; above 900px `.lp-hero-img` is a fixed-height cover
+  `clamp(340px, calc(100svh - var(--lp-header-h, 77px) - 56px), 560px)`
+  with `object-position: 0% 50%` and a 16px radius so both aces stay
+  visible; below 900px the image keeps its natural aspect. The header
+  height is exposed as `--lp-header-h` instead of a hard-coded 77px.
+  Verified at 1245x650 (hero bottom above the fold, text 48px from the
+  left, aces fully visible), 1440x900 and 375x812 (unchanged, no
+  horizontal scroll).
+- Step 2 (promo video): `scripts/record-promo/` Playwright recorder that
+  drives the running app (backend + vite dev) only through the WebMCP
+  tools (a stand-in document.modelContext injected via addInitScript,
+  tools collected on window.__webmcp), following the coach panel each
+  turn. It records 1920x1080, ~60-75s: landing hero -> TRY ONE SPOT
+  reveal -> login -> opponent choice -> 4-5 hands (coach panel, dealer
+  button BB -> SB -> BTN) -> hand review -> sidebar overall performance ->
+  champion screen (dev-only ?testWinner=true&testWinnerName=Hero). The
+  cookie consent is pre-set in localStorage (no banner clicks). ffmpeg
+  produces an H.264 MP4 under 10 MB with one burned-in caption per scene
+  and a WebP poster; optional piper-tts voice-over only if it installs;
+  no music. Output lands in public/videos/ICMBOT_promo.mp4 (+ poster),
+  the landing demo slot points at them, the old clip and poster are
+  deleted, and `npm run record:promo` re-runs the whole pipeline from an
+  empty state.

@@ -1910,3 +1910,12 @@ FIX-POKERTABLE-LAYOUT-TEST first and the mockup measured with Playwright):
   real-money gambling." right; stacks on phones.
 - og:url and og:image (and twitter:image) now use https://icmbot.one
   (og image at /images/og-1200x630.jpg); Archivo 900 added to the font link.
+
+## A48 - Landing hero fold fix + reproducible promo video (2026-10-11)
+
+Task: Step 1 fits the landing hero above the fold on short desktop viewports
+(1245x650) via the CSS above and exposes the sticky header height as
+--lp-header-h; Step 2 builds a reproducible Playwright promo recorder in
+scripts/record-promo/ that drives the app through its WebMCP tools, records
+1920x1080, and encodes an H.264 MP4 under 10 MB with captions and a WebP
+poster, wired into the landing demo slot.
