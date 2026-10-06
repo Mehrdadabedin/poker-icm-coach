@@ -74,9 +74,9 @@ describe("public landing page (A47 rebuild)", () => {
     await openLanding();
     const player = screen.getByTestId("landing-video-player");
     expect(player.tagName).toBe("VIDEO");
-    expect(player).toHaveAttribute("poster", "/videos/ICMBOT_promo_poster.webp");
+    expect(player).toHaveAttribute("poster", "/videos/ICMBOT_video_poster.png");
     expect(player.querySelector("source")).toHaveAttribute("src", "/videos/ICMBOT_promo.mp4");
-    expect(screen.getByTestId("landing-video-poster").querySelector("img")).toHaveAttribute("src", "/videos/ICMBOT_promo_poster.webp");
+    expect(screen.getByTestId("landing-video-poster").querySelector("img")).toHaveAttribute("src", "/videos/ICMBOT_video_poster.png");
   });
 
   it("starts the quiz hand on the red backs and turns both cards over", async () => {
