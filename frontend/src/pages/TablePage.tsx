@@ -46,6 +46,7 @@ export function TablePage() {
   const champion = state ? tournamentChampion(state) : null;
   const heroPendingReentry = !!hero?.awaitingReentry;
   const heroOut = !!hero && hero.sitsOut && !heroPendingReentry;
+  const eliminationModalOpen = heroPendingReentry || (heroOut && !watchToEnd);
 
   useAutoFinish({
     enabled: watchToEnd,
@@ -77,14 +78,14 @@ export function TablePage() {
   }, [state?.waitingForHero, state?.handNumber, state?.phase, state?.street,
       state?.actionLog?.length, tableId]);
   useEffect(() => {
-    if (state?.phase === "handOver" && !showReview && champion === null) {
+    if (state?.phase === "handOver" && !showReview && champion === null && !eliminationModalOpen) {
       start();
     } else if (state?.phase !== "handOver") {
       stop();
       setShowReview(false);
     }
     return () => stop();
-  }, [state?.phase, state?.handNumber, showReview, start, stop, champion]);
+  }, [state?.phase, state?.handNumber, showReview, start, stop, champion, eliminationModalOpen]);
 
   // A46: a coach-grade banner must not survive the hand it graded.
   useEffect(() => setComparison(null), [state?.handNumber]);
@@ -153,8 +154,7 @@ export function TablePage() {
     state.username ?? getUsername() ?? "",
   );
   const showWinner = previewWinner || champion !== null;
-  const showEliminatedModal =
-    heroPendingReentry || (heroOut && !watchToEnd && !showWinner);
+  const showEliminatedModal = heroPendingReentry || (eliminationModalOpen && !showWinner);
   const overlay = showWinner ? (
     <TournamentWinner username={winnerName ?? ""} place={state.heroFinishPlace} />
   ) : showEliminatedModal ? (
