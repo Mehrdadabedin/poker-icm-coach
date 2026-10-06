@@ -1,0 +1,90 @@
+/* A47 — TRY ONE SPOT: the pinned coach quiz. CALL / FOLD reveal the same
+   backend-computed answer (backend/tests/test_landing_spot.py). */
+
+.lp-quiz-card {
+  max-width: 640px;
+  margin: 0 auto;
+  border: 1px solid var(--lp-card-border);
+  border-radius: 16px;
+  background: var(--lp-card);
+  padding: 26px;
+}
+
+.lp-quiz-hand {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin: 0 0 16px;
+}
+
+.lp-quiz-card-img {
+  width: 86px; height: 120px;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.55));
+}
+
+.lp-quiz-spot {
+  margin: 0 0 12px;
+  color: var(--lp-text);
+  font-size: 1rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.lp-quiz-prompt {
+  margin: 0 0 16px;
+  color: var(--lp-gold);
+  font-family: var(--lp-head);
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.lp-quiz-actions { display: flex; gap: 12px; justify-content: center; }
+
+.lp-btn-quiz-quiet {
+  background: transparent;
+  border-color: var(--lp-gold);
+  color: var(--lp-gold);
+  font-family: var(--lp-head);
+  letter-spacing: 1.6px;
+}
+
+/* ---- revealed answer ---- */
+.lp-quiz-answer {
+  margin-top: 20px;
+  border: 1px solid var(--lp-gold);
+  border-radius: 12px;
+  background: #0f1218;
+  padding: 16px 18px;
+  text-align: center;
+}
+
+.lp-quiz-verdict {
+  margin: 0 0 10px;
+  color: var(--lp-text);
+  font-family: var(--lp-head);
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.lp-quiz-reason {
+  margin: 0 0 14px;
+  color: var(--lp-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.lp-quiz-facts { margin: 0; display: flex; flex-wrap: wrap; gap: 8px 26px; justify-content: center; }
+
+.lp-quiz-fact { margin: 0; }
+.lp-quiz-fact dt {
+  color: var(--lp-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.lp-quiz-fact dd { margin: 0 0 0; color: var(--lp-text); font-weight: 700; }
+
+.lp-quiz-note { margin: 12px 0 0; color: var(--lp-muted); font-size: 0.85rem; }

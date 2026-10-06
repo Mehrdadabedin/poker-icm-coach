@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import {
   getAnalyticsConsent,
@@ -10,6 +10,14 @@ export function AnalyticsConsentBanner() {
   const { pathname } = useLocation();
   const [consent, setConsent] = useState(getAnalyticsConsent);
   const [isEditing, setIsEditing] = useState(consent === null);
+
+  // A47: the landing footer's "Cookie settings" opens this same consent
+  // editor through a window event, so there is exactly one settings control.
+  useEffect(() => {
+    const openSettings = () => setIsEditing(true);
+    window.addEventListener("icmbot:cookie-settings", openSettings);
+    return () => window.removeEventListener("icmbot:cookie-settings", openSettings);
+  }, []);
 
   if (!isGoogleAnalyticsConfigured()) return null;
 

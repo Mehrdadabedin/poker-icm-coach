@@ -1,0 +1,97 @@
+/* A47 — FAQ, final CTA and footer. The FAQ asks exactly the three pinned
+   questions; the final CTA offers START TRAINING FREE always and Continue
+   with Google only when the backend advertises the provider. */
+
+.lp-faq-list { margin: 0; display: grid; gap: 14px; }
+
+.lp-faq-item {
+  border: 1px solid var(--lp-card-border);
+  border-radius: 12px;
+  background: var(--lp-card);
+  padding: 16px 18px;
+}
+
+.lp-faq-q {
+  margin: 0 0 8px;
+  color: var(--lp-text);
+  font-family: var(--lp-head);
+  font-weight: 800;
+}
+
+.lp-faq-a { margin: 0; color: var(--lp-muted); font-size: 0.95rem; line-height: 1.5; }
+
+/* ---- final CTA ---- */
+.lp-final-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: clamp(20px, 4vw, 48px);
+  align-items: center;
+}
+
+.lp-final-title {
+  margin: 0 0 22px;
+  color: var(--lp-text);
+  font-family: var(--lp-head);
+  font-size: clamp(1.35rem, 3vw, 2.1rem);
+  font-weight: 800;
+  line-height: 1.15;
+  text-transform: uppercase;
+}
+
+.lp-final-actions { display: flex; flex-wrap: wrap; gap: 14px; }
+
+.lp-final-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--lp-card-border);
+  border-radius: 12px;
+}
+
+/* ---- footer ---- */
+.lp-footer {
+  margin-top: clamp(26px, 5vw, 52px);
+  border-top: 1px solid var(--lp-card-border);
+  padding: 26px clamp(16px, 4vw, 48px) 30px;
+  background: var(--lp-bg);
+  text-align: center;
+}
+
+.lp-tagline {
+  margin: 0 0 14px;
+  color: var(--lp-gold);
+  font-family: var(--lp-head);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+}
+
+.lp-footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 26px;
+  margin: 0 0 14px;
+}
+
+.lp-footer-links a,
+.lp-footer-links button {
+  color: var(--lp-muted);
+  font-size: 0.92rem;
+  text-decoration: none;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.lp-footer-links a:hover,
+.lp-footer-links button:hover { color: var(--lp-text); text-decoration: underline; }
+
+.lp-copyright { margin: 0; color: var(--lp-muted); font-size: 0.9rem; }
+
+/* ---- phones: single column CTA, no horizontal scroll ---- */
+@media (max-width: 959px) {
+  .lp-final-layout { grid-template-columns: minmax(0, 1fr); }
+  .lp-final-actions .lp-btn { width: 100%; }
+}

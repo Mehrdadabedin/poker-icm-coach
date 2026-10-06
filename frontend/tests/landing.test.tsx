@@ -1,7 +1,9 @@
-/* A16 frontend tests: the public landing page and its links into the existing
- * authentication flow. The entry route and the unchanged sign-in / sign-up
- * screen are in landing_entry.test.tsx. */
+/* A47 frontend tests: the rebuilt ICMBOT landing page. The entry route and
+ * the unchanged sign-in / sign-up screens stay in landing_entry.test.tsx.
+ * The quiz answer copy is pinned by backend/tests/test_landing_spot.py. */
 import { describe, expect, it, vi, beforeEach } from "vitest";
+
+let scrolled = false;
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 
@@ -26,135 +28,168 @@ async function openLanding() {
       <LandingPage />
     </MemoryRouter>,
   );
-  await act(async () => undefined); // let the footer version lookup land inside act()
+  await act(async () => undefined); // let the providers lookup and footer settle
   return screen;
 }
 
-describe("public landing page", () => {
+describe("public landing page (A47 rebuild)", () => {
   beforeEach(() => {
     localStorage.clear();
     // jsdom has no media engine: give play() a conforming promise so the
-    // landing video overlay behaves like a real browser (play fires 'play').
+    // landing video overlay behaves like a real browser.
     vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) {
       this.dispatchEvent(new Event("play"));
       return Promise.resolve();
     });
+    scrolled = false;
+    Element.prototype.scrollIntoView = () => {
+      scrolled = true;
+    };
   });
 
-  it("renders the brand, hero, demo slot, features and final CTA", async () => {
+  it("renders a solid header with brand, section links and account buttons", async () => {
     await openLanding();
-    expect(screen.getByTestId("landing-page")).toBeInTheDocument();
-    expect(screen.getByTestId("landing-brand")).toHaveTextContent("ICM MASTER");
-    expect(screen.getByTestId("landing-hero-visual").querySelector("img")).toHaveAttribute(
-      "src", "/images/ICMBOT_target_hero.png",
-    );
-    expect(screen.getByTestId("landing-video")).toHaveAttribute("data-video-slot", "16:9");
-    expect(screen.getByTestId("landing-features")).toHaveTextContent(/practice realistic/i);
-    ["PLAY", "REVIEW", "IMPROVE"].forEach((title) => {
-      expect(screen.getByText(title)).toBeInTheDocument();
-    });
-    expect(screen.getByTestId("landing-final-cta")).toHaveTextContent(
-      /ready to improve your tournament game/i,
-    );
+    const header = screen.getByTestId("landing-header");
+    expect(header).toHaveClass("lp-header");
+    const landingCss = (await import("fs")).readFileSync("src/styles/landing.css", "utf8");
+    expect(landingCss).toContain("--lp-bg: #07080a");
+    expect(landingCss).toContain(".lp-header");
+    expect(landingCss).toContain("background: var(--lp-bg);");
+    expect(screen.getByTestId("landing-brand")).toBeInTheDocument();
+    for (const label of ["What is ICM", "How it works", "Opponents", "FAQ"]) {
+      expect(header.querySelectorAll("a.lp-nav-link").length).toBe(4);
+      expect(header.textContent).toContain(label);
+    }
+    expect(screen.getByTestId("landing-login")).toHaveAttribute("href", "/login");
+    expect(screen.getByTestId("landing-signup")).toHaveAttribute("href", "/login");
   });
 
-  it("plays the BOT PROFILES demo clip with the ICMBOT poster overlay", async () => {
+  it("renders the two-column hero with the H1 and real buttons", async () => {
+    const { getByRole } = await openLanding();
+    expect(getByRole("heading", { level: 1 }).textContent).toBe("MASTER YOUR TOURNAMENT DECISIONS");
+    expect(screen.getByText("TOURNAMENT POKER TRAINER")).toBeInTheDocument();
+    expect(screen.getByText(/Play 9-handed tournaments against 8 bots/)).toBeInTheDocument();
+    expect(screen.getByTestId("landing-start-training")).toHaveAttribute("href", "/login");
+    expect(screen.getByTestId("landing-start-training").textContent).toContain("START TRAINING FREE");
+    expect(screen.getByText(/Practice only, no real money/)).toBeInTheDocument();
+    const visual = screen.getByTestId("landing-hero-visual");
+    expect(visual.tagName).toBe("IMG");
+    expect(visual).toHaveAttribute("src", "/images/hero-robot.webp");
+    // no invisible hit areas over artwork remain
+    expect(document.querySelector(".lp-hero-hit")).toBeNull();
+  });
+
+  it("scrolls to the demo video from the WATCH DEMO button", async () => {
+    await openLanding();
+    fireEvent.click(screen.getByTestId("landing-watch-demo"));
+    expect(scrolled).toBe(true);
+  });
+
+  it("keeps the current demo player and poster", async () => {
     await openLanding();
     const player = screen.getByTestId("landing-video-player");
     expect(player.tagName).toBe("VIDEO");
-    expect(player).toHaveAttribute("controls");
-    expect(player).toHaveAttribute("preload", "metadata");
     expect(player).toHaveAttribute("poster", "/videos/ICMBOT_video_poster.png");
-    expect(player).not.toHaveAttribute("autoplay");
-    expect(player).not.toHaveAttribute("loop");
     expect(player.querySelector("source")).toHaveAttribute(
       "src",
       "/videos/ICM_BOT_demo_bot_profiles_narrated.mp4",
     );
-    // no placeholder artwork and no external host is left behind
-    expect(screen.queryByText(/coming soon/i)).toBeNull();
-    expect(player.outerHTML).not.toMatch(/youtube|vimeo|http/i);
-
-    // The poster overlay uses the new poster and is visible before playback.
-    const overlay = screen.getByTestId("landing-video-poster");
-    expect(overlay.querySelector("img")).toHaveAttribute(
+    expect(screen.getByTestId("landing-video-poster").querySelector("img")).toHaveAttribute(
       "src",
       "/videos/ICMBOT_video_poster.png",
     );
-
-    // Clicking the overlay starts playback and hides the poster.
-    fireEvent.click(overlay);
-    expect(screen.queryByTestId("landing-video-poster")).toBeNull();
-
-    // Pausing shows the poster again and keeps the playback position.
-    fireEvent.pause(player);
-    expect(screen.getByTestId("landing-video-poster")).toBeInTheDocument();
-    expect(player).toHaveProperty("currentTime", 0); // jsdom cannot advance time
-
-    // Clicking the poster resumes playback and hides it again.
-    fireEvent.click(screen.getByTestId("landing-video-poster"));
-    expect(screen.queryByTestId("landing-video-poster")).toBeNull();
-
-    // The clip ending brings the poster back.
-    fireEvent.ended(player);
-    expect(screen.getByTestId("landing-video-poster")).toBeInTheDocument();
   });
 
-  it("renders a clean header with brand and nav, and the hero visual", async () => {
+  it("lets both quiz buttons reveal the pinned coach answer", async () => {
     await openLanding();
-    const header = document.querySelector(".lp-header");
-    expect(header).not.toBeNull();
-    // brand is present, no h1 in the header
-    expect(screen.getByTestId("landing-brand")).toHaveTextContent("ICM MASTER");
-    expect(header!.querySelector("h1")).toBeNull();
-    // nav links are present
-    expect(screen.getByTestId("landing-login")).toHaveAttribute("href", "/login");
-    expect(screen.getByTestId("landing-signup")).toHaveAttribute("href", "/login");
-    // hero visual exists with the correct artwork
-    const visual = screen.getByTestId("landing-hero-visual").querySelector("img");
-    expect(visual).not.toBeNull();
-    expect(visual?.getAttribute("src")).toBe("/images/ICMBOT_target_hero.png");
-    expect(screen.queryByRole("heading", { level: 1 })).toBeNull();
+    fireEvent.click(screen.getByTestId("landing-quiz-call"));
+    const answer = screen.getByTestId("landing-quiz-answer");
+    expect(answer.textContent).toContain("FOLD");
+    expect(answer.textContent).toContain("65% confident");
+    expect(answer.textContent).toContain("AQo equity ~33% below required 54%. ICM pressure MEDIUM.");
+    expect(answer.textContent).toContain("Pot odds");
+    expect(answer.textContent).toContain("MEDIUM");
+    expect(answer.textContent).toContain("Alternative: CALL");
+    // FOLD reveals the same engine answer
+    fireEvent.click(screen.getByTestId("landing-quiz-fold"));
+    expect(screen.getByTestId("landing-quiz-answer").textContent).toContain("FOLD");
   });
 
-  it("uses the target artwork as the hero with an interaction layer", async () => {
+  it("shows the real coach screenshot and the three points", async () => {
     await openLanding();
-    const figure = screen.getByTestId("landing-hero-visual");
-    const img = figure.querySelector("img");
-    expect(img?.getAttribute("src")).toBe("/images/ICMBOT_target_hero.png");
-    // the visible copy lives in the artwork; the DOM mirrors it accessibly
-    expect(screen.getAllByText("PRACTICE WITH").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("ICM BOT").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("PRACTICE • IMPROVE • WIN").length).toBeGreaterThan(0);
-    // invisible hit areas keep the real actions clickable
-    const start = screen.getByTestId("landing-start-training");
-    expect(start.getAttribute("aria-label")).toBe("Start Training");
-    expect(start).toHaveAttribute("href", "/login");
-    const watch = screen.getByTestId("landing-watch-demo");
-    expect(watch.getAttribute("aria-label")).toBe("Watch How It Works");
-    expect(watch.getAttribute("type")).toBe("button");
+    const shot = screen.getByTestId("landing-coach-shot");
+    expect(shot).toHaveAttribute("src", "/images/table-coach.webp");
+    expect(screen.getByText("One clear action")).toBeInTheDocument();
+    expect(screen.getByText("The reason in one line")).toBeInTheDocument();
+    expect(screen.getByText("The tournament picture")).toBeInTheDocument();
+    expect(screen.getByText(/ICM pressure, bubble, stack band, risk premium, pot odds and SPR/)).toBeInTheDocument();
   });
 
-  it("links into the existing authentication flow only", async () => {
+  it("lists the three how-it-works steps with the grade vocabulary", async () => {
     await openLanding();
-    expect(screen.getByTestId("landing-login")).toHaveAttribute("href", "/login");
-    // SIGN UP uses the same existing sign-in screen: its own "Sign up" link
-    // switches to registration, so no auth component is touched.
-    expect(screen.getByTestId("landing-signup")).toHaveAttribute("href", "/login");
-    expect(screen.getByTestId("landing-start-training")).toHaveAttribute("href", "/login");
-    expect(screen.getByTestId("landing-final-start")).toHaveAttribute("href", "/login");
-    // no credential field lives on the landing page
-    expect(screen.queryByTestId("password-input")).toBeNull();
+    expect(screen.getByTestId("landing-how").textContent).toContain("Sign up");
+    expect(screen.getByTestId("landing-how").textContent).toContain("Choose your opponents");
+    expect(screen.getByTestId("landing-how").textContent).toContain("PREFERRED");
+    expect(screen.getByTestId("landing-how").textContent).toContain("ACCEPTABLE");
+    expect(screen.getByTestId("landing-how").textContent).toContain("SUBOPTIMAL");
   });
 
-  it("keeps the author copyright footer", async () => {
+  it("renders all four bot profiles from botProfiles.ts", async () => {
     await openLanding();
-    const footer = screen.getByTestId("app-footer");
-    expect(footer).toHaveTextContent("© 2026 — Created by Mehrdad Abedin");
-    expect(footer).not.toHaveTextContent("NEXORA");
-    expect(footer).toHaveTextContent("Created by Mehrdad Abedin");
-    // A23: the version was removed from the copyright line
-    expect(footer).not.toHaveTextContent("v0.");
-    expect(screen.queryByTestId("app-version")).toBeNull();
+    const section = screen.getByTestId("landing-opponents");
+    for (const name of ["Alex", "Sarah", "David", "Emma"]) {
+      expect(section.textContent).toContain(name);
+    }
+    expect(section.querySelectorAll("img.lp-opponent-portrait")).toHaveLength(4);
+    expect(section.textContent).toContain("Tight-Aggressive");
+    expect(section.textContent).toContain("Loose-Passive");
+  });
+
+  it("shows the nine WHAT YOU GET cards", async () => {
+    await openLanding();
+    const perks = screen.getByTestId("landing-perks");
+    const cards = perks.querySelectorAll("li.lp-perk");
+    expect(cards).toHaveLength(9);
+    expect(perks.textContent).toContain("Exact ICM");
+    expect(perks.textContent).toContain("Push/fold and ranges");
+    expect(perks.textContent).toContain("Works with AI agents (WebMCP)");
+    expect(perks.textContent).toContain("Eight opponent seats");
+  });
+
+  it("asks exactly the three FAQ questions and never 'Is it free?'", async () => {
+    await openLanding();
+    const faq = screen.getByTestId("landing-faq");
+    expect(faq.textContent).toContain("Is real money involved?");
+    expect(faq.textContent).toContain("No. ICMBOT is practice only and never touches real money.");
+    expect(faq.textContent).toContain("Do I need to know ICM?");
+    expect(faq.textContent).toContain("Does it work on my phone?");
+    expect(screen.queryByText(/Is it free/i)).toBeNull();
+  });
+
+  it("renders the final CTA, footer and the champion image", async () => {
+    await openLanding();
+    expect(screen.getByText("PLAY YOUR FIRST TOURNAMENT TODAY.")).toBeInTheDocument();
+    expect(screen.getByTestId("landing-final-start").textContent).toContain("START TRAINING FREE");
+    expect(screen.getByTestId("landing-champion-img")).toHaveAttribute(
+      "src",
+      "/images/tournament-champion.webp",
+    );
+    const footer = screen.getByTestId("landing-footer");
+    for (const label of ["Privacy", "Terms", "Cookie settings"]) {
+      expect(footer.textContent).toContain(label);
+    }
+    expect(footer.textContent).toContain("© 2026 ICMBOT. Practice only.");
+  });
+
+  it("hides Continue with Google when the backend does not advertise it", async () => {
+    await openLanding();
+    expect(screen.queryByTestId("landing-google")).toBeNull();
+  });
+
+  it("offers Continue with Google only when /api/auth/providers says google", async () => {
+    const { getAuthProviders } = await import("../src/services/api");
+    vi.mocked(getAuthProviders).mockResolvedValueOnce({ google: true, apple: false, phone: false });
+    await openLanding();
+    expect(screen.getByTestId("landing-google")).toBeInTheDocument();
   });
 });
