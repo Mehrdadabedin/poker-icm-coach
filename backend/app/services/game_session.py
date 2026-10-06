@@ -86,6 +86,9 @@ class GameSession:
 
     def next_hand(self) -> None:
         with self._lock:
+            # A45: a finished table must not replay/duplicate history.
+            if self.status != "active":
+                raise ValueError("tournament is not active")
             if self.phase() != "handOver":
                 raise ValueError("current hand is still in progress")
             self._record_and_persist()

@@ -759,3 +759,13 @@ WATCH TO THE END.
 - Frontend: `useAutoFinish` (gated on the watch choice) and `useTableActions`
   hooks extracted; render body moved to `LiveTableView`; TablePage <= 200
   lines.
+
+### A45 — Tournament end screen (IMPLEMENTED)
+At tournament end (one player left) the existing TournamentWinner artwork
+shows "CONGRATULATIONS <champion name>"; when the hero is not the champion,
+"You finished Nth" is shown too (heroFinishPlace). If the hero won, the
+username is the champion name.
+- Backend guard: `next_hand()` on a table whose status is not "active" raises
+  ValueError (HTTP 400) BEFORE `_record_and_persist()` so a finished table
+  can never write a duplicate history line.
+- Frontend: the auto-next countdown does not start when a champion exists.

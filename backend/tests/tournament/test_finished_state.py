@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import random
 
+import pytest
+
 from app.game.actions import Action, ActionType
 from app.services.game_session import GameSession
 from app.services.session_store import session_store
@@ -141,3 +143,12 @@ def test_api_get_state_on_finished_table_returns_200() -> None:
     # the real BOT winner, never the authenticated user
     assert live_names(body) != ["A41BotWinner"]
     assert client.get(f"/api/game/{s.session_id}/state").status_code == 200
+
+
+def test_next_hand_after_finish_raises_without_duplicate_history() -> None:
+    """A45: next_hand on a finished table is rejected before writing history."""
+    s = finished_bot_champion()
+    before = len(s.history.all())
+    with pytest.raises(ValueError):
+        s.next_hand()
+    assert len(s.history.all()) == before

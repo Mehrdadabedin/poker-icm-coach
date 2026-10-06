@@ -79,14 +79,14 @@ export function TablePage() {
       state?.actionLog?.length, tableId]);
 
   useEffect(() => {
-    if (state?.phase === "handOver" && !showReview) {
+    if (state?.phase === "handOver" && !showReview && champion === null) {
       start();
     } else if (state?.phase !== "handOver") {
       stop();
       setShowReview(false);
     }
     return () => stop();
-  }, [state?.phase, state?.handNumber, showReview, start, stop]);
+  }, [state?.phase, state?.handNumber, showReview, start, stop, champion]);
 
   const onAction = async (kind: ActionKind, amount?: number) => {
     const next = await actions.act(kind, amount);
@@ -156,7 +156,7 @@ export function TablePage() {
   const showEliminatedModal =
     heroPendingReentry || (heroOut && !watchToEnd && !showWinner);
   const overlay = showWinner ? (
-    <TournamentWinner username={winnerName ?? ""} />
+    <TournamentWinner username={winnerName ?? ""} place={state.heroFinishPlace} />
   ) : showEliminatedModal ? (
     <ReentryModal
       available={heroPendingReentry}

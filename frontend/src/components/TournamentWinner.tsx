@@ -1,10 +1,13 @@
-/* Tournament winner screen: the supplied champion artwork fills the central
- * table area when the current user wins the entire tournament (existing
- * tournament-end state). Only the winning username is dynamically rendered,
- * positioned inside the artwork's empty name plaque; no buttons, no extra
- * text, no game logic. */
-export function TournamentWinner({ username }: { username: string }) {
+/* Tournament winner screen (A45): the champion artwork fills the central
+ * table area when the tournament ends. "Congratulations <champion name>"
+ * overlays the artwork; when the hero is not the champion, the hero's
+ * finishing place is shown too. No buttons, no extra text, no game logic. */
+export function TournamentWinner({ username, place }: {
+  username: string;
+  place?: number | null;
+}) {
   const display = username?.trim() || "Champion";
+  const finished = place !== undefined && place !== null && place > 1;
   return (
     <div className="tournament-winner" data-testid="tournament-winner">
       <div className="tournament-winner-content">
@@ -15,9 +18,17 @@ export function TournamentWinner({ username }: { username: string }) {
           data-testid="tournament-winner-image"
           draggable={false}
         />
+        <div className="tournament-winner-title" data-testid="tournament-winner-title">
+          CONGRATULATIONS
+        </div>
         <div className="tournament-winner-name" data-testid="tournament-winner-name">
           {display}
         </div>
+        {finished && (
+          <div className="tournament-winner-place" data-testid="tournament-winner-place">
+            YOU FINISHED {place} OF 9
+          </div>
+        )}
       </div>
     </div>
   );

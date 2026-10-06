@@ -107,6 +107,24 @@ describe("TournamentWinner", () => {
     expect(screen.queryByText(/play again|new tournament|home/i)).toBeNull();
   });
 
+  it("shows CONGRATULATIONS with the champion name (A45)", () => {
+    render(<TournamentWinner username="Alex" />);
+    expect(screen.getByTestId("tournament-winner-title")).toHaveTextContent("CONGRATULATIONS");
+    expect(screen.getByTestId("tournament-winner-name")).toHaveTextContent("Alex");
+  });
+
+  it("shows YOU FINISHED N OF 9 when the hero is not the champion (A45)", () => {
+    render(<TournamentWinner username="Alex" place={3} />);
+    expect(screen.getByTestId("tournament-winner-place")).toHaveTextContent("YOU FINISHED 3 OF 9");
+  });
+
+  it("omits the finish line when the hero is the champion or the place is unknown", () => {
+    render(<TournamentWinner username="micky" />);
+    expect(screen.queryByTestId("tournament-winner-place")).toBeNull();
+    render(<TournamentWinner username="Alex" place={1} />);
+    expect(screen.queryByTestId("tournament-winner-place")).toBeNull();
+  });
+
   it("is an overlay layer (absolute positioning supplied by winner.css)", () => {
     render(<TournamentWinner username="Alice" />);
     const overlay = screen.getByTestId("tournament-winner");
