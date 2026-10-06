@@ -59,6 +59,7 @@ def build_state_view(session) -> dict:
     active_count = sum(1 for p in tournament.players if not p.is_eliminated)
     return {
         "tableId": session.session_id,
+        "heroFinishPlace": session.hero_finish_place,
         "tableLabel": session.table_label,
         "status": session.status,
         "username": session.owner,

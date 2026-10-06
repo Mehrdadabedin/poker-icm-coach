@@ -24,11 +24,22 @@ describe("ReentryModal (A39)", () => {
     expect(onNewGame).toHaveBeenCalledTimes(1);
   });
 
-  it("shows RE-ENTRY CLOSED without buttons after Level 5", () => {
+  it("shows YOU FINISHED N OF 9 with WATCH/START NEW GAME after Level 5 (A44)", () => {
+    const onWatch = vi.fn();
+    const onNewGame = vi.fn();
+    render(<ReentryModal available={false} finishPlace={7} onWatch={onWatch} onNewGame={onNewGame} />);
+    expect(screen.getByText("YOU FINISHED 7 OF 9")).toBeInTheDocument();
+    expect(screen.getByTestId("reentry-watch")).toHaveTextContent("WATCH TO THE END");
+    expect(screen.getByTestId("reentry-new-game")).toHaveTextContent("START NEW GAME");
+    fireEvent.click(screen.getByTestId("reentry-watch"));
+    expect(onWatch).toHaveBeenCalledTimes(1);
+    fireEvent.click(screen.getByTestId("reentry-new-game"));
+    expect(onNewGame).toHaveBeenCalledTimes(1);
+  });
+
+  it("renders a placeholder finish place when the backend has none yet", () => {
     render(<ReentryModal available={false} />);
-    expect(screen.getByText("RE-ENTRY CLOSED")).toBeInTheDocument();
-    expect(screen.getByText("Level 5 has passed. Re-entry is no longer available.")).toBeInTheDocument();
-    expect(screen.queryByRole("button")).toBeNull();
+    expect(screen.getByText("YOU FINISHED ? OF 9")).toBeInTheDocument();
   });
 });
 

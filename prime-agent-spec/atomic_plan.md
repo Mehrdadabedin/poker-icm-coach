@@ -744,3 +744,18 @@ out), clockwise from the button.
   box, no OUT badge, no position); the hero seat stays visible.
 - Acceptance: 8 players left -> exactly 8 labels, none on the busted seat,
   CO present; short ring labels drive the existing range/coach lookups.
+
+### A44 — Hero out: choose to watch or start a new game (IMPLEMENTED)
+When the hero is permanently eliminated (after Level 5 / no re-entry), the
+table shows a modal (extended `ReentryModal`) with "You finished Nth of 9"
+and two actions: WATCH TO THE END (starts the existing A39 BOT auto-finish)
+or START NEW GAME (fresh table, same BOT lineup/profile when available, navigates
+to the new table, never `/`). Auto-finish does not start until the hero picks
+WATCH TO THE END.
+- Backend records the hero's finishing place at elimination: place = players
+  still alive after that hand + 1; simultaneous busts in one hand place by
+  the stack they started the hand with (larger first). Exposed as
+  `heroFinishPlace` in the state view and schema.
+- Frontend: `useAutoFinish` (gated on the watch choice) and `useTableActions`
+  hooks extracted; render body moved to `LiveTableView`; TablePage <= 200
+  lines.

@@ -126,6 +126,7 @@ class HandReviewModel(BaseModel):
 
 class GameStateModel(BaseModel):
     tableId: str
+    heroFinishPlace: int | None = None
     tableLabel: str = ""
     status: str = "active"
     username: str | None = None

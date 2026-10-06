@@ -98,6 +98,7 @@ export interface TableState {
   tableLabel?: string;
   username?: string | null;
   handNumber: number;
+  heroFinishPlace?: number | null;
   players: PlayerView[];
   actionLog?: TableAction[];
   playersRemaining?: number;

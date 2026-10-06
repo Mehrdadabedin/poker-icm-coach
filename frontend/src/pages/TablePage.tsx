@@ -1,56 +1,24 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { HandResult } from "../components/HandResult";
-import { HandReview } from "../components/HandReview";
-import { HeroControls } from "../components/HeroControls";
+import { resolveWinnerName, winnerPreviewEnabled } from "./endgame";
+import { LiveTableView } from "../components/LiveTableView";
 import { LoginForm } from "../components/LoginForm";
-import { PokerTable } from "../components/PokerTable";
-import { TableHeader } from "../components/TableHeader";
-import { TableSidebar } from "../components/TableSidebar";
 import { ReentryModal } from "../components/ReentryModal";
 import { TournamentWinner } from "../components/TournamentWinner";
 import { useAutoNext } from "../hooks/useAutoNext";
+import { useAutoFinish } from "../hooks/useAutoFinish";
 import { useGame } from "../hooks/useGame";
-import { ActionKind, CoachAdvice, LegalAction, tournamentChampion } from "../models/game";
+import { useTableActions } from "../hooks/useTableActions";
+import type { ActionKind, CoachAdvice } from "../models/game";
+import { tournamentChampion } from "../models/game";
 import { useLabelPreferences } from "../services/preferences";
-import { clearAuth, coachAdvice, coachCompare, createTournament, getToken, getUsername, logout, nextHand as requestNextHand, reentry as requestReentry, request } from "../services/api";
+import { clearAuth, coachAdvice, coachCompare, getToken, getUsername, request } from "../services/api";
 import type { HandHistoryEntry } from "../webmcp/registerGameTools";
 import { useGameWebMcp } from "../webmcp/useGameWebMcp";
 
 const REVIEW_SECONDS = 10;
 
-/** Development-only winner preview trigger. Always false for production
- * builds (import.meta.env.DEV is false there) and when the query parameter
- * is absent, so real tournament behavior is never affected. */
-export function winnerPreviewEnabled(isDev: boolean, param: string | null): boolean {
-  return isDev && param === "true";
-}
-
-/** Winner plaque name. Dev preview: the ?testWinnerName parameter (else the
- * signed-in username fallback). Real tournament: the champion's own name -
- * never the authenticated user. */
-export function resolveWinnerName(
-  previewWinner: boolean,
-  previewName: string,
-  championName: string | null,
-  fallback: string,
-): string {
-  if (previewWinner) {
-    return previewName || fallback;
-  }
-  return championName || fallback;
-}
-
-/** A39: BOT-only auto-finish is active when the hero is permanently out,
- * BOTs still remain, and no champion exists yet. */
-export function autoFinishActive(
-  heroEliminated: boolean,
-  playersRemaining: number | undefined,
-  championName: string | null,
-): boolean {
-  if (!heroEliminated || championName !== null) return false;
-  return (playersRemaining ?? 9) > 1;
-}
+export { autoFinishActive, resolveWinnerName, winnerPreviewEnabled } from "./endgame";
 
 /** Live table: compact result + optional Review the Hand (A10/A11/A16). */
 export function TablePage() {
@@ -59,16 +27,39 @@ export function TablePage() {
   const [searchParams] = useSearchParams();
   const [authed, setAuthed] = useState<boolean>(() => !!getToken());
   const [showReview, setShowReview] = useState(false);
-  const { state, error, act, nextHand, acting, refresh: refreshTable } = useGame(tableId);
+  const [watchToEnd, setWatchToEnd] = useState(false); // A44: hero watched -> auto-finish
+  const { state, error, nextHand, acting, refresh: refreshTable } = useGame(tableId);
   const { countdown, paused, start, stop, pause, resume } = useAutoNext(nextHand, REVIEW_SECONDS);
-  const stateRef = useRef(state);
-  stateRef.current = state;
   const [coach, setCoach] = useState<CoachAdvice | null>(null);
-  // UI-only HIDE / SHOW for the two side panels; no game or API state.
   const [coachHidden, setCoachHidden] = useState(false);
   const [historyHidden, setHistoryHidden] = useState(false);
   const [comparison, setComparison] = useState<Record<string, string> | null>(null);
   const { actionLabels, resultLabels } = useLabelPreferences();
+  const lineup = useMemo(() => {
+    const profiles = (state?.players ?? [])
+      .filter((p) => !p.isHero)
+      .map((p) => p.profile ?? null);
+    return (profiles.length === 8 && profiles.every((p): p is string => p !== null))
+      ? profiles : null;
+  }, [state]);
+  const actions = useTableActions({ tableId, refresh: refreshTable, navigate, lineup });
+  const hero = state?.players.find((p) => p.isHero);
+  const champion = state ? tournamentChampion(state) : null;
+  const heroPendingReentry = !!hero?.awaitingReentry;
+  const heroOut = !!hero && hero.sitsOut && !heroPendingReentry;
+
+  useAutoFinish({
+    enabled: watchToEnd,
+    paused,
+    heroOut,
+    phase: state?.phase,
+    handNumber: state?.handNumber,
+    playersRemaining: state?.playersRemaining,
+    championName: champion?.name ?? null,
+    next: actions.nextHand,
+    stop,
+    start,
+  });
 
   // The hero can be the actor more than once in a hand, on a later street or on
   // the same one after somebody reopens the betting. The 350 ms poll often never
@@ -87,7 +78,6 @@ export function TablePage() {
   }, [state?.waitingForHero, state?.handNumber, state?.phase, state?.street,
       state?.actionLog?.length, tableId]);
 
-  // Auto-next only on the table result state; review suspends it (A10/A16).
   useEffect(() => {
     if (state?.phase === "handOver" && !showReview) {
       start();
@@ -98,29 +88,8 @@ export function TablePage() {
     return () => stop();
   }, [state?.phase, state?.handNumber, showReview, start, stop]);
 
-  // A39: BOT-only accelerated auto-finish after permanent hero elimination.
-  useEffect(() => {
-    const s = stateRef.current;
-    if (!s || paused) return undefined;
-    const hero = s.players.find((p) => p.isHero);
-    const pending = !!hero?.awaitingReentry;
-    if (pending || !hero || !hero.sitsOut) return undefined; // hero still in play
-    if (tournamentChampion(s) !== null) return undefined; // winner screen takes over
-    if (winnerPreviewEnabled(import.meta.env.DEV, searchParams.get("testWinner"))) return undefined;
-    if ((s.playersRemaining ?? s.players.length) <= 1) return undefined;
-    if (s.phase !== "handOver") return undefined;
-    stop(); // suppress the 10 s review countdown in auto-finish mode
-    const id = setInterval(() => {
-      requestNextHand(tableId).then(() => refreshTable()).catch(() => undefined);
-    }, 900);
-    return () => {
-      clearInterval(id);
-      start();
-    };
-  }, [state?.phase, state?.handNumber, state?.playersRemaining, paused, tableId, stop, start, refreshTable, searchParams]);
-
-  const onAction = async (kind: string, amount?: number) => {
-    const next = await act(kind, amount);
+  const onAction = async (kind: ActionKind, amount?: number) => {
+    const next = await actions.act(kind, amount);
     if (next) {
       const grade = await coachCompare(tableId).catch(() => null);
       setComparison(grade);
@@ -137,16 +106,8 @@ export function TablePage() {
     countdown: () => countdown,
     isReviewOpen: () => showReview,
     act: onAction,
-    nextHand: async () => {
-      const next = await requestNextHand(tableId);
-      await refreshTable();
-      return next;
-    },
-    startNewHand: async () => {
-      const next = await createTournament(10);
-      navigate(`/table/${next.tableId}`);
-      return next;
-    },
+    nextHand: actions.nextHand,
+    startNewHand: actions.startNewGame,
     getHandHistory: async () => {
       const data = await request<{ hands: HandHistoryEntry[] }>(
         `/api/game/${encodeURIComponent(tableId)}/hands`,
@@ -157,26 +118,6 @@ export function TablePage() {
     resume,
     showHandResult: () => setShowReview(true),
   });
-
-  const signOut = async () => {
-    try {
-      await logout();
-    } catch {
-      // token may already be revoked server-side; clear locally regardless
-    }
-    clearAuth();
-    navigate("/");
-  };
-
-  // A39: explicit re-entry after a Level 1-5 bust (exactly 45,000, same level).
-  const continueReentry = async () => {
-    try {
-      await requestReentry(tableId);
-      await refreshTable();
-    } catch {
-      // next poll reflects the backend state regardless
-    }
-  };
 
   if (!authed) {
     return (
@@ -202,14 +143,6 @@ export function TablePage() {
     return <div className="loading-box">Connecting to the table…</div>;
   }
 
-  const hero = state.players.find((p) => p.isHero);
-  const handOver = state.phase === "handOver" && !!state.review;
-  const isReview = handOver && showReview;
-  // Existing tournament state: the sole survivor is the champion (hero or
-  // any BOT), so Alex/a BOT finishing first also triggers the presentation.
-  const champion = tournamentChampion(state);
-  const heroPendingReentry = !!hero?.awaitingReentry;
-  const heroEliminated = !!hero && hero.sitsOut && !heroPendingReentry;
   // DEV preview only: reuses the exact winner branch; no effect in builds.
   const previewWinner = winnerPreviewEnabled(import.meta.env.DEV, searchParams.get("testWinner"));
   const previewName = searchParams.get("testWinnerName") ?? "";
@@ -220,90 +153,48 @@ export function TablePage() {
     state.username ?? getUsername() ?? "",
   );
   const showWinner = previewWinner || champion !== null;
-  const autoFinish = autoFinishActive(heroEliminated, state.playersRemaining, champion?.name ?? null);
-  const nameBySeat = new Map(state.players.map((pl) => [pl.seat, pl.name]));
+  const showEliminatedModal =
+    heroPendingReentry || (heroOut && !watchToEnd && !showWinner);
+  const overlay = showWinner ? (
+    <TournamentWinner username={winnerName ?? ""} />
+  ) : showEliminatedModal ? (
+    <ReentryModal
+      available={heroPendingReentry}
+      finishPlace={state.heroFinishPlace}
+      onContinue={actions.continueReentry}
+      onWatch={() => setWatchToEnd(true)}
+      onNewGame={actions.startNewGame}
+    />
+  ) : undefined;
 
   return (
-    <div className="table-page" data-testid="table-page">
-      <TableHeader
-        state={state}
-        username={getUsername()}
-        paused={paused}
-        handOver={handOver}
-        isReview={isReview}
-        onHome={() => navigate("/")}
-        onLogout={() => void signOut()}
-        onTogglePause={paused ? resume : pause}
-      />
-      {isReview && state.review ? (
-        <HandReview
-          review={state.review}
-          coach={coach}
-          comparison={comparison}
-          totalPlayers={state.players.length}
-          nameBySeat={nameBySeat}
-          onBack={() => setShowReview(false)}
-        />
-      ) : (
-        <>
-          <PokerTable
-            state={state}
-            overlay={showWinner ? (
-              <TournamentWinner username={winnerName ?? ""} />
-            ) : (heroPendingReentry || (heroEliminated && autoFinish)) ? (
-              <ReentryModal
-                available={heroPendingReentry}
-                onContinue={() => void continueReentry()}
-                onNewGame={() => navigate("/")}
-              />
-            ) : undefined}
-          >
-            {handOver && state.review ? (
-              <HandResult
-                review={state.review}
-                username={state.username}
-                onReview={() => setShowReview(true)}
-                onNext={() => void nextHand()}
-                countdown={countdown}
-                paused={paused}
-                showResultLabels={resultLabels}
-              />
-            ) : (
-              <HeroControls
-                legalActions={(state.legalActions ?? []) as LegalAction[]}
-                toCall={state.toCall}
-                pot={state.pot}
-                stack={hero?.stack ?? 0}
-                bigBlind={state.bigBlind}
-                disabled={!state.waitingForHero}
-                submitting={acting}
-                showLabels={actionLabels}
-                onAction={(kind: ActionKind, amount?: number) => void onAction(kind, amount)}
-              />
-            )}
-            {comparison && !handOver && (
-              <div className="comparison-box" data-testid="comparison">
-                <b>{comparison.grade}</b> — {comparison.explanation}
-              </div>
-            )}
-          </PokerTable>
-          {!handOver && (
-            <TableSidebar
-              actions={state.actionLog ?? []}
-              heroSeat={state.heroSeat}
-              nameBySeat={nameBySeat}
-              coach={coach}
-              tableId={tableId}
-              handNumber={state.handNumber}
-              currentLevel={state.level}
-              coachCollapsed={coachHidden}
-              historyCollapsed={historyHidden}
-              onToggleCoach={() => setCoachHidden((v) => !v)}
-              onToggleHistory={() => setHistoryHidden((v) => !v)}
-            />
-          )}
-        </>
-      )}
-    </div>
+    <LiveTableView
+      state={state}
+      overlay={overlay}
+      coach={coach}
+      comparison={comparison}
+      countdown={countdown}
+      paused={paused}
+      acting={acting}
+      showLabels={actionLabels}
+      showResultLabels={resultLabels}
+      nameBySeat={new Map(state.players.map((p) => [p.seat, p.name]))}
+      coachCollapsed={coachHidden}
+      historyCollapsed={historyHidden}
+      reviewOpen={showReview}
+      username={getUsername()}
+      onHome={() => navigate("/")}
+      onLogout={async () => {
+        await actions.signOut();
+        setAuthed(false);
+      }}
+      onTogglePause={paused ? resume : pause}
+      onReview={() => setShowReview(true)}
+      onNext={() => void nextHand()}
+      onBackReview={() => setShowReview(false)}
+      onAction={(kind, amount) => void onAction(kind, amount)}
+      onToggleCoach={() => setCoachHidden((v) => !v)}
+      onToggleHistory={() => setHistoryHidden((v) => !v)}
+    />
   );
 }

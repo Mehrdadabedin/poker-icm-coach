@@ -11,6 +11,7 @@ from app.game.actions import Action, ActionType
 from app.game.hand_engine import HandEngine
 from app.game.positions import position_labels
 from app.services import hand_history
+from app.services.elimination import apply_reentry_or_elimination
 from app.services.game_state_view import build_state_view
 from app.services.hand_history import HandHistoryRecord, HandHistoryStore
 from app.services.session_coach import advice_dict, coach_request, grade_last_action
@@ -18,6 +19,7 @@ from app.services.session_store import mark_finished
 from app.strategy.coach import Coach, CoachRequest
 from app.tournament.tournament import build_default_tournament
 from app.tournament.tournament_timer import TournamentTimer
+
 
 class GameSession:
     """Owns one table; every public entry takes self._lock (reentrant)."""
@@ -34,6 +36,7 @@ class GameSession:
         self.table_label = table_label or self.session_id
         self.created_at = time.time()
         self.status = "active"
+        self.hero_finish_place: int | None = None
         self.last_seen = self.created_at
         self.idle_timeout = 30 * 60
         self.history_dir = history_dir or ""
@@ -145,22 +148,8 @@ class GameSession:
             return grade_last_action(self.coach, self._last_hero_action, self._last_hero_request)
 
     def _apply_reentry_or_eliminate(self) -> None:
-        """A39: BOTs re-enter through Level 5; the hero is parked awaiting
-        re-entry (or eliminated after L5), never auto-restored."""
-        assert self.tournament is not None
-        level = self.tournament.level_index
-        for player in self.tournament.players:
-            if player.is_eliminated or player.stack > 0:
-                continue
-            if level < self.REENTRY_LEVELS:
-                if player.is_human:
-                    player.awaiting_reentry = True
-                    player.sit_out = True
-                else:
-                    player.stack = self.tournament_starting_stack
-            else:
-                player.eliminate()
-                player.awaiting_reentry = False
+        """A39/A44: re-enter or eliminate busted players; note hero place."""
+        apply_reentry_or_elimination(self)
     def reentry(self) -> None:
         """A39 hero re-entry: starting stack, same level."""
         with self._lock:
