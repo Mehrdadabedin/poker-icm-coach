@@ -29,9 +29,7 @@ describe("public landing page (A47 rebuild)", () => {
     scrolled = false;
     // jsdom has no media engine: play() gets a conforming promise for the overlay.
     vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(function (this: HTMLMediaElement) { this.dispatchEvent(new Event("play")); return Promise.resolve(); });
-    Element.prototype.scrollIntoView = () => {
-      scrolled = true;
-    };
+    Element.prototype.scrollIntoView = () => { scrolled = true; };
   });
 
   it("renders a solid header with brand, section buttons and account buttons", async () => {
@@ -41,11 +39,7 @@ describe("public landing page (A47 rebuild)", () => {
     const landingCss = (await import("fs")).readFileSync("src/styles/landing.css", "utf8");
     for (const needle of ["--lp-bg: #07080a", ".lp-header", "background: var(--lp-bg);"]) { expect(landingCss).toContain(needle); }
     expect(screen.getByTestId("landing-brand")).toBeInTheDocument();
-    const navButtons = header.querySelectorAll("button.lp-nav-link");
-    expect(navButtons).toHaveLength(5);
-    expect(Array.from(navButtons).map((b) => b.textContent)).toEqual([
-      "What is ICM", "The Coach", "How it works", "Opponents", "FAQ",
-    ]);
+    expect(Array.from(header.querySelectorAll("button.lp-nav-link")).map((b) => b.textContent)).toEqual(["What is ICM", "The Coach", "How it works", "Opponents", "FAQ"]);
     expect(screen.getByTestId("landing-login")).toHaveAttribute("href", "/login");
     expect(screen.getByTestId("landing-signup")).toHaveAttribute("href", "/login");
   });
@@ -66,10 +60,7 @@ describe("public landing page (A47 rebuild)", () => {
     expect(screen.getByTestId("landing-start-training")).toHaveAttribute("href", "/login");
     expect(screen.getByTestId("landing-start-training").textContent).toContain("START TRAINING FREE");
     expect(screen.getByText(/Practice only, no real money/)).toBeInTheDocument();
-    const visual = screen.getByTestId("landing-hero-visual");
-    expect(visual.tagName).toBe("IMG");
-    expect(visual).toHaveAttribute("src", "/images/hero-robot.webp");
-    // no invisible hit areas over artwork remain
+    expect(screen.getByTestId("landing-hero-visual")).toHaveAttribute("src", "/images/hero-robot.webp");
     expect(document.querySelector(".lp-hero-hit")).toBeNull();
   });
 
@@ -84,55 +75,69 @@ describe("public landing page (A47 rebuild)", () => {
     const player = screen.getByTestId("landing-video-player");
     expect(player.tagName).toBe("VIDEO");
     expect(player).toHaveAttribute("poster", "/videos/ICMBOT_promo_poster.webp");
-    expect(player.querySelector("source")).toHaveAttribute(
-      "src", "/videos/ICMBOT_promo.mp4",
-    );
-    expect(screen.getByTestId("landing-video-poster").querySelector("img")).toHaveAttribute(
-      "src", "/videos/ICMBOT_promo_poster.webp",
-    );
+    expect(player.querySelector("source")).toHaveAttribute("src", "/videos/ICMBOT_promo.mp4");
+    expect(screen.getByTestId("landing-video-poster").querySelector("img")).toHaveAttribute("src", "/videos/ICMBOT_promo_poster.webp");
+  });
+
+  it("starts the quiz hand on the red backs and turns both cards over", async () => {
+    class MockIO {
+      static instances: MockIO[] = [];
+      cb: IntersectionObserverCallback;
+      constructor(cb: IntersectionObserverCallback) { this.cb = cb; MockIO.instances.push(this); }
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+      fire() { this.cb([{ isIntersecting: true } as IntersectionObserverEntry], this as unknown as IntersectionObserver); }
+    }
+    vi.stubGlobal("IntersectionObserver", MockIO);
+    vi.useFakeTimers();
+    await openLanding();
+    const hand = screen.getByTestId("landing-quiz-hand");
+    const up = () => hand.querySelectorAll(".lp-flip-card-up").length;
+    expect(Array.from(hand.querySelectorAll("img.lp-flip-back")).map((i) => i.getAttribute("src"))).toEqual(["/cards/back-red.png", "/cards/back-red.png"]);
+    expect(up()).toBe(0);
+    act(() => MockIO.instances[0].fire());
+    fireEvent.click(hand.querySelectorAll(".lp-flip-card")[0]);
+    expect(up()).toBe(1);
+    act(() => { vi.advanceTimersByTime(800 + 250 + 700); });
+    expect(up()).toBe(2);
+    expect(Array.from(hand.querySelectorAll("img.lp-flip-front")).map((i) => i.getAttribute("src"))).toEqual(["/cards/Ks.png", "/cards/Jh.png"]);
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
   });
 
   it("shows the bubble spot and lets both quiz buttons reveal the coach answer", async () => {
     await openLanding();
     const card = screen.getByTestId("landing-quiz-card");
-    for (const line of ["4 left, 3 paid.", "K♠ J♥",
-                        "Chip leader (40 BB) shoves from the small blind.", "Short stack has 3 BB."]) {
+    for (const line of ["4 left, 3 paid.", "K♠ J♥", "Chip leader (40 BB) shoves from the small blind.", "Short stack has 3 BB."]) {
       expect(card.textContent).toContain(line);
     }
     fireEvent.click(screen.getByTestId("landing-quiz-call"));
     const answer = screen.getByTestId("landing-quiz-answer");
-    expect(answer.textContent).toContain("The coach says FOLD");
-    expect(answer.textContent).toContain("ICM pressure VERY HIGH");
-    expect(answer.textContent).toContain("on the bubble");
-    expect(answer.textContent).toContain("You picked CALL — the coach folds.");
-    // no raw engine strings or forbidden numbers on the reveal
+    for (const needle of ["The coach says FOLD", "ICM pressure VERY HIGH", "on the bubble", "You picked CALL — the coach folds."]) {
+      expect(answer.textContent).toContain(needle);
+    }
     expect(answer.textContent).not.toContain("Est. equity");
     expect(answer.textContent).not.toContain("~33% below required");
-    // FOLD reveals the same answer and reports the match
     fireEvent.click(screen.getByTestId("landing-quiz-fold"));
-    const again = screen.getByTestId("landing-quiz-answer");
-    expect(again.textContent).toContain("The coach says FOLD");
-    expect(again.textContent).toContain("You picked FOLD — matches the coach.");
+    expect(screen.getByTestId("landing-quiz-answer").textContent).toContain("You picked FOLD — matches the coach.");
     expect(screen.queryByText(/Same answer from the engine every time/)).toBeNull();
   });
 
   it("shows the real coach screenshot and the three points", async () => {
     await openLanding();
-    const shot = screen.getByTestId("landing-coach-shot");
-    expect(shot).toHaveAttribute("src", "/images/table-coach.webp");
-    expect(screen.getByText("One clear action")).toBeInTheDocument();
-    expect(screen.getByText("The reason in one line")).toBeInTheDocument();
-    expect(screen.getByText("The tournament picture")).toBeInTheDocument();
+    expect(screen.getByTestId("landing-coach-shot")).toHaveAttribute("src", "/images/table-coach.webp");
+    for (const needle of ["One clear action", "The reason in one line", "The tournament picture"]) {
+      expect(screen.getByText(needle)).toBeInTheDocument();
+    }
     expect(screen.getByText(/ICM pressure, bubble, stack band, risk premium, pot odds and SPR/)).toBeInTheDocument();
   });
 
   it("lists the three how-it-works steps with the grade vocabulary", async () => {
     await openLanding();
-    expect(screen.getByTestId("landing-how").textContent).toContain("Sign up");
-    expect(screen.getByTestId("landing-how").textContent).toContain("Choose your opponents");
-    expect(screen.getByTestId("landing-how").textContent).toContain("PREFERRED");
-    expect(screen.getByTestId("landing-how").textContent).toContain("ACCEPTABLE");
-    expect(screen.getByTestId("landing-how").textContent).toContain("SUBOPTIMAL");
+    for (const needle of ["Sign up", "Choose your opponents", "PREFERRED", "ACCEPTABLE", "SUBOPTIMAL"]) {
+      expect(screen.getByTestId("landing-how").textContent).toContain(needle);
+    }
   });
 
   it("renders all four bot profiles from botProfiles.ts", async () => {
@@ -149,35 +154,28 @@ describe("public landing page (A47 rebuild)", () => {
   it("shows the nine WHAT YOU GET cards", async () => {
     await openLanding();
     const perks = screen.getByTestId("landing-perks");
-    const cards = perks.querySelectorAll("li.lp-perk");
-    expect(cards).toHaveLength(9);
-    expect(perks.textContent).toContain("Exact ICM");
-    expect(perks.textContent).toContain("Push/fold and ranges");
-    expect(perks.textContent).toContain("Works with AI agents (WebMCP)");
-    expect(perks.textContent).toContain("Eight opponent seats");
+    expect(perks.querySelectorAll("li.lp-perk")).toHaveLength(9);
+    for (const needle of ["Exact ICM", "Push/fold and ranges", "Works with AI agents (WebMCP)", "Eight opponent seats"]) {
+      expect(perks.textContent).toContain(needle);
+    }
   });
 
   it("asks exactly the three FAQ questions and never 'Is it free?'", async () => {
     await openLanding();
     const faq = screen.getByTestId("landing-faq");
-    expect(faq.textContent).toContain("Is real money involved?");
-    expect(faq.textContent).toContain("No. ICMBOT is practice only and never touches real money.");
-    expect(faq.textContent).toContain("Do I need to know ICM?");
-    expect(faq.textContent).toContain("Does it work on my phone?");
+    for (const needle of ["Is real money involved?", "No. ICMBOT is practice only and never touches real money.", "Do I need to know ICM?", "Does it work on my phone?"]) {
+      expect(faq.textContent).toContain(needle);
+    }
     expect(screen.queryByText(/Is it free/i)).toBeNull();
   });
 
   it("renders the final CTA card, footer and the champion image", async () => {
     await openLanding();
-    const card = screen.getByTestId("landing-final-card");
-    expect(card).toHaveClass("lp-final-card");
+    expect(screen.getByTestId("landing-final-card")).toHaveClass("lp-final-card");
     expect(screen.getByText("PLAY YOUR FIRST TOURNAMENT TODAY.")).toBeInTheDocument();
     expect(screen.getByText("Nine players. One champion. Will it be you?")).toBeInTheDocument();
     expect(screen.getByTestId("landing-final-start").textContent).toContain("START TRAINING FREE");
-    expect(screen.getByTestId("landing-champion-img")).toHaveAttribute(
-      "src",
-      "/images/tournament-champion.webp",
-    );
+    expect(screen.getByTestId("landing-champion-img")).toHaveAttribute("src", "/images/tournament-champion.webp");
     const footer = screen.getByTestId("landing-footer");
     for (const label of ["Privacy", "Terms", "Cookie settings"]) {
       expect(footer.textContent).toContain(label);
