@@ -1,45 +1,60 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LANDING_QUIZ_FACTS, LANDING_SPOT } from "./landingQuizData";
+import { QuizFlipCard } from "./QuizFlipCard";
 
 /** A47 — TRY ONE SPOT: the pinned coach quiz. Both CALL and FOLD reveal the
- * same backend-computed answer (source: backend/tests/test_landing_spot.py):
- * the coach's action, the ICM pressure and a plain explanation, plus whether
- * the visitor's pick matched the coach. The hole cards start face down
- * (cards/back.png) and flip when the section scrolls into view. */
+ * same backend-computed answer (source: backend/tests/test_landing_spot.py).
+ * The hole cards show the red brand back and turn over to K♠ J♥ when the
+ * whole hand is visible: the King after 800ms, the Jack 250ms later, once.
+ * Without IntersectionObserver (tests) the faces render up as before. */
 const QUIZ_CARDS = [
-  { face: "/cards/Ks.png", alt: "King of spades" },
-  { face: "/cards/Jh.png", alt: "Jack of hearts" },
+  { face: "/cards/Ks.png", alt: "King of spades", delay: 800 },
+  { face: "/cards/Jh.png", alt: "Jack of hearts", delay: 1050 },
 ];
 
 export function LandingQuiz() {
   const [chosen, setChosen] = useState<"call" | "fold" | null>(null);
-  const [faceUp, setFaceUp] = useState(false);
+  const [faceUp, setFaceUp] = useState<readonly [boolean, boolean]>([false, false]);
+  const startedRef = useRef(false);
   const facts = LANDING_QUIZ_FACTS;
   const picked = (name: "call" | "fold") => () => setChosen(name);
   const matched = chosen === facts.recommendedAction.toLowerCase();
+  const turn = (index: 0 | 1) => () => {
+    setFaceUp((prev) => {
+      if (prev[index]) return prev;
+      const next = [...prev];
+      next[index] = true;
+      return next as [boolean, boolean];
+    });
+  };
 
   useEffect(() => {
-    // Flip the cards when the quiz scrolls into view; without an observer
-    // (tests) flip immediately so the faces are rendered as before.
+    // Preload both faces and the back so turning never shows a blank frame.
+    for (const src of [QUIZ_CARDS[0].face, QUIZ_CARDS[1].face, "/cards/back-red.png"]) {
+      const image = new Image();
+      image.src = src;
+    }
+    const showFaces = () => setFaceUp([true, true]);
     if (typeof IntersectionObserver === "undefined") {
-      setFaceUp(true);
+      showFaces();
       return;
     }
-    const quiz = document.getElementById("lp-quiz");
-    if (!quiz) {
-      setFaceUp(true);
+    const hand = document.querySelector('[data-testid="landing-quiz-hand"]');
+    if (!hand) {
+      showFaces();
       return;
     }
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          setFaceUp(true);
-          observer.disconnect();
-        }
+        if (!entries.some((entry) => entry.isIntersecting) || startedRef.current) return;
+        startedRef.current = true;
+        window.setTimeout(() => turn(0)(), QUIZ_CARDS[0].delay);
+        window.setTimeout(() => turn(1)(), QUIZ_CARDS[1].delay);
+        observer.disconnect();
       },
-      { threshold: 0.4 },
+      { threshold: 1.0 },
     );
-    observer.observe(quiz);
+    observer.observe(hand);
     return () => observer.disconnect();
   }, []);
 
@@ -50,12 +65,13 @@ export function LandingQuiz() {
         <span className="lp-section-rule" aria-hidden="true" />
         <div className="lp-quiz-card" data-testid="landing-quiz-card">
           <div className="lp-quiz-hand" data-testid="landing-quiz-hand">
-            {QUIZ_CARDS.map((card) => (
-              <img
+            {QUIZ_CARDS.map((card, i) => (
+              <QuizFlipCard
                 key={card.face}
-                className={`lp-quiz-card-img ${faceUp ? "lp-quiz-card-up" : ""}`}
-                src={faceUp ? card.face : "/cards/back.png"}
+                face={card.face}
                 alt={card.alt}
+                flipped={faceUp[i as 0 | 1]}
+                onFlip={turn(i as 0 | 1)}
               />
             ))}
           </div>

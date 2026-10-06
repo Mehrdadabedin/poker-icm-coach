@@ -17,22 +17,54 @@
   margin: 0 0 16px;
 }
 
-.lp-quiz-card-img {
+/* two-sided flip cards: the red brand back and the face are stacked with
+   backface-visibility hidden; the inner element rotates 180deg (perspective
+   on the hand), so the face only shows once the turn completes */
+.lp-flip-card {
   width: 86px; height: 120px;
+  perspective: 900px;
+  cursor: pointer;
+}
+
+.lp-flip-inner {
+  position: relative;
+  width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.7s ease;
+}
+
+.lp-flip-card-up .lp-flip-inner {
+  transform: rotateY(180deg);
+}
+
+.lp-flip-face {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
   object-fit: contain;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.55));
 }
 
-/* face-down hole cards: when the quiz scrolls into view the card turns over
-   (full 360 turn so the face is not mirrored) */
-.lp-quiz-card-up {
-  animation: lp-card-turnover 0.5s ease;
+.lp-flip-front {
+  transform: rotateY(180deg);
 }
-@keyframes lp-card-turnover {
-  0%   { transform: rotateY(0deg); }
-  45%  { transform: rotateY(92deg); opacity: 0.2; }
-  60%  { transform: rotateY(268deg); opacity: 0.2; }
-  100% { transform: rotateY(360deg); opacity: 1; }
+
+/* prefers-reduced-motion: no rotation, cross-fade instead */
+@media (prefers-reduced-motion: reduce) {
+  .lp-flip-inner {
+    transform: none;
+    transition: none;
+  }
+  .lp-flip-face {
+    transition: opacity 0.7s ease;
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+  }
+  .lp-flip-front { transform: none; opacity: 0; }
+  .lp-flip-card-up .lp-flip-back { opacity: 0; }
+  .lp-flip-card-up .lp-flip-front { opacity: 1; }
 }
 
 .lp-quiz-spot {
