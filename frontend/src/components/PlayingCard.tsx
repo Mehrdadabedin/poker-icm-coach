@@ -1,4 +1,5 @@
 import { Card, cardAlt } from "../models/game";
+import { useDisplayPreferences } from "../services/preferences";
 
 interface PlayingCardProps {
   card?: Card | null;
@@ -16,18 +17,25 @@ function cardAssetUrl(card: Card): string {
   return `${import.meta.env.BASE_URL}cards/${card.rank}${card.suit}.png`;
 }
 
+const BACK_FILE = { blue: "back.png", red: "back-red.png" } as const;
+
+/** A face-down card in the player's chosen back (Settings: Card back). */
+function CardBackImage({ className }: { className: string }) {
+  const { cardBack } = useDisplayPreferences();
+  return (
+    <img
+      src={`${import.meta.env.BASE_URL}cards/${BACK_FILE[cardBack]}`}
+      alt="face down card"
+      className={`playing-card ${className}`.trim()}
+      data-testid="card-back"
+      data-back={cardBack}
+      draggable={false}
+    />
+  );
+}
+
 export function PlayingCard({ card, faceDown = false, className = "" }: PlayingCardProps) {
-  if (faceDown || !card) {
-    return (
-      <img
-        src={`${import.meta.env.BASE_URL}cards/back.png`}
-        alt="face down card"
-        className={`playing-card ${className}`.trim()}
-        data-testid="card-back"
-        draggable={false}
-      />
-    );
-  }
+  if (faceDown || !card) return <CardBackImage className={className} />;
   return (
     <img
       src={cardAssetUrl(card)}
