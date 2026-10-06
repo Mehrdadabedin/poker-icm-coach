@@ -20,7 +20,9 @@
 
 .lp-faq-a { margin: 0; color: var(--lp-muted); font-size: 0.95rem; line-height: 1.5; }
 
-/* ---- final CTA ---- */
+/* ---- final CTA: same side padding as .lp-section, taller vertical rhythm ---- */
+.lp-final { padding: clamp(40px, 6vw, 80px) clamp(16px, 4vw, 48px); }
+
 .lp-final-layout {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);

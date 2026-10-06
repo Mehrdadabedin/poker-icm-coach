@@ -64,8 +64,11 @@
 }
 
 .lp-how-num {
-  display: inline-block;
-  width: 34px; height: 34px; line-height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px; height: 36px;
+  margin: 0 auto 12px;
   border-radius: 50%;
   background: var(--lp-gold);
   color: #14140c;
@@ -87,6 +90,8 @@
   border-radius: 14px;
   background: var(--lp-card);
 }
+
+.lp-opponent-body { padding: 10px 14px 16px; }
 
 .lp-opponent-portrait {
   display: block; width: 100%; aspect-ratio: 1 / 1;

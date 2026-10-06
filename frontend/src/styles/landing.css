@@ -16,6 +16,12 @@
   --lp-head: "Archivo", system-ui, sans-serif;
   --lp-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   display: flex; flex-direction: column;
+  /* full-width dark page: the shared .page box (980px) must not wrap it */
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
   background: var(--lp-bg);
   color: var(--lp-text);
   font-family: var(--lp-body);

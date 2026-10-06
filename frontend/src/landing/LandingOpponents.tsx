@@ -17,9 +17,11 @@ export function LandingOpponents() {
                 src={`/images/bot-profiles/${profile.id}.webp`}
                 alt={`${profile.name} portrait`}
               />
-              <h3 className="lp-opponent-name">{profile.name}</h3>
-              <p className="lp-opponent-style">{profile.style}</p>
-              <p className="lp-opponent-text">{profile.description}</p>
+              <div className="lp-opponent-body">
+                <h3 className="lp-opponent-name">{profile.name}</h3>
+                <p className="lp-opponent-style">{profile.style}</p>
+                <p className="lp-opponent-text">{profile.description}</p>
+              </div>
             </li>
           ))}
         </ul>
