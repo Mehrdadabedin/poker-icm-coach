@@ -30,7 +30,7 @@ def _derive(password: str, salt: bytes) -> bytes:
     return hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, _PBKDF2_ROUNDS)
 
 
-def _hashed(password: str) -> dict[str, str]:
+def _hashed(password: str) -> dict[str, object]:
     salt = os.urandom(16)
     return {
         "salt": base64.b64encode(salt).decode("ascii"),
@@ -50,7 +50,7 @@ class UserRegistry:
     entries have no hash. JSON persistence to `users_file` (blank = none)."""
 
     def __init__(self, users_file: str = "") -> None:
-        self._users: dict[str, dict[str, str]] = {}
+        self._users: dict[str, dict[str, object]] = {}
         self._lock = threading.RLock()
         self._path = Path(users_file) if users_file else None
         if self._path is not None:
@@ -105,7 +105,8 @@ class UserRegistry:
             _derive(password, _DECOY_SALT)
             return False
         return hmac.compare_digest(
-            _derive(password, base64.b64decode(salt_b64)), base64.b64decode(hash_b64)
+            _derive(password, base64.b64decode(str(salt_b64))),
+            base64.b64decode(str(hash_b64)),
         )
 
     def username_for_external(self, provider: str, subject: str) -> str | None:
@@ -168,7 +169,8 @@ class UserRegistry:
     def account_snapshot(self) -> list[tuple[str, str | None]]:
         """A02 safe rows: (username, provider) per account."""
         with self._lock:
-            return sorted((n, (e or {}).get("provider")) for n, e in self._users.items())
+            return sorted((n, p if isinstance(p, str) else None)
+                          for n, e in self._users.items() for p in [e.get("provider")])
 
     def bootstrap_admin(self, password: str) -> bool:
         """Deterministic, idempotent bootstrap: create the initial Admin."""
@@ -181,12 +183,10 @@ class UserRegistry:
         return True
 
     def requires_password_change(self, username: str) -> bool:
-        """True while a forced first-login password change is pending."""
         with self._lock:
             return bool((self._users.get(username) or {}).get("change_password"))
 
     def change_password(self, username: str, new_password: str) -> None:
-        """Replace the account hash and clear the forced-change flag."""
         if len(new_password) < MIN_PASSWORD_LENGTH:
             raise ValueError(f"password must be at least {MIN_PASSWORD_LENGTH} characters")
         with self._lock:
