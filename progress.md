@@ -1780,3 +1780,112 @@ frontend/src/styles/seats.css, frontend/tests/table.test.tsx, docs.
 Validation: frontend 121/121 (18 files), tsc clean, build PASSED; visual
 desktop 1440x900 + mobile 390x844 (8 portraits, hero excluded, no overflow,
 no text overlap, seat boxes unchanged).
+
+## A47 - ICMBOT landing page rebuild (2026-10-11)
+
+Task: rebuild the public landing page from the A47 spec as split components,
+with the new ICMBOT identity: dark palette, Archivo/Instrument Sans, a cropped
+robot hero, the pinned "TRY ONE SPOT" coach quiz, a real table+coach
+screenshot, the four bot profiles, nine WHAT YOU GET cards, FAQ, final CTA with
+conditional Continue with Google, landing-only WebMCP tools
+(watch_demo/start_training/explain_icm), SEO index.html, and a cleaned
+public/videos directory. All gates must stay green; every touched source file
+stays within the 200-line cap.
+
+Branch: feat/landing-a47 (A47 commit series on top of 2065b0c).
+
+### A47 implementation results (2026-10-11)
+
+Frontend (frontend/src/pages/LandingPage.tsx reassembled as 10 split sections
+under src/landing/, each well under 200 lines):
+- Header: solid #07080A band (nothing shows through), BrandLogo left, desktop
+  section links (What is ICM / How it works / Opponents / FAQ, hidden on
+  phones), LOGIN (gold outline) and SIGN UP (blue #0B6CF0) right.
+- Hero: two columns. Left: kicker TOURNAMENT POKER TRAINER, real H1 MASTER
+  YOUR TOURNAMENT DECISIONS, the 8-bot sub line, START TRAINING FREE (gold
+  #F2B33D, dark text, -> /login) and WATCH DEMO (outline, smooth-scrolls to
+  #lp-demo), plus "Practice only, no real money . Plays in your browser and
+  on Android". Right: hero-robot.webp, a crop of ICMBOT_target_hero.png
+  (x 640-1665, y 106-905, no baked text) whose left 180 px fade into the
+  page background. The old invisible click areas are removed.
+- Video section "SEE ICM BOT IN ACTION": the current player and poster stay
+  (ICM_BOT_demo_bot_profiles_narrated.mp4 + ICMBOT_video_poster.png).
+- TRY ONE SPOT quiz (v2 after PR review; v1's 18-BB A♥Q♠ spot was not
+  reachable on a 9-player table): a real bubble spot — 4 players left, 3 paid
+  (the engine's BUBBLE stage), payouts 50/30/20, hero KJo 14 BB in the big
+  blind, chip leader (40 BB) shoved from the SB, short stack at 3 BB. CALL
+  and FOLD both reveal the coach's answer, computed by the real backend
+  engine (Coach() on the exact CoachRequest) and pinned by
+  backend/tests/test_landing_spot.py: FOLD (ICM pressure VERY HIGH), and the
+  reveal shows only the action, the ICM pressure, a plain 1-2 sentence
+  explanation and whether the pick matched the coach (no "Est. equity", no
+  raw reasoning string).
+- THE COACH: real Playwright screenshot of the live table with the coach
+  panel (demo user "Hero", backend + built frontend running locally), saved
+  as public/images/table-coach.webp at 44 KB, plus the three points (one
+  clear action / reason in one line / tournament picture: ICM pressure,
+  bubble, stack band, risk premium, pot odds, SPR).
+- HOW IT WORKS (Sign up or Google / Choose your opponents / Play and get
+  graded PREFERRED / ACCEPTABLE / SUBOPTIMAL); YOUR OPPONENTS from
+  models/botProfiles.ts (portrait webp, name, style, description);
+  WHAT YOU GET: exactly 9 cards (Exact ICM, Test mode, Hand review, Leak
+  finder, Push/fold and ranges, Real tournament structure, Works with AI
+  agents (WebMCP), Phone and Android app, Eight opponent seats).
+- FAQ: exactly three items (real money? no / know ICM? no / phone? yes);
+  "Is it free?" is deliberately absent.
+- Final CTA "PLAY YOUR FIRST TOURNAMENT TODAY." with START TRAINING FREE and
+  Continue with Google ONLY when /api/auth/providers reports google;
+  tournament-champion.webp on the right. Footer: tagline, Privacy, Terms,
+  Cookie settings (window event re-opens the AnalyticsConsentBanner editor),
+  "(c) 2026 ICMBOT. Practice only."
+- Landing-only WebMCP tools watch_demo / start_training / explain_icm using
+  the same register pattern as src/webmcp (WeakMap per model context,
+  AbortController, settle-all, silent failures); registered only while the
+  landing page is mounted.
+- index.html: title "ICMBOT", meta description, Open Graph + Twitter tags
+  with the 1200x630 og-1200x630.jpg, user-scalable=no removed; Archivo +
+  Instrument Sans loaded from Google Fonts with system fallback stacks.
+- Styles split into landing.css / landing-hero.css / landing-sections.css /
+  landing-quiz.css / landing-coach.css / landing-faq.css under the
+  #07080A / #0C0E13 / #12151C / #232836 / #F2B33D / #0B6CF0 palette.
+
+Assets:
+- public/images/hero-robot.webp (new, 71 KB): the spec crop with the left
+  edge faded into the background.
+- public/images/table-coach.webp (new, 44 KB, under the 150 KB cap).
+- public/images/tournament-champion.webp (new, 171 KB; the PNG stays for the
+  winner screen).
+- public/images/bot-profiles/*.webp (new, 16-20 KB each; the PNGs stay for
+  the app pages).
+- public/images/og-1200x630.jpg (new, 1200x630, 111 KB).
+- public/videos: deleted the five unused files (ICMBOT_demo_narrated.mp4,
+  ICM_MASTER_demo.mp4, ICM_MASTER_demo_narrated.mp4, icm-master-demo.mp4,
+  ICMBOT_poster.png); only the used video and its poster remain.
+
+Tests:
+- backend/tests/test_landing_spot.py (new, 2 tests): pins the quiz action,
+  alternative, confidence, reasoning and every printed detail row.
+- frontend/tests/landing.test.tsx (rewritten, 13 tests): header solidity,
+  hero H1/actions/robot webp, no hit areas, WATCH DEMO scroll, demo player +
+  poster, quiz reveal from both buttons, coach screenshot + 3 points,
+  how-it-works grades, 4 opponents, 9 perks, FAQ (no "Is it free?"), final
+  CTA + footer, Google CTA conditional on /api/auth/providers.
+- frontend/tests/landing_webmcp.test.ts (new, 6 tests): registration list,
+  tool execution, explain_icm data = pinned facts, dedupe/cleanup, retry
+  lifecycle.
+
+Validation:
+- Backend: 605 passed, 4 skipped (ruff + mypy clean).
+- Frontend: 31 files, 203 passed; tsc clean; oxlint clean; vite build
+  PASSED.
+- 200-line audit: no source file over 200 lines.
+- Browser check (Playwright, real build): desktop 1440 and mobile 375 show
+  no horizontal scroll (scrollWidth == viewport); section links hidden on
+  phones; quiz reveal works; fonts/meta/OG tags served from the new
+  index.html.
+
+Not touched (per task): table, coach (TablePage/CoachPanelView/TableSidebar/
+TournamentWinner, their hooks and CSS), backend game engine files.
+
+git status: all A47 work committed on feat/landing-a47; backend data/
+users.json created by the local screenshot run stays gitignored.

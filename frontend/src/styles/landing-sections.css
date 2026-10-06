@@ -1,67 +1,113 @@
-/* A16 landing page: feature cards, final CTA, footer and responsive rules.
-   Split from landing.css (200-line cap); imported right after it so these
-   rules keep their cascade position. */
+/* A47 shared section frame: full-width bands, centred content column,
+   16:9 demo slot, HOW IT WORKS steps and the opponent cards. */
 
-/* ---- PLAY / REVIEW / IMPROVE ---- */
-.lp-features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
-.lp-feature { padding: 22px; border: 1px solid var(--lp-line); border-radius: 14px; background: #171d24; }
+.lp-band { background: var(--lp-bg); }
+.lp-band-soft { background: var(--lp-bg-soft); }
 
-.lp-feature-title {
-  margin: 0 0 10px; color: var(--lp-gold);
-  font-size: 1.05rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
+.lp-section { padding: clamp(34px, 6vw, 72px) clamp(16px, 4vw, 48px); }
+
+.lp-inner { width: 100%; max-width: 1120px; margin: 0 auto; }
+.lp-narrow { max-width: 860px; }
+
+.lp-section-title {
+  margin: 0;
+  color: var(--lp-gold);
+  text-align: center;
+  font-family: var(--lp-head);
+  font-size: clamp(1.25rem, 2.6vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
 }
 
-.lp-feature-text { margin: 0; color: var(--lp-muted); font-size: 0.92rem; line-height: 1.5; }
-
-/* ---- final call to action ---- */
-.lp-final {
-  padding: clamp(40px, 6vw, 82px) clamp(16px, 4vw, 48px);
-  border-top: 1px solid var(--lp-line); border-bottom: 1px solid var(--lp-line);
-  background: #11161c; text-align: center;
+.lp-section-rule {
+  display: block;
+  width: 72px; height: 3px;
+  margin: 14px auto 26px;
+  border-radius: 3px;
+  background: var(--lp-gold);
 }
 
-.lp-final-title {
-  max-width: 26ch; margin: 0 auto 26px; color: #f4f7fb;
-  font-size: clamp(1.15rem, 2.6vw, 1.8rem);
-  font-weight: 800; letter-spacing: 1px; line-height: 1.2; text-transform: uppercase;
+/* ---- 16:9 demo slot (unchanged player + poster) ---- */
+.lp-video {
+  position: relative; width: 100%; aspect-ratio: 16 / 9;
+  border: 1px solid var(--lp-card-border); border-radius: 14px; overflow: hidden;
+  background: linear-gradient(160deg, #10131a 0%, #0a0c10 55%, #12151c 100%);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
 }
 
-/* ---- footer: existing Copyright markup, landing spacing only ---- */
-.lp-footer { padding: 0 clamp(16px, 4vw, 48px) 24px; }
-.lp-footer .app-footer { border-top-color: rgba(250, 209, 90, 0.22); color: var(--lp-gold); }
-
-.lp-tagline {
-  margin: 0; padding: 24px 0 0; color: #9dacbd;
-  font-size: 0.72rem; letter-spacing: 8px; text-indent: 8px;
-  text-align: center; text-transform: uppercase;
+.lp-video-el {
+  display: block; width: 100%; height: 100%;
+  object-fit: contain; background: #000;
 }
 
-/* ---- responsive: tablet, mobile portrait, mobile landscape ---- */
-@media (max-width: 959px) {
-  .lp-features { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.lp-video-poster {
+  position: absolute; left: 0; right: 0; top: 0; bottom: 48px;
+  width: 100%; border: 0; padding: 0; background: #000;
+  cursor: pointer; z-index: 2;
+}
+.lp-video-poster img {
+  display: block; width: 100%; height: 100%; object-fit: cover;
 }
 
-@media (max-width: 767px) and (max-aspect-ratio: 4/3) {
-  .lp-features { grid-template-columns: minmax(0, 1fr); }
-  .lp-nav-btn { padding: 8px 12px; }
-  .lp-hero-title { max-width: 16ch; }
-  .lp-cta-row { flex-direction: column; align-items: stretch; }
-  .lp-cta-row .lp-btn { width: 100%; }
-  .lp-play { width: 58px; height: 58px; font-size: 1.3rem; }
-  .lp-tagline { letter-spacing: 4px; text-indent: 4px; }
+/* ---- HOW IT WORKS ---- */
+.lp-how-steps {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px; margin: 0; padding: 0; list-style: none;
 }
 
-/* short rotated viewports: tighten the vertical rhythm only, so the hero,
-   the 16:9 slot and the CTAs all stay on screen. */
-@media (max-width: 959px) and (min-aspect-ratio: 5/4) {
-  .lp-hero-title { max-width: 30ch; font-size: 1.55rem; }
-  .lp-hero-rule { margin: 12px auto 10px; }
-  .lp-cta-row { margin-top: 14px; gap: 10px; }
-  .lp-btn { min-height: 40px; padding: 8px 16px; font-size: 0.8rem; }
-  .lp-section { padding: 22px 16px; }
-  .lp-section-rule { margin: 10px auto 16px; }
-  .lp-play { width: 52px; height: 52px; font-size: 1.2rem; }
-  .lp-features { gap: 12px; }
-  .lp-feature { padding: 14px; }
-  .lp-tagline { padding: 14px 0 0; }
+.lp-how-step {
+  padding: 22px;
+  border: 1px solid var(--lp-card-border);
+  border-radius: 14px;
+  background: var(--lp-card);
+}
+
+.lp-how-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px; height: 36px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--lp-gold);
+  color: #14140c;
+  font-family: var(--lp-head);
+  font-weight: 800;
+}
+
+.lp-how-title { margin: 0 0 8px; color: var(--lp-text); font-family: var(--lp-head); font-weight: 700; }
+.lp-how-text { margin: 0; color: var(--lp-muted); font-size: 0.92rem; line-height: 1.5; }
+
+/* ---- YOUR OPPONENTS ---- */
+.lp-opponents {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px; margin: 0; padding: 0; list-style: none;
+}
+
+.lp-opponent {
+  border: 1px solid var(--lp-card-border);
+  border-radius: 14px;
+  background: var(--lp-card);
+}
+
+.lp-opponent-body { padding: 10px 14px 16px; }
+
+.lp-opponent-portrait {
+  display: block; width: 100%; aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 10px 10px 0 0;
+}
+
+.lp-opponent-name { margin: 10px 0 2px; color: var(--lp-text); font-family: var(--lp-head); font-weight: 800; }
+.lp-opponent-style { margin: 0 0 10px; color: var(--lp-gold); font-size: 0.82rem; letter-spacing: 0.6px; text-transform: uppercase; }
+.lp-opponent-text { margin: 0; color: var(--lp-muted); font-size: 0.88rem; line-height: 1.45; }
+
+@media (max-width: 1023px) {
+  .lp-opponents { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 767px) {
+  .lp-how-steps { grid-template-columns: minmax(0, 1fr); }
+  .lp-opponents { grid-template-columns: minmax(0, 1fr); }
 }

@@ -1,164 +1,79 @@
-/* A16 - public ICM MASTER landing page.
-   Every rule is scoped to .landing-page / .lp-* so the poker table, the sign-in
-   screen and the app menu keep their own styles untouched. The palette repeats
-   the measured sign-in values (auth.css) so the landing page shares the existing
-   dark/gold/blue identity without editing that file. Layout is one column of
-   full-width bands; .lp-inner is the centred content column inside each band. */
+/* A47 - ICMBOT public landing page.
+   Palette and typography define the whole page: dark #07080A / #0C0E13 bands,
+   cards #12151C with #232836 borders, gold #F2B33D, blue #0B6CF0, Archivo
+   headings + Instrument Sans body (Google Fonts with system fallbacks). Every
+   rule is scoped to .landing-page / .lp-* so the rest of the app is untouched. */
 
 .landing-page {
-  --lp-gold: #fad15a;
-  --lp-gold-rule: #fcf159;
-  --lp-text: #e9eef5;
-  --lp-muted: #99a8ba;
-  --lp-line: #2c373f;
-  --lp-blue: #086aec;
+  --lp-gold: #f2b33d;
+  --lp-blue: #0b6cf0;
+  --lp-bg: #07080a;
+  --lp-bg-soft: #0c0e13;
+  --lp-card: #12151c;
+  --lp-card-border: #232836;
+  --lp-text: #eef1f6;
+  --lp-muted: #9aa5b4;
+  --lp-head: "Archivo", system-ui, sans-serif;
+  --lp-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   display: flex; flex-direction: column;
-  max-width: none; padding: 0;
-  background: #0e141a; color: var(--lp-text);
+  /* full-width dark page: the shared .page box (980px) must not wrap it */
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background: var(--lp-bg);
+  color: var(--lp-text);
+  font-family: var(--lp-body);
 }
 
-/* ---- header: ICM MASTER left, LOGIN / SIGN UP right ---- */
+/* ---- header: solid band, brand left, links + account right ---- */
 .lp-header {
-  position: sticky; top: 0; z-index: 20;
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 10px; padding: 12px clamp(14px, 4vw, 48px);
-  background: rgba(14, 20, 26, 0.94);
-  border-bottom: 1px solid var(--lp-line);
+  background: var(--lp-bg);  /* solid: nothing shows through */
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 14px;
+  padding: 12px clamp(14px, 4vw, 48px);
 }
 
-.lp-brand {
-  margin: 0; color: var(--lp-gold);
-  font-size: clamp(0.95rem, 1.6vw, 1.15rem);
-  font-weight: 800; letter-spacing: 2.6px; line-height: 1.1;
-  text-transform: uppercase;
+.lp-brand { justify-self: start; margin: 0; }
+
+.lp-nav-links { justify-self: center; display: flex; gap: 22px; }
+
+.lp-nav-link {
+  color: var(--lp-muted);
+  font-family: var(--lp-body);
+  font-size: 0.92rem;
+  text-decoration: none;
 }
+.lp-nav-link:hover { color: var(--lp-text); }
 
-/* The desktop brand mark is 50px tall, which would push this row to 75px. 8px
-   vertical padding keeps the row at its previous height; the horizontal padding
-   (the left margin) and the phones' 12px padding are unchanged. */
-@media (min-width: 960px) {
-  .lp-header { padding-top: 8px; padding-bottom: 8px; }
-}
+.lp-nav { justify-self: end; display: flex; align-items: center; gap: 10px; }
 
-.lp-nav { display: flex; align-items: center; gap: 10px; }
-
-/* ---- buttons: landing only, the shared .btn is left alone ---- */
+/* ---- buttons ---- */
 .lp-btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  min-height: 50px; padding: 12px 30px;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 46px; padding: 10px 22px;
   border: 1px solid transparent; border-radius: 10px;
-  font: inherit; font-size: 0.95rem; font-weight: 700;
-  letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
-  /* LOGIN / SIGN UP / START TRAINING are <a> elements: reset the user-agent
-     anchor underline so they read as buttons. Nothing else changes. */
+  font: inherit; font-family: var(--lp-head); font-size: 0.92rem; font-weight: 700;
+  letter-spacing: 0.4px; cursor: pointer;
   text-decoration: none;
   transition: filter 120ms ease, background 120ms ease;
 }
 .lp-btn:hover { filter: brightness(1.08); }
+
 .lp-btn-primary { background: var(--lp-blue); color: #fff; }
 .lp-btn-ghost { background: transparent; border-color: var(--lp-gold); color: var(--lp-gold); }
-.lp-nav-btn { min-height: 40px; padding: 8px 18px; font-size: 0.8rem; }
+.lp-btn-gold { background: var(--lp-gold); color: #14140c; font-weight: 800; }
+.lp-btn-outline { background: transparent; border-color: var(--lp-card-border); color: var(--lp-text); }
+.lp-btn-xl { min-height: 54px; padding: 13px 30px; font-size: 1rem; }
+.lp-nav-btn { min-height: 40px; padding: 8px 18px; font-size: 0.82rem; }
 
-/* ---- hero ---- */
-.lp-main { flex: 1 0 auto; }
-/* Hero padding/display are owned by landing-hero.css (artwork hero):
-   zero spacing keeps the single header separator straight above the image. */
-.lp-hero { text-align: center; }
-
-.lp-hero-title {
-  max-width: 20ch; margin: 0 auto; color: #f4f7fb;
-  font-size: clamp(1.8rem, 5.1vw, 3.35rem);
-  font-weight: 800; line-height: 1.08; letter-spacing: 0.5px;
-  text-transform: uppercase;
+/* hide the section links on phones; the account buttons stay */
+@media (max-width: 959px) {
+  .lp-nav-links { display: none; }
+  .lp-header { grid-template-columns: auto 1fr; }
+  .lp-nav { justify-self: end; }
+  .lp-btn-xl { width: 100%; }
 }
-
-.lp-hero-rule {
-  display: block; width: 107px; height: 4px;
-  margin: 22px auto 20px; border-radius: 3px; background: var(--lp-gold-rule);
-}
-
-.lp-hero-text {
-  max-width: 52ch; margin: 0 auto; color: var(--lp-muted);
-  font-size: clamp(1rem, 1.5vw, 1.15rem); line-height: 1.5;
-}
-
-.lp-cta-row { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 30px; }
-
-/* ---- section frame ---- */
-.lp-section { padding: clamp(34px, 6vw, 72px) clamp(16px, 4vw, 48px); }
-/* A17: the demo block follows the artwork hero directly. The artwork has a
-   dark tail of its last ~40 rows below the table cards (inside the image,
-   40/1665 of the width), which reads as a large empty gap above the heading.
-   Tuck only the demo section up by that band so the heading sits ~20-30px
-   below the REAL hero content; other sections keep their layout. */
-#lp-demo {
-  /* The artwork has a dark tail of its last ~40 rows below the table cards
-     (inside the image, 40/1665 of the width). Tuck the demo section up by that
-     band and let it paint above the hero (the hero is position:relative, which
-     would otherwise cover the heading), so the heading sits ~20-30px below the
-     REAL hero content instead of below the dark tail. */
-  position: relative;
-  z-index: 1;
-  margin-top: -3.0%;
-  padding-top: clamp(12px, 1.6vw, 24px);
-}
-.lp-inner { width: 100%; max-width: 1080px; margin: 0 auto; }
-
-.lp-section-title {
-  margin: 0; color: var(--lp-gold); text-align: center;
-  font-size: clamp(1.1rem, 2.3vw, 1.6rem);
-  font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
-}
-
-.lp-section-rule { width: 72px; height: 3px; margin: 14px auto 26px; border-radius: 3px; background: var(--lp-gold-rule); }
-
-/* ---- 16:9 demo slot: bundled ICM MASTER demo clip (A17) ---- */
-.lp-video {
-  position: relative; width: 100%; aspect-ratio: 16 / 9;
-  border: 1px solid var(--lp-line); border-radius: 14px; overflow: hidden;
-  background:
-    radial-gradient(60% 70% at 50% 45%, rgba(28, 107, 79, 0.32), transparent 70%),
-    linear-gradient(160deg, #12242c 0%, #0e141a 55%, #131b23 100%);
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
-}
-
-/* A17: contain keeps a clip's own aspect ratio inside the 16:9 slot (letterboxed
-   on the dark background) instead of cropping or stretching it. The current
-   narrated clip is 16:9, so it fills the slot exactly. */
-.lp-video-el { display: block; width: 100%; height: 100%; object-fit: contain; background: #000; }
-
-/* A17 poster overlay: sits above the video but leaves the native control
-   strip reachable, so pausing shows the brand frame without blocking the
-   player controls. Covers the video itself; clicking resumes playback. */
-.lp-video-poster {
-  position: absolute; left: 0; right: 0; top: 0; bottom: 48px;
-  width: 100%; border: 0; padding: 0; background: #000;
-  cursor: pointer; z-index: 2;
-}
-.lp-video-poster img {
-  /* cover: the poster artwork is centered with wide margins, so the slight
-     vertical crop from excluding the native control strip never clips the
-     ICM BOT branding. */
-  display: block; width: 100%; height: 100%; object-fit: cover;
-}
-
-.lp-video-placeholder {
-  position: absolute; inset: 0;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  gap: 12px; padding: 18px; text-align: center;
-  border: 1px dashed rgba(250, 209, 90, 0.3); border-radius: 13px;
-}
-
-.lp-play {
-  display: flex; align-items: center; justify-content: center;
-  width: 74px; height: 74px;
-  border: 2px solid var(--lp-gold); border-radius: 50%;
-  color: var(--lp-gold); font-size: 1.6rem; line-height: 1; text-indent: 5px;
-}
-
-.lp-video-label {
-  color: var(--lp-text); font-size: clamp(0.9rem, 1.6vw, 1.15rem);
-  font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
-}
-
-.lp-video-note { color: var(--lp-muted); font-size: 0.8rem; letter-spacing: 0.6px; }

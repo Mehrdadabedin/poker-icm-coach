@@ -1,89 +1,72 @@
-/* A16 landing hero - the target artwork IS the hero (OPTION 2).
-   The hero shows the extracted hero band of docs/design/ICMBOT_landing_target.png
-   as ONE complete image (aspect preserved, full width). The visible copy and
-   buttons are inside the artwork; this file only styles the header, the figure,
-   and the two invisible hit areas that keep the real actions clickable. */
-.lp-header {
-  display: grid; grid-template-columns: auto 1fr auto; align-items: center;
-}
+/* A47 hero: two columns. Left is real HTML copy with the H1 and actions;
+   right is the cropped robot artwork whose left edge fades into the band.
+   The old baked-text artwork and its invisible hit areas are gone. */
 
-.lp-brand { justify-self: start; }
-
-.lp-nav { justify-self: end; }
-
-.lp-header-title {
-  margin: 0; min-width: 0; color: var(--lp-gold);
-  font-size: clamp(0.8rem, 1.3vw, 1.05rem);
-  font-weight: 800; letter-spacing: 1.8px; line-height: 1.2;
-  text-align: center; text-transform: uppercase;
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-
-/* One complete hero image, full width, aspect preserved (1666:675). */
 .lp-hero {
-  position: relative; display: block; width: 100%; padding: 0;
-  /* Tuck the artwork's built-in top band behind the sticky header so the header
-     border is the ONE separator and the scene starts directly under it. No
-     clipping: the hidden band renders behind the header (z-20 above). */
-  margin: -6.4% 0 0 0;
-  border-top: 0;
-}
-.lp-hero-figure {
-  position: relative; display: block; line-height: 0;
-  /* Rounded bottom corners (8px). The figure clips ONLY itself so the artwork
-     follows the corners; top corners / width / height / artwork are unchanged. */
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-  overflow: hidden;
-}
-.lp-hero-figure img { display: block; width: 100%; height: auto; }
-
-/* Desktop: the template artwork is 1665x945; shown at full page width it gets
-   too tall for the viewport. Cap the rendered width (aspect preserved, centred,
-   no crop, no stretch) so header + hero + the "SEE ICM BOT IN ACTION" heading
-   all fit without scrolling. The strip above the scene (rows 0-105 = 11.11% of
-   the image height) rides behind the header via a transform, and the demo block
-   below is pulled up by the matching amount; below 1140px the full-width
-   page-based tucks keep working as-is. */
-@media (min-width: 1140px) {
-  .lp-hero { margin-top: 0; }
-  /* Displayed at 1080 wide, centred - same left/right edges as the demo video
-     player. CSS-crop only the artwork's dark bottom margin (template rows
-     ~905-945): the image is scaled uniformly (object-fit: cover, no distortion)
-     and aligned to the top, so the bottom dark rows are not shown. The top strip
-     (rows 0-105) rides behind the header via the transform. */
-  .lp-hero-figure {
-    max-width: 1080px;
-    height: 587px;
-    margin: 0 auto;
-    transform: translateY(-69px);
-  }
-  .lp-hero-figure img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top;
-  }
-  #lp-demo {
-    margin-top: -77px;
-    padding-top: 24px;
-  }
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: clamp(20px, 4vw, 44px);
+  align-items: center;
+  padding: clamp(30px, 6vw, 76px) clamp(16px, 4vw, 48px);
 }
 
-/* Invisible interaction layer over the artwork's buttons:
-   START TRAINING (blue button) and WATCH HOW IT WORKS (secondary). */
-.lp-hero-hit {
-  position: absolute; padding: 0; margin: 0; border: 0;
-  background: transparent; color: transparent; font: 0/0 arial;
-  cursor: pointer;
-}
-.lp-start-hit { left: 9%; top: 59.3%; width: 20%; height: 12.8%; }
-.lp-watch-hit { left: 8%; top: 76.9%; width: 23%; height: 16.5%; }
+.lp-hero-copy { min-width: 0; }
 
+.lp-kicker {
+  margin: 0 0 14px;
+  color: var(--lp-gold);
+  font-family: var(--lp-head);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+}
+
+.lp-hero-title {
+  margin: 0 0 16px;
+  max-width: 16ch;
+  color: var(--lp-text);
+  font-family: var(--lp-head);
+  font-size: clamp(1.9rem, 5vw, 3.1rem);
+  font-weight: 800;
+  line-height: 1.06;
+}
+
+.lp-hero-sub {
+  margin: 0 0 26px;
+  max-width: 46ch;
+  color: var(--lp-muted);
+  font-family: var(--lp-body);
+  font-size: clamp(0.98rem, 1.5vw, 1.14rem);
+  line-height: 1.5;
+}
+
+.lp-hero-actions { display: flex; flex-wrap: wrap; gap: 14px; }
+
+.lp-hero-legal {
+  margin: 18px 0 0;
+  color: var(--lp-muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.3px;
+  text-align: center;
+}
+
+.lp-hero-visual { min-width: 0; }
+
+.lp-hero-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+/* phones: one column, copy first, robot below full width */
 @media (max-width: 959px) {
-  .lp-header-title { font-size: clamp(0.72rem, 1.5vw, 0.92rem); max-width: 26ch; }
+  .lp-hero { grid-template-columns: minmax(0, 1fr); }
+  .lp-hero-actions .lp-btn { width: 100%; }
 }
 
-@media (max-width: 767px) and (max-aspect-ratio: 4/3) {
-  .lp-header-title { display: none; }
+/* desktop: cap the robot so the two columns keep a balanced height */
+@media (min-width: 1140px) {
+  .lp-hero-img { max-width: 560px; margin: 0 auto; }
 }
