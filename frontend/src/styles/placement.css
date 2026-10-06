@@ -2,22 +2,22 @@
 
 Centralized geometry: all nine physical seats are evenly distributed around
 the oval, with each seat centered on its (left, top) percentage via
-translate(-50%, -50%). The seat-index order is intentionally wired so that
-DECREASING index (mod 9) moves one physical seat CLOCKWISE on screen
-(measured clockwise order: 0 -> 8 -> 7 -> 6 -> 5 -> 4 -> 3 -> 2 -> 1 -> 0),
-matching the dealer-button rotation in backend/app/game/dealer_button.py.
-The hero seat (0) anchors the top of the ring.
+translate(-50%, -50%). The seat-index order is wired so that INCREASING index
+(mod 9) moves one physical seat CLOCKWISE on screen (seat 0 at the top, then
+1 upper-right, 2 right, ... 8 upper-left), matching the +1 dealer-button
+rotation in backend/app/game/dealer_button.py. The hero seat (0) anchors the
+top of the ring.
 */
 
 .seat:nth-child(1) { left: 49.4%; top: 16.5%; transform: translate(-50%, -50%); }
-.seat:nth-child(2) { left: 23.4%; top: 24.3%; transform: translate(-50%, -50%); }
-.seat:nth-child(3) { left: 9.6%; top: 44.2%; transform: translate(-50%, -50%); }
-.seat:nth-child(4) { left: 14.4%; top: 66.8%; transform: translate(-50%, -50%); }
-.seat:nth-child(5) { left: 35.6%; top: 81.5%; transform: translate(-50%, -50%); }
-.seat:nth-child(6) { left: 63.2%; top: 81.5%; transform: translate(-50%, -50%); }
-.seat:nth-child(7) { left: 84.4%; top: 66.8%; transform: translate(-50%, -50%); }
-.seat:nth-child(8) { left: 89.2%; top: 44.2%; transform: translate(-50%, -50%); }
-.seat:nth-child(9) { left: 75.4%; top: 24.3%; transform: translate(-50%, -50%); }
+.seat:nth-child(2) { left: 76.6%; top: 24.3%; transform: translate(-50%, -50%); }
+.seat:nth-child(3) { left: 90.4%; top: 44.2%; transform: translate(-50%, -50%); }
+.seat:nth-child(4) { left: 85.6%; top: 66.8%; transform: translate(-50%, -50%); }
+.seat:nth-child(5) { left: 64.4%; top: 81.5%; transform: translate(-50%, -50%); }
+.seat:nth-child(6) { left: 36.8%; top: 81.5%; transform: translate(-50%, -50%); }
+.seat:nth-child(7) { left: 15.6%; top: 66.8%; transform: translate(-50%, -50%); }
+.seat:nth-child(8) { left: 10.8%; top: 44.2%; transform: translate(-50%, -50%); }
+.seat:nth-child(9) { left: 24.6%; top: 24.3%; transform: translate(-50%, -50%); }
 
 @media (max-width: 640px) {
   .seat {

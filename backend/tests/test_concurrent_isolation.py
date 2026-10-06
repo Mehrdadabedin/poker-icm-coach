@@ -195,5 +195,6 @@ def test_websocket_streams_are_table_scoped() -> None:
     assert sa["handNumber"] == 1 and sb["handNumber"] == 1
     hero_a = next(p for p in sa["players"] if p["isHero"])
     hero_b = next(p for p in sb["players"] if p["isHero"])
-    assert 25_000 - sa["bigBlind"] <= hero_a["stack"] < 25_000
-    assert 60_000 - sb["bigBlind"] <= hero_b["stack"] < 60_000
+    # A42 rotation: the hero starts on the CO, so may post no blind.
+    assert 25_000 - sa["bigBlind"] <= hero_a["stack"] <= 25_000
+    assert 60_000 - sb["bigBlind"] <= hero_b["stack"] <= 60_000

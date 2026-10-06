@@ -94,10 +94,11 @@ def test_different_stacks_and_blinds_are_isolated() -> None:
     sa, sb = state_of(a), state_of(b)
     hero_a = next(p for p in sa["players"] if p["isHero"])
     hero_b = next(p for p in sb["players"] if p["isHero"])
-    # Hero may post the small blind at hand start depending on the clockwise
-    # dealer rotation; stacks stay within (start - big blind, start).
-    assert 35_000 - sa["bigBlind"] <= hero_a["stack"] < 35_000, hero_a
-    assert 48_000 - sb["bigBlind"] <= hero_b["stack"] < 48_000, hero_b
+    # The hero may or may not post a blind at hand start depending on the
+    # dealer rotation (A42: hero starts on the CO, SB on hand 2); stacks stay
+    # within (start - big blind, start].
+    assert 35_000 - sa["bigBlind"] <= hero_a["stack"] <= 35_000, hero_a
+    assert 48_000 - sb["bigBlind"] <= hero_b["stack"] <= 48_000, hero_b
     assert sa["tableId"] == a and sb["tableId"] == b
     assert chips_in_play(sa) == 35_000 * 9
     assert chips_in_play(sb) == 48_000 * 9

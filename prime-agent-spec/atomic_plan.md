@@ -713,3 +713,17 @@ through the existing state instead of starting another hand.
   existing `finished`/champion state with its real name; hero-only survivor
   finishes too; normal multi-player hands and all existing behaviour are
   unchanged; poker/ICM/BOT/tournament rules untouched.
+
+### A42 — Dealer button direction (IMPLEMENTED)
+The dealer button must land on the previous hand's small blind every hand.
+- Root cause: `dealer_button.next_button()` advanced -1 in seat index while
+  every other module (`blind_seats`, `first_action_order`,
+  `preflop_first_seat`, `position_for`) walks +1, so the old SB became the
+  next BB (observed live: hero SB on hand 37, BB on hand 38). Commit 90f848c
+  introduced the -1 direction and its tests pinned the wrong cycle
+  (hero SB -> BB -> UTG).
+- Fix: `next_button()` advances +1 (mod n), skipping inactive seats; the felt
+  placement CSS is mirrored so increasing seat index runs clockwise on screen.
+- Acceptance: next-hand BTN == this-hand SB; hero cycle BB -> SB -> BTN -> CO;
+  dealer/position tests rewritten to the correct ring; dealing, betting and
+  blind amounts untouched; backend + frontend suites green.

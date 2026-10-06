@@ -62,6 +62,7 @@ Main requested changes:
 | A38 | Admin A07 — Extensible Admin sections | 🟢 | Centralized typed section registry `frontend/src/components/AdminSections.tsx` drives shell navigation/content; future sections are one registry entry; tests `frontend/tests/admin_sections.test.tsx`; plan: admin.md. |
 | A39 | Hero all-in loss / re-entry cutoff / BOT auto-finish | 🟢 | Re-entry L1-L5 via explicit player choice; no auto 45k restore; L>5 permanent elimination; BOT-only auto-finish to existing champion; tests backend `test_reentry.py`, frontend `reentry.test.tsx`; plan: atomic_plan.md A39. |
 | A40 | Tournament endgame reliability / deep all-in stall | 🟢 | Hand engine no longer starts a hand with <=1 active seat; `blind_seats` guards <2 seats; bots-only endgames reach `finished` + champion; tests `backend/tests/tournament/test_endgame.py`; plan: atomic_plan.md A40. |
+| A42 | Dealer button direction | 🟢 | `next_button` advances +1 (next-hand BTN = this-hand SB); felt CSS mirrored so increasing seat index runs clockwise; seeded multi-hand test pins the hero cycle BB->SB->BTN->CO; tests `test_dealer_button.py`/`test_positions.py`; plan: atomic_plan.md A42. |
 
 ## Known evidence from the supplied screenshots
 

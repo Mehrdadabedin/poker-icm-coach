@@ -1,5 +1,4 @@
 """A03-A07 tests: auth, identity, per-user isolation, table labels.
-
 Clients log in via login_client(); game endpoints resolve sessions from the
 bearer token, never from a client-supplied username."""
 from __future__ import annotations
@@ -122,8 +121,9 @@ def test_two_users_play_independently() -> None:
     hero_a = next(p for p in a["players"] if p["isHero"])
     hero_b = next(p for p in b["players"] if p["isHero"])
     assert hero_a["name"] == "Alice" and hero_b["name"] == "Bob"
-    assert 35_000 - a["bigBlind"] <= hero_a["stack"] < 35_000
-    assert 48_000 - b["bigBlind"] <= hero_b["stack"] < 48_000
+    # A42 rotation: hero starts on the CO, so may post no blind at hand start.
+    assert 35_000 - a["bigBlind"] <= hero_a["stack"] <= 35_000
+    assert 48_000 - b["bigBlind"] <= hero_b["stack"] <= 48_000
     _play_hand(alice, a["tableId"])
     _play_hand(bob, b["tableId"])
     _play_hand(alice, a["tableId"])
