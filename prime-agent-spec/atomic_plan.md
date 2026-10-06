@@ -882,3 +882,21 @@ Second pass (2026-10-11, post-merge with branded card backs):
   en_US-amy-medium) driven by scripts/record-promo/narration.json; audio is
   AAC 128 kbps loudnorm ~-16 LUFS, no music, each scene held at least its
   line +0.5s.
+Third pass (recorder/encoder fixes, frames verified numerically):
+- recordVideo.size is now the NATIVE 1280x720 surface; encode scales to
+  1920x1080 right after the trim (lanczos) so the frame is never the
+  grey-padded 1280x720 box. Poster comes from the scaled stream.
+- Cue time is exactly (marks[id] - heroAt) + 0.45 in the POST-TRIM timeline
+  (the trim resets timestamps; no trim added twice): the voice is no longer
+  2.4s late.
+- Captions wrap at 40px/1.25 with max-width 1500px on a 1920x220 page and
+  overlay at y=H-h-40; only lines that really wrap past 2 lines split into
+  two cues at a sentence boundary. Quiz/hands/champion no longer clip.
+- The champion scene holds the overlay for the full line + 1.5s and the
+  video ends there (no START NEW SESSION click).
+- 2 hands instead of 4; review -> champion dead air removed (analysis.png is
+  taken during the review hold); every inter-line silence is <= 4s.
+- Loudnorm audio is resampled back to 48 kHz (AAC 128k).
+- scripts/record-promo/check.mjs guards the result (no padding grey pixels,
+  caption bboxes <= 1800px, audio present at 48 kHz with I in -17..-15 LUFS,
+  no >4s silence between lines) and writes the labelled contact sheet.

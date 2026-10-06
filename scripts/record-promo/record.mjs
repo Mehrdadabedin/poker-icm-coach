@@ -31,7 +31,7 @@ const { chromium } = require("playwright");
 
 const API = process.env.ICMBOT_API_URL ?? "http://localhost:8000";
 const APP = process.env.ICMBOT_APP_URL ?? "http://localhost:5173";
-const HAND_COUNT = 4;
+const HAND_COUNT = 2;
 const RECORDING_DIR = process.env.PROMO_DIR ?? "/tmp/icmbot-promo";
 const NARRATION = JSON.parse(fs.readFileSync(new URL("narration.json", import.meta.url).pathname, "utf8"));
 
@@ -204,7 +204,8 @@ async function main() {
   const context = await browser.newContext({
     viewport: { width: 1280, height: 720 },
     deviceScaleFactor: 1.5,
-    recordVideo: { dir: RECORDING_DIR, size: { width: 1920, height: 1080 } },
+    // record the native 1280x720 surface; encode.mjs upscales it to 1920x1080
+    recordVideo: { dir: RECORDING_DIR, size: { width: 1280, height: 720 } },
   });
   const page = await context.newPage();
   await page.addInitScript(() => {
@@ -244,13 +245,15 @@ async function main() {
   await holdUntil(marks.quiz + sceneLen("quiz"));
 
   // Login straight from the quiz (sticky header), no scene back to the hero.
+  // Start the transition just before the quiz line ends so the silent login
+  // beat never leaves a gap longer than 4s between the narration lines.
+  await holdUntil(marks.quiz + sceneLen("quiz") - 0.6);
   await page.getByTestId("landing-login").click();
   await page.waitForSelector('[data-testid="username-input"]');
   await page.getByTestId("username-input").fill(account.username);
   await page.getByTestId("password-input").fill(account.password);
   await page.getByTestId("auth-submit").click();
   await page.waitForSelector('[data-testid="session-bar"]', { timeout: 20_000 });
-  await sleep(1800);
 
   await page.getByTestId("start-practice").click();
   await page.waitForSelector('[data-testid="opponent-choice-page"]');
@@ -268,17 +271,19 @@ async function main() {
   await page.waitForSelector('[data-testid="table-page"]', { timeout: 40_000 });
   await sleep(1300);
 
-  // Hands: mark at the first live hand; keep playing up to ~4 hands.
+  // Hands: mark at the first live hand and play exactly 2 hands, briskly, so
+  // the narration gap after the hands line stays under 4s.
   await waitFor(page, (s) => s && s.phase === "playing" && s.tournament.handNumber > 0, 60_000, "a live hand");
   mark("hands");
+  let lingered = false;
   async function playHand(final = false) {
     let acted = 0;
     while (acted < 6) {
       const current = await gameState(page);
-      if (!current) { await sleep(400); continue; }
+      if (!current) { await sleep(300); continue; }
       if (current.phase === "handOver") {
         await callTool(page, "pause_game");
-        await sleep(2400);
+        await sleep(1200);
         if (!final) await callTool(page, "next_hand");
         return;
       }
@@ -286,42 +291,50 @@ async function main() {
         const rec = await coachRecommendation(page);
         const action = actionFor(rec, current) ?? fallbackAction(current);
         if (action) { await callTool(page, action.name, action.input); acted += 1; }
-        await sleep(1600);
+        // Optional: linger on the first hand where the coach asks for a real
+        // decision (RAISE / 3-BET / CALL) instead of folding immediately.
+        if (!lingered && ["RAISE", "3-BET", "CALL", "BET"].includes(rec)) {
+          lingered = true;
+          await sleep(2600);
+        } else {
+          await sleep(1400);
+        }
         continue;
       }
-      await sleep(400);
+      await sleep(300);
     }
     await waitFor(page, (s) => s && s.phase === "handOver", 60_000, "hand completion");
     await callTool(page, "pause_game");
-    await sleep(1400);
+    await sleep(1200);
     if (!final) await callTool(page, "next_hand");
   }
   for (let i = 0; i < HAND_COUNT; i++) {
     await playHand(i === HAND_COUNT - 1);
-    await sleep(1700);
+    await sleep(600);
   }
 
-  // Review + sidebar performance.
-  await waitFor(page, (s) => s && s.phase === "handOver", 60_000, "final review");
+  // Review + sidebar performance (the sidebar renders between hands).
+  await waitFor(page, (s) => s && s.phase === "handOver", 30_000, "final review");
   mark("review");
   await callTool(page, "pause_game");
-  await holdUntil(marks.review + sceneLen("review") + 0.8);
+  // The review stays up for its whole line; advance just before the line
+  // ends so the sidebar is back for the analysis shot within the same hold.
+  await holdUntil(marks.review + sceneLen("review") - 0.35);
   await callTool(page, "next_hand");
-  await waitFor(page, (s) => s && s.phase === "playing", 30_000, "a hand for the sidebar");
-  await sleep(2000);
+  await waitFor(page, (s) => s && s.phase === "playing", 15_000, "a hand for the sidebar");
   await page.screenshot({ path: `${RECORDING_DIR}/analysis.png` });
-  await holdUntil(marks.review + sceneLen("review") + 4.4);
+  // total review scene ≈ line + 1.5s (dead air removed)
+  await holdUntil(marks.review + sceneLen("review") + 1.5);
 
   // Champion.
   const tableId = (await gameState(page))?.table?.id ?? "";
   await page.goto(`${APP}/#/table/${tableId}?testWinner=true&testWinnerName=Hero`);
   await page.waitForSelector('[data-testid="tournament-winner"]', { timeout: 30_000 });
   mark("champion");
-  await sleep(1500);
-  await page.getByTestId("tournament-new-session").click();
-  await page.waitForSelector('[data-testid="table-page"]', { timeout: 40_000 });
-  await sleep(1200);
-  await holdUntil(marks.champion + sceneLen("champion") + 3.2);
+  // Hold the champion overlay for the whole line + 1.5s and stop there
+  // (no START NEW SESSION click: the camera ends on the champion screen).
+  await holdUntil(marks.champion + sceneLen("champion") + 1.5);
+  await sleep(400);
 
   const videoEnd = relNow();
   fs.writeFileSync(`${RECORDING_DIR}/marks.json`, JSON.stringify({
@@ -330,31 +343,89 @@ async function main() {
   await context.close();
   await browser.close();
 
-  // Render caption overlays (one per narration line) as transparent PNGs.
+  // Render caption overlays as transparent PNGs: 1920x220 page, wrapped to
+  // at most 2 lines at 40px (max-width 1500px). Longer lines are split into
+  // two cues at a sentence boundary so nothing is ever cut off.
   const captionBrowser = await chromium.launch();
   const captionDir = `${RECORDING_DIR}/captions`;
   fs.mkdirSync(captionDir, { recursive: true });
   const escapeHtml = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  for (const [i, line] of lines.entries()) {
-    const capPage = await captionBrowser.newPage({ viewport: { width: 1920, height: 140 } });
-    await capPage.setContent(`<!doctype html><style>html,body{margin:0;background:transparent}
+  const captionStyle = `<style>html,body{margin:0;background:transparent}
       .cap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-      font:700 44px "DejaVu Sans",sans-serif;color:#fff;white-space:nowrap;
-      background:rgba(0,0,0,0.55);border-radius:12px;padding:12px 26px;}</style>
-      <div class="cap">${escapeHtml(line.line)}</div>`);
-    await capPage.screenshot({ path: `${captionDir}/cap-${String(i).padStart(2, "0")}.png`, omitBackground: true });
-    await capPage.close();
+      max-width:1500px;white-space:normal;text-align:center;
+      font:400 40px/1.25 "DejaVu Sans",sans-serif;color:#fff;
+      background:rgba(0,0,0,0.55);border-radius:12px;padding:12px 26px;}</style>`;
+  const measurePage = await captionBrowser.newPage({ viewport: { width: 1920, height: 400 } });
+  async function wrappedLines(text) {
+    // Render the text as per-word spans in the SAME caption box styling and
+    // group the words by their rendered row: that is the real wrap.
+    const words = escapeHtml(text).split(" ");
+    await measurePage.setContent(`<!doctype html><style>html,body{margin:0}
+      #c{position:absolute;left:82px;top:40px;max-width:1500px;white-space:normal;
+      text-align:center;font:400 40px/1.25 "DejaVu Sans",sans-serif;padding:0}</style>
+      <div id="c">${words.map((w) => `<span>${w}</span>`).join("<span> </span>")}</div>`);
+    return measurePage.evaluate(() => {
+      const rows = new Map();
+      for (const span of document.querySelectorAll("#c span")) {
+        const top = Math.round(span.getBoundingClientRect().top);
+        if (!rows.has(top)) rows.set(top, []);
+        rows.get(top).push(span.textContent);
+      }
+      return Array.from(rows.values()).map((line) => line.join(" "));
+    });
   }
+  const cues = [];
+  for (const [i, line] of lines.entries()) {
+    // Fallback: only when the real wrap exceeds 2 lines, split at the
+    // sentence boundary nearest the middle instead of clipping.
+    const wrapped = await wrappedLines(line.line);
+    let pieces = [line.line];
+    if (wrapped.length > 2) {
+      const words = line.line.split(" ");
+      const wordBoundary = wrapped.slice(0, Math.ceil(wrapped.length / 2)).join(" ").split(" ").length;
+      let splitAt = wordBoundary - 1;
+      for (let w = wordBoundary - 1; w >= 0; w -= 1) {
+        if (/[.?!]/.test(words[w].slice(-1))) { splitAt = w; break; }
+      }
+      if (splitAt >= 0 && splitAt < words.length - 1) {
+        pieces = [
+          words.slice(0, splitAt + 1).join(" "),
+          words.slice(splitAt + 1).join(" "),
+        ].filter((s) => s.trim());
+      }
+    }
+    const parts = [];
+    for (const [pi, piece] of pieces.entries()) {
+      const capPage = await captionBrowser.newPage({ viewport: { width: 1920, height: 220 } });
+      await capPage.setContent(`<!doctype html><div class="cap">${escapeHtml(piece)}</div>${captionStyle}`);
+      const file = `cap-${String(i).padStart(2, "0")}-${pi}.png`;
+      await capPage.screenshot({ path: `${captionDir}/${file}`, omitBackground: true });
+      await capPage.close();
+      parts.push({ text: piece, file, frac0: pi / pieces.length, frac1: (pi + 1) / pieces.length });
+    }
+    cues.push({ id: line.id, dur: line.dur, parts });
+  }
+  await measurePage.close();
   await captionBrowser.close();
+  fs.writeFileSync(`${RECORDING_DIR}/captions.json`, JSON.stringify({ cues, voice, lines }, null, 1));
 
   const mp4 = new URL("../../frontend/public/videos/ICMBOT_promo.mp4", import.meta.url).pathname;
   const poster = new URL("../../frontend/public/videos/ICMBOT_promo_poster.webp", import.meta.url).pathname;
   const encode = spawn("bash", ["-lc", `node ${new URL("encode.mjs", import.meta.url).pathname} "${RECORDING_DIR}" "${mp4}" "${poster}"`], {
     cwd: ROOT_DIR, stdio: "inherit", env: process.env,
   });
-  encode.on("exit", (code) => {
-    for (const proc of started) proc.kill("SIGTERM");
-    process.exit(code ?? 0);
+  encode.on("exit", async (code) => {
+    if (code !== 0) {
+      for (const proc of started) proc.kill("SIGTERM");
+      process.exit(code ?? 1);
+    }
+    const check = spawn("bash", ["-lc", `node ${new URL("check.mjs", import.meta.url).pathname} "${RECORDING_DIR}" "${mp4}"`], {
+      cwd: ROOT_DIR, stdio: "inherit", env: process.env,
+    });
+    check.on("exit", (checkCode) => {
+      for (const proc of started) proc.kill("SIGTERM");
+      process.exit(checkCode ?? 1);
+    });
   });
 }
 

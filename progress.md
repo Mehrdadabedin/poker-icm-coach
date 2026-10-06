@@ -1974,3 +1974,18 @@ Narration is REQUIRED female piper-tts voice en_US-hfc_female-medium
 (fallback en_US-amy-medium), scripted in scripts/record-promo/narration.json,
 AAC 128 kbps loudnorm ~-16 LUFS, no music. Final: 1:07, 2.7 MB MP4, 89 KB
 poster.
+
+Third pass (2026-10-11): promo recorder/encoder rebuilt per frame review.
+The recording is the native 1280x720 surface (recordVideo.size 1280x720)
+upscaled to 1920x1080 (lanczos) after the lead trim inside encode.mjs; cues
+are exactly marks+0.45 in the post-trim timeline (voice and captions no
+longer lag); captions wrap (40px/1.25, max-width 1500px, 1920x220 page,
+y=H-h-40) and only actual 3-line wraps split into two cues; the champion
+screen is held for its line + 1.5s (no START NEW SESSION click); 2 hands
+with review->champion dead air removed (analysis.png during the review
+hold) keep every inter-line silence under 4s; loudnorm audio is resampled
+to 48 kHz AAC 128k. check.mjs (run at the end of npm run record:promo)
+verifies no padding grey at (1900,40)/(1900,1060), caption bboxes <=1800px,
+48 kHz audio at -17..-15 LUFS and no >4s line gaps, and renders the labelled
+contact sheet. Final: 43s, 3.0 MB MP4, 93 KB poster, voice
+en_US-hfc_female-medium.
