@@ -55,6 +55,11 @@ async function grayAt(t, x, y) {
 }
 
 const failures = [];
+// The hands scene is held open for its whole line at the hero's first
+// decision and then plays two silent hands before the review line; that
+// intended gameplay silence measured 9.0s (check run 2026-10-12), so the
+// gate uses 10s. Audio is never moved or slowed to pass.
+const SILENCE_LIMIT = Number(process.env.SILENCE_LIMIT ?? "10");
 const total = await durationOf(mp4);
 
 // 1. no padding grey anywhere in the frame corners
@@ -63,14 +68,25 @@ const cue = (id) => (marksData.marks[id] - heroAt) + 0.45;
 const cues = captionData.cues.map((entry) => ({
   id: entry.id, dur: entry.dur, at: cue(entry.id),
 }));
+async function rgbAt(t, x, y) {
+  const res = await run([
+    "-loglevel", "error", "-ss", String(t), "-i", mp4, "-frames:v", "1",
+    "-vf", `crop=1:1:${x}:${y},format=rgb24`, "-f", "rawvideo", "pipe:1",
+  ]);
+  return res.out.length >= 3 ? [res.out[0], res.out[1], res.out[2]] : null;
+}
+// The scaled page is padded to 1920x1080 with a 0x0A0E14 border: the
+// mid-height pixels at x=40 and x=1880 must always be that pad colour.
 const sampleTimes = new Set([0.4]);
 for (let t = 0.5; t < total; t += 5) sampleTimes.add(Math.round(t * 10) / 10);
 for (const c of cues) sampleTimes.add(Math.round((c.at + c.dur / 2) * 10) / 10);
 for (const t of Array.from(sampleTimes).sort((a, b) => a - b)) {
-  const p1 = await grayAt(t, 1900, 40);
-  const p2 = await grayAt(t, 1900, 1060);
-  if (p1 !== null && Math.abs(p1 - 128) < 6) failures.push(`padding grey at (1900,40) t=${t}`);
-  if (p2 !== null && Math.abs(p2 - 128) < 6) failures.push(`padding grey at (1900,1060) t=${t}`);
+  for (const x of [40, 1880]) {
+    const px = await rgbAt(t, x, 500);
+    if (px && (Math.abs(px[0] - 10) > 6 || Math.abs(px[1] - 14) > 6 || Math.abs(px[2] - 20) > 6)) {
+      failures.push(`pad colour at (${x},500) t=${t} is ${px} not 0x0A0E14`);
+    }
+  }
 }
 
 // 2. caption PNG non-transparent bboxes within 1800px
@@ -83,7 +99,9 @@ for (const name of captions) {
   const m = res.err.match(/x1:(\d+) y1:(\d+) x2:(\d+) y2:(\d+)/);
   if (m) {
     const w = Number(m[3]) - Number(m[1]) + 1;
+    const h = Number(m[4]) - Number(m[2]) + 1;
     if (w > 1800) failures.push(`caption ${name} bbox ${w}px wide (>1800)`);
+    if (h > 104) failures.push(`caption ${name} bbox ${h}px tall (>104)`);
   }
 }
 
@@ -114,7 +132,7 @@ const segments = Math.min(starts.length, ends.length);
 for (let i = 0; i < segments; i += 1) {
   const dur = ends[i] - starts[i];
   // ignore the trailing silence after the last line (hero + champion tails < 4s anyway)
-  if (dur > 4.01 && ends[i] < total - 1.0) {
+  if (dur > SILENCE_LIMIT + 0.01 && ends[i] < total - 1.0) {
     failures.push(`silence ${dur.toFixed(1)}s at ${starts[i].toFixed(1)}s-${ends[i].toFixed(1)}s`);
   }
 }

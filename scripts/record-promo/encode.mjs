@@ -15,7 +15,7 @@
 import { spawn } from "node:child_process";
 import fs from "node:fs";
 
-const [, , workDir, output, poster] = process.argv;
+const [, , workDir, output] = process.argv;
 const ffmpeg = process.env.FFMPEG_BIN ?? "ffmpeg";
 const SIZE_LIMIT = 10 * 1024 * 1024;
 const input = fs.readdirSync(workDir).map((n) => `${workDir}/${n}`).find((p) => p.endsWith(".webm"));
@@ -81,15 +81,19 @@ const allParts = cues.flatMap((c) => c.parts);
 const total = cues.length ? cues.reduce((max, c) => Math.max(max, c.at + c.dur), 0) + 1.5 : 1;
 const totalSec = Math.max(total, 1);
 
-// video chain: blank-lead trim -> t=0 -> 1920x1080 lanczos -> caption parts
+// video chain: strip the blank lead, scale the 1280x720 page to 1728x972
+// and pad to 1920x1080 (#0A0E14) so the page keeps its top-left position and
+// a 108px caption strip lives below it; captions overlay at x=0, y=972 and
+// can never cover the page.
 const chain = [
-  `[0:v]trim=start=${trim.toFixed(2)},setpts=PTS-STARTPTS,scale=1920:1080:flags=lanczos[vpre]`,
+  `[0:v]trim=start=${trim.toFixed(2)},setpts=PTS-STARTPTS,` +
+  `scale=1728:972:flags=lanczos,pad=1920:1080:96:0:color=0x0A0E14[vpre]`,
 ];
 let previous = "vpre";
 allParts.forEach((part, i) => {
   const next = `p${i + 1}`;
   chain.push(
-    `[${previous}][${i + 1}:v]overlay=x=(W-w)/2:y=H-h-40:` +
+    `[${previous}][${i + 1}:v]overlay=x=0:y=972:` +
     `enable='between(t,${part.start.toFixed(2)},${part.end.toFixed(2)})'[${next}]`,
   );
   previous = next;
@@ -137,22 +141,11 @@ if (size >= SIZE_LIMIT || !fs.existsSync(output)) {
   process.exit(3);
 }
 
-// Poster from the SCALED stream (the raw webm is 1280x720).
-const champion = cues.find((c) => c.id === "champion");
-const posterAt = Math.max(0, (champion ? champion.at : totalSec * 0.7) - 0.9);
-const posterPng = poster.replace(/\.webp$/, ".png");
-await run([
-  "-loglevel", "error", "-y", "-ss", String(posterAt + trim), "-i", input,
-  "-vf", "scale=1920:1080:flags=lanczos", "-frames:v", "1", posterPng,
-]);
-await run(["-loglevel", "error", "-y", "-i", posterPng, "-c:v", "libwebp", "-quality", "82", poster]);
-fs.rmSync(posterPng, { force: true });
-
 const sizeKb = Math.round(fs.statSync(output).size / 1024);
 const minutes = Math.floor(totalSec / 60);
 const seconds = Math.round(totalSec % 60);
 console.log(
   `promo ready: ${sizeKb} KB (limit 10240), duration ${minutes}:${String(seconds).padStart(2, "0")}, ` +
-  `${cues.length} scenes / ${allParts.length} caption parts, poster ${Math.round(fs.statSync(poster).size / 1024)} KB, voice ${marksData.voice}`,
+  `${cues.length} scenes / ${allParts.length} caption parts, voice ${marksData.voice}`,
 );
 process.exit(0);

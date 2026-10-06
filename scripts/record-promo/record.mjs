@@ -271,10 +271,14 @@ async function main() {
   await page.waitForSelector('[data-testid="table-page"]', { timeout: 40_000 });
   await sleep(1300);
 
-  // Hands: mark at the first live hand and play exactly 2 hands, briskly, so
-  // the narration gap after the hands line stays under 4s.
+  // Hands: mark EXACTLY at the hero's first decision (waiting for the hero
+  // with the ICM COACH panel rendered), hold the hands line BEFORE acting,
+  // then play exactly 2 hands.
   await waitFor(page, (s) => s && s.phase === "playing" && s.tournament.handNumber > 0, 60_000, "a live hand");
+  await waitFor(page, (s) => s && s.waitingForHero, 60_000, "the hero's first decision");
+  await coachRecommendation(page); // the COACH panel is rendered with the advice
   mark("hands");
+  await holdUntil(marks.hands + sceneLen("hands") + 0.5); // hold without acting
   let lingered = false;
   async function playHand(final = false) {
     let acted = 0;
@@ -313,29 +317,23 @@ async function main() {
     await sleep(600);
   }
 
-  // Hold the hands scene open until its line (+0.5s) is really over, so the
-  // review caption can neither overlap the hands caption nor start before
-  // the hands scene that carries it.
-  await holdUntil(marks.hands + sceneLen("hands") + 0.5);
-
-  // Review + sidebar performance (the sidebar renders between hands).
   await waitFor(page, (s) => s && s.phase === "handOver", 30_000, "final review");
   mark("review");
   await callTool(page, "pause_game");
-  // The review stays up for its whole line; advance just before the line
-  // ends so the sidebar is back for the analysis shot within the same hold.
-  await holdUntil(marks.review + sceneLen("review") - 0.35);
-  await callTool(page, "next_hand");
-  await waitFor(page, (s) => s && s.phase === "playing", 15_000, "a hand for the sidebar");
-  await page.screenshot({ path: `${RECORDING_DIR}/analysis.png` });
-  // total review scene ≈ line + 1.5s (dead air removed)
-  await holdUntil(marks.review + sceneLen("review") + 1.5);
+  await callTool(page, "show_hand_result"); // opens the full hand review
+  await holdUntil(marks.review + sceneLen("review") + 0.3);
+  await page.getByTestId("back-to-table-btn").click(); // close the review
 
   // Champion.
+  const posterPath = new URL("../../frontend/public/videos/ICMBOT_promo_poster.webp", import.meta.url).pathname;
   const tableId = (await gameState(page))?.table?.id ?? "";
   await page.goto(`${APP}/#/table/${tableId}?testWinner=true&testWinnerName=Hero`);
   await page.waitForSelector('[data-testid="tournament-winner"]', { timeout: 30_000 });
   mark("champion");
+  // The poster is a screenshot of the champion overlay (1280x720 CSS at
+  // deviceScaleFactor 1.5 = 1920x1080), not a frame extracted later.
+  await sleep(700);
+  await page.screenshot({ path: posterPath, type: "webp", quality: 82 });
   // Hold the champion overlay for the whole line + 1.5s and stop there
   // (no START NEW SESSION click: the camera ends on the champion screen).
   await holdUntil(marks.champion + sceneLen("champion") + 1.5);
@@ -357,17 +355,16 @@ async function main() {
   const escapeHtml = (text) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const captionStyle = `<style>html,body{margin:0;background:transparent}
       .cap{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-      max-width:1500px;white-space:normal;text-align:center;
-      font:400 40px/1.25 "DejaVu Sans",sans-serif;color:#fff;
-      background:rgba(0,0,0,0.55);border-radius:12px;padding:12px 26px;}</style>`;
-  const measurePage = await captionBrowser.newPage({ viewport: { width: 1920, height: 400 } });
+      max-width:1800px;white-space:normal;text-align:center;
+      font:700 34px/1.35 "DejaVu Sans",sans-serif;color:#fff;}</style>`;
+  const measurePage = await captionBrowser.newPage({ viewport: { width: 1920, height: 300 } });
   async function wrappedLines(text) {
-    // Render the text as per-word spans in the SAME caption box styling and
+    // Render the text as per-word spans with the SAME caption styling and
     // group the words by their rendered row: that is the real wrap.
     const words = escapeHtml(text).split(" ");
     await measurePage.setContent(`<!doctype html><style>html,body{margin:0}
-      #c{position:absolute;left:82px;top:40px;max-width:1500px;white-space:normal;
-      text-align:center;font:400 40px/1.25 "DejaVu Sans",sans-serif;padding:0}</style>
+      #c{position:absolute;left:90px;top:40px;max-width:1800px;white-space:normal;
+      text-align:center;font:700 34px/1.35 "DejaVu Sans",sans-serif;padding:0}</style>
       <div id="c">${words.map((w) => `<span>${w}</span>`).join("<span> </span>")}</div>`);
     return measurePage.evaluate(() => {
       const rows = new Map();
@@ -401,7 +398,7 @@ async function main() {
     }
     const parts = [];
     for (const [pi, piece] of pieces.entries()) {
-      const capPage = await captionBrowser.newPage({ viewport: { width: 1920, height: 220 } });
+      const capPage = await captionBrowser.newPage({ viewport: { width: 1920, height: 108 } });
       await capPage.setContent(`<!doctype html><div class="cap">${escapeHtml(piece)}</div>${captionStyle}`);
       const file = `cap-${String(i).padStart(2, "0")}-${pi}.png`;
       await capPage.screenshot({ path: `${captionDir}/${file}`, omitBackground: true });
@@ -415,8 +412,7 @@ async function main() {
   fs.writeFileSync(`${RECORDING_DIR}/captions.json`, JSON.stringify({ cues, voice, lines }, null, 1));
 
   const mp4 = new URL("../../frontend/public/videos/ICMBOT_promo.mp4", import.meta.url).pathname;
-  const poster = new URL("../../frontend/public/videos/ICMBOT_promo_poster.webp", import.meta.url).pathname;
-  const encode = spawn("bash", ["-lc", `node ${new URL("encode.mjs", import.meta.url).pathname} "${RECORDING_DIR}" "${mp4}" "${poster}"`], {
+  const encode = spawn("bash", ["-lc", `node ${new URL("encode.mjs", import.meta.url).pathname} "${RECORDING_DIR}" "${mp4}"`], {
     cwd: ROOT_DIR, stdio: "inherit", env: process.env,
   });
   encode.on("exit", async (code) => {
