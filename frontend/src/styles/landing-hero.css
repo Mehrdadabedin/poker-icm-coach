@@ -1,18 +1,20 @@
-/* A47 hero: two columns inside a ~1240px centred container. Left is real
+/* A47/A48 hero: full-width two columns with inline padding, sized so the
+   whole hero ends above the fold on short desktop viewports. Left is real
    HTML copy with the H1 and actions; right is the cropped robot artwork
-   (hero-robot.webp) with a 12px left blend. The old baked-text artwork and
-   its invisible hit areas are gone. */
+   (hero-robot.webp) with a 12px left blend, cover-fit above 900px so both
+   aces stay visible. The old baked-text artwork and hit areas are gone. */
 
 .lp-hero {
-  padding: clamp(30px, 6vw, 76px) 0;
+  padding-top: 16px;
+  padding-bottom: 40px;
 }
 
 .lp-hero-inner {
-  max-width: 1240px;
-  margin: 0 auto;
+  box-sizing: border-box;
+  padding-inline: clamp(20px, 4vw, 48px);
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-  gap: clamp(20px, 4vw, 48px);
+  gap: 48px;
   align-items: center;
 }
 
@@ -64,6 +66,18 @@
   display: block;
   width: 100%;
   height: auto;
+}
+
+/* above 900px: fixed-height cover so the hero fits the fold; the left
+   anchor keeps the aces at the image's left edge fully visible */
+@media (min-width: 900px) {
+  .lp-hero-img {
+    width: 100%;
+    height: clamp(340px, calc(100svh - var(--lp-header-h, 77px) - 56px), 560px);
+    object-fit: cover;
+    object-position: 0% 50%;
+    border-radius: 16px;
+  }
 }
 
 /* phones: one column, copy first, robot below full width */
