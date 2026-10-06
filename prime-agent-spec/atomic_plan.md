@@ -769,3 +769,13 @@ username is the champion name.
   ValueError (HTTP 400) BEFORE `_record_and_persist()` so a finished table
   can never write a duplicate history line.
 - Frontend: the auto-next countdown does not start when a champion exists.
+
+### A46 — Stale coach grade banner (IMPLEMENTED)
+The "SUBOPTIMAL - ALL_IN diverges from the recommended FOLD" banner must not
+outlive the hand it graded.
+- TablePage clears the comparison state when `handNumber` changes; vitest
+  `tests/table_banner.test.tsx` (renders TablePage with a mocked api/useGame)
+  proves the banner disappears on the next hand.
+- `registerGameTools.ts:368` console.error removed (registration failures are
+  silently dropped); the file is split into webmcpTypes/webmcpTools/
+  webmcpViews so every touched source file stays within the 200-line cap.

@@ -66,6 +66,7 @@ Main requested changes:
 | A43 | Positions only for active players; busted BOTs leave the felt | 🟢 | `position_labels` labels only active seats; 8/7-handed rings drop early positions and keep CO; all `position_for` callers active-aware; frontend hides eliminated BOT seats; tests `test_positions.py`; plan: atomic_plan.md A43. |
 | A44 | Hero out: watch or start a new game | 🟢 | L5+ eliminated hero sees "You finished Nth of 9" with WATCH TO THE END (gated A39 auto-finish) / START NEW GAME (same lineup, new table); backend `heroFinishPlace`; tests `test_hero_finish.py` + reentry.test.tsx; plan: atomic_plan.md A44. |
 | A45 | Tournament end screen | 🟢 | Winner artwork shows CONGRATULATIONS + champion name and (hero lost) YOU FINISHED Nth; backend 400s next_hand on non-active tables before history writes; no auto-next when a champion exists; tests test_finished_state.py + winner.test.tsx; plan: atomic_plan.md A45. |
+| A46 | Stale coach grade banner | 🟢 | Comparison clears when handNumber changes (vitest table_banner.test.tsx); WebMCP tool files split, console.error removed; tests backend pytest + frontend vitest; plan: atomic_plan.md A46. |
 
 ## Known evidence from the supplied screenshots
 

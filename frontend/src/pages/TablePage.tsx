@@ -20,7 +20,6 @@ const REVIEW_SECONDS = 10;
 
 export { autoFinishActive, resolveWinnerName, winnerPreviewEnabled } from "./endgame";
 
-/** Live table: compact result + optional Review the Hand (A10/A11/A16). */
 export function TablePage() {
   const { tableId = "" } = useParams();
   const navigate = useNavigate();
@@ -77,7 +76,6 @@ export function TablePage() {
     }
   }, [state?.waitingForHero, state?.handNumber, state?.phase, state?.street,
       state?.actionLog?.length, tableId]);
-
   useEffect(() => {
     if (state?.phase === "handOver" && !showReview && champion === null) {
       start();
@@ -87,6 +85,9 @@ export function TablePage() {
     }
     return () => stop();
   }, [state?.phase, state?.handNumber, showReview, start, stop, champion]);
+
+  // A46: a coach-grade banner must not survive the hand it graded.
+  useEffect(() => setComparison(null), [state?.handNumber]);
 
   const onAction = async (kind: ActionKind, amount?: number) => {
     const next = await actions.act(kind, amount);
@@ -143,7 +144,6 @@ export function TablePage() {
     return <div className="loading-box">Connecting to the table…</div>;
   }
 
-  // DEV preview only: reuses the exact winner branch; no effect in builds.
   const previewWinner = winnerPreviewEnabled(import.meta.env.DEV, searchParams.get("testWinner"));
   const previewName = searchParams.get("testWinnerName") ?? "";
   const winnerName = resolveWinnerName(
