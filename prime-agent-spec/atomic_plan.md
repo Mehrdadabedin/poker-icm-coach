@@ -793,9 +793,11 @@ fallbacks), and the page must work at 375 px with no horizontal scroll.
   TOURNAMENT DECISIONS", the 8-bot/ICM-coach sub line, START TRAINING FREE
   (gold -> /login) and WATCH DEMO (outline, scrolls to the video), and the
   "Practice only, no real money" line. Right: crop
-  public/images/ICMBOT_target_hero.png to x 640-1665, y 106-905 (no baked
-  text), save as public/images/hero-robot.webp, fade the left edge into the
-  background. The invisible click areas over the old artwork are removed.
+  public/images/ICMBOT_target_hero.png to x 860-1665 (the baked text band
+  ends near x 825; the first crop at 640 showed letter edges), y 106-905 (no
+  baked text), save as public/images/hero-robot.webp, fade the left edge
+  ~200px into the background. The invisible click areas over the old artwork
+  are removed.
 - Video section "SEE ICM BOT IN ACTION" right under the hero; keep the current
   player and poster (a new video replaces the file later).
 - "TRY ONE SPOT" quiz (v2, fixed after PR review): a real bubble spot for
