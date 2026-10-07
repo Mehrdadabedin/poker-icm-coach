@@ -8,6 +8,7 @@
   /* measured desktop header height (52px mark + paddings); the hero image
      cover size is derived from it instead of a hard-coded number */
   --lp-header-h: 77px;
+  --lp-section-pad-top: clamp(34px, 6vw, 72px);
   --lp-gold: #f2b33d;
   --lp-blue: #0b6cf0;
   --lp-bg: #07080a;
@@ -87,11 +88,14 @@
 .lp-btn-google { background: #ffffff; color: #1f1f1f; }
 .lp-nav-btn { min-height: 40px; padding: 8px 18px; font-size: 0.82rem; }
 
-/* the sticky header sits above the sections it scrolls to */
-.lp-section, .lp-hero { scroll-margin-top: calc(var(--lp-header-h, 77px) + 19px); }
+/* the sticky header sits above the sections it scrolls to; a section's own top
+   padding scales with width, so subtract it to stop every title 24px under the header */
+.lp-hero { scroll-margin-top: calc(var(--lp-header-h, 77px) + 19px); }
+.lp-section { scroll-margin-top: calc(var(--lp-header-h, 77px) + 24px - var(--lp-section-pad-top)); }
 
 /* hide the section links on phones; the account buttons stay */
 @media (max-width: 959px) {
+  .landing-page { --lp-header-h: 66px; }  /* measured: brand logo below 52px */
   .lp-nav-links { display: none; }
   .lp-header-inner { grid-template-columns: auto 1fr; }
   .lp-nav { justify-self: end; }
