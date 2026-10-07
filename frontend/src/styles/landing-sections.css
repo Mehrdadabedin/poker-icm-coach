@@ -4,7 +4,7 @@
 .lp-band { background: var(--lp-bg); }
 .lp-band-soft { background: var(--lp-bg-soft); }
 
-.lp-section { padding: clamp(34px, 6vw, 72px) clamp(16px, 4vw, 48px); }
+.lp-section { padding: var(--lp-section-pad-top) clamp(16px, 4vw, 48px) clamp(34px, 6vw, 72px); }
 
 .lp-inner { width: 100%; max-width: 1240px; margin: 0 auto; }
 .lp-narrow { max-width: 860px; }
