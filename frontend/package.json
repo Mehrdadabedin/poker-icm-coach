@@ -16,7 +16,8 @@
     "apk:debug": "cd android && ./gradlew assembleDebug",
     "apk:release": "cd android && ./gradlew assembleRelease",
     "e2e": "playwright test",
-    "lint:js": "oxlint --deny-warnings"
+    "lint:js": "oxlint --deny-warnings",
+    "record:promo": "node ../scripts/record-promo/record.mjs"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.0",

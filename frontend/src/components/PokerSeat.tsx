@@ -1,5 +1,7 @@
 import { Card, PlayerView, formatChips } from "../models/game";
+import { botProfilePortrait } from "../models/botProfiles";
 import { CardView } from "./CardView";
+import { PlayingCard } from "./PlayingCard";
 
 interface PokerSeatProps {
   player: PlayerView;
@@ -12,6 +14,12 @@ interface PokerSeatProps {
 
 /** One seat on the poker table: stack, position, bet, cards, indicators. */
 export function PokerSeat({ player, active, lastAction, status, revealCards, revealHand }: PokerSeatProps) {
+  const portrait = player.isHero ? null : (player.profile ? botProfilePortrait(player.profile) : null);
+  // Real cards when known (hero, showdown); a BOT still in the hand shows two
+  // backs; folded seats show none. Busted seats take the OUT branch below.
+  const shown = revealCards && revealCards.length === 2
+    ? revealCards
+    : player.holeCards && player.holeCards.length === 2 ? player.holeCards : null;
   const classes = [
     "seat",
     player.isHero ? "seat-hero" : "",
@@ -24,11 +32,20 @@ export function PokerSeat({ player, active, lastAction, status, revealCards, rev
     .join(" ");
 
   return (
-    <div className={classes} data-testid={`seat-${player.seat}`} data-active={active} data-status={status ?? ""}>
+    <div className={classes} data-testid={`seat-${player.seat}`} data-seat={player.seat} data-active={active} data-status={status ?? ""}>
       {player.isDealer && (
         <span className="dealer-button" data-testid={`dealer-${player.seat}`}>
           D
         </span>
+      )}
+      {portrait && (
+        <img
+          className="seat-bot-portrait"
+          src={portrait.src}
+          alt={`${portrait.alt} bot profile`}
+          style={{ borderColor: portrait.color }}
+          draggable={false}
+        />
       )}
       <div className="seat-position">
         {player.position} {player.position === "SB" || player.position === "BB" ? "•" : ""}
@@ -42,15 +59,14 @@ export function PokerSeat({ player, active, lastAction, status, revealCards, rev
             {formatChips(player.stack)} <span className="seat-bb">({player.stackInBB} BB)</span>
           </div>
           <div className={`seat-cards ${player.isHero ? "hero-cards" : ""}`}>
-            {(revealCards && revealCards.length === 2
-              ? revealCards
-              : player.holeCards && player.holeCards.length === 2
-                ? player.holeCards
-                : []
-            ).map((c, i) => (
-              <CardView key={i} card={c} />
-            ))}
-            {revealCards?.length === 0 && <span className="seat-hidden-cards">? ?</span>}
+            {shown
+              ? shown.map((c, i) => <CardView key={i} card={c} />)
+              : !player.isHero && !player.folded && (
+                <>
+                  <PlayingCard faceDown className="seat-card-back" />
+                  <PlayingCard faceDown className="seat-card-back" />
+                </>
+              )}
           </div>
           {revealHand && <div className="seat-reveal-hand">{revealHand}</div>}
         </>

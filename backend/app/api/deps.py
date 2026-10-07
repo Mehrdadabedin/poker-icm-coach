@@ -4,6 +4,7 @@ from __future__ import annotations
 from fastapi import Header, HTTPException
 
 from app.services.auth import auth_store
+from app.services.user_registry import auth_registry
 
 _401 = HTTPException(status_code=401, detail="authentication required")
 
@@ -27,3 +28,17 @@ def bearer_token(authorization: str) -> str | None:
     if len(parts) == 2 and parts[0].lower() == "bearer" and parts[1]:
         return parts[1]
     return None
+
+def require_admin(authorization: str = Header(default="")) -> str:
+    """Resolve the authenticated username and require Admin level (A01).
+
+    401 for an unauthenticated/invalid token; 403 for a valid normal user.
+    Server-side gate so future Admin APIs stay protected from any client that
+    holds a normal user token; the frontend can never elevate access.
+    """
+    user = require_user(authorization)
+    if not auth_registry.is_admin(user):
+        raise HTTPException(status_code=403, detail="admin access required")
+    if auth_registry.requires_password_change(user):
+        raise HTTPException(status_code=403, detail="admin password change required")
+    return user

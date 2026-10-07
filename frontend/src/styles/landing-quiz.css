@@ -1,0 +1,157 @@
+/* A47 — TRY ONE SPOT: the pinned coach quiz. CALL / FOLD reveal the same
+   backend-computed answer (backend/tests/test_landing_spot.py). */
+
+.lp-quiz-card {
+  max-width: 640px;
+  margin: 0 auto;
+  border: 1px solid var(--lp-card-border);
+  border-radius: 16px;
+  background: var(--lp-card);
+  padding: 26px;
+}
+
+.lp-quiz-hand {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin: 0 0 16px;
+}
+
+/* two-sided flip cards: the red brand back and the face are stacked with
+   backface-visibility hidden; the inner element rotates 180deg (perspective
+   on the hand), so the face only shows once the turn completes */
+.lp-flip-card {
+  width: 86px; height: 120px;
+  perspective: 900px;
+  cursor: pointer;
+}
+
+.lp-flip-inner {
+  position: relative;
+  width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.7s ease;
+}
+
+.lp-flip-card-up .lp-flip-inner {
+  transform: rotateY(180deg);
+}
+
+.lp-flip-face {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.55));
+}
+
+.lp-flip-front {
+  transform: rotateY(180deg);
+}
+
+/* prefers-reduced-motion: no rotation, cross-fade instead */
+@media (prefers-reduced-motion: reduce) {
+  .lp-flip-inner {
+    transform: none;
+    transition: none;
+  }
+  .lp-flip-face {
+    transition: opacity 0.7s ease;
+    backface-visibility: visible;
+    -webkit-backface-visibility: visible;
+  }
+  .lp-flip-front { transform: none; opacity: 0; }
+  .lp-flip-card-up .lp-flip-back { opacity: 0; }
+  .lp-flip-card-up .lp-flip-front { opacity: 1; }
+}
+
+.lp-quiz-spot {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  color: var(--lp-text);
+  font-size: 1rem;
+  line-height: 1.5;
+  text-align: center;
+}
+.lp-quiz-spot li { margin: 2px 0; }
+
+.lp-quiz-prompt {
+  margin: 0 0 16px;
+  color: var(--lp-gold);
+  font-family: var(--lp-head);
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.lp-quiz-actions { display: flex; gap: 12px; justify-content: center; }
+
+.lp-btn-quiz-quiet {
+  background: transparent;
+  border-color: var(--lp-gold);
+  color: var(--lp-gold);
+  font-family: var(--lp-head);
+  letter-spacing: 1.6px;
+}
+
+/* ---- revealed answer ---- */
+.lp-quiz-answer {
+  margin-top: 20px;
+  border: 1px solid var(--lp-gold);
+  border-radius: 12px;
+  background: #0f1218;
+  padding: 16px 18px;
+  text-align: center;
+}
+
+.lp-quiz-verdict {
+  margin: 0 0 10px;
+  color: var(--lp-text);
+  font-family: var(--lp-head);
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.lp-quiz-pressure {
+  display: inline-block;
+  margin: 0 0 0 10px;
+  padding: 2px 10px;
+  border: 1px solid var(--lp-gold);
+  border-radius: 999px;
+  color: var(--lp-gold);
+  font-family: var(--lp-head);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.lp-quiz-reason {
+  margin: 0 0 14px;
+  color: var(--lp-muted);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.lp-quiz-facts { margin: 0; display: flex; flex-wrap: wrap; gap: 8px 26px; justify-content: center; }
+
+.lp-quiz-fact { margin: 0; }
+.lp-quiz-fact dt {
+  color: var(--lp-muted);
+  font-size: 0.78rem;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+}
+.lp-quiz-fact dd { margin: 0 0 0; color: var(--lp-text); font-weight: 700; }
+
+.lp-quiz-match {
+  margin: 12px 0 0;
+  color: var(--lp-gold);
+  font-family: var(--lp-head);
+  font-weight: 800;
+  font-size: 0.95rem;
+}

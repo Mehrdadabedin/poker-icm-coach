@@ -91,6 +91,77 @@
 }
 
 
+/* Desktop header controls. LOG OUT is the reference box: 30px tall, 6px
+   radius, 12px bold text, 2px 12px padding. HOME (yellow) and PAUSE copy that
+   exact box, so all three buttons are the same size and shape. PAUSE is
+   orange, the paused RESUME state stays green and LOG OUT stays blue.
+   Everything here is desktop only, so the shared mobile header keeps the
+   rendering it had before: icon only, amber or green, untouched sizes. */
+@media (min-width: 960px) {
+  .header-right > .header-btn {
+    min-width: 68px;
+    min-height: 26px;
+    padding: 2px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: normal;
+  }
+
+  .header-btn.header-pause {
+    background: #e65100;
+    color: #fff;
+  }
+
+  .header-pause.header-icon-play {
+    background: #2e7d32;
+  }
+
+  /* The table label and the username are header chrome, so they follow the
+     compact scale of the status bars instead of the 16px default. */
+  .tbl-label,
+  .header-user {
+    font-size: 0.78rem;
+  }
+
+  .header-right > .btn-logout {
+    order: 1;
+    min-height: 26px;
+    padding: 2px 10px;
+  }
+
+  /* Compact action bar. The four action buttons lose height and side padding so
+     the table page uses less vertical space and stops scrolling on laptop
+     screens. Colors, labels, order and behaviour are untouched, and phones keep
+     their own sizes from styles/mobile.css (a max-width block, so it wins there
+     and is not affected here). */
+  .hero-controls {
+    margin-top: 6px;
+    padding: 6px;
+  }
+
+  .hero-controls .hero-info {
+    margin-bottom: 6px;
+  }
+
+  .hero-controls .controls-row {
+    gap: 6px;
+  }
+
+  .hero-controls .controls-row .btn {
+    min-height: 36px;
+    min-width: 76px;
+    padding: 2px 10px;
+  }
+}
+
+/* The label exists only for the desktop header. */
+@media (max-width: 959px) {
+  .header-pause-label {
+    display: none;
+  }
+}
+
 /* Home/table header LOG OUT — smaller blue rectangular button, white text */
 .btn-logout {
   background: #1565c0;

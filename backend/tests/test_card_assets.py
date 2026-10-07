@@ -1,7 +1,7 @@
 """A17 — card asset completeness audit (frontend/public/cards).
 
-Verifies the installed deck is exactly the standard 52-card set (+ card back)
-as PNG — the only format the renderer loads — that the png assets are the
+Verifies the installed deck is exactly the standard 52-card set (+ the blue
+and red card backs) as PNG — the only format the renderer loads — that the png assets are the
 optimized 300x420 OpenDecks rasters (issue #6), and that the CC0 license text
 is bundled for provenance. Mirrors the mapping in
 scripts/import_opendecks_cards.py without depending on the OpenDecks checkout
@@ -12,9 +12,12 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
+import pytest
+
 ASSET_DIR = Path(__file__).resolve().parents[2] / "frontend" / "public" / "cards"
 
 RANKS = {"A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"}
+BACKS = ("back", "back-red")  # branded backs: blue (default) and red
 SUITS = {"s", "h", "d", "c"}
 
 
@@ -24,7 +27,7 @@ def _expected_faces() -> set[str]:
 
 def test_exactly_52_png_card_faces_exist() -> None:
     files = {p.stem for p in ASSET_DIR.glob("*.png")}
-    cards = {f for f in files if f != "back"}
+    cards = files - set(BACKS)
     assert len(cards) == 52, f"expected 52 png card faces, found {len(cards)}"
     assert cards == _expected_faces(), f"missing/extra png faces: {_expected_faces() ^ cards}"
 
@@ -47,15 +50,16 @@ def test_each_png_is_optimized_300x420() -> None:
             assert path.stat().st_size <= 300 * 1024, f"{path.name} too large"
 
 
-def test_card_back_exists_and_is_optimized() -> None:
-    path = ASSET_DIR / "back.png"
-    assert path.is_file()
+@pytest.mark.parametrize("name", BACKS)
+def test_card_back_exists_and_is_optimized(name: str) -> None:
+    path = ASSET_DIR / f"{name}.png"
+    assert path.is_file(), f"{name}.png missing"
     data = path.read_bytes()
     assert data.startswith(b"\x89PNG\r\n\x1a\n")
     width = int.from_bytes(data[16:20], "big")
     height = int.from_bytes(data[20:24], "big")
-    assert (width, height) == (300, 420), f"back.png size {(width, height)} != 300x420"
-    assert path.stat().st_size <= 300 * 1024, "back.png too large"
+    assert (width, height) == (300, 420), f"{name}.png size {(width, height)} != 300x420"
+    assert path.stat().st_size <= 300 * 1024, f"{name}.png too large"
 
 
 def test_no_unused_vector_duplicates_ship_in_the_bundle() -> None:

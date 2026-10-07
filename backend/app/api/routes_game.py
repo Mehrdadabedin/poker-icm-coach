@@ -50,6 +50,32 @@ def create_tournament(request: TournamentCreateRequest,
     # max(1.0, float(...)), so a bool always collapses to 1.0 and silently
     # discards whatever multiplier the client asked for.
     fast = request.fast_mode
+    # A26: optional BOT profile (validated here so unknown names fail cleanly).
+    bot_profile: str | None = None
+    if request.profile is not None:
+        from app.ai.personalities import profile_for
+
+        try:
+            profile_for(request.profile)
+        except KeyError as exc:
+            raise HTTPException(status_code=422, detail="unknown bot profile") from exc
+        bot_profile = request.profile
+    # A27: optional explicit BOT lineup. Exactly 8 personalities (one per
+    # opponent seat); each name must be a known archetype.
+    bot_profiles: list[str] | None = None
+    if request.bots is not None:
+        from app.ai.personalities import profile_for
+
+        if len(request.bots) != 8:
+            raise HTTPException(status_code=422,
+                                detail="bots must contain exactly 8 profiles")
+        for name in request.bots:
+            try:
+                profile_for(name)
+            except KeyError as exc:
+                raise HTTPException(status_code=422,
+                                    detail=f"unknown bot profile: {name}") from exc
+        bot_profiles = request.bots
     session = GameSession(
         fast_mode=fast,
         starting_stack=starting_stack,
@@ -59,6 +85,8 @@ def create_tournament(request: TournamentCreateRequest,
         hero_name=user,
         table_label=session_store.next_label(),
         history_dir=settings.history_dir,
+        bot_profile=bot_profile,
+        bot_profiles=bot_profiles,
     )
     session.start()
     session_store.add(session)
@@ -76,6 +104,18 @@ def game_action(table_id: str, request: ActionRequest,
     session = get_session(table_id, user)
     try:
         session.hero_action(request.kind, request.amount)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return session.state()
+
+
+@router.post("/game/{table_id}/reentry", response_model=GameStateModel)
+def reentry(table_id: str, user: str = Depends(require_user)) -> dict:
+    """Explicit hero re-entry (A39): restores the starting stack at the same
+    blind level when the hero busted at level 5 or earlier."""
+    session = get_session(table_id, user)
+    try:
+        session.reentry()
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     return session.state()

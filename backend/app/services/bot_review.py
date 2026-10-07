@@ -9,8 +9,8 @@ from __future__ import annotations
 
 from app.ai.ai_framework import pot_odds
 from app.ai.postflop_ai import equity_estimate
-from app.game.hand_setup import active_seats, blind_seats
-from app.game.positions import position_for
+from app.game.hand_setup import blind_seats
+from app.game.positions import position_labels
 from app.poker.card import Card
 from app.strategy.bubble import bubble_pressure, detect_stage
 from app.strategy.coach import _preflop_equity
@@ -82,19 +82,22 @@ def _decision(action: str, hand: str, stack_bb: float, equity: float,
 def build_explanations(session, result, level, pressure: str) -> list[dict]:
     players = session.tournament.players
     hero = session.hero_seat
-    active = sorted(active_seats(players))
-    if not active:
+    # Same hand-scoped seat set as build_review: a finished tournament may
+    # already have one survivor while the completed hand still shows the two
+    # seats that posted the blinds. (A41)
+    hand = sorted(s for s, start in result.starting_stacks.items() if start > 0)
+    if len(hand) < 2:
         return []
-    sb, bb = blind_seats(result.button, set(active), len(players))
+    sb, bb = blind_seats(result.button, set(hand), len(players))
     start = result.starting_stacks
-    contrib = {s: 0 for s in active}
+    contrib = {s: 0 for s in hand}
     contrib[sb], contrib[bb] = level.small, level.big
     cum = dict(contrib)
     bet, street, board = level.big, "preflop", []
     out = []
     for a in result.actions:
         if a.street != street:
-            street, bet, contrib = a.street, 0, {s: 0 for s in active}
+            street, bet, contrib = a.street, 0, {s: 0 for s in hand}
             board = list(result.community_cards[:_BOARD_LEN[street]])
         if a.seat == hero:
             continue
@@ -104,7 +107,7 @@ def build_explanations(session, result, level, pressure: str) -> list[dict]:
         hole = list(result.hole_cards.get(a.seat, []))
         equity = _equity(hole, street, board) if len(hole) == 2 else 0.0
         stack_bb = round(max(0, start.get(a.seat, 0) - cum.get(a.seat, 0)) / max(1, level.big), 1)
-        pos = position_for(result.button, a.seat, len(players))
+        pos = position_labels(result.button, set(hand), len(players)).get(a.seat, "")
         out.append({
             "seat": a.seat, "name": players[a.seat].name, "action": a.action,
             "amount": a.amount, "street": street, "position": pos,

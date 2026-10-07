@@ -8,11 +8,17 @@ The card face artwork is the **Public Domain Deck / OpenDecks** set:
 - Contains all 52 standard poker cards + 2 jokers + card backs, as SVG and PNG.
 
 This project installs only the **52 standard poker cards** (Ace through King in
-Spades, Hearts, Diamonds, Clubs) and one card back, as **PNG**, under
-`frontend/public/cards/`. No jokers are installed; the poker game does not use
-jokers.
+Spades, Hearts, Diamonds, Clubs) as **PNG** under `frontend/public/cards/`. No
+jokers are installed; the poker game does not use jokers.
 
-The frontend renderer resolves `cards/<rank><suit>.png` and `cards/back.png`,
+The two card backs are the project's own branded artwork, not OpenDecks:
+`back.png` (blue, the default) and `back-red.png` (red), both 300x420. The
+Settings "Card back" preference picks one. `import_opendecks_cards.py` still
+copies the OpenDecks blue back over `back.png`; restore the branded file after
+a re-import.
+
+The frontend renderer resolves `cards/<rank><suit>.png` and `cards/back.png` /
+`cards/back-red.png`,
 and those files are served locally by the built application — no runtime URL or
 CDN dependency. **Only PNG is installed.** `public/` is copied verbatim into
 `dist/` and into the Android APK, so the parallel SVG deck that used to sit

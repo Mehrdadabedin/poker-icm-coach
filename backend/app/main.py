@@ -1,11 +1,14 @@
 """FastAPI application entry point with REST + WebSocket."""
 from __future__ import annotations
 
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Query, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.concurrency import run_in_threadpool
 
 from app.api.deps import bearer_token
+from app.api.routes_admin import router as admin_router
 from app.api.routes_auth import router as auth_router
 from app.api.routes_game import router as game_router
 from app.api.routes_meta import router as meta_router
@@ -14,16 +17,28 @@ from app.core.config import settings
 from app.core.version import app_version
 from app.services.auth import auth_store
 from app.services.session_store import session_store
+from app.services.user_registry_admin import bootstrap_admin
 
 VERSION = app_version()
 
-app = FastAPI(title="ICM Master API", version=VERSION)
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    """Startup: create the initial Admin account once (idempotent), so no
+    manual users.json edit or env admin identity is required for the demo.
+    Tests use TestClient without lifespan, so this never writes in-test."""
+    bootstrap_admin()
+    yield
+
+
+app = FastAPI(title="ICM Master API", version=VERSION, lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origin_list,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(admin_router)
 app.include_router(auth_router)
 app.include_router(oauth_router)
 app.include_router(game_router)

@@ -1,31 +1,66 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { HandResult } from "../components/HandResult";
-import { HandReview } from "../components/HandReview";
-import { HeroControls } from "../components/HeroControls";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { winnerPreviewEnabled } from "./endgame";
+import { endgameOverlays } from "./endgameOverlays";
+import { LiveTableView } from "../components/LiveTableView";
 import { LoginForm } from "../components/LoginForm";
-import { PokerTable } from "../components/PokerTable";
-import { TableHeader } from "../components/TableHeader";
-import { TableSidebar } from "../components/TableSidebar";
 import { useAutoNext } from "../hooks/useAutoNext";
+import { useAutoFinish } from "../hooks/useAutoFinish";
 import { useGame } from "../hooks/useGame";
-import { ActionKind, CoachAdvice, LegalAction } from "../models/game";
-import { useLabelPreferences } from "../services/preferences";
-import { clearAuth, coachAdvice, coachCompare, getToken, getUsername, logout } from "../services/api";
+import { useTableActions } from "../hooks/useTableActions";
+import type { ActionKind, CoachAdvice } from "../models/game";
+import { tournamentChampion } from "../models/game";
+import { useDisplayPreferences } from "../services/preferences";
+import { clearAuth, coachAdvice, coachCompare, getToken, getUsername, request } from "../services/api";
+import type { HandHistoryEntry } from "../webmcp/registerGameTools";
+import { useGameWebMcp } from "../webmcp/useGameWebMcp";
 
 const REVIEW_SECONDS = 10;
 
-/** Live table: compact result + optional Review the Hand (A10/A11/A16). */
+export { autoFinishActive, resolveWinnerName, winnerPreviewEnabled } from "./endgame";
+
 export function TablePage() {
   const { tableId = "" } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [authed, setAuthed] = useState<boolean>(() => !!getToken());
   const [showReview, setShowReview] = useState(false);
-  const { state, error, act, nextHand, acting, refresh: refreshTable } = useGame(tableId);
+  const [watchToEnd, setWatchToEnd] = useState(false); // A44: hero watched -> auto-finish
+  const { state, error, nextHand, acting, refresh: refreshTable } = useGame(tableId);
   const { countdown, paused, start, stop, pause, resume } = useAutoNext(nextHand, REVIEW_SECONDS);
   const [coach, setCoach] = useState<CoachAdvice | null>(null);
+  const [coachHidden, setCoachHidden] = useState(false);
+  const [historyHidden, setHistoryHidden] = useState(false);
   const [comparison, setComparison] = useState<Record<string, string> | null>(null);
-  const { actionLabels, resultLabels } = useLabelPreferences();
+  const { actionLabels, resultLabels } = useDisplayPreferences();
+  const lineup = useMemo(() => {
+    const profiles = (state?.players ?? [])
+      .filter((p) => !p.isHero)
+      .map((p) => p.profile ?? null);
+    return (profiles.length === 8 && profiles.every((p): p is string => p !== null))
+      ? profiles : null;
+  }, [state]);
+  const actions = useTableActions({ tableId, refresh: refreshTable, navigate, lineup });
+  const hero = state?.players.find((p) => p.isHero);
+  const champion = state ? tournamentChampion(state) : null;
+  const previewWinner = winnerPreviewEnabled(import.meta.env.DEV, searchParams.get("testWinner"));
+  const championShown = previewWinner || champion !== null;
+  const heroPendingReentry = !!hero?.awaitingReentry;
+  const heroOut = !!hero && hero.sitsOut && !heroPendingReentry;
+  const eliminationModalOpen = heroPendingReentry || (heroOut && !watchToEnd);
+
+  useAutoFinish({
+    enabled: watchToEnd,
+    paused,
+    heroOut,
+    phase: state?.phase,
+    handNumber: state?.handNumber,
+    playersRemaining: state?.playersRemaining,
+    championName: champion?.name ?? null,
+    next: actions.nextHand,
+    stop,
+    start,
+  });
 
   // The hero can be the actor more than once in a hand, on a later street or on
   // the same one after somebody reopens the betting. The 350 ms poll often never
@@ -43,35 +78,49 @@ export function TablePage() {
     }
   }, [state?.waitingForHero, state?.handNumber, state?.phase, state?.street,
       state?.actionLog?.length, tableId]);
-
-  // Auto-next only on the table result state; review suspends it (A10/A16).
   useEffect(() => {
-    if (state?.phase === "handOver" && !showReview) {
+    if (state?.phase === "handOver" && !showReview && !championShown && !eliminationModalOpen) {
       start();
     } else if (state?.phase !== "handOver") {
       stop();
       setShowReview(false);
     }
     return () => stop();
-  }, [state?.phase, state?.handNumber, showReview, start, stop]);
+  }, [state?.phase, state?.handNumber, showReview, start, stop, championShown, eliminationModalOpen]);
 
-  const onAction = async (kind: string, amount?: number) => {
-    const next = await act(kind, amount);
+  // A46: a coach-grade banner must not survive the hand it graded.
+  useEffect(() => setComparison(null), [state?.handNumber]);
+
+  const onAction = async (kind: ActionKind, amount?: number) => {
+    const next = await actions.act(kind, amount);
     if (next) {
       const grade = await coachCompare(tableId).catch(() => null);
       setComparison(grade);
     }
+    return next;
   };
 
-  const signOut = async () => {
-    try {
-      await logout();
-    } catch {
-      // token may already be revoked server-side; clear locally regardless
-    }
-    clearAuth();
-    navigate("/");
-  };
+  useGameWebMcp({
+    enabled: authed,
+    stateAvailable: state !== null,
+    tableId,
+    getState: () => state,
+    isPaused: () => paused,
+    countdown: () => countdown,
+    isReviewOpen: () => showReview,
+    act: onAction,
+    nextHand: actions.nextHand,
+    startNewHand: actions.startNewGame,
+    getHandHistory: async () => {
+      const data = await request<{ hands: HandHistoryEntry[] }>(
+        `/api/game/${encodeURIComponent(tableId)}/hands`,
+      );
+      return data.hands;
+    },
+    pause,
+    resume,
+    showHandResult: () => setShowReview(true),
+  });
 
   if (!authed) {
     return (
@@ -97,74 +146,48 @@ export function TablePage() {
     return <div className="loading-box">Connecting to the table…</div>;
   }
 
-  const hero = state.players.find((p) => p.isHero);
-  const handOver = state.phase === "handOver" && !!state.review;
-  const isReview = handOver && showReview;
-  const nameBySeat = new Map(state.players.map((pl) => [pl.seat, pl.name]));
+  const { cover, overlay } = endgameOverlays({
+    state,
+    champion,
+    previewWinner,
+    previewName: searchParams.get("testWinnerName") ?? "",
+    fallbackName: state.username ?? getUsername() ?? "",
+    heroPendingReentry,
+    eliminationModalOpen,
+    onContinue: actions.continueReentry,
+    onWatch: () => setWatchToEnd(true),
+    onNewGame: () => void actions.startNewGame(),
+  });
 
   return (
-    <div className="table-page" data-testid="table-page">
-      <TableHeader
-        state={state}
-        username={getUsername()}
-        paused={paused}
-        handOver={handOver}
-        isReview={isReview}
-        onHome={() => navigate("/")}
-        onLogout={() => void signOut()}
-        onTogglePause={paused ? resume : pause}
-      />
-      {isReview && state.review ? (
-        <HandReview
-          review={state.review}
-          coach={coach}
-          comparison={comparison}
-          totalPlayers={state.players.length}
-          nameBySeat={nameBySeat}
-          onBack={() => setShowReview(false)}
-        />
-      ) : (
-        <>
-          <PokerTable state={state}>
-            {handOver && state.review ? (
-              <HandResult
-                review={state.review}
-                username={state.username}
-                onReview={() => setShowReview(true)}
-                onNext={() => void nextHand()}
-                countdown={countdown}
-                paused={paused}
-                showResultLabels={resultLabels}
-              />
-            ) : (
-              <HeroControls
-                legalActions={(state.legalActions ?? []) as LegalAction[]}
-                toCall={state.toCall}
-                pot={state.pot}
-                stack={hero?.stack ?? 0}
-                bigBlind={state.bigBlind}
-                disabled={!state.waitingForHero}
-                submitting={acting}
-                showLabels={actionLabels}
-                onAction={(kind: ActionKind, amount?: number) => void onAction(kind, amount)}
-              />
-            )}
-            {comparison && !handOver && (
-              <div className="comparison-box" data-testid="comparison">
-                <b>{comparison.grade}</b> — {comparison.explanation}
-              </div>
-            )}
-          </PokerTable>
-          {!handOver && (
-            <TableSidebar
-              actions={state.actionLog ?? []}
-              heroSeat={state.heroSeat}
-              nameBySeat={nameBySeat}
-              coach={coach}
-            />
-          )}
-        </>
-      )}
-    </div>
+    <LiveTableView
+      state={state}
+      overlay={overlay}
+      cover={cover}
+      coach={coach}
+      comparison={comparison}
+      countdown={countdown}
+      paused={paused}
+      acting={acting}
+      showLabels={actionLabels}
+      showResultLabels={resultLabels}
+      nameBySeat={new Map(state.players.map((p) => [p.seat, p.name]))}
+      coachCollapsed={coachHidden}
+      historyCollapsed={historyHidden}
+      reviewOpen={showReview}
+      username={getUsername()}
+      onHome={() => navigate("/")}
+      onLogout={async () => {
+        await actions.signOut();
+        setAuthed(false);
+      }}
+      onTogglePause={paused ? resume : pause}
+      onReview={() => setShowReview(true)}
+      onNext={() => void nextHand()}
+      onBackReview={() => setShowReview(false)}
+      onAction={(kind, amount) => void onAction(kind, amount)}
+      onToggleCoach={() => setCoachHidden((v) => !v)}
+      onToggleHistory={() => setHistoryHidden((v) => !v)}
+    />
   );
 }

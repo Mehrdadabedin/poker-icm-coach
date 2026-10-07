@@ -1,0 +1,120 @@
+/* Shared brand mark: the logo asset (frontend/public/Logo/logo.png) shown at ONE
+   size everywhere it appears, so the brand has the same scale on the landing page,
+   the authenticated header and the sign-in screen.
+
+   The raw PNG is 2170x725: a wide wordmark (spade mark plus word) on the same
+   near-black as the app shell; the blend below is lighten, so those flat background
+   pixels keep the shell's own shade and never show as a panel behind the mark.
+   The box keeps the file's own 2170:725 shape, so the artwork fills it exactly: the
+   CSS height IS the visible mark height, and nothing is cropped or stretched. */
+
+.brand-logo {
+  display: block;
+  width: auto;
+  height: 91px;
+  max-height: 91px;
+  aspect-ratio: 2170 / 725;
+  object-fit: contain;
+  object-position: center;
+  flex: 0 0 auto;
+  mix-blend-mode: lighten;
+}
+
+/* Accessible name for the mark without adding visible text. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Authenticated header (table + home). The title must never shrink to zero
+   width, or the crowded mobile row clips the mark away. */
+.header-title {
+  flex: 1 0 auto;
+  min-width: 0;
+}
+
+/* The sign-in screen's centred brand mark (A23/A24). Centred by the flex
+   heading. It is deliberately larger than the header mark because it has to show
+   the whole artwork READABLY, including the tagline at the bottom of the badge:
+   the tagline's glyphs are 37 of the artwork's 880 rows, so at 214px of artwork
+   they render ~9px tall. The header marks keep the shared 91px above. */
+.auth-brand-logo {
+  display: flex;
+  justify-content: center;
+  margin: 0;
+  line-height: 0;
+}
+
+.auth-brand-logo .brand-logo {
+  /* A28: the mark is 30% larger than it was (305px -> 396px), and still
+     width-driven so a narrower screen shrinks the whole mark instead of
+     cropping it. */
+  width: 396px;
+  max-width: 100%;
+  height: auto;
+  max-height: none;
+}
+
+/* A19: the same mark, pinned to the sign-in screen's top-left. Its containing
+   block is .home-page.auth-page, which is position: relative in styles/auth.css.
+   The left margin matches the landing header's. */
+.auth-brand-mark {
+  position: absolute;
+  top: 8px;
+  left: clamp(14px, 4vw, 48px);
+  margin: 0;
+  line-height: 0;
+}
+
+/* A25/A26: the top-left header marks (landing header + app header) are sized by this
+   rule on desktop and by the phone rule below on small screens; nothing else uses
+   them, so the sign-in screen's own marks keep their size. A26 shrank them ~40%
+   (66px of the 2170x725 file renders the tagline glyphs ~8px tall). The header is a
+   content-sized flex row, so it resizes with the mark. */
+@media (min-width: 960px) {
+  .lp-brand .brand-logo,
+  .header-title .brand-logo {
+    height: 66px;
+    max-height: 66px;
+  }
+}
+
+@media (max-width: 959px) {
+  /* Phones get their own size from the same rule, so no context can drift to a
+     different scale. */
+  .brand-logo { height: 41px; max-height: 41px; }
+
+  /* The row order stays LOGO -> label/username -> controls. The controls keep
+     their own width (they used to absorb the squeeze and wrap), and the two text
+     spans give up the space the mark needs by truncating instead. */
+  .app-header .header-right {
+    flex: 1 1 auto;
+    min-width: 0;
+    justify-content: flex-end;
+  }
+
+  .app-header .header-right > button { flex: 0 0 auto; }
+
+  .app-header .header-user,
+  .app-header .tbl-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* A24: on phones the sign-in screen's top-left mark and its centred mark are two
+   separate elements and they would overlap, so the sign-in column starts below
+   the mark (8px offset + 69px mark = 77px). Very short screens keep the
+   top-aligned behaviour they already had in auth-footer.css. */
+@media (max-width: 959px) and (min-height: 561px) {
+  .home-page.auth-page { padding-top: 88px; }
+}

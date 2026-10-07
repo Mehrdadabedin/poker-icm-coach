@@ -1,0 +1,113 @@
+/* A47 shared section frame: full-width bands, centred content column,
+   16:9 demo slot, HOW IT WORKS steps and the opponent cards. */
+
+.lp-band { background: var(--lp-bg); }
+.lp-band-soft { background: var(--lp-bg-soft); }
+
+.lp-section { padding: clamp(34px, 6vw, 72px) clamp(16px, 4vw, 48px); }
+
+.lp-inner { width: 100%; max-width: 1240px; margin: 0 auto; }
+.lp-narrow { max-width: 860px; }
+
+.lp-section-title {
+  margin: 0;
+  color: var(--lp-gold);
+  text-align: center;
+  font-family: var(--lp-head);
+  font-size: clamp(1.25rem, 2.6vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+}
+
+.lp-section-rule {
+  display: block;
+  width: 72px; height: 3px;
+  margin: 14px auto 26px;
+  border-radius: 3px;
+  background: var(--lp-gold);
+}
+
+/* ---- 16:9 demo slot (unchanged player + poster) ---- */
+.lp-video {
+  position: relative; width: 100%; aspect-ratio: 16 / 9;
+  border: 1px solid var(--lp-card-border); border-radius: 14px; overflow: hidden;
+  background: linear-gradient(160deg, #10131a 0%, #0a0c10 55%, #12151c 100%);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+.lp-video-el {
+  display: block; width: 100%; height: 100%;
+  object-fit: contain; background: #000;
+}
+
+.lp-video-poster {
+  position: absolute; left: 0; right: 0; top: 0; bottom: 48px;
+  width: 100%; border: 0; padding: 0; background: #000;
+  cursor: pointer; z-index: 2;
+}
+.lp-video-poster img {
+  display: block; width: 100%; height: 100%; object-fit: cover;
+}
+
+/* ---- HOW IT WORKS ---- */
+.lp-how-steps {
+  display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px; margin: 0; padding: 0; list-style: none;
+}
+
+.lp-how-step {
+  padding: 22px;
+  border: 1px solid var(--lp-card-border);
+  border-radius: 14px;
+  background: var(--lp-card);
+}
+
+.lp-how-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px; height: 36px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: var(--lp-gold);
+  color: #14140c;
+  font-family: var(--lp-head);
+  font-weight: 800;
+}
+
+.lp-how-title { margin: 0 0 8px; color: var(--lp-text); font-family: var(--lp-head); font-weight: 700; }
+.lp-how-text { margin: 0; color: var(--lp-muted); font-size: 0.92rem; line-height: 1.5; }
+
+/* ---- YOUR OPPONENTS ---- */
+.lp-opponents {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px; margin: 0; padding: 0; list-style: none;
+}
+
+.lp-opponent {
+  border: 1px solid var(--lp-card-border);
+  border-radius: 14px;
+  background: var(--lp-card);
+}
+
+.lp-opponent-body { padding: 10px 14px 16px; }
+
+.lp-opponent-portrait {
+  display: block; width: 100%; aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 10px 10px 0 0;
+}
+
+.lp-opponent-name { margin: 10px 0 2px; color: var(--lp-text); font-family: var(--lp-head); font-weight: 800; }
+.lp-opponent-style { margin: 0 0 10px; color: var(--lp-gold); font-size: 0.82rem; letter-spacing: 0.6px; text-transform: uppercase; }
+.lp-opponent-text { margin: 0; color: var(--lp-muted); font-size: 0.88rem; line-height: 1.45; }
+
+@media (max-width: 1023px) {
+  .lp-opponents { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 767px) {
+  .lp-how-steps { grid-template-columns: minmax(0, 1fr); }
+  .lp-opponents { grid-template-columns: minmax(0, 1fr); }
+}

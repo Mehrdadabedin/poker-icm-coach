@@ -1244,3 +1244,748 @@ Not pushed: both commits are local on `fix/tournament-settings-500`.
   Frontend lint has one pre-existing error in `tests/useAutoNext.test.tsx`.
 - Committed locally, not pushed: pushing would trigger Render rebuilds for no
   code change, and this task says not to deploy the MCP server.
+
+
+## A16 - ICM MASTER public landing page (2026-09-23)
+
+Status: COMPLETE for the code, tests and documentation. Browser/live checks listed
+separately below. Branch `FIX-POKERTABLE-LAYOUT-TEST`; test frontend only;
+production untouched.
+
+Numbering: the owner-requested label is A16. Note that
+`prime-agent-spec/atomic_plan.md` already used A16 for the earlier hand-review
+task, so this entry is documented as "A16 (landing page)" there and no existing
+task was renamed, reordered or removed. The repository has no root-level
+`atomic_plan.md`; the atomic plan lives in `prime-agent-spec/atomic_plan.md` and
+this session's task list in `plan.md`, which this entry does not change.
+
+### Inspection (before any edit)
+| Area | Finding |
+| --- | --- |
+| Router | `frontend/src/App.tsx`, `HashRouter`; `/` = `HomePage`, plus `/table/:tableId`, `/auth/callback`, `/training`, `/ranges`, `/coach`, `/settings`, `/history`, `/statistics` |
+| Login screen | `frontend/src/pages/HomePage.tsx` unauthenticated branch: brand header + `LoginForm` (`data-testid="home-page"`) |
+| Sign-up flow | the existing `LoginForm` mode switch (`go-signup` / `go-signin`); there is NO separate signup route or component |
+| Authenticated app | the same `HomePage` authenticated branch (menu) then `/table/:tableId` |
+| Footer | `frontend/src/components/Copyright.tsx` (`app-footer`, version read from `/api/health`) |
+| Visual identity | `auth.css` measured palette (gold #fad15a, rule #fcf159, blue #086aec, bg #0e141a, line #2c373f, muted #99a8ba). Those tokens are scoped to `.auth-page` / `.login-panel`, so the landing page repeats the values in its own scope instead of editing `auth.css` |
+
+### Implementation
+- New `frontend/src/pages/LandingPage.tsx` (121 lines): header (ICM MASTER /
+  LOGIN / SIGN UP), hero ("Master your tournament decisions", supporting line,
+  START TRAINING + "WATCH HOW IT WORKS"), the 16:9 demo placeholder, PLAY /
+  REVIEW / IMPROVE, the final CTA, the `PRACTICE • IMPROVE • WIN` tagline and the
+  existing `Copyright` footer.
+- New `frontend/src/styles/landing.css` (184 lines): every rule scoped to
+  `.landing-page` / `.lp-*`, with desktop, tablet, mobile portrait and mobile
+  landscape blocks. No existing stylesheet changed.
+- Routing (`frontend/src/App.tsx`, +13/-1): `/` = `EntryPage` (landing without a
+  session, the existing home screen with one, so HOME and every existing deep
+  link keep their behaviour); new `/login` = the existing `HomePage`. No other
+  route touched.
+- Zero-touch authentication (owner decision): SIGN UP, LOGIN and START TRAINING
+  all link to `/login`; registration is reached with the login page's own
+  "Sign up" link. `LoginForm.tsx` and `HomePage.tsx` were restored byte-exactly
+  and are unmodified (`git diff HEAD` for both is empty).
+- `frontend/src/main.tsx` (+1): one `landing.css` import.
+- New `frontend/tests/landing.test.tsx` (7 tests).
+
+### Files changed
+- New: `frontend/src/pages/LandingPage.tsx`, `frontend/src/styles/landing.css`,
+  `frontend/tests/landing.test.tsx`
+- Modified: `frontend/src/App.tsx`, `frontend/src/main.tsx`
+- Documentation: this file, `prime-agent-spec/atomic_plan.md`,
+  `prime-agent-spec/progress.md`
+
+### Verification
+- `npx tsc --noEmit` clean; `npx oxlint --deny-warnings src tests` 0 warnings /
+  0 errors (53 files); `npx vitest run` 68 passed in 13 files (including the 7 new
+  landing tests); `vite build` succeeded.
+- Scope proof: `git diff HEAD --name-only` contains no `backend/` file, no
+  `LoginForm`, no `HomePage`, no OAuth/provider/Google file, and no poker-table,
+  seat, card, felt or game file. `main` is still `a0813fb`.
+- Not done: the local multi-viewport browser pass (the harness hung and was
+  stopped) and the live check on the test URL.
+
+### Implementation checklist
+- [x] Inspect existing routing
+- [x] Inspect existing login route
+- [x] Inspect existing signup route (it is a mode of the existing login screen)
+- [x] Create landing page
+- [x] Connect LOGIN to existing login (`/login`)
+- [x] Connect SIGN UP to existing signup flow (via `/login`, zero-touch)
+- [x] Connect START TRAINING to existing login (`/login`)
+- [x] Add hero section
+- [x] Add demo/video placeholder (16:9, ready for an MP4/WebM)
+- [x] Add PLAY / REVIEW / IMPROVE section
+- [x] Add final CTA
+- [x] Preserve existing NEXORA footer (existing `Copyright` component reused)
+- [x] Add responsive desktop design
+- [x] Add responsive tablet design
+- [x] Add responsive mobile portrait design
+- [x] Add responsive mobile landscape design
+- [x] Verify existing login unchanged (both auth files byte-identical to HEAD)
+- [x] Verify signup unchanged (same files; no auth component touched)
+- [x] Verify Google OAuth unchanged (no OAuth file in the diff; the landing page
+      does not touch providers or the callback)
+- [x] Verify poker table unchanged (no table component or table CSS in the diff)
+- [x] Verify poker functionality unchanged (no game or backend file in the diff)
+- [x] Build successfully
+- [x] Automated tests, type check and lint pass
+- [ ] Deploy test frontend (the test service rebuilds on push; the served assets
+      are checked after the push)
+- [ ] Test live URL (multi-viewport browser pass on the test URL)
+
+
+## A17 - Integrate the ICM MASTER demo video into the public landing page (2026-09-23)
+
+Status: implemented and verified locally. Not committed or deployed at the time of
+writing; the test frontend rebuilds automatically once this is pushed. Production
+untouched.
+
+Numbering: the owner-requested label is A17. `prime-agent-spec/atomic_plan.md`
+already used A17 for the OpenDecks card bundle, so this entry is documented there
+as "A17 (landing page)" with a numbering note; no existing task was renamed,
+reordered or removed.
+
+### Source
+| Item | Value |
+| --- | --- |
+| Source file | `/home/mehrdad/Downloads/ICM MASATER.mp4` (left untouched) |
+| Size | 5,961,614 bytes (5.7 MB) |
+| sha256 | `2019904ff2ad3facb990164dc8185fe5769a6dbb1463eeebf1e701f1d8787441` (source and copy identical) |
+| Container / codecs | ISO MP4 (`isom/iso2/avc1/mp41`), H.264 `avc1` video + AAC `mp4a` audio |
+| Duration | 25.00 s (video track, timescale 15360) |
+| Frame size | 3408x1702 = 2.00:1 (NOT 16:9) |
+
+### Final asset
+- Filename: `icm-master-demo.mp4`
+- Location: `frontend/public/videos/icm-master-demo.mp4` (Vite serves `public/` at
+  the web root, so the URL is `/videos/icm-master-demo.mp4`)
+- Bundled into the build: `dist/videos/icm-master-demo.mp4`, 5,961,614 bytes
+
+### Implementation
+- `frontend/src/pages/LandingPage.tsx`: the placeholder block inside the
+  "SEE ICM MASTER IN ACTION" card was replaced by
+  `<video className="lp-video-el" data-testid="landing-video-player" controls
+  preload="metadata" playsInline>` with
+  `<source src="/videos/icm-master-demo.mp4" type="video/mp4" />`. The heading,
+  the `.lp-video` 16:9 container, `data-testid="landing-video"` and
+  `data-video-slot="16:9"` are unchanged.
+- `frontend/src/styles/landing.css`: `.lp-video-el` changed from
+  `object-fit: cover` to `object-fit: contain` plus `background: #000`, because
+  the clip is 2:1 inside a 16:9 slot (letterbox instead of crop/stretch). The
+  section comment now names the bundled clip. The now-unused placeholder rules
+  (`.lp-video-placeholder`, `.lp-play`, `.lp-video-label`, `.lp-video-note`) were
+  deliberately kept, matching the project's habit of leaving retired UI rules in
+  place (see `auth.css`), so they are inert.
+- `frontend/tests/landing.test.tsx`: new test asserting the player is a `VIDEO`
+  with `controls` + `preload="metadata"`, without `autoplay` or `loop`, whose
+  source is `/videos/icm-master-demo.mp4`, with no placeholder copy and no
+  external host in its markup.
+- No other file changed. No dependency added.
+
+### Verification (local, 2026-09-23)
+- Source exists; copy is byte-identical (`sha256sum` match); original still in
+  Downloads with its original mtime.
+- `npx tsc --noEmit` clean; `npx oxlint --deny-warnings src tests` 0 warnings /
+  0 errors (53 files); `npx vitest run` 69 passed in 13 files (one new A17 test);
+  `npm run build` succeeded.
+- Build output: `dist/assets/index-CBaNVXH6.css` (33.36 kB),
+  `dist/assets/index-N2nwq8GD.js` (239.50 kB), and
+  `dist/videos/icm-master-demo.mp4` (5,961,614 bytes) - the MP4 is in the build.
+- The built stylesheet contains
+  `.lp-video-el{display:block;width:100%;height:100%;object-fit:contain;background:#000}`.
+- Not run: browser playback verification (automation timed out twice; see the
+  session report). Playback, responsive sizing and the live URL still need one
+  browser pass, and the test-frontend deployment is pending the push.
+- Unchanged and confirmed by `git status` / `git diff --stat`: no authentication,
+  OAuth, backend, API, poker, game, route or Render file is modified.
+- Pre-existing working-tree items, not mine and not staged: modified
+  `frontend/tsconfig.tsbuildinfo` (build artifact) and untracked
+  `Adjustedpokertable.png` (reference image from an earlier task).
+
+
+## A18 - Win / Lose Analysis inside the Hand History panel (2026-10-09)
+
+Numbering note: .env.example already references an earlier "A18 (auth
+persistence)" concept from the atomic plan's first numbering pass; this entry is
+the next task ID after A17 (landing video) in progress.md's numbering and matches
+the owner-requested label. No existing task was renamed.
+
+### Source
+| Item | Value |
+| --- | --- |
+| Data source | GET /api/game/{tableId}/hands (existing route_meta.py endpoint) |
+| Data shape | HandHistoryEntry: handNumber, heroPosition, pot, winnerSeats, stage, net, heroDecision, coachRecommendation, grade, level, blindLevel |
+| Auth/session scope | require_user + get_session ownership check (table owner only) |
+| Screen target | Screenshot 1 (visual reference only; no mock values used) |
+
+### Implementation
+- Existing right-side HAND HISTORY panel becomes two-view: HAND HISTORY
+  (default) and WIN / LOSE ANALYSIS, selected with a native dropdown in the
+  panel head (`.history-view-select`). HIDE / SHOW button is untouched and works
+  on both views.
+- `frontend/src/components/ActionHistory.tsx`: head renders the dropdown only
+  when `onViewChange` is supplied (live table). The review screen and every
+  existing caller pass no `onViewChange` and keep the original h3 title and
+  history body byte-for-byte; the history body inside the new view branch is the
+  original code untouched.
+- `frontend/src/components/TableSidebar.tsx`: owns the view state (default
+  "history") and one read-only `GET /api/game/{tableId}/hands` fetch, fired only
+  while the analysis view is active, refreshed when the hand number advances.
+  The switch never starts a hand, pauses, resumes or alters any game/tournament
+  state: it only swaps local view state plus that single GET.
+- New `frontend/src/models/winloss.ts`: pure aggregation functions
+  (winLossTotals, blindLevelStats, positionStats, percent). Win = net > 0,
+  loss = net < 0, net == 0 is neutral and excluded from the split so
+  win% + loss% = 100% for every reported level/position; empty or neutral-only
+  levels/positions are omitted (never 0% / 0%).
+- New `frontend/src/components/WinLoseAnalysis.tsx`: OVERALL PERFORMANCE (WIN
+  and LOSS ring donuts, Total Hands, Wins, Losses, Win Rate, Loss Rate,
+  Profit/Loss), WIN / LOSE BY BLIND LEVEL (green/red horizontal bars, CURRENT
+  badge on the live level), RESULTS BY POSITION (compact ring donuts, ordered by
+  POSITIONS_9MAX). All charts are inline SVG + CSS: no chart dependency added.
+- New `frontend/src/styles/winloss.css` (`.wl-*` only; dark panel theme, gold
+  --accent, green #81c784 / red #ff8f8f reused from the hand history action
+  colors). Imported once in `frontend/src/main.tsx`.
+- `frontend/src/models/game.ts`: added the shared `HandHistoryEntry` type.
+- `frontend/src/pages/TablePage.tsx`: passes tableId, handNumber and current
+  level to the sidebar (+3 props only).
+
+### Verification (local)
+- `npx vitest run`: 103 passed in 17 files (13 new A18 tests in
+  tests/winloss.test.ts + tests/winloss.test.tsx; table_layout, table and review
+  suites untouched and green).
+- `npx tsc --noEmit` clean. `npx oxlint --deny-warnings`: only the 4 pre-existing
+  WebMCP errors (untracked prior work), none in A18 files.
+- `npm run build` ok (101 modules). Backend untouched; relevant backend subset
+  (api, auth isolation, settings/history, google auth, table lifecycle) 54
+  passed.
+- Not run: live browser pass. Visual layout of the new view still needs one
+  browser check on the test URL; renders inside the existing panel width.
+
+### Strict exclusions (unchanged)
+Poker table, seats, cards, dealing, betting, showdown, ICM engine, tournament/
+blind/timer logic, hero actions, Auto-next, authentication/OAuth, session
+isolation, WebMCP, GA4, cookie settings, landing page, mobile layout.
+
+
+## A26 - BOT Profiles + Navigation Cleanup + NEXORA Removal (2026-09-29 12:07 CEST)
+
+Task: add four selectable human-style BOT profiles connected to table creation,
+remove TRAINING from the main menu, add BOT PROFILES to the main menu, remove
+visible NEXORA branding, and set the footer to "© 2026 — Created by Mehrdad Abedin".
+
+Branch: FIX-POKERTABLE-LAYOUT-TEST.
+
+Starting git status (before implementation):
+- modified: frontend/tsconfig.tsbuildinfo (build artifact)
+- untracked: docs/design/, docs/webmcp.md, frontend/public/images/icmbot-hero*.png,
+  frontend/tests/webmcp.test.ts, logo.png (all pre-existing)
+
+Files inspected (architecture):
+- prime-agent-spec/atomic_plan.md (A-numbering; next ID = A26)
+- progress.md (task numbering/conventions; TOC 001-061 + A16/A17/A18 entries)
+- frontend/src/App.tsx (routes) — HomePage owns the main menu; /training route exists
+- frontend/src/pages/HomePage.tsx — main menu: START PRACTICE, TRAINING, RANGES,
+  ICM COACH, TOURNAMENT SETTINGS, HAND HISTORY, STATISTICS; startPractice calls
+  createTournament(10)
+- frontend/src/components/Copyright.tsx — "© 2026 NEXORA — Created by Mehrdad Abedin"
+  (the ONLY user-facing NEXORA occurrence; used by every page incl. landing)
+- frontend/src/services/api.ts — createTournament posts {players:9, fast_mode}
+- frontend/src/services/preferences.ts — existing localStorage/in-memory pattern
+- backend/app/api/routes_game.py — POST /api/tournament -> GameSession
+- backend/app/schemas/game_schemas.py — TournamentCreateRequest
+- backend/app/services/game_session.py — builds AIDecisionProvider (single
+  adaptive personality today); bots are not individually profiled in the live
+  engine
+- backend/app/ai/personalities.py — 8 archetypes (tight, aggressive, tag, loose,
+  lag, passive, balanced, adaptive); no exact tight-passive / loose-passive
+- backend/app/ai/ai_framework.py — AIDecisionProvider(personality=...)
+- backend/tests/ai/test_personalities.py — asserts exactly 8 profiles (must be
+  updated when the two new archetypes are added)
+- frontend/tests/landing.test.tsx + version_footer.test.tsx — assert the NEXORA
+  footer (must be updated)
+- TrainingPage.tsx — kept intact; only the menu entry is removed
+
+Planned steps (from atomic_plan A26-1..A26-13): inspect / remove TRAINING from
+menu / add BOT PROFILES to menu / build profiles page / define 4 profiles /
+connect profile to table creation / persist selection / remove NEXORA / update
+footer tests / tsc / tests / build / regression verification.
+
+
+### Implementation results (A26, completed 2026-09-29)
+
+Branch: FIX-POKERTABLE-LAYOUT-TEST.
+
+Files changed (working tree, not committed):
+- backend/app/ai/personalities.py — added the two missing archetypes
+  "tight_passive" (vpip 0.15, aggression 0.18) and "loose_passive"
+  (vpip 0.55, aggression 0.20); existing 8 archetypes unchanged.
+- backend/app/schemas/game_schemas.py — TournamentCreateRequest gains optional
+  `profile: str | None = None` (max 40 chars; backward compatible).
+- backend/app/api/routes_game.py — create_tournament validates the optional
+  profile (422 "unknown bot profile") and forwards it to GameSession.
+- backend/app/services/game_session.py — GameSession(bot_profile=...) sets the
+  AI provider personality from profile_for(name); default remains adaptive, so
+  existing behaviour is unchanged.
+- backend/tests/ai/test_personalities.py — 8 -> 10 profile assertions + two
+  behavioural tests for the new archetypes.
+- backend/tests/test_bot_profiles.py (new) — profile wiring, tight-passive
+  wiring, no-profile default, unknown-profile 422.
+- frontend/src/models/botProfiles.ts (new) — 4 profiles
+  (Alex/Tight-Aggressive->tag, Sarah/Loose-Aggressive->lag,
+  David/Tight-Passive->tight_passive, Emma/Loose-Passive->loose_passive),
+  avatar initials + colours, localStorage persistence (icm_bot_profile).
+- frontend/src/pages/BotProfilesPage.tsx (new) — BOT PROFILES screen with 4
+  responsive cards, avatar, name, style, description and SELECTED state.
+- frontend/src/pages/HomePage.tsx — TRAINING menu button removed; BOT PROFILES
+  button added; START PRACTICE forwards the selected profile backend name.
+- frontend/src/App.tsx — new route /bot-profiles.
+- frontend/src/services/api.ts — createTournament(fastMode, profile?) sends the
+  optional profile field.
+- frontend/src/components/Copyright.tsx — footer changed from
+  "© 2026 NEXORA — Created by Mehrdad Abedin" to
+  "© 2026 — Created by Mehrdad Abedin". NEXORA removed repo-wide (sources and
+  rebuilt assets; grep clean). TrainingPage + /training route preserved intact.
+- frontend/src/styles/bot-profiles.css (new) — scoped styles, desktop + mobile.
+- frontend/src/main.tsx — imports bot-profiles.css.
+- tests: frontend/tests/botProfiles.test.tsx (new, 6 tests),
+  version_footer.test.tsx + landing.test.tsx footer assertions updated to the
+  new copyright text.
+
+BOT profiles implemented: Alex (Tight-Aggressive), Sarah (Loose-Aggressive),
+David (Tight-Passive), Emma (Loose-Passive); local initials avatars (no external
+assets, generic non-identifying).
+
+Profile -> table creation: selection stored in localStorage (icm_bot_profile);
+START PRACTICE / training calls pass profile?.backend into POST
+/api/tournament {players, fast_mode, profile}; backend maps the name to the AI
+personality via personalities.profile_for and applies it to the bots' decision
+provider at session start. All existing poker/engine logic untouched; the only
+API change is the additive optional `profile` field.
+
+NEXORA removal: footer only (the sole user-facing occurrence); repo-wide grep
+clean; rebuilt dist clean.
+
+Tests executed:
+- Frontend full suite: 18 files, 111 passed (was 105; +6 new).
+- Backend full suite: 530 passed, 3 failed, 4 skipped. The 3 failures are
+  the pre-existing 200-line audit checks (test_project_setup
+  test_code_files_under_200_lines[ts]/[tsx] and test_github_audit): files
+  TablePage.tsx (213), src/webmcp/registerGameTools.ts (380),
+  tests/webmcp.test.ts (434), styles/base.css (204), styles/auth.css (204),
+  styles/landing.css (213). None of these files are modified by this task
+  (verified via git status); they already violated the 200-line rule at task
+  start. game_session.py (my change) was trimmed to exactly 200 lines, so the
+  [py] audit check now passes.
+- TypeScript: npx tsc --noEmit clean.
+- Lint: oxlint not installed in this environment (pre-existing env limitation).
+- Production build: PASSED (vite); dist rebuilt.
+
+Regression: table/game/tournament/AI suites green (see backend subset above);
+bot-profile default path keeps the previous adaptive personality.
+
+Remaining issues: the pre-existing 200-line audit failures described above;
+nothing else outstanding. Working tree not staged/committed/pushed.
+
+
+## A27 - Multi-BOT Profile Selection and Practice Opponent Builder (2026-09-29)
+
+Task: extend A26 BOT PROFILES from one selection to a full 8-BOT opponent
+builder. START PRACTICE first shows RANDOM OPPONENTS / CHOOSE OPPONENTS; CHOOSE
+opens the BOT PROFILES builder (add/remove counts, max 8, repeats allowed); the
+complete lineup is sent to table creation; RANDOM keeps the existing behaviour.
+
+Branch: FIX-POKERTABLE-LAYOUT-TEST.
+Current commit: 82cde7f (A26 feat committed + pushed).
+Starting git status: modified frontend/tsconfig.tsbuildinfo (build artifact);
+untracked docs/design/, docs/webmcp.md, icmbot-hero*.png, webmcp.test.ts,
+logo.png (pre-existing).
+
+Files inspected:
+- prime-agent-spec/atomic_plan.md (A26 added; next ID A27)
+- progress.md (A26 entry)
+- frontend/src/models/botProfiles.ts (A26: 4 profiles + single selection,
+  localStorage icm_bot_profile)
+- frontend/src/pages/BotProfilesPage.tsx (A26 single-select cards)
+- frontend/src/pages/HomePage.tsx (START PRACTICE -> createTournament(10,
+  profile?.backend))
+- frontend/src/services/api.ts (createTournament(profile?))
+- frontend/src/App.tsx (routes; /bot-profiles)
+- backend/app/api/routes_game.py (POST /api/tournament profile validation)
+- backend/app/schemas/game_schemas.py (TournamentCreateRequest.profile)
+- backend/app/services/game_session.py (bot_profile -> provider.personality)
+- backend/app/ai/personalities.py (10 archetypes) + ai_framework.py
+  (AIDecisionProvider holds ONE personality; needs per-seat extension)
+- frontend tests (botProfiles.test.tsx, landing.test.tsx, version_footer)
+- backend tests (test_bot_profiles.py, ai/test_personalities.py)
+
+Planned steps (atomic_plan A27.1..A27.15): inspect / START PRACTICE choice /
+RANDOM preserved / CHOOSE flow / multi-bot builder / repeats allowed / max 8 /
+add-remove controls / connect lineup to table creation / UI (BACK top-right) /
+tests / tsc / build / backend tests / regression.
+
+
+### A27 progress
+- Backend (A27.6/A27.9): per-seat personalities. AIDecisionProvider gained
+  `seat_personalities` and uses the seat's profile during decide() (restoring
+  afterwards); personalities.personalities_for_seats() builds one fresh profile
+  copy per seat; TournamentCreateRequest gained optional `bots: list[str]`;
+  POST /api/tournament validates exactly 8 known names and forwards to
+  GameSession (bot_profiles); GameSession maps seats 1..8. game_session.py kept
+  at exactly 200 lines. Backend tests: +6 (composition, repeats, wrong count,
+  unknown name, no-bots default, per-seat decide). 24/24 pass in
+  test_bot_profiles + test_personalities.
+
+
+### A27 implementation results (2026-09-29)
+
+Flow: HOME -> START PRACTICE -> CHOOSE YOUR OPPONENTS (RANDOM OPPONENTS /
+CHOOSE OPPONENTS). RANDOM keeps the legacy A26 single-profile path (or the
+default random setup); CHOOSE opens the BOT PROFILES lineup builder.
+
+Backend:
+- AIDecisionProvider gained `seat_personalities`; decide() uses the seat's
+  profile when one is mapped (restoring after the call; single-threaded under
+  the session lock). personalities.personalities_for_seats() builds fresh
+  per-seat profile copies (independent adaptive state).
+- TournamentCreateRequest gained optional `bots: list[str]` (max 8);
+  POST /api/tournament validates exactly 8 known archetype names (422
+  otherwise) and forwards to GameSession.bot_profiles; GameSession maps seats
+  1..8 to personalities. `profile` (A26) unchanged; no bots/profile -> previous
+  default behaviour (fully backward compatible). game_session.py kept to 200
+  lines.
+- Backend tests: +6 (composition per-seat, repeats as separate instances,
+  wrong count 422, unknown name 422, no-bots default, per-seat decide). Full
+  suite: 536 passed, 3 failed (pre-existing 200-line audit: TablePage.tsx,
+  webmcp files, base.css, auth.css, landing.css), 4 skipped.
+
+Frontend:
+- New OpponentChoicePage (/start): CHOOSE YOUR OPPONENTS screen; RANDOM
+  (legacy createTournament with stored A26 profile) and CHOOSE (-> /bot-profiles).
+- HomePage START PRACTICE now navigates to /start (no longer creates directly).
+- BotProfilesPage rebuilt as the builder: + / - counters per profile, count
+  never < 0, total never > 8, OPPONENTS N / 8, YOUR OPPONENTS summary,
+  ADD BOTS TO TABLE (requires exactly 8; "Please select 8 opponents to fill the
+  tournament." otherwise), BACK top-right (returns to previous screen).
+- botProfiles.ts: lineup model (icm_bot_lineup), MAX_BOTS = 8, lineupFromCounts.
+- api.ts createTournament(fastMode, profile?, bots?).
+- Tests: frontend +12 new (choice, random legacy, choose -> builder, counts,
+  repeats, max 8, exact-8 requirement, example lineup payload, BACK, menu,
+  footer). Full frontend suite: 117 passed / 18 files.
+
+Validation: tsc clean; production build PASSED; desktop + mobile (390px)
+rendered with no horizontal overflow; visual flow verified end-to-end
+(choice -> builder counts -> BACK to /start).
+
+Poker engine untouched: dealing, betting, rotation, Button/SB/BB, tournament,
+ICM, timers, hand history, auth, sessions, layout are unchanged; only the AI
+provider's personality selection became per-seat when a lineup is supplied.
+
+git status: A27 changes are uncommitted (not staged). atomic_plan.md A27 and
+this progress entry are part of the working-tree changes. Nothing pushed.
+
+
+## A28 - Display BOT profile names at the poker table (2026-09-29)
+
+Branch: FIX-POKERTABLE-LAYOUT-TEST (HEAD 5ddbf66, A27 committed+pushed).
+Starting status: modified frontend/tsconfig.tsbuildinfo; untracked docs/design/,
+docs/webmcp.md, icmbot-hero*.png, webmcp.test.ts, logo.png (pre-existing).
+Files inspected: backend/app/tournament/tournament.py (build_default_tournament
+names bots "Bot N"), backend/app/services/game_session.py (session init),
+backend/app/ai/personalities.py (archetypes), backend/app/services/
+game_state_view.py (state exposes player.name), frontend/src/components/
+PokerSeat.tsx (renders player.name), tests/table.test.tsx (PokerTable renders
+seat names from state).
+Plan: backend display-name mapping + per-profile numbering; apply to BOT seats
+only when a lineup/profile is given; random mode unchanged; tests; tsc; build.
+
+
+### A28 implementation results (2026-09-29)
+
+Files changed (working tree, uncommitted):
+- backend/app/ai/personalities.py — PROFILE_DISPLAY_NAMES (tag->Alex, lag->Sarah,
+  tight_passive->David, loose_passive->Emma) + display_bot_names() numbering
+  per profile occurrence (Alex 1, Alex 2, ...).
+- backend/app/services/game_session.py — when a custom lineup (bot_profiles) or
+  single profile (bot_profile) is supplied, the 8 BOT seats get the profile
+  display names; random mode (no lineup/profile) leaves "Bot N" unchanged.
+  File kept at exactly 200 lines.
+- backend/tests/test_bot_profiles.py — +5 A28 tests (per-occurrence numbering,
+  repeats, identity uniqueness, no-lineup fallback, single-profile case).
+- frontend/tests/table.test.tsx — +1 PokerTable test rendering profile names.
+- prime-agent-spec/atomic_plan.md (A28), progress.md (this entry).
+
+Display-name implementation: cosmetic rename at session creation, only for
+custom lineups/profile. Per-profile counters (not seat numbers). Player/seat/
+session IDs, hand-history identity and all engine logic unchanged; the human
+seat keeps the authenticated username.
+
+Tests: frontend full suite 118 passed / 18 files; backend full suite
+541 passed, 3 failed (pre-existing 200-line audit on untouched files), 4
+skipped; tsc clean; production build PASSED. Visual (real browser, API-stub):
+seat names render Alice / Alex 1..2 / Sarah 1 / David 1..3 / Emma 1..2 at
+1440x900; no seat-layout change needed.
+
+
+## A29 - Integrate BOT profile portrait images (2026-09-29)
+
+Branch: FIX-POKERTABLE-LAYOUT-TEST (HEAD 5ddbf66).
+Assets: the four 430x430 portraits are at docs/design/ and were copied into the
+app location frontend/public/images/bot-profiles/ (docs/design untouched).
+Plan: replace the initials/avatar circles in BotProfilesPage with the portrait
+images, keep colored identity + all existing card controls, update the focused
+test, verify desktop/mobile.
+
+
+### A29 implementation results (2026-09-29)
+- The four 430x430 portraits (docs/design/*.png) were copied into the app
+  location frontend/public/images/bot-profiles/ (docs/design untouched).
+- BotProfilesPage avatar: initials circle replaced with <img class=bot-portrait>
+  (object-fit cover, round avatar with 3px coloured ring per profile: green/blue/
+  purple/red). botProfiles.ts BotAvatar {portrait, color}; paths updated.
+- Focused test: builder cards render the four portrait srcs. Tables/landing/
+  footer tests unchanged.
+- Validation: frontend 119/119 (18 files), tsc clean, build PASSED (portraits
+  in dist), backend test_bot_profiles green. Visual desktop 1440 + mobile 390:
+  all four portraits load (430px), no horizontal overflow.
+
+
+## A31 - Fix silent 401 session failure (2026-09-29)
+
+Root cause confirmed (deployed layout-test site): backend keeps sessions
+in-process; a stale token makes POST /api/tournament return 401, which addBots
+swallowed silently. Fix: on AuthError(401) -> clearAuth() + navigate("/login",
+{state:{authNotice}}); HomePage login view renders the notice
+(.auth-notice, data-testid auth-session-notice). Non-401 errors unchanged.
+Files: frontend/src/pages/BotProfilesPage.tsx, frontend/src/pages/HomePage.tsx,
+frontend/src/services/api.ts (export AuthError), frontend/src/styles/
+auth-footer.css (.auth-notice), tests/botProfiles.test.tsx (+1 401 test).
+Validation: frontend 120/120 (18 files), tsc clean, build PASSED.
+
+
+## A35 - Add BOT profile portraits inside existing poker-table seats (2026-09-29)
+
+Visual-only. Backend state view now includes an additive per-player `profile`
+(A28 identifier; None for human/default tables) via game_state_view + the
+PlayerStateModel schema. Frontend: PlayerView.profile; botProfilePortrait()
+reuses the four portrait assets; PokerSeat renders an absolute 30px (28px
+mobile) circular portrait in the top-right of non-hero seats with the profile's
+ring color. Human seat and seat geometry unchanged.
+Files: backend/app/services/game_state_view.py, backend/app/schemas/
+game_schemas.py, backend/tests/test_bot_profiles.py, frontend/src/models/game.ts,
+frontend/src/models/botProfiles.ts, frontend/src/components/PokerSeat.tsx,
+frontend/src/styles/seats.css, frontend/tests/table.test.tsx, docs.
+Validation: frontend 121/121 (18 files), tsc clean, build PASSED; visual
+desktop 1440x900 + mobile 390x844 (8 portraits, hero excluded, no overflow,
+no text overlap, seat boxes unchanged).
+
+## A47 - ICMBOT landing page rebuild (2026-10-11)
+
+Task: rebuild the public landing page from the A47 spec as split components,
+with the new ICMBOT identity: dark palette, Archivo/Instrument Sans, a cropped
+robot hero, the pinned "TRY ONE SPOT" coach quiz, a real table+coach
+screenshot, the four bot profiles, nine WHAT YOU GET cards, FAQ, final CTA with
+conditional Continue with Google, landing-only WebMCP tools
+(watch_demo/start_training/explain_icm), SEO index.html, and a cleaned
+public/videos directory. All gates must stay green; every touched source file
+stays within the 200-line cap.
+
+Branch: feat/landing-a47 (A47 commit series on top of 2065b0c).
+
+### A47 implementation results (2026-10-11)
+
+Frontend (frontend/src/pages/LandingPage.tsx reassembled as 10 split sections
+under src/landing/, each well under 200 lines):
+- Header: solid #07080A band (nothing shows through), BrandLogo left, desktop
+  section links (What is ICM / How it works / Opponents / FAQ, hidden on
+  phones), LOGIN (gold outline) and SIGN UP (blue #0B6CF0) right.
+- Hero: two columns. Left: kicker TOURNAMENT POKER TRAINER, real H1 MASTER
+  YOUR TOURNAMENT DECISIONS, the 8-bot sub line, START TRAINING FREE (gold
+  #F2B33D, dark text, -> /login) and WATCH DEMO (outline, smooth-scrolls to
+  #lp-demo), plus "Practice only, no real money . Plays in your browser and
+  on Android". Right: hero-robot.webp, a crop of ICMBOT_target_hero.png
+  (x 640-1665, y 106-905, no baked text) whose left 180 px fade into the
+  page background. The old invisible click areas are removed.
+- Video section "SEE ICM BOT IN ACTION": the current player and poster stay
+  (ICM_BOT_demo_bot_profiles_narrated.mp4 + ICMBOT_video_poster.png).
+- TRY ONE SPOT quiz (v2 after PR review; v1's 18-BB A♥Q♠ spot was not
+  reachable on a 9-player table): a real bubble spot — 4 players left, 3 paid
+  (the engine's BUBBLE stage), payouts 50/30/20, hero KJo 14 BB in the big
+  blind, chip leader (40 BB) shoved from the SB, short stack at 3 BB. CALL
+  and FOLD both reveal the coach's answer, computed by the real backend
+  engine (Coach() on the exact CoachRequest) and pinned by
+  backend/tests/test_landing_spot.py: FOLD (ICM pressure VERY HIGH), and the
+  reveal shows only the action, the ICM pressure, a plain 1-2 sentence
+  explanation and whether the pick matched the coach (no "Est. equity", no
+  raw reasoning string).
+- THE COACH: real Playwright screenshot of the live table with the coach
+  panel (demo user "Hero", backend + built frontend running locally), saved
+  as public/images/table-coach.webp at 44 KB, plus the three points (one
+  clear action / reason in one line / tournament picture: ICM pressure,
+  bubble, stack band, risk premium, pot odds, SPR).
+- HOW IT WORKS (Sign up or Google / Choose your opponents / Play and get
+  graded PREFERRED / ACCEPTABLE / SUBOPTIMAL); YOUR OPPONENTS from
+  models/botProfiles.ts (portrait webp, name, style, description);
+  WHAT YOU GET: exactly 9 cards (Exact ICM, Test mode, Hand review, Leak
+  finder, Push/fold and ranges, Real tournament structure, Works with AI
+  agents (WebMCP), Phone and Android app, Eight opponent seats).
+- FAQ: exactly three items (real money? no / know ICM? no / phone? yes);
+  "Is it free?" is deliberately absent.
+- Final CTA "PLAY YOUR FIRST TOURNAMENT TODAY." with START TRAINING FREE and
+  Continue with Google ONLY when /api/auth/providers reports google;
+  tournament-champion.webp on the right. Footer: tagline, Privacy, Terms,
+  Cookie settings (window event re-opens the AnalyticsConsentBanner editor),
+  "(c) 2026 ICMBOT. Practice only."
+- Landing-only WebMCP tools watch_demo / start_training / explain_icm using
+  the same register pattern as src/webmcp (WeakMap per model context,
+  AbortController, settle-all, silent failures); registered only while the
+  landing page is mounted.
+- index.html: title "ICMBOT", meta description, Open Graph + Twitter tags
+  with the 1200x630 og-1200x630.jpg, user-scalable=no removed; Archivo +
+  Instrument Sans loaded from Google Fonts with system fallback stacks.
+- Styles split into landing.css / landing-hero.css / landing-sections.css /
+  landing-quiz.css / landing-coach.css / landing-faq.css under the
+  #07080A / #0C0E13 / #12151C / #232836 / #F2B33D / #0B6CF0 palette.
+
+Assets:
+- public/images/hero-robot.webp (new, 71 KB): the spec crop with the left
+  edge faded into the background.
+- public/images/table-coach.webp (new, 44 KB, under the 150 KB cap).
+- public/images/tournament-champion.webp (new, 171 KB; the PNG stays for the
+  winner screen).
+- public/images/bot-profiles/*.webp (new, 16-20 KB each; the PNGs stay for
+  the app pages).
+- public/images/og-1200x630.jpg (new, 1200x630, 111 KB).
+- public/videos: deleted the five unused files (ICMBOT_demo_narrated.mp4,
+  ICM_MASTER_demo.mp4, ICM_MASTER_demo_narrated.mp4, icm-master-demo.mp4,
+  ICMBOT_poster.png); only the used video and its poster remain.
+
+Tests:
+- backend/tests/test_landing_spot.py (new, 2 tests): pins the quiz action,
+  alternative, confidence, reasoning and every printed detail row.
+- frontend/tests/landing.test.tsx (rewritten, 13 tests): header solidity,
+  hero H1/actions/robot webp, no hit areas, WATCH DEMO scroll, demo player +
+  poster, quiz reveal from both buttons, coach screenshot + 3 points,
+  how-it-works grades, 4 opponents, 9 perks, FAQ (no "Is it free?"), final
+  CTA + footer, Google CTA conditional on /api/auth/providers.
+- frontend/tests/landing_webmcp.test.ts (new, 6 tests): registration list,
+  tool execution, explain_icm data = pinned facts, dedupe/cleanup, retry
+  lifecycle.
+
+Validation:
+- Backend: 605 passed, 4 skipped (ruff + mypy clean).
+- Frontend: 31 files, 203 passed; tsc clean; oxlint clean; vite build
+  PASSED.
+- 200-line audit: no source file over 200 lines.
+- Browser check (Playwright, real build): desktop 1440 and mobile 375 show
+  no horizontal scroll (scrollWidth == viewport); section links hidden on
+  phones; quiz reveal works; fonts/meta/OG tags served from the new
+  index.html.
+
+Not touched (per task): table, coach (TablePage/CoachPanelView/TableSidebar/
+TournamentWinner, their hooks and CSS), backend game engine files.
+
+git status: all A47 work committed on feat/landing-a47; backend data/
+users.json created by the local screenshot run stays gitignored.
+
+Second pass (2026-10-11, mockup-matched; PR #22 merged into
+FIX-POKERTABLE-LAYOUT-TEST first and the mockup measured with Playwright):
+- Hero image re-cropped to x 772-1665 (baked text ends at x=758, aces start
+  at x=793; both aces fully visible), 12px edge blend instead of the 200px
+  fade.
+- Header section links are now buttons that smooth-scroll via scrollToSection
+  with scroll-margin-top on the sections: the app is a HashRouter, so
+  href="#faq" would change the route. Vitest proves clicking FAQ scrolls and
+  leaves location.hash unchanged.
+- Header + hero content on a ~1240px centred column; hero buttons and the
+  "Practice only..." line match the mockup (left-aligned under the buttons).
+- Final CTA is one rounded card (#12151C, 1px #2B3142 border, 24px radius):
+  heading "PLAY YOUR FIRST TOURNAMENT TODAY.", sub "Nine players. One
+  champion. Will it be you?", gold START TRAINING FREE + white Continue with
+  Google pill (with the Google G), champion artwork filling the right half
+  (object-fit cover). Footer is a single row: gold tagline left, Privacy /
+  Terms / Cookie settings centre, "© 2026 ICMBOT. Practice only. No
+  real-money gambling." right; stacks on phones.
+- og:url and og:image (and twitter:image) now use https://icmbot.one
+  (og image at /images/og-1200x630.jpg); Archivo 900 added to the font link.
+
+## A48 - Landing hero fold fix + reproducible promo video (2026-10-11)
+
+Task: Step 1 fits the landing hero above the fold on short desktop viewports
+(1245x650) via the CSS above and exposes the sticky header height as
+--lp-header-h; Step 2 builds a reproducible Playwright promo recorder in
+scripts/record-promo/ that drives the app through its WebMCP tools, records
+1920x1080, and encodes an H.264 MP4 under 10 MB with captions and a WebP
+poster, wired into the landing demo slot.
+
+### A48 implementation results (2026-10-11)
+
+Step 1 (hero fold, one commit): `.lp-hero` is now 16px/40px vertical
+padding; `.lp-hero-inner` is a full-width box with `padding-inline:
+clamp(20px, 4vw, 48px)`, `gap: 48px`, `align-items: center`; above 900px
+`.lp-hero-img` uses `height: clamp(340px, calc(100svh - var(--lp-header-h,
+77px) - 56px), 560px)` with `object-fit: cover`, `object-position: 0% 50%`
+and a 16px radius; below 900px the natural aspect stays. The header height
+is exposed as `--lp-header-h` on `.landing-page` and reused for
+scroll-margin-top. Browser-verified at 1245x650 (hero bottom at the fold,
+copy 48px from the left, both aces visible), 1440x900 and 375x812
+(unchanged image sizing, zero horizontal scroll).
+
+Step 2 (promo video, one commit): `scripts/record-promo/` is a reproducible
+Playwright recorder. It starts backend (uvicorn :8000) and vite dev (:5173)
+when down, creates a `Hero` account through POST /api/auth/register with a
+random password (stored only in the gitignored
+scripts/record-promo/.venv/hero-credentials.json), injects a stand-in
+document.modelContext.registerTool before the app loads (tools collected on
+window.__webmcp), and drives the table ONLY through get_game_state / fold /
+check / call / bet / all_in / next_hand / show_hand_result, following the
+coach panel recommendation every turn. The recording (1920x1080) covers:
+landing hero -> TRY ONE SPOT reveal -> sign-in -> choose opponents -> 4
+hands with the coach panel and the moving dealer button -> hand review ->
+sidebar OVERALL PERFORMANCE -> champion screen (dev-only ?testWinner=true
+&testWinnerName=Hero) with START NEW SESSION. The cookie consent is preset
+to denied in localStorage (never clicked). The static ffmpeg (imageio-
+ffmpeg in scripts/record-promo/.venv, no drawtext support) concatenates the
+8 transparent caption overlays rendered by Playwright with the overlay
+filter (enable=between), trims the initial blank webm frames, encodes H.264
+MP4 (libx264 preset slow, CRF loop under 10 MB) and extracts the champion
+frame as the WebP poster. Outputs are wired into the landing demo slot
+(frontend/public/videos/ICMBOT_promo.mp4 + ICMBOT_promo_poster.webp); the
+old clip and its poster were deleted; `npm run record:promo` re-runs the
+whole pipeline. Result: 1:04, 8 captions, 3.0 MB MP4, 69 KB poster.
+
+Validation: backend 610 passed / 4 skipped (ruff + mypy clean); frontend
+208 passed (tsc, oxlint, vite build clean); the recorder ran end-to-end
+twice (reproducible) and the promo verified frame-by-frame (hero, quiz,
+hands, review, sidebar, champion).
+
+Second pass (2026-10-11): after merging FIX-POKERTABLE-LAYOUT-TEST (branded
+card backs + face-down BOT cards), the header gained "The Coach" (nav order:
+What is ICM / The Coach / How it works / Opponents / FAQ); the THE COACH
+screenshot was retaken with a bot-profile lineup so seats show
+Alex/Sarah/David/Emma portraits and face-down card backs (54 KB WebP); the
+TRY ONE SPOT cards start face down and flip when the section scrolls into
+view; and the promo was re-recorded at 1280x720 x1.5 device scale (1920x1080
+output), going straight from the quiz into login (the hero no longer
+appears twice), with exactly one caption per scene at its scene mark.
+Narration is REQUIRED female piper-tts voice en_US-hfc_female-medium
+(fallback en_US-amy-medium), scripted in scripts/record-promo/narration.json,
+AAC 128 kbps loudnorm ~-16 LUFS, no music. Final: 1:07, 2.7 MB MP4, 89 KB
+poster.
+
+Third pass (2026-10-11): promo recorder/encoder rebuilt per frame review.
+The recording is the native 1280x720 surface (recordVideo.size 1280x720)
+upscaled to 1920x1080 (lanczos) after the lead trim inside encode.mjs; cues
+are exactly marks+0.45 in the post-trim timeline (voice and captions no
+longer lag); captions wrap (40px/1.25, max-width 1500px, 1920x220 page,
+y=H-h-40) and only actual 3-line wraps split into two cues; the champion
+screen is held for its line + 1.5s (no START NEW SESSION click); 2 hands
+with review->champion dead air removed (analysis.png during the review
+hold) keep every inter-line silence under 4s; loudnorm audio is resampled
+to 48 kHz AAC 128k. check.mjs (run at the end of npm run record:promo)
+verifies no padding grey at (1900,40)/(1900,1060), caption bboxes <=1800px,
+48 kHz audio at -17..-15 LUFS and no >4s line gaps, and renders the labelled
+contact sheet. Final: 43s, 3.0 MB MP4, 93 KB poster, voice
+en_US-hfc_female-medium.

@@ -49,6 +49,48 @@ describe("PokerTable", () => {
   });
 });
 
+
+
+  it("renders BOT profile portraits inside the right seats", () => {
+    const profiles = ["tag", "tag", "lag", "lag",
+                      "tight_passive", "tight_passive", "loose_passive", "loose_passive"];
+    const state = sampleTableState();
+    state.players = state.players.map((p, i) =>
+      i === 0 ? p : { ...p, profile: profiles[i - 1] });
+    render(<PokerTable state={state} />);
+    // human seat has no portrait
+    expect(screen.getByTestId("seat-0").querySelector(".seat-bot-portrait")).toBeNull();
+    // each BOT seat shows its profile portrait
+    const expected = [
+      ["seat-1", "alex.png", "Alex bot profile"],
+      ["seat-2", "alex.png", "Alex bot profile"],
+      ["seat-3", "sarah.png", "Sarah bot profile"],
+      ["seat-4", "sarah.png", "Sarah bot profile"],
+      ["seat-5", "david.png", "David bot profile"],
+      ["seat-6", "david.png", "David bot profile"],
+      ["seat-7", "emma.png", "Emma bot profile"],
+      ["seat-8", "emma.png", "Emma bot profile"],
+    ];
+    for (const [seat, file, alt] of expected) {
+      const img = screen.getByTestId(seat).querySelector(".seat-bot-portrait");
+      expect(img).not.toBeNull();
+      expect((img as HTMLImageElement).getAttribute("src")).toBe(`/images/bot-profiles/${file}`);
+      expect((img as HTMLImageElement).getAttribute("alt")).toBe(alt);
+    }
+    // names are unchanged by the portraits
+    expect(screen.getByTestId("seat-1").textContent).toContain("Bot 1");
+  });
+  it("renders profile-based BOT display names", () => {
+    const names = ["Alex 1", "Alex 2", "Sarah 1", "David 1", "David 2", "David 3", "Emma 1", "Emma 2"];
+    const state = sampleTableState();
+    state.players = state.players.map((p, i) => (i === 0 ? p : { ...p, name: names[i - 1] }));
+    render(<PokerTable state={state} />);
+    for (const name of names) {
+      expect(screen.getByText(name)).toBeInTheDocument();
+    }
+    expect(screen.getByText("Alice")).toBeInTheDocument(); // human seat unchanged
+  });
+
 describe("TablePage", () => {
   it("renders the screen with title (API mock)", async () => {
     vi.mock("../src/services/api", async (importOriginal) => ({

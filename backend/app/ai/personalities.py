@@ -7,7 +7,7 @@ bounded to [0, 1].
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 
 @dataclass(slots=True)
@@ -76,6 +76,9 @@ def profiles() -> list[PersonalityProfile]:
         _p("loose", 0.52, 0.22, 0.07, 0.45, 0.18, 0.65, 0.22, 0.04),
         _p("lag", 0.48, 0.36, 0.15, 0.90, 0.38, 0.42, 0.20, 0.10),
         _p("passive", 0.28, 0.06, 0.02, 0.20, 0.05, 0.70, 0.25, 0.01),
+        # BOT Profiles (A26): the two passive archetypes missing from the set.
+        _p("tight_passive", 0.15, 0.04, 0.02, 0.18, 0.04, 0.55, 0.55, 0.01),
+        _p("loose_passive", 0.55, 0.08, 0.03, 0.20, 0.06, 0.85, 0.15, 0.01),
         _p("balanced", 0.28, 0.17, 0.09, 0.55, 0.16, 0.50, 0.35, 0.05),
         adaptive_profile(),
     ]
@@ -97,3 +100,40 @@ def assign_personalities(count: int) -> list[str]:
     """Cycle through the eight archetypes for `count` computer seats."""
     pool = [p.name for p in profiles()]
     return [pool[i % len(pool)] for i in range(count)]
+
+
+def personalities_for_seats(bot_names: list[str]) -> dict[int, PersonalityProfile]:
+    """Map each bot seat (1..n) to a fresh copy of its personality (A27).
+
+    The copies keep additive history (results) independent between seats so
+    adaptive profiles never leak across bot instances.
+    """
+    return {
+        seat: replace(profile_for(name), results=list(profile_for(name).results))
+        for seat, name in enumerate(bot_names, start=1)
+    }
+
+
+# A28: human-style display names for the four BOT profiles. Anything not listed
+# falls back to the archetype name itself.
+PROFILE_DISPLAY_NAMES: dict[str, str] = {
+    "tag": "Alex",
+    "lag": "Sarah",
+    "tight_passive": "David",
+    "loose_passive": "Emma",
+}
+
+
+def display_bot_names(bot_names: list[str]) -> list[str]:
+    """Profile display names numbered per profile occurrence.
+
+    ["tag", "tag"] -> ["Alex 1", "Alex 2"]; a mixed lineup numbers each
+    profile separately (Alex 1, David 1, Alex 2, ...).
+    """
+    seen: dict[str, int] = {}
+    names: list[str] = []
+    for backend in bot_names:
+        seen[backend] = seen.get(backend, 0) + 1
+        base = PROFILE_DISPLAY_NAMES.get(backend, backend)
+        names.append(f"{base} {seen[backend]}")
+    return names

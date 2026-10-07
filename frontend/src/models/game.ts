@@ -12,12 +12,15 @@ export interface PlayerView {
   name: string;
   stack: number;
   stackInBB: number;
-  position: string;
+  position: string | null;
   bet: number;
   folded: boolean;
   isHero: boolean;
   isDealer: boolean;
   sitsOut: boolean;
+  awaitingReentry?: boolean;
+  /** A28 profile identifier for BOT seats (e.g. "tag"), absent otherwise. */
+  profile?: string | null;
   holeCards?: Card[]; // only present for the hero
 }
 
@@ -95,6 +98,7 @@ export interface TableState {
   tableLabel?: string;
   username?: string | null;
   handNumber: number;
+  heroFinishPlace?: number | null;
   players: PlayerView[];
   actionLog?: TableAction[];
   playersRemaining?: number;
@@ -131,28 +135,30 @@ export interface LegalAction {
 
 // Semantic full-word names for accessibility (A17 professional cards).
 // 8 + h => "8 of Hearts"; A + s => "Ace of Spades"; T + d => "10 of Diamonds".
-const RANK_WORD: Record<string, string> = {
-  A: "Ace", K: "King", Q: "Queen", J: "Jack", T: "10",
-  "9": "9", "8": "8", "7": "7", "6": "6", "5": "5", "4": "4", "3": "3", "2": "2",
-};
-export const SUIT_WORD: Record<Suit, string> = {
-  s: "Spades", h: "Hearts", d: "Diamonds", c: "Clubs",
-};
+const RANK_WORD: Record<string, string> = { A: "Ace", K: "King", Q: "Queen", J: "Jack", T: "10", "9": "9", "8": "8", "7": "7", "6": "6", "5": "5", "4": "4", "3": "3", "2": "2" };
+export const SUIT_WORD: Record<Suit, string> = { s: "Spades", h: "Hearts", d: "Diamonds", c: "Clubs" };
 
 // Fixed 9-max seat order, shared by the sample state and the practice tools.
 export const POSITIONS_9MAX = ["UTG", "UTG+1", "MP", "LJ", "HJ", "CO", "BTN", "SB", "BB"];
 
 // Shared by ActionHistory and BotExplanations; PokerTable uses its own
 // upper-case, past-tense labels for the in-seat badge and stays separate.
-export const ACTION_LABEL: Record<string, string> = {
-  fold: "Fold", check: "Check", call: "Call", bet: "Bet", raise: "Raise", all_in: "All-in",
-};
-
+export const ACTION_LABEL: Record<string, string> = { fold: "Fold", check: "Check", call: "Call", bet: "Bet", raise: "Raise", all_in: "All-in" };
 export const cardAlt = (card: Card): string =>
   `${RANK_WORD[card.rank] ?? card.rank} of ${SUIT_WORD[card.suit]}`;
 
 export function formatChips(value: number): string {
   return value.toLocaleString("en-US");
+}
+
+/** Sole survivor is the tournament champion (hero or BOT); null otherwise. */
+export function tournamentChampion(
+  state: { playersRemaining?: number; players: PlayerView[] },
+): PlayerView | null {
+  const survivors = state.playersRemaining ?? state.players.length;
+  if (survivors !== 1) return null;
+  const active = state.players.filter((player) => !player.sitsOut);
+  return active.length === 1 ? active[0] : null;
 }
 
 /** Shared shape for the ICM coach's advice on the current decision, rendered
@@ -184,4 +190,11 @@ export function reviewResultMeta(review: HandReview): { title: string; subtitle:
 export function chipsInBB(stack: number, bigBlind: number): number {
   if (bigBlind <= 0) return 0;
   return Math.round((stack / bigBlind) * 10) / 10;
+}/** One completed hand served by GET /api/game/{tableId}/hands (owner only):
+ * net is the hero's chip result for the hand. */
+export interface HandHistoryEntry {
+  handNumber: number; heroPosition: string; pot: number; winnerSeats: number[];
+  stage: string; net: number; heroDecision: string | null;
+  coachRecommendation: string | null; grade: string | null;
+  level: number; blindLevel: string;
 }

@@ -1,0 +1,156 @@
+/* Tournament champion screen. Covers the whole .table-wrap (info bars, felt,
+ * hand result, action buttons); the page header sits outside it and stays
+ * visible. Every artwork position below is a percentage of the artwork box,
+ * which has the image's own aspect ratio (1671 x 941), so no letterboxing
+ * shifts the plaque. Coordinates were measured on tournament-champion.png. */
+.tournament-winner {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background: rgba(4, 7, 10, 0.92);
+  border-radius: 12px;
+  container-type: size;
+}
+
+.tournament-winner-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Widest box that still leaves room for the button below it. */
+.tournament-winner-art {
+  position: relative;
+  aspect-ratio: 1671 / 941;
+  width: min(100cqw - 16px, (100cqh - 76px) * 1671 / 941);
+}
+
+.tournament-winner-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Plaque: x 32.7%-67.1%, y 56.0%-71.6% of the artwork. Children are placed
+ * by artwork y, converted to plaque percentages. */
+.tournament-winner-plaque {
+  position: absolute;
+  left: 32.7%;
+  right: 32.9%;
+  top: 56%;
+  bottom: 28.4%;
+  container-type: inline-size;
+  pointer-events: none;
+}
+
+.tournament-winner-title,
+.tournament-winner-name {
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  transform: translateY(-50%);
+  text-align: center;
+  white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
+}
+
+.tournament-winner-title {
+  top: calc((60.7 - 56) / 15.6 * 100%);
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  color: #f2c14e;
+  font-size: clamp(0.55rem, 1.1vw, 1rem);
+}
+
+.tournament-winner-divider {
+  position: absolute;
+  left: 12%;
+  right: 12%;
+  top: calc((65.2 - 56) / 15.6 * 100%);
+  height: 1px;
+  background: #f2c14e;
+}
+
+/* --name-chars (6-24, set inline) shrinks long names to the plaque width;
+ * 0.62em is the average bold glyph width. Past 24 characters: ellipsis. */
+.tournament-winner-name {
+  top: calc((68.4 - 56) / 15.6 * 100%);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 800;
+  color: #fff;
+  font-size: min(clamp(0.7rem, 1.5vw, 1.4rem), 92cqi / (var(--name-chars) * 0.62));
+}
+
+/* Bot champion: cover the painted "YOU WON THE TOURNAMENT!" strip
+ * (x 35%-67%, y 74%-78.7%) with the hero's finishing place. */
+.tournament-winner-place {
+  position: absolute;
+  left: 35%;
+  right: 33%;
+  top: 74%;
+  bottom: 21.3%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0a141c;
+  border-radius: 6px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #f2c14e;
+  font-size: clamp(0.5rem, 1.1vw, 1rem);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.tournament-winner-new {
+  min-height: 44px;
+  padding: 0 28px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.reentry-modal {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  width: min(86%, 420px);
+  padding: 22px;
+  background: rgba(20, 24, 29, 0.97);
+  border: 1px solid rgba(242, 193, 78, 0.55);
+  border-radius: 14px;
+  text-align: center;
+  color: var(--text);
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.6);
+}
+
+.reentry-title {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+
+.reentry-modal p {
+  margin: 6px 0;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.reentry-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 14px;
+}

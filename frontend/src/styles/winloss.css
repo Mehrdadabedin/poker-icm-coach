@@ -1,0 +1,182 @@
+/* A18 — WIN / LOSE ANALYSIS inside the existing right-side panel.
+   Scoped to .wl-*; reuses the panel's dark background, --accent gold and the
+   same green/red the hand history uses for win/loss actions. The poker table
+   and the existing HAND HISTORY styles are untouched. */
+
+.wl-analysis {
+  padding: 2px 0 0;
+  font-size: 0.72rem;
+  color: var(--text);
+}
+
+.wl-section {
+  margin: 8px 0;
+  background: #1d242c;
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.wl-title {
+  margin: 0 0 6px;
+  color: var(--accent);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.wl-donut-row {
+  display: flex;
+  justify-content: center;
+  gap: 26px;
+}
+
+.wl-ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+.wl-ring-label {
+  color: var(--text);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.wl-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px 10px;
+  margin: 8px 0 0;
+  font-size: 0.68rem;
+}
+
+.wl-metric {
+  line-height: 1.25;
+  color: var(--muted);
+}
+
+.wl-metric dd {
+  margin: 0;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.wl-level {
+  margin: 6px 0;
+}
+
+.wl-level[data-current="true"] .wl-level-name {
+  color: var(--accent);
+}
+
+.wl-level-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 0.68rem;
+}
+
+.wl-level-name {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.wl-level-blinds {
+  color: var(--muted);
+}
+
+.wl-level-current {
+  background: var(--accent);
+  color: #17191b;
+  border-radius: 4px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  padding: 0 5px;
+}
+
+.wl-level-pct {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.wl-bar {
+  display: flex;
+  height: 10px;
+  margin-top: 3px;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.wl-bar-win {
+  background: var(--wl-win, #81c784);
+}
+
+.wl-bar-loss {
+  background: var(--wl-loss, #ff8f8f);
+}
+
+.wl-position {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 5px 0;
+}
+
+.wl-position .wl-ring {
+  flex: 0 0 60px;
+}
+
+.wl-position .wl-ring-label {
+  font-size: 0.68rem;
+}
+
+.wl-position-meta {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.wl-position-name {
+  color: var(--text);
+  font-weight: 700;
+  font-size: 0.72rem;
+}
+
+.wl-position-rate {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.wl-position-count {
+  color: var(--muted);
+  font-size: 0.66rem;
+}
+
+/* Selector in the panel head, styled to match the existing toggle button. */
+.history-view-select {
+  font-size: 0.7rem;
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.history-view-select select {
+  background: #243040;
+  border: 1px solid #35455a;
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  min-height: 24px;
+  padding: 2px 6px;
+}
+
+.wl-empty {
+  color: var(--muted);
+  padding: 8px 0;
+  font-size: 0.72rem;
+}

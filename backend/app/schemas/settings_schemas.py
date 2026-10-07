@@ -1,6 +1,8 @@
 """Schema for the shared tournament-settings update route."""
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
@@ -23,3 +25,4 @@ class SettingsUpdate(BaseModel):
     fast_mode: bool | None = None
     show_action_labels: bool | None = None
     show_result_labels: bool | None = None
+    card_back: Literal["blue", "red"] | None = None

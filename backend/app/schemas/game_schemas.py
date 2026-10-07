@@ -34,12 +34,14 @@ class PlayerStateModel(BaseModel):
     name: str
     stack: int
     stackInBB: float
-    position: str
+    position: str | None
     bet: int
     folded: bool
     isHero: bool
     isDealer: bool
     sitsOut: bool
+    awaitingReentry: bool = False
+    profile: str | None = None
     holeCards: list[CardModel] | None = None
 
 
@@ -124,6 +126,7 @@ class HandReviewModel(BaseModel):
 
 class GameStateModel(BaseModel):
     tableId: str
+    heroFinishPlace: int | None = None
     tableLabel: str = ""
     status: str = "active"
     username: str | None = None
@@ -159,3 +162,7 @@ class TournamentCreateRequest(BaseModel):
     blind_level_minutes: int | None = Field(default=None, ge=1)
     ante_mode: str = "bba"
     fast_mode: float = Field(default=1.0, ge=1.0)
+    # A26: optional BOT profile personality applied to the table's bots.
+    profile: str | None = Field(default=None, max_length=40)
+    # A27: optional explicit BOT lineup (personality per opponent seat, max 8).
+    bots: list[str] | None = Field(default=None, max_length=8)

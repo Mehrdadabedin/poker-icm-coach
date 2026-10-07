@@ -1,0 +1,87 @@
+/* A47/A48 hero: full-width two columns with inline padding, sized so the
+   whole hero ends above the fold on short desktop viewports. Left is real
+   HTML copy with the H1 and actions; right is the cropped robot artwork
+   (hero-robot.webp) with a 12px left blend, cover-fit above 900px so both
+   aces stay visible. The old baked-text artwork and hit areas are gone. */
+
+.lp-hero {
+  padding-top: 16px;
+  padding-bottom: 40px;
+}
+
+.lp-hero-inner {
+  box-sizing: border-box;
+  padding-inline: clamp(20px, 4vw, 48px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 48px;
+  align-items: center;
+}
+
+.lp-hero-copy { min-width: 0; }
+
+.lp-kicker {
+  margin: 0 0 14px;
+  color: var(--lp-gold);
+  font-family: var(--lp-head);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 2.4px;
+  text-transform: uppercase;
+}
+
+.lp-hero-title {
+  margin: 0 0 16px;
+  max-width: 14ch;
+  color: var(--lp-text);
+  font-family: var(--lp-head);
+  font-size: clamp(2.2rem, 4.8vw, 4.25rem);
+  font-weight: 900;
+  line-height: 1.04;
+}
+
+.lp-hero-sub {
+  margin: 0 0 26px;
+  max-width: 46ch;
+  color: var(--lp-muted);
+  font-family: var(--lp-body);
+  font-size: clamp(0.98rem, 1.5vw, 1.14rem);
+  line-height: 1.5;
+}
+
+.lp-hero-actions { display: flex; flex-wrap: wrap; gap: 14px; }
+.lp-hero-actions .lp-btn { min-height: 56px; padding: 13px 30px; font-size: 0.98rem; }
+
+.lp-hero-legal {
+  margin: 18px 0 0;
+  color: var(--lp-muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.3px;
+  text-align: left;
+}
+
+.lp-hero-visual { min-width: 0; }
+
+.lp-hero-img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* above 900px: fixed-height cover so the hero fits the fold; the left
+   anchor keeps the aces at the image's left edge fully visible */
+@media (min-width: 900px) {
+  .lp-hero-img {
+    width: 100%;
+    height: clamp(340px, calc(100svh - var(--lp-header-h, 77px) - 56px), 560px);
+    object-fit: cover;
+    object-position: 0% 50%;
+    border-radius: 16px;
+  }
+}
+
+/* phones: one column, copy first, robot below full width */
+@media (max-width: 959px) {
+  .lp-hero-inner { grid-template-columns: minmax(0, 1fr); }
+  .lp-hero-actions .lp-btn { width: 100%; }
+}

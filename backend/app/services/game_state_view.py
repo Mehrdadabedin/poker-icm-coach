@@ -3,9 +3,19 @@ from __future__ import annotations
 
 from app.game.actions import legal_actions
 from app.game.hand_setup import in_hand_seats
-from app.game.positions import position_for
+from app.game.positions import position_labels
 from app.poker.card import card_model
 from app.services.hand_review import build_review
+
+
+def _player_profile(session, player) -> str | None:
+    """A28 profile identifier for a player, or None for the human seat and
+    sessions created without a custom BOT lineup/profile."""
+    if player.is_human:
+        return None
+    if session.bot_profiles is not None and 0 < player.seat <= len(session.bot_profiles):
+        return session.bot_profiles[player.seat - 1]
+    return session.bot_profile
 
 
 def build_state_view(session) -> dict:
@@ -15,6 +25,9 @@ def build_state_view(session) -> dict:
     street_contrib = eng._street.contributions
     level = tournament.current_blind_level()
     button = tournament.button
+    active_seats = {p.seat for p in tournament.players
+                    if not p.is_eliminated and not p.sit_out}
+    positions = position_labels(button, active_seats, len(tournament.players))
     players = []
     for p in tournament.players:
         players.append({
@@ -22,12 +35,14 @@ def build_state_view(session) -> dict:
             "name": p.name,
             "stack": p.stack,
             "stackInBB": round(p.stack / max(1, level.big), 1),
-            "position": position_for(button, p.seat, len(tournament.players)),
+            "position": positions.get(p.seat),
             "bet": street_contrib.get(p.seat, 0),
             "folded": p.folded,
             "isHero": p.is_human,
             "isDealer": p.seat == button,
             "sitsOut": p.sit_out or p.is_eliminated,
+            "awaitingReentry": p.awaiting_reentry,
+            "profile": _player_profile(session, p),
             "holeCards": [card_model(c) for c in p.hole_cards] if p.is_human and p.hole_cards else None,
         })
     actor = eng.current_actor
@@ -44,6 +59,7 @@ def build_state_view(session) -> dict:
     active_count = sum(1 for p in tournament.players if not p.is_eliminated)
     return {
         "tableId": session.session_id,
+        "heroFinishPlace": session.hero_finish_place,
         "tableLabel": session.table_label,
         "status": session.status,
         "username": session.owner,

@@ -5,6 +5,10 @@ import { PokerSeat } from "./PokerSeat";
 interface PokerTableProps {
   state: TableState;
   children?: React.ReactNode;
+  /** Optional overlay rendered over the felt (re-entry / hero-out modal). */
+  overlay?: React.ReactNode;
+  /** Covers the whole table area: bars, felt and controls (champion screen). */
+  cover?: React.ReactNode;
 }
 
 const ACT_LABEL: Record<string, string> = {
@@ -17,8 +21,11 @@ const ACT_LABEL: Record<string, string> = {
 };
 
 /** The 9-seat poker table: seats, community board, pot, header info. */
-export function PokerTable({ state, children }: PokerTableProps) {
-  const sorted = [...state.players].sort((a, b) => a.seat - b.seat);
+export function PokerTable({ state, children, overlay, cover }: PokerTableProps) {
+  // A43: an eliminated BOT leaves the felt entirely; the hero seat stays.
+  const sorted = [...state.players]
+    .filter((pl) => !pl.sitsOut || pl.isHero)
+    .sort((a, b) => a.seat - b.seat);
   const isReview = state.phase === "handOver" && !!state.review;
   const review = state.review ?? null;
 
@@ -98,8 +105,10 @@ export function PokerTable({ state, children }: PokerTableProps) {
             <CardView key={i} card={c} />
           ))}
         </div>
+        {overlay}
       </div>
       {children}
+      {cover}
     </div>
   );
 }

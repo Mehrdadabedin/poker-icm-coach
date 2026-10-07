@@ -6,8 +6,8 @@ cards revealed. Bot decision explanations live in bot_review.py.
 """
 from __future__ import annotations
 
-from app.game.hand_setup import active_seats, blind_seats
-from app.game.positions import position_for
+from app.game.hand_setup import blind_seats
+from app.game.positions import position_labels
 from app.poker.card import card_model
 from app.poker.hand_evaluator import best_hand
 from app.poker.hand_rank import CATEGORY_NAMES, HandCategory
@@ -77,24 +77,33 @@ def build_review(session) -> dict | None:
     winning_name = (hand_description(winner_hand) if winner_hand else
                     ("Uncontested (all others folded)" if len(result.showed_down) <= 1 else None))
 
-    active = sorted(active_seats(players))
-    sb, bb = blind_seats(result.button, set(active), len(players))
-    actions = [
-        {"seat": sb, "name": players[sb].name, "action": "small_blind", "amount": level.small, "street": "preflop"},
-        {"seat": bb, "name": players[bb].name, "action": "big_blind", "amount": level.big, "street": "preflop"},
-    ]
+    # The review describes this completed hand, so blinds and chip accounting
+    # use the seats that actually played it. The current active set is wrong at
+    # the endgame: the tournament can already be finished with one survivor
+    # while this result still records the seats that posted the blinds, and
+    # blind_seats() must never see fewer than two seats. (A41)
+    hand_seats = sorted(s for s, start in result.starting_stacks.items() if start > 0)
+    actions = []
+    sb = bb = -1
+    if len(hand_seats) >= 2:
+        sb, bb = blind_seats(result.button, set(hand_seats), len(players))
+        actions = [
+            {"seat": sb, "name": players[sb].name, "action": "small_blind", "amount": level.small, "street": "preflop"},
+            {"seat": bb, "name": players[bb].name, "action": "big_blind", "amount": level.big, "street": "preflop"},
+        ]
     actions += [{"seat": a.seat, "name": players[a.seat].name, "action": a.action,
                  "amount": a.amount, "street": a.street} for a in result.actions]
 
-    committed = {s: 0 for s in active}
-    committed[sb], committed[bb] = level.small, level.big
+    committed = {s: 0 for s in hand_seats}
+    if sb >= 0:
+        committed[sb], committed[bb] = level.small, level.big
     for a in result.actions:
         cap = result.starting_stacks.get(a.seat, 0)
         if a.action in ("bet", "raise", "all_in") and a.amount is not None:
             committed[a.seat] = max(committed.get(a.seat, 0), min(a.amount, cap))
         elif a.action == "call" and a.amount is not None:
             committed[a.seat] = min(cap, committed.get(a.seat, 0) + a.amount)
-    all_in = [s for s in active if result.starting_stacks.get(s, 0) > 0
+    all_in = [s for s in hand_seats if result.starting_stacks.get(s, 0) > 0
               and committed.get(s, 0) >= result.starting_stacks.get(s, 0)]
 
     rb = sorted(result.starting_stacks.values(), reverse=True)
@@ -106,7 +115,8 @@ def build_review(session) -> dict | None:
         "heroSeat": hero, "heroCards": [card_model(c) for c in result.hole_cards.get(hero, [])],
         "heroStart": hero_start, "heroEnd": hero_end,
         "heroNet": hero_end - hero_start, "heroWon": hero_won, "chop": chop,
-        "heroPosition": position_for(result.button, hero, len(players)),
+        "heroPosition": position_labels(result.button, set(hand_seats),
+                                        len(players)).get(hero, ""),
         "heroRankBefore": rb.index(hero_start) + 1, "heroRankAfter": ra.index(hero_end) + 1,
         "winners": winners, "foldedSeats": list(result.folded), "allInSeats": all_in,
         "showdown": showdown, "actions": actions,

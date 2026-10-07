@@ -72,10 +72,15 @@ def import_deck(source: Path | None = None) -> int:
     FRONT.mkdir(parents=True, exist_ok=True)
     n_png = _import_format(src)
 
+    # The branded backs are products of this repo (default back.png plus the
+    # red/blue preference backs). Re-running the importer must never clobber
+    # a customized back: install the stock blue back only when none exists.
     back_png = src / "png cards" / "card backs" / "card back blue.png"
+    target_back = FRONT / "back.png"
     if not back_png.is_file():
         raise SystemExit("missing card back png")
-    shutil.copyfile(back_png, FRONT / "back.png")
+    if not target_back.exists():
+        shutil.copyfile(back_png, target_back)
 
     license_src = src / "LICENSE"
     if license_src.is_file():

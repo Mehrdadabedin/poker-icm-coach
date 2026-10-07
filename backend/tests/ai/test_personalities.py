@@ -13,11 +13,12 @@ from app.ai.personalities import (
 )
 
 
-def test_eight_profiles_exist() -> None:
+def test_ten_profiles_exist() -> None:
     names = {p.name for p in profiles()}
     assert names == {
         "tight", "aggressive", "tag", "loose", "lag",
         "passive", "balanced", "adaptive",
+        "tight_passive", "loose_passive",
     }
 
 
@@ -34,7 +35,7 @@ def test_all_params_in_valid_range() -> None:
 
 def test_profiles_are_distinct() -> None:
     signatures = {(p.name, round(p.vpip, 3), round(p.pfr, 3), round(p.three_bet, 3)) for p in profiles()}
-    assert len(signatures) == 8
+    assert len(signatures) == 10
 
 
 def test_tag_aggregate() -> None:
@@ -56,6 +57,18 @@ def test_tight_has_low_vpip() -> None:
 def test_passive_low_aggression() -> None:
     passive = profile_for("passive")
     assert passive.aggression < 0.3
+
+
+def test_tight_passive_low_vpip_low_aggression() -> None:
+    profile = profile_for("tight_passive")
+    assert profile.vpip < 0.25
+    assert profile.aggression < 0.3
+
+
+def test_loose_passive_high_vpip_low_aggression() -> None:
+    profile = profile_for("loose_passive")
+    assert profile.vpip > 0.4
+    assert profile.aggression < 0.3
 
 
 def test_validate_profile_rejects_out_of_range() -> None:

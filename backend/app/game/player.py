@@ -28,6 +28,7 @@ class Player:
         # side pots must not treat them as a wager anyone has to call.
         self.ante_total = 0
         self.sit_out = False
+        self.awaiting_reentry = False
 
     def new_hand(self) -> None:
         """Reset all per-hand state (called before every new deal)."""

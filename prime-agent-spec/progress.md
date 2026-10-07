@@ -41,7 +41,9 @@ Main requested changes:
 | A13 | Regression tests | 🟢 | Backend 394 passed / 4 skipped; frontend 32 passed; new auth/isolation/label/history + card/result/review/login suites. |
 | A14 | Deployment verification | 🟢 | Deployed frontend reachable; deployed backend preflight 200 + ACAO on errors for Render origin (verified live). Redeploy of this branch required for auth endpoints; multi-browser check listed as remaining step. |
 | A15 | Documentation | 🟢 | progress.md (this file) + repo progress.md updated; .env.example/.gitignore updated. |
+| A16 (landing page) | ICM MASTER public landing page | 🟢 | Owner-labelled A16, distinct from the A16 hand-review row above. Public landing page at `/` for a signed-out visitor (signed-in users still get the existing home screen), `/login` = the existing sign-in screen. Zero-touch auth: LOGIN/SIGN UP/START TRAINING link to `/login`, registration via the login page's own "Sign up" link. New `LandingPage.tsx` + `landing.css` + `tests/landing.test.tsx`; only existing changed files are `App.tsx` (+13/-1) and `main.tsx` (+1 import). tsc/oxlint clean, 68 frontend tests pass, build ok. NEXORA footer preserved. Test frontend only. |
 | A16 | Optional hand review must not interrupt the live game | 🟢 | Implemented with A10: compact result stays on table; review opens only on click; return to table; pause/play intact. |
+| A17 (landing page) | ICM MASTER demo video on the public landing page | 🟢 | Owner-labelled A17, distinct from the A17 card-asset row below. `/home/mehrdad/Downloads/ICM MASATER.mp4` (5.7 MB, H.264+AAC, 25 s, 2:1) copied unchanged to `frontend/public/videos/icm-master-demo.mp4`; placeholder replaced by `<video controls preload="metadata" playsInline>` with a local `<source>`; `.lp-video-el` uses `object-fit: contain` (letterbox) because the clip is 2:1 in a 16:9 slot. No autoplay, no loop, no external host, no dependency. tsc/oxlint clean, 69 frontend tests pass, build ok with the MP4 in `dist/videos/`. Test frontend only. |
 | A17 | Professional playing-card assets (OpenDecks CC0) | 🟢 | OpenDecks 52-card deck installed locally in BOTH PNG and SVG (frontend/public/cards/); production renderer now uses the PNG set (cards/<rank><suit>.png + back.png); CC0 license bundled; mapping layer scripts/import_opendecks_cards.py (validates 52/52 per format); hero seat container fit verified (no clip/overlap, desktop/tablet/mobile); semantic alt text; backend test_card_assets.py (6) + frontend A08/A17 suite. |
 | A18 | Registration-first authentication flow | 🟢 | SIGN IN / SIGN UP entry; username + password + confirm registration with validation; salted PBKDF2 password hashes; duplicate/short rejected; invalid sign-in 401; bearer-token session preserved; users.json best-effort persistence; login.test.tsx + backend auth tests; 400 backend / 37 frontend tests pass. |
 | A19 | WebAuthn / passkey / biometric authentication | 🟡 | PLANNED — NOT IMPLEMENTED |
@@ -51,6 +53,20 @@ Main requested changes:
 | A23 | Hand History table dropdown | 🟡 | PLANNED — NOT IMPLEMENTED |
 | A24 | Hand History / review UX refinement | 🟡 | PLANNED — NOT IMPLEMENTED |
 | A25 | Regression/acceptance tests for future features | 🟡 | PLANNED — NOT IMPLEMENTED |
+| A30 | Admin A01 — Secure Admin access / authorization | 🟢 | Backend `require_admin` dependency on the existing bearer token; admin identity via `ADMIN_USERNAMES` config or persisted `admin` flag; tests `backend/tests/test_admin_auth.py`; plan: admin.md. |
+| A32 | Admin A02 — UserRegistry read-only helpers | 🟢 | Safe snapshot, provider-aware totals and listing in `app/services/user_registry_admin.py`; tests `backend/tests/test_admin_registry.py`; plan: admin.md. |
+| A33 | Admin A03 — Protected Admin Users API | 🟢 | Admin-only `GET /api/admin/users` + `GET /api/admin/users/summary` in `app/api/routes_admin.py`; tests `backend/tests/test_admin_api.py`; plan: admin.md. |
+| A34 | Admin A04 — Admin dashboard shell | 🟢 | Admin shell page, section navigation and placeholders in `frontend/src/pages/AdminPage.tsx`; backend access probe via A03 summary; tests `frontend/tests/admin.test.tsx`; plan: admin.md. |
+| A36 | Admin A05 — Dashboard user metrics | 🟢 | Dashboard renders live Total/Google/Local counts from A03 summary API in `AdminPage.tsx`; tests cover loading/zero/error/401/403; plan: admin.md. |
+| A37 | Admin A06 — Users list + search | 🟢 | Safe account list and client-side search in `frontend/src/components/AdminUsersView.tsx`, consumed via A03 `GET /api/admin/users`; tests `frontend/tests/admin_users.test.tsx`; plan: admin.md. |
+| A38 | Admin A07 — Extensible Admin sections | 🟢 | Centralized typed section registry `frontend/src/components/AdminSections.tsx` drives shell navigation/content; future sections are one registry entry; tests `frontend/tests/admin_sections.test.tsx`; plan: admin.md. |
+| A39 | Hero all-in loss / re-entry cutoff / BOT auto-finish | 🟢 | Re-entry L1-L5 via explicit player choice; no auto 45k restore; L>5 permanent elimination; BOT-only auto-finish to existing champion; tests backend `test_reentry.py`, frontend `reentry.test.tsx`; plan: atomic_plan.md A39. |
+| A40 | Tournament endgame reliability / deep all-in stall | 🟢 | Hand engine no longer starts a hand with <=1 active seat; `blind_seats` guards <2 seats; bots-only endgames reach `finished` + champion; tests `backend/tests/tournament/test_endgame.py`; plan: atomic_plan.md A40. |
+| A42 | Dealer button direction | 🟢 | `next_button` advances +1 (next-hand BTN = this-hand SB); felt CSS mirrored so increasing seat index runs clockwise; seeded multi-hand test pins the hero cycle BB->SB->BTN->CO; tests `test_dealer_button.py`/`test_positions.py`; plan: atomic_plan.md A42. |
+| A43 | Positions only for active players; busted BOTs leave the felt | 🟢 | `position_labels` labels only active seats; 8/7-handed rings drop early positions and keep CO; all `position_for` callers active-aware; frontend hides eliminated BOT seats; tests `test_positions.py`; plan: atomic_plan.md A43. |
+| A44 | Hero out: watch or start a new game | 🟢 | L5+ eliminated hero sees "You finished Nth of 9" with WATCH TO THE END (gated A39 auto-finish) / START NEW GAME (same lineup, new table); backend `heroFinishPlace`; tests `test_hero_finish.py` + reentry.test.tsx; plan: atomic_plan.md A44. |
+| A45 | Tournament end screen | 🟢 | Winner artwork shows CONGRATULATIONS + champion name and (hero lost) YOU FINISHED Nth; backend 400s next_hand on non-active tables before history writes; no auto-next when a champion exists; tests test_finished_state.py + winner.test.tsx; plan: atomic_plan.md A45. |
+| A46 | Stale coach grade banner | 🟢 | Comparison clears when handNumber changes (vitest table_banner.test.tsx); WebMCP tool files split, console.error removed; tests backend pytest + frontend vitest; plan: atomic_plan.md A46. |
 
 ## Known evidence from the supplied screenshots
 
@@ -119,6 +135,35 @@ The browser console/network screenshots show a POST action request returning HTT
 - No Google/Facebook/OAuth; no poker/ICM/card changes; A19-A25 stay PLANNED.
 
 ## Verification log
+
+### 2026-09-23 (A17 landing-page demo video)
+- Asset: `frontend/public/videos/icm-master-demo.mp4` (5,961,614 bytes, sha256
+  verified identical to the source in Downloads, which is untouched).
+- `LandingPage.tsx`: placeholder replaced by a plain HTML5 player
+  (`controls`, `preload="metadata"`, `playsInline`, no autoplay/loop) with
+  `<source src="/videos/icm-master-demo.mp4" type="video/mp4" />`; the section
+  heading and the 16:9 container are unchanged.
+- `landing.css`: `.lp-video-el` `object-fit: cover` -> `contain` + black
+  background, so the 2:1 clip is letterboxed, not cropped or stretched.
+- Checks: tsc clean, oxlint 0/0, 69 frontend tests pass (one new A17 test),
+  `npm run build` ok with `dist/videos/icm-master-demo.mp4` present.
+- Outstanding: browser playback/responsive pass and the test-frontend deployment
+  (automation timed out; nothing was reverted or refactored because of it).
+
+### 2026-09-23 (A16 landing page)
+- New public landing page: `frontend/src/pages/LandingPage.tsx` (header, hero,
+  16:9 demo placeholder, PLAY/REVIEW/IMPROVE, final CTA, NEXORA footer via the
+  existing `Copyright` component) and `frontend/src/styles/landing.css`
+  (scoped to `.landing-page` / `.lp-*`; desktop, tablet, portrait, landscape).
+- Routing: `/` -> landing without a session / existing home screen with one;
+  `/login` -> existing `HomePage`. All other routes untouched.
+- Zero-touch authentication: SIGN UP, LOGIN and START TRAINING all link to
+  `/login`. `LoginForm.tsx` and `HomePage.tsx` are byte-identical to HEAD.
+- Verification: `tsc` clean, `oxlint --deny-warnings` 0/0, `vitest run` 68
+  passed (7 new landing tests), `vite build` ok. No backend, OAuth, poker-table,
+  game-logic or CSS-of-the-table file is in the diff. Production untouched.
+- Outstanding: local multi-viewport browser pass (harness hung, stopped) and the
+  live check on the test URL.
 
 ### 2026-09-03
 - A01 audit complete (architecture, endpoints, session model, Hero hard-coding, card assets, 400 root causes).

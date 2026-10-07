@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field
 from app.api.deps import bearer_token, require_user
 from app.core.config import settings
 from app.services.auth import auth_store, normalize_username
-from app.services.user_registry import auth_registry
+from app.services.user_registry import MIN_PASSWORD_LENGTH, auth_registry
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
@@ -34,6 +34,10 @@ class RegisterRequest(BaseModel):
 class LoginRequest(BaseModel):
     username: str = Field(min_length=1, max_length=64)
     password: str = Field(min_length=1, max_length=128)
+
+
+class ChangePasswordRequest(BaseModel):
+    new_password: str = Field(min_length=1, max_length=128)
 
 
 # Bind the shared user registry + session store to the configured persistence
@@ -63,7 +67,14 @@ def login(request: LoginRequest) -> dict:
     if not auth_registry.verify(request.username, request.password):
         raise HTTPException(status_code=401, detail="invalid username or password")
     token = auth_store.login(request.username)
-    return {"token": token, "username": normalize_username(request.username)}
+    username = normalize_username(request.username)
+    is_admin = auth_registry.is_admin(username)
+    return {
+        "token": token,
+        "username": username,
+        "admin": is_admin,
+        "must_change_password": is_admin and auth_registry.requires_password_change(username),
+    }
 
 
 @router.post("/logout")
@@ -72,6 +83,26 @@ def logout(_user: str = Depends(require_user),
     """Revoke the presented token."""
     auth_store.logout(bearer_token(authorization))
     return {"ok": True}
+
+
+@router.post("/change-password")
+def change_password(request: ChangePasswordRequest,
+                    user: str = Depends(require_user)) -> dict:
+    """Force-change the bootstrap Admin password on first login (A-ADM-fix).
+
+    Only the caller's own account, and only while a forced change is pending.
+    The new password is hashed with the app's PBKDF2 scheme and the forced
+    flag is cleared, so the old bootstrap password stops working immediately.
+    """
+    if not auth_registry.requires_password_change(user):
+        raise HTTPException(status_code=403, detail="password change not required")
+    if len(request.new_password) < MIN_PASSWORD_LENGTH:
+        raise HTTPException(
+            status_code=400,
+            detail=f"password must be at least {MIN_PASSWORD_LENGTH} characters",
+        )
+    auth_registry.change_password(user, request.new_password)
+    return {"changed": True}
 
 
 @router.get("/me")

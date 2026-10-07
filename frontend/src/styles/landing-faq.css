@@ -1,0 +1,112 @@
+/* A47 — FAQ, final CTA card and footer (mockup-aligned). The FAQ asks exactly
+   the three pinned questions; the final CTA is one rounded card with the
+   champion artwork filling the right half; the footer is a single row that
+   stacks on phones. */
+
+.lp-faq-list { margin: 0; display: grid; gap: 14px; }
+
+.lp-faq-item {
+  border: 1px solid var(--lp-card-border);
+  border-radius: 12px;
+  background: var(--lp-card);
+  padding: 16px 18px;
+}
+
+.lp-faq-q {
+  margin: 0 0 8px;
+  color: var(--lp-text);
+  font-family: var(--lp-head);
+  font-weight: 800;
+}
+
+.lp-faq-a { margin: 0; color: var(--lp-muted); font-size: 0.95rem; line-height: 1.5; }
+
+/* ---- final CTA: one rounded card ---- */
+.lp-final { padding: clamp(40px, 6vw, 80px) 0; background: var(--lp-bg); }
+
+.lp-final-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  border: 1px solid #2b3142;
+  border-radius: 24px;
+  background: #12151c;
+  overflow: hidden;
+}
+
+.lp-final-copy {
+  padding: clamp(30px, 4vw, 56px) clamp(26px, 3.4vw, 60px);
+}
+
+.lp-final-title {
+  margin: 0 0 18px;
+  color: var(--lp-text);
+  font-family: var(--lp-head);
+  font-size: clamp(1.5rem, 3vw, 2.3rem);
+  font-weight: 900;
+  line-height: 1.12;
+  text-transform: uppercase;
+}
+
+.lp-final-sub {
+  margin: 0 0 26px;
+  color: var(--lp-muted);
+  font-size: clamp(1rem, 1.4vw, 1.15rem);
+}
+
+.lp-final-actions { display: flex; flex-wrap: wrap; gap: 14px; }
+
+.lp-final-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  align-self: stretch;
+}
+
+/* ---- footer: one row, stacked on phones ---- */
+.lp-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(16px, 3vw, 44px);
+  flex-wrap: wrap;
+  padding: 26px clamp(16px, 8vw, 100px) 30px;
+}
+
+.lp-tagline {
+  margin: 0;
+  color: var(--lp-gold);
+  font-family: var(--lp-head);
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.lp-footer-links {
+  display: flex;
+  gap: 26px;
+  margin: 0;
+  justify-content: center;
+}
+
+.lp-footer-links a,
+.lp-footer-links button {
+  color: #c9cdd6;
+  font-size: 0.92rem;
+  text-decoration: none;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.lp-footer-links a:hover,
+.lp-footer-links button:hover { color: var(--lp-text); text-decoration: underline; }
+
+.lp-copyright { margin: 0; color: var(--lp-muted); font-size: 0.92rem; }
+
+@media (max-width: 959px) {
+  .lp-final-card { grid-template-columns: minmax(0, 1fr); }
+  .lp-final-actions .lp-btn { width: 100%; }
+  .lp-footer { flex-direction: column; align-items: center; gap: 12px; }
+}

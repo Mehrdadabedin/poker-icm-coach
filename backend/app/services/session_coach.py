@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from app.game.positions import position_for
+from app.game.positions import position_labels
 from app.strategy.coach import Coach, CoachRecommendation, CoachRequest
 from app.strategy.test_mode import compare_decisions
 
@@ -24,10 +24,14 @@ def coach_request(session: GameSession) -> CoachRequest:
     hero = tournament.players[session.hero_seat]
     level = tournament.current_blind_level()
     contributed = engine._street.contributions.get(session.hero_seat, 0)
+    positions = position_labels(
+        tournament.button,
+        {p.seat for p in tournament.players if not p.is_eliminated and not p.sit_out},
+        len(tournament.players),
+    )
     return CoachRequest(
         hero=list(hero.hole_cards),
-        position=position_for(tournament.button, session.hero_seat,
-                              len(tournament.players)),
+        position=positions.get(session.hero_seat, ""),
         stack=hero.stack, big_blind=level.big, small_blind=level.small,
         ante=tournament.structure.ante_for(tournament.ante_mode, level),
         pot=sum(p.committed for p in tournament.players),

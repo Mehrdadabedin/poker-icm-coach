@@ -150,12 +150,6 @@
   border-color: #4f2683;
 }
 
-.seat-hidden-cards {
-  color: var(--muted);
-  font-size: 0.7rem;
-  letter-spacing: 2px;
-}
-
 .seat-reveal-hand {
   font-size: 0.56rem;
   color: #d8f5e6;
@@ -163,4 +157,22 @@
   overflow: hidden;
   text-overflow: ellipsis;
   margin-top: 1px;
+}
+
+
+/* A35: small circular BOT profile portrait inside existing BOT seats.
+   Absolute positioning keeps the seat box, placement and content untouched.
+   The hero seat never gets one (renderer only emits it for non-hero seats). */
+.seat-bot-portrait {
+  position: absolute;
+  top: 2px; right: 3px;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent, #f2c14e); /* overridden per profile via inline style */
+  user-select: none;
+}
+
+@media (max-width: 640px) {
+  .seat-bot-portrait { width: 28px; height: 28px; top: 1px; right: 2px; }
 }

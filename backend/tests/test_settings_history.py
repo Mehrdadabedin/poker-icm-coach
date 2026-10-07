@@ -114,13 +114,13 @@ def test_total_chips_reflect_reentry() -> None:
 
 
 def test_total_chips_reflect_elimination() -> None:
-    """Bust a bot at level 4+ -> eliminated, excluded from average stack."""
+    """Bust a bot at level 6+ -> eliminated, excluded from average stack."""
     from app.services.game_session import GameSession
 
     s = GameSession(starting_stack=45_000)
     s.start()
     _play_to_completion(s)
-    s.tournament.level_index = 3  # level 4
+    s.tournament.level_index = 5  # Level 6: re-entry closed, elimination
     s.tournament.players[1].stack = 0
     s.next_hand()  # elimination applies, then the new hand starts
     assert s.tournament.players[1].is_eliminated
