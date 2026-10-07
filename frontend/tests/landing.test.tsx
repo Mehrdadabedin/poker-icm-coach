@@ -39,7 +39,7 @@ describe("public landing page (A47 rebuild)", () => {
     const landingCss = (await import("fs")).readFileSync("src/styles/landing.css", "utf8");
     for (const needle of ["--lp-bg: #07080a", ".lp-header", "background: var(--lp-bg);"]) { expect(landingCss).toContain(needle); }
     expect(screen.getByTestId("landing-brand")).toBeInTheDocument();
-    expect(Array.from(header.querySelectorAll("button.lp-nav-link")).map((b) => b.textContent)).toEqual(["What is ICM", "The Coach", "How it works", "Opponents", "FAQ"]);
+    expect(Array.from(header.querySelectorAll("button.lp-nav-link")).map((b) => b.textContent)).toEqual(["Video", "What is ICM", "The Coach", "How it works", "Opponents", "FAQ"]);
     expect(screen.getByTestId("landing-login")).toHaveAttribute("href", "/login");
     expect(screen.getByTestId("landing-signup")).toHaveAttribute("href", "/login");
   });
