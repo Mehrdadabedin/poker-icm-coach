@@ -4,17 +4,13 @@ from __future__ import annotations
 import base64
 import hashlib
 import hmac
-import json
-import logging
 import os
 import re
 import threading
-from pathlib import Path
 
 from app.core.config import settings
 from app.services.auth import normalize_username
-
-logger = logging.getLogger(__name__)
+from app.services.documents import Document, FileDocument
 
 MIN_PASSWORD_LENGTH = 8
 USERNAME_MAX_LENGTH = 24
@@ -47,39 +43,29 @@ def username_from_email(email: str) -> str:
 class UserRegistry:
     """Users: username -> salted PBKDF2-SHA256 hash or external identity
     {provider, subject, email}. register/verify are constant time; external
-    entries have no hash. JSON persistence to `users_file` (blank = none)."""
+    entries have no hash. Persisted as one document (file or database row)."""
 
     def __init__(self, users_file: str = "") -> None:
         self._users: dict[str, dict[str, object]] = {}
         self._lock = threading.RLock()
-        self._path = Path(users_file) if users_file else None
-        if self._path is not None:
-            self._load()
+        self._document: Document | None = None
+        if users_file:
+            self.bind_path(users_file)
 
-    def _load(self) -> None:
-        try:
-            if self._path is not None and self._path.is_file():
-                self._users = json.loads(self._path.read_text(encoding="utf-8"))
-        except (OSError, ValueError):  # pragma: no cover - env dependent
-            logger.warning("could not load users file; starting empty")
-
-    def _save(self) -> None:
-        if self._path is None:
-            return
-        try:
-            self._path.parent.mkdir(parents=True, exist_ok=True)
-            self._path.write_text(
-                json.dumps(self._users, indent=2, sort_keys=True), encoding="utf-8"
-            )
-        except OSError:  # pragma: no cover - env dependent
-            logger.warning("could not persist users file")
+    def bind_document(self, document: Document | None) -> None:
+        """(Re)bind persistence and load it; None keeps users in memory only."""
+        with self._lock:
+            self._document = document
+            self._users = (document.load() if document else None) or {}
 
     def bind_path(self, users_file: str) -> None:
-        """(Re)bind the persistence path (blank disables file persistence)."""
-        self._path = Path(users_file) if users_file else None
-        self._users = {}
-        if self._path is not None:
-            self._load()
+        """(Re)bind a JSON file (blank disables persistence)."""
+        self.bind_document(FileDocument(users_file) if users_file else None)
+
+    def _save(self) -> None:
+        """Callers hold the lock, so saves cannot land out of order."""
+        if self._document is not None:
+            self._document.save(self._users)
 
     def register(self, username: str, password: str) -> str:
         name = normalize_username(username)

@@ -12,18 +12,18 @@ Models:
 - Tokens are revocable (logout) and expire after a TTL.
 - Passwords are never stored in plaintext and never logged.
 
-Session state persists best-effort to a JSON file; if the directory is
-unwritable it silently falls back to in-memory so authentication still works.
+Session state persists as one document (a JSON file, or a database row when
+AUTH_STORAGE=database); see `app.services.documents`.
 """
 from __future__ import annotations
 
-import json
 import logging
 import re
 import secrets
 import threading
 import time
-from pathlib import Path
+
+from app.services.documents import Document, FileDocument
 
 logger = logging.getLogger(__name__)
 
@@ -44,59 +44,67 @@ def normalize_username(raw: str) -> str:
 class AuthStore:
     """Token -> username session registry (single-worker deployment).
 
-    Sessions are persisted best-effort to a JSON file (bind_path) so a process
-    restart does not invalidate valid sessions; expired sessions are dropped on
-    load and lazily on lookup. Blank path disables persistence (tests).
+    Sessions are persisted (bind_document / bind_path) so a process restart
+    does not invalidate valid sessions; expired sessions are dropped on load
+    and lazily on lookup. No document disables persistence (tests).
 
-    Expiry deadlines are wall-clock (`time.time`) because they are written to
-    disk: `time.monotonic` is only comparable within one process, so persisted
+    Expiry deadlines are wall-clock (`time.time`) because they are persisted:
+    `time.monotonic` is only comparable within one process, so persisted
     monotonic deadlines would make tokens outlive their TTL (or die instantly)
     after a restart.
 
-    `_save` and `_load` take the lock themselves, so every caller must release
-    it first. The lock is reentrant so that forgetting to is a redundant
-    acquire rather than a worker thread wedged forever, which is what a
-    non-reentrant lock did here on the first lookup of an expired token.
+    `_save` takes the lock itself, so every caller must release it first. The
+    lock is reentrant so that forgetting to is a redundant acquire rather than
+    a worker thread wedged forever, which is what a non-reentrant lock did here
+    on the first lookup of an expired token. The write happens outside the
+    lock, so a slow database never blocks token lookups.
     """
 
     def __init__(self, ttl: float = TOKEN_TTL_SECONDS) -> None:
         self._ttl = ttl
         self._tokens: dict[str, tuple[str, float]] = {}  # token -> (username, expires_at)
         self._lock = threading.RLock()
-        self._path: Path | None = None
+        self._document: Document | None = None
+        self._write_lock = threading.Lock()
+        self._snapshots = 0  # snapshots taken, under _lock
+        self._written = 0  # newest snapshot saved, under _write_lock
+
+    def bind_document(self, document: Document | None) -> None:
+        """(Re)bind persistence and load it. None stops persisting and keeps the
+        current sessions, so tokens issued before a test fixture rebinds survive."""
+        if document is None:
+            with self._lock:
+                self._document = None
+            return
+        rows = document.load()
+        now = time.time()
+        try:
+            tokens = {tok: (name, exp) for tok, (name, exp) in (rows or {}).items() if exp > now}
+        except (ValueError, TypeError, AttributeError):
+            logger.warning("could not read stored sessions; starting empty")
+            tokens = {}
+        with self._lock:
+            self._document = document
+            self._tokens = tokens
 
     def bind_path(self, sessions_file: str) -> None:
-        """(Re)bind the persistence path (blank disables file persistence)."""
-        self._path = Path(sessions_file) if sessions_file else None
-        if self._path is not None:
-            self._load()
-
-    def _load(self) -> None:
-        try:
-            if self._path is not None and self._path.is_file():
-                rows = json.loads(self._path.read_text(encoding="utf-8"))
-                now = time.time()
-                with self._lock:
-                    self._tokens = {
-                        tok: (name, exp)
-                        for tok, (name, exp) in rows.items()
-                        if exp > now
-                    }
-        except (OSError, ValueError, TypeError, AttributeError):
-            logger.warning("could not load sessions file; starting empty")
+        """(Re)bind a JSON file (blank disables persistence)."""
+        self.bind_document(FileDocument(sessions_file) if sessions_file else None)
 
     def _save(self) -> None:
-        if self._path is None:
+        with self._lock:
+            document = self._document
+            self._snapshots += 1
+            snapshot, rows = self._snapshots, dict(self._tokens)
+        if document is None:
             return
-        try:
-            self._path.parent.mkdir(parents=True, exist_ok=True)
-            with self._lock:
-                rows = dict(self._tokens)
-            self._path.write_text(
-                json.dumps(rows, indent=2, sort_keys=True), encoding="utf-8"
-            )
-        except OSError:
-            logger.warning("could not persist sessions file")
+        with self._write_lock:
+            # A thread that snapshotted earlier but reached the write later
+            # must not overwrite a newer snapshot: that would drop a login.
+            if snapshot < self._written:
+                return
+            document.save(rows)
+            self._written = snapshot
 
     def login(self, username: str) -> str:
         name = normalize_username(username)

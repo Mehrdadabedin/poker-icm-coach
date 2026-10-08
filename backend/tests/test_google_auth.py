@@ -176,5 +176,5 @@ def test_the_suite_writes_no_persisted_auth_file(monkeypatch) -> None:
     before = [p.stat().st_mtime_ns if p.exists() else None for p in watched]
     client = _ready(monkeypatch, _identity())
     assert _username(client, _sign_in(client)["token"][0])
-    blank = (settings.auth_users_file, settings.auth_sessions_file, auth_registry._path)  # noqa: SLF001
+    blank = (settings.auth_users_file, settings.auth_sessions_file, auth_registry._document)  # noqa: SLF001
     assert blank == ("", "", None) and [p.stat().st_mtime_ns if p.exists() else None for p in watched] == before
