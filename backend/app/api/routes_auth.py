@@ -8,7 +8,9 @@ from pydantic import BaseModel, Field
 
 from app.api.deps import bearer_token, require_user
 from app.core.config import settings
+from app.database.session import engine
 from app.services.auth import auth_store, normalize_username
+from app.services.documents import DatabaseDocument, FileDocument
 from app.services.user_registry import MIN_PASSWORD_LENGTH, auth_registry
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
@@ -26,6 +28,11 @@ def _abs(path_str: str) -> str:
     return str(_BACKEND_ROOT / p) if not p.is_absolute() else str(p)
 
 
+def _seed(path: str) -> FileDocument | None:
+    """Existing JSON files fill an empty database once, on its first save."""
+    return FileDocument(path) if path else None
+
+
 class RegisterRequest(BaseModel):
     username: str = Field(min_length=1, max_length=64)
     password: str = Field(min_length=1, max_length=128)
@@ -40,10 +47,19 @@ class ChangePasswordRequest(BaseModel):
     new_password: str = Field(min_length=1, max_length=128)
 
 
-# Bind the shared user registry + session store to the configured persistence
-# files (blank disables file persistence, e.g. in the hermetic test suite).
-auth_registry.bind_path(_abs(settings.auth_users_file))
-auth_store.bind_path(_abs(settings.auth_sessions_file))
+def bind_auth_storage() -> None:
+    """Bind the shared user registry + session store to AUTH_STORAGE. Blank file
+    paths disable file persistence (the hermetic test suite)."""
+    users, sessions = _abs(settings.auth_users_file), _abs(settings.auth_sessions_file)
+    if settings.auth_storage == "database":
+        auth_registry.bind_document(DatabaseDocument("users", engine, _seed(users)))
+        auth_store.bind_document(DatabaseDocument("sessions", engine, _seed(sessions)))
+    else:
+        auth_registry.bind_path(users)
+        auth_store.bind_path(sessions)
+
+
+bind_auth_storage()
 
 
 @router.post("/register")

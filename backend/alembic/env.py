@@ -6,7 +6,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-from app.core.config import settings
+from app.core.config import settings, sqlalchemy_url
 from app.database.session import Base
 import app.models  # noqa: F401  (registers all ORM models)
 
@@ -14,7 +14,8 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-config.set_main_option("sqlalchemy.url", settings.database_url)
+# configparser treats "%" as interpolation, and URL-encoded passwords contain it.
+config.set_main_option("sqlalchemy.url", sqlalchemy_url(settings.database_url).replace("%", "%%"))
 target_metadata = Base.metadata
 
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-from app.core.config import settings
+from app.core.config import settings, sqlalchemy_url
 
 
 class Base(DeclarativeBase):
@@ -12,7 +12,7 @@ class Base(DeclarativeBase):
 
 
 def build_engine(database_url: str | None = None):
-    url = database_url or settings.database_url
+    url = sqlalchemy_url(database_url or settings.database_url)
     return create_engine(url, pool_pre_ping=True)
 
 

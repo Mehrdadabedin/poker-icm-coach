@@ -1,7 +1,18 @@
 """Application configuration loaded from environment variables."""
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def sqlalchemy_url(url: str) -> str:
+    """Render hands out `postgres://` / `postgresql://` URLs, which SQLAlchemy maps
+    to psycopg2. Only psycopg 3 is installed, so name that driver explicitly."""
+    for scheme in ("postgres://", "postgresql://"):
+        if url.startswith(scheme):
+            return "postgresql+psycopg://" + url[len(scheme):]
+    return url
 
 
 class Settings(BaseSettings):
@@ -22,6 +33,10 @@ class Settings(BaseSettings):
     history_dir: str = "data/history"
     auth_users_file: str = "data/users.json"
     auth_sessions_file: str = "data/sessions.json"
+    # "database" keeps accounts and logins in PostgreSQL (DATABASE_URL), so they
+    # survive redeploys on hosts with an ephemeral disk such as Render. The
+    # files above then only seed an empty database once.
+    auth_storage: Literal["file", "database"] = "file"
     # Initial Admin identities (A01): comma-separated usernames granted
     # Admin level on this deployment. Usernames only; no secrets.
     admin_usernames: str = ""

@@ -84,11 +84,12 @@ def test_credentials_never_returned(tmp_path) -> None:
 def test_read_only_helpers_do_not_touch_store(monkeypatch, tmp_path) -> None:
     import json
 
+    from app.services.documents import FileDocument
     from app.services.user_registry import auth_registry
 
     path = tmp_path / "live.json"
     path.write_text(json.dumps({"keep": LOCAL_ENTRY}), encoding="utf-8")
-    monkeypatch.setattr(auth_registry, "_path", path)
+    monkeypatch.setattr(auth_registry, "_document", FileDocument(str(path)))
     monkeypatch.setattr(auth_registry, "_users", {"keep": dict(LOCAL_ENTRY)})
     before = path.read_text(encoding="utf-8")
     _ = admin.total_registered_accounts(auth_registry)
