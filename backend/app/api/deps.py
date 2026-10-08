@@ -16,7 +16,9 @@ def require_user(authorization: str = Header(default="")) -> str:
     """
     token = bearer_token(authorization)
     user = auth_store.user_for_token(token)
-    if user is None:
+    # Suspending revokes tokens; the flag check also covers a token minted
+    # by a login that finished while the suspension was being applied.
+    if user is None or auth_registry.is_suspended(user):
         raise _401
     return user
 

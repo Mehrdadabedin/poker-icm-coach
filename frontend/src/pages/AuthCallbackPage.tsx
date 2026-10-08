@@ -17,7 +17,11 @@ export function AuthCallbackPage() {
     const username = params.get("username");
     const error = params.get("error");
     if (error) {
-      setMessage("Sign-in could not be completed. Please try again.");
+      setMessage(
+        error === "account_suspended"
+          ? "This account is suspended."
+          : "Sign-in could not be completed. Please try again.",
+      );
       return;
     }
     if (!token || !username) {

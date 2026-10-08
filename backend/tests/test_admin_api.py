@@ -12,6 +12,8 @@ from app.main import app
 from app.services.user_registry import auth_registry
 from tests.api_helpers import TEST_PASSWORD, register_user
 
+SAFE_FIELDS = {"username", "provider", "suspended", "admin"}
+
 
 def _login(username: str) -> TestClient:
     register_user(username)
@@ -69,13 +71,13 @@ def test_admin_user_list_safe_fields(monkeypatch) -> None:
     assert r.status_code == 200
     body = r.json()
     assert body["users"] == [
-        {"username": "alice", "provider": "google"},
-        {"username": "bob", "provider": "local"},
+        {"username": "alice", "provider": "google", "suspended": False, "admin": False},
+        {"username": "bob", "provider": "local", "suspended": False, "admin": False},
     ]
     assert body["total"] == 2 and body["limit"] == 50 and body["offset"] == 0
-    # safe shape: exactly username/provider, nothing else anywhere
+    # safe shape: exactly these four fields, nothing else anywhere
     for row in body["users"]:
-        assert set(row) == {"username", "provider"}
+        assert set(row) == SAFE_FIELDS
 
 
 def test_no_credentials_in_any_admin_response(monkeypatch) -> None:
@@ -96,7 +98,7 @@ def test_users_json_never_returned(monkeypatch) -> None:
     client = _login("AdminApiRaw")
     _seed_users({"alice": {"salt": "s", "hash": "h"}})
     body = client.get("/api/admin/users").json()
-    assert all(set(row) == {"username", "provider"} for row in body["users"])
+    assert all(set(row) == SAFE_FIELDS for row in body["users"])
     # the response is a bounded projection, not the raw store object
     assert "users.json" not in client.get("/api/admin/users/summary").text
 

@@ -11,6 +11,7 @@ import threading
 from app.core.config import settings
 from app.services.auth import normalize_username
 from app.services.documents import Document, FileDocument
+from app.services.user_moderation import Moderation
 
 MIN_PASSWORD_LENGTH = 8
 USERNAME_MAX_LENGTH = 24
@@ -40,7 +41,7 @@ def username_from_email(email: str) -> str:
     return cleaned[:USERNAME_MAX_LENGTH] if len(cleaned) >= 2 else "player"
 
 
-class UserRegistry:
+class UserRegistry(Moderation):
     """Users: username -> salted PBKDF2-SHA256 hash or external identity
     {provider, subject, email}. register/verify are constant time; external
     entries have no hash. Persisted as one document (file or database row)."""

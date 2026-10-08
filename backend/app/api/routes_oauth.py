@@ -76,6 +76,8 @@ def google_callback(
     except google_oauth.GoogleAuthError:
         return _failure(origin)
     username = _resolve_user(identity)
+    if auth_registry.is_suspended(username):
+        return _failure(origin, "account_suspended")
     token = auth_store.login(username)
     return RedirectResponse(
         google_oauth.frontend_callback_url(origin, {"token": token, "username": username}),
@@ -92,10 +94,10 @@ def _resolve_user(identity: google_oauth.GoogleIdentity) -> str:
     return auth_registry.register_external(candidate, GOOGLE, identity.subject, identity.email)
 
 
-def _failure(origin: str) -> RedirectResponse:
+def _failure(origin: str, error: str = "google_signin_failed") -> RedirectResponse:
     """Send the browser back to the app: a raw JSON error page would strand it."""
     return RedirectResponse(
-        google_oauth.frontend_callback_url(origin, {"error": "google_signin_failed"}),
+        google_oauth.frontend_callback_url(origin, {"error": error}),
         status_code=302,
     )
 

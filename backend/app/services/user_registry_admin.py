@@ -29,6 +29,8 @@ class RegisteredAccount:
 
     username: str
     provider: str  # "local" or "google"
+    suspended: bool = False
+    admin: bool = False  # admins cannot be suspended or deleted, so the UI hides those actions
 
 
 def _provider_name(provider: str | None) -> str:
@@ -89,7 +91,10 @@ def list_registered_accounts(
     registry: UserRegistry | None = None,
 ) -> list[RegisteredAccount]:
     """Safe enumeration for the future Admin Users API (A03)."""
+    reg = registry or auth_registry
+    suspended = reg.suspended_names()
     return [
-        RegisteredAccount(username=name, provider=_provider_name(provider))
-        for name, provider in _snapshot(registry)
+        RegisteredAccount(username=name, provider=_provider_name(provider),
+                          suspended=name in suspended, admin=reg.is_admin(name))
+        for name, provider in _snapshot(reg)
     ]

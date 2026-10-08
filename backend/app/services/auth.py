@@ -138,5 +138,15 @@ class AuthStore:
             self._tokens.pop(token, None)
         self._save()
 
+    def revoke_user(self, username: str) -> int:
+        """Sign a user out everywhere (admin suspend/delete). Returns the count."""
+        with self._lock:
+            mine = [tok for tok, (name, _exp) in self._tokens.items() if name == username]
+            for token in mine:
+                del self._tokens[token]
+        if mine:
+            self._save()
+        return len(mine)
+
 
 auth_store = AuthStore()
