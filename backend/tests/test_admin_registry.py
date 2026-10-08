@@ -62,10 +62,10 @@ def test_safe_enumeration_fields_only(tmp_path) -> None:
     )
     rows = admin.list_registered_accounts(registry)
     assert [asdict(r) for r in rows] == [
-        {"username": "alice", "provider": "local"},
-        {"username": "carol", "provider": "google"},
+        {"username": "alice", "provider": "local", "suspended": False, "admin": False},
+        {"username": "carol", "provider": "google", "suspended": False, "admin": False},
     ]
-    assert all(set(asdict(r)) == {"username", "provider"} for r in rows)
+    assert all(set(asdict(r)) == {"username", "provider", "suspended", "admin"} for r in rows)
 
 
 def test_credentials_never_returned(tmp_path) -> None:

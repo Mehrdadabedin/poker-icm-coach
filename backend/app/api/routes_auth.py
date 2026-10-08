@@ -82,8 +82,11 @@ def login(request: LoginRequest) -> dict:
     Invalid/unknown credentials yield a single generic 401 (no account hint)."""
     if not auth_registry.verify(request.username, request.password):
         raise HTTPException(status_code=401, detail="invalid username or password")
-    token = auth_store.login(request.username)
     username = normalize_username(request.username)
+    # Checked after the password, so it reveals nothing to a caller without it.
+    if auth_registry.is_suspended(username):
+        raise HTTPException(status_code=403, detail="this account is suspended")
+    token = auth_store.login(request.username)
     is_admin = auth_registry.is_admin(username)
     return {
         "token": token,

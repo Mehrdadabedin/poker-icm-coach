@@ -28,6 +28,7 @@ import "./styles/brand.css";
 import "./styles/mobile.css";
 import "./styles/analytics-consent.css";
 import "./styles/admin.css";
+import "./styles/admin-moderation.css";
 import "./styles/bot-profiles.css";
 import "./styles/winloss.css";
 import "./styles/winner.css";

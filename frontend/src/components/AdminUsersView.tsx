@@ -2,17 +2,20 @@
 
 Consumes the existing A03 protected API (GET /api/admin/users) - the single
 user-data source; users.json is never read. The backend returns exactly
-{username, provider} per row, so the UI shows only those safe fields. Search is
-a case-insensitive presentation filter over the fetched safe list (current
-scale is one bounded page); no new backend search API is introduced.
+{username, provider, suspended, admin} per row, so the UI shows only those safe
+fields. Search is a case-insensitive presentation filter over the fetched safe
+list (current scale is one bounded page). Each row can be suspended or deleted
+through AdminUserActions; the table updates in place on success.
 */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AdminUserActions } from "./AdminUserActions";
 import {
   AdminUserRow,
   AuthError,
   adminUsers,
   clearAuth,
+  getUsername,
 } from "../services/api";
 
 /** Bounded single page: the backend caps page size at 200, which covers the
@@ -28,6 +31,21 @@ export function AdminUsersView() {
   const navigate = useNavigate();
   const [state, setState] = useState<UsersState>({ status: "loading" });
   const [query, setQuery] = useState("");
+  const [actionError, setActionError] = useState<string | null>(null);
+
+  const replaceRow = (username: string, next: AdminUserRow | null) => {
+    setActionError(null);
+    setState((current) =>
+      current.status !== "ready"
+        ? current
+        : {
+            status: "ready",
+            rows: next
+              ? current.rows.map((row) => (row.username === username ? next : row))
+              : current.rows.filter((row) => row.username !== username),
+          },
+    );
+  };
 
   useEffect(() => {
     let cancelled = false;
@@ -85,6 +103,11 @@ export function AdminUsersView() {
         aria-label="Search users"
         data-testid="admin-users-search"
       />
+      {actionError && (
+        <p className="admin-action-error" role="alert" data-testid="admin-users-action-error">
+          {actionError}
+        </p>
+      )}
       {rows.length === 0 ? (
         <p className="admin-placeholder" data-testid="admin-users-empty">
           No registered users.
@@ -100,6 +123,8 @@ export function AdminUsersView() {
               <tr>
                 <th>Username</th>
                 <th>Provider</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -110,6 +135,22 @@ export function AdminUsersView() {
                     <span className={`admin-provider admin-provider-${row.provider}`}>
                       {row.provider === "google" ? "Google" : "Local"}
                     </span>
+                  </td>
+                  <td>
+                    <span
+                      className={`admin-status admin-status-${row.suspended ? "suspended" : "active"}`}
+                      data-testid={`admin-status-${row.username}`}
+                    >
+                      {row.suspended ? "Suspended" : "Active"}
+                    </span>
+                  </td>
+                  <td>
+                    <AdminUserActions
+                      row={row}
+                      currentUser={getUsername()}
+                      onChanged={(next) => replaceRow(row.username, next)}
+                      onError={setActionError}
+                    />
                   </td>
                 </tr>
               ))}

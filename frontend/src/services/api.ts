@@ -188,7 +188,7 @@ export interface AdminSummary { total_registered_accounts: number; local_account
 export function adminSummary(): Promise<AdminSummary> {
   return request<AdminSummary>("/api/admin/users/summary");
 }
-export interface AdminUserRow { username: string; provider: string; } // "local" | "google"
+export interface AdminUserRow { username: string; provider: string; suspended?: boolean; admin?: boolean; }
 
 export interface AdminUsersResponse { users: AdminUserRow[]; total: number; limit: number; offset: number; }
 

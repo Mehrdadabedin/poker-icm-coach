@@ -69,6 +69,14 @@ class SessionStore:
         """The user's tables, oldest first."""
         return [s for s in self._sessions.values() if s.owner == user]
 
+    def remove_owned_by(self, user: str) -> int:
+        """Drop every table of a deleted account. Hand history is only served
+        from these live tables, so this also ends access to that history."""
+        owned = [s.session_id for s in self.owned_by(user)]
+        for session_id in owned:
+            self._sessions.pop(session_id, None)
+        return len(owned)
+
     def evict_ended(self, owner: str | None = None, now: float | None = None) -> int:
         """Drop finished and idle-past-timeout tables. Returns the count."""
         now = now if now is not None else time.time()
