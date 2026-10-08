@@ -28,7 +28,7 @@ export function LandingDemo() {
             controls
             preload="metadata"
             playsInline
-            poster="/videos/ICMBOT_promo_poster.webp"
+            poster="/videos/ICMBOT_video_poster.png"
             ref={videoRef}
             onPlay={() => setShowPoster(false)}
             onPause={() => setShowPoster(true)}
@@ -44,7 +44,7 @@ export function LandingDemo() {
               aria-label="Play ICM BOT demo video"
               onClick={startPlayback}
             >
-              <img src="/videos/ICMBOT_promo_poster.webp" alt="" draggable={false} />
+              <img src="/videos/ICMBOT_video_poster.png" alt="" draggable={false} />
             </button>
           )}
         </div>
