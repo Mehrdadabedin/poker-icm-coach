@@ -35,8 +35,8 @@ export function LandingHero() {
         <div className="lp-hero-visual">
           <img
             className="lp-hero-img"
-            src="/images/hero-robot.webp"
-            alt="ICMBOT robot at the tournament table, emerging from the dark"
+            src="/images/hero-robot-sarah.webp"
+            alt="ICMBOT robot with a half-human face at the tournament table"
             data-testid="landing-hero-visual"
           />
         </div>
