@@ -1,0 +1,14 @@
+/* Shared page header (plan 063). On desktop it reuses the table header's
+   compact pills from controls.css. A phone cannot fit the logo, BACK TO TABLE,
+   HOME and LOG OUT in one row, and BACK TO TABLE ended up over the logo, so the
+   buttons get their own centred row under it and the username gives way. */
+
+.page-header { margin-bottom: 6px; }
+
+@media (max-width: 959px) {
+  .page-header { flex-wrap: wrap; justify-content: center; }
+  .page-header .header-title { flex: 1 1 100%; text-align: center; }
+  .page-header .header-right { flex: 1 1 100%; flex-wrap: wrap; justify-content: center; }
+  .page-header .header-user { display: none; }
+  .page-header .header-right > .btn { min-height: 36px; padding: 0 12px; font-size: 0.78rem; }
+}

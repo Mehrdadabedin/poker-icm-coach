@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createTournament } from "../services/api";
 import { Copyright } from "../components/Copyright";
-import { HomeButton } from "../components/HomeButton";
+import { PageHeader } from "../components/PageHeader";
 
 /** TRAINING screen: choose COACH MODE or TEST MODE for a practice run. */
 export function TrainingPage() {
@@ -16,6 +16,7 @@ export function TrainingPage() {
 
   return (
     <div className="page" data-testid="training-page">
+      <PageHeader />
       <h1 className="screen-title">TRAINING MODE</h1>
       <div className="mode-cards">
         <button className={mode === "coach" ? "mode-card active" : "mode-card"} onClick={() => setMode("coach")}>
@@ -28,7 +29,6 @@ export function TrainingPage() {
         </button>
       </div>
       <button className="btn btn-primary" onClick={start} data-testid="training-start">START TRAINING</button>
-      <HomeButton />
       <Copyright />
     </div>
   );

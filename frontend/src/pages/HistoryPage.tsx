@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { request } from "../services/api";
 import { Copyright } from "../components/Copyright";
-import { HomeButton } from "../components/HomeButton";
+import { PageHeader } from "../components/PageHeader";
 
 type HandRow = {
   handNumber: number; heroPosition: string; pot: number; winnerSeats: number[];
@@ -43,10 +43,10 @@ export function HistoryPage() {
 
   return (
     <div className="page" data-testid="history-page">
+      <PageHeader />
       <h1 className="screen-title">HAND HISTORY</h1>
       <div className="toolbar">
         <input placeholder="table id" value={tableId} onChange={(e) => load(e.target.value)} data-testid="history-table-input" />
-        <HomeButton />
       </div>
       <p className="note">
         {tableId ? `Tournament table: ${tableId} — ${hands.length} completed hand(s)` : loaded ? "No active table yet — start a practice session first." : "Loading active table…"}

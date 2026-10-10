@@ -4,7 +4,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Copyright } from "../components/Copyright";
-import { HomeButton } from "../components/HomeButton";
+import { PageHeader } from "../components/PageHeader";
 import { getSelectedProfile } from "../models/botProfiles";
 import { createTournament } from "../services/api";
 
@@ -25,6 +25,7 @@ export function OpponentChoicePage() {
 
   return (
     <div className="page" data-testid="opponent-choice-page">
+      <PageHeader />
       <h1 className="screen-title">CHOOSE YOUR OPPONENTS</h1>
       <p className="bot-profiles-intro">How would you like to practice?</p>
       <div className="opponent-choice">
@@ -44,7 +45,6 @@ export function OpponentChoicePage() {
           CHOOSE OPPONENTS
         </button>
       </div>
-      <HomeButton />
       <Copyright />
     </div>
   );

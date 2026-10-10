@@ -25,6 +25,7 @@ export interface LiveTableViewProps {
   reviewOpen: boolean;
   username: string | null;
   onHome: () => void;
+  onMistakes: () => void;
   onLogout: () => void;
   onTogglePause: () => void;
   onReview: () => void;
@@ -40,7 +41,7 @@ export function LiveTableView(props: LiveTableViewProps) {
   const {
     state, overlay, cover, coach, comparison, countdown, paused, acting, showLabels,
     showResultLabels, nameBySeat, coachCollapsed, historyCollapsed, reviewOpen,
-    username, onHome, onLogout, onTogglePause, onReview, onNext, onBackReview,
+    username, onHome, onMistakes, onLogout, onTogglePause, onReview, onNext, onBackReview,
     onAction, onToggleCoach, onToggleHistory,
   } = props;
   const hero = state.players.find((p) => p.isHero);
@@ -56,6 +57,7 @@ export function LiveTableView(props: LiveTableViewProps) {
         handOver={handOver}
         isReview={isReview}
         onHome={onHome}
+        onMistakes={onMistakes}
         onLogout={onLogout}
         onTogglePause={onTogglePause}
       />

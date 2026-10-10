@@ -4,11 +4,13 @@ import { adminSummary, clearAuth, getToken, getUsername, logout, me } from "../s
 import { Copyright } from "../components/Copyright";
 import { BrandLogo } from "../components/BrandLogo";
 import { LoginForm } from "../components/LoginForm";
+import { useAwayTable } from "../hooks/useAwayTable";
 
 /** HOME screen: username login (A03) then start a practice tournament or
  * visit the tools. The authenticated username replaces "Hero" everywhere. */
 export function HomePage() {
   const navigate = useNavigate();
+  const away = useAwayTable();
   const location = useLocation();
   const authNotice = (location.state as { authNotice?: string } | null)?.authNotice ?? null;
   const [user, setUser] = useState<string | null>(() => (getToken() ? getUsername() : null));
@@ -97,6 +99,11 @@ export function HomePage() {
       </div>
       <p className="home-tagline">9-player tournament practice with an ICM coach</p>
       <div className="home-menu">
+        {away && (
+          <button className="btn btn-primary" onClick={() => navigate(`/table/${away.tableId}`)} data-testid="continue-table">
+            CONTINUE TABLE{away.label ? ` ${away.label}` : ""}
+          </button>
+        )}
         <button className="btn btn-primary" onClick={startPractice} data-testid="start-practice">
           START PRACTICE
         </button>

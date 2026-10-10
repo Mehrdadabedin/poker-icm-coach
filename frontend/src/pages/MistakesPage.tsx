@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import { request } from "../services/api";
 import { Copyright } from "../components/Copyright";
-import { HomeButton } from "../components/HomeButton";
+import { PageHeader } from "../components/PageHeader";
 import { MistakeCard, type Decision, type Mistake } from "../components/MistakeCard";
 
 type HandRow = {
@@ -51,8 +51,8 @@ export function MistakesPage() {
 
   return (
     <div className="page" data-testid="mistakes-page">
+      <PageHeader />
       <h1 className="screen-title">MY MISTAKES</h1>
-      <div className="toolbar"><HomeButton /></div>
       {status === "loading" && <p className="note">Loading your active table…</p>}
       {status === "noTable" && (
         <p className="note" data-testid="mistakes-no-table">No active table yet. Play a practice session first.</p>

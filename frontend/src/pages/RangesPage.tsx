@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { rangeGrid } from "../services/api";
 import { Copyright } from "../components/Copyright";
-import { HomeButton } from "../components/HomeButton";
+import { PageHeader } from "../components/PageHeader";
 import { RANKS as COLUMNS } from "../components/CoachCardPicker";
 import { POSITIONS_9MAX as POSITIONS } from "../models/game";
 
@@ -17,6 +17,7 @@ export function RangesPage() {
 
   return (
     <div className="page" data-testid="ranges-page">
+      <PageHeader />
       <h1 className="screen-title">BASELINE STRATEGY RANGES</h1>
       <p className="note">Heuristic practice ranges — not solver-exact.</p>
       <div className="toolbar">
@@ -26,7 +27,6 @@ export function RangesPage() {
         <select value={depth} onChange={(e) => setDepth(Number(e.target.value))}>
           {[100, 50, 30, 20, 12, 8, 5].map((d) => <option key={d} value={d}>{d} BB</option>)}
         </select>
-        <HomeButton />
       </div>
       <div className="matrix-scroll">
         <table className="range-matrix" data-testid="range-matrix">

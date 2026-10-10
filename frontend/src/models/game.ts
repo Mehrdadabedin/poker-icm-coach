@@ -113,7 +113,7 @@ export interface TableState {
   ante: number;
   level: number;
   secondsLeft: number;
-  inBreak?: boolean;
+  inBreak?: boolean; away?: boolean; // scheduled tournament break / hero left the table
   street: "preflop" | "flop" | "turn" | "river" | "showdown" | "complete";
   currentActor: number | null;
   dealerSeat: number;

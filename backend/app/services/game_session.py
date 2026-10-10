@@ -39,6 +39,7 @@ class GameSession:
         self.hero_finish_place: int | None = None
         self.last_seen = self.created_at
         self.idle_timeout = 30 * 60
+        self.away = False  # hero left the table (HOME, MY MISTAKES): clock stopped
         self.history_dir = history_dir or ""
         self.tournament_starting_stack = starting_stack
         self.tournament = build_default_tournament(
@@ -88,6 +89,7 @@ class GameSession:
 
     def next_hand(self) -> None:
         with self._lock:
+            self.away = False  # playing on means the hero is back
             # A45: a finished table must not replay/duplicate history.
             if self.status != "active":
                 raise ValueError("tournament is not active")
@@ -113,6 +115,7 @@ class GameSession:
         return "handOver" if self.engine.is_complete else "playing"
     def hero_action(self, kind: str, amount: int | None = None) -> None:
         with self._lock:
+            self.away = False
             assert self.engine is not None
             actor = self.engine.current_actor
             if actor is None or not self.tournament.players[actor].is_human:
@@ -150,9 +153,25 @@ class GameSession:
             assert self.engine is not None and self.timer is not None
             self.last_seen = time.time()
             self.timer.tick()
-            if self.engine.is_complete and not self.timer.running and self.status == "active":
+            if (self.engine.is_complete and not self.timer.running and self.status == "active"
+                    and not self.away):
                 self.timer.resume()
             return build_state_view(self)
+
+    def step_away(self) -> None:
+        """Stop the tournament clock while the hero is off the table."""
+        with self._lock:
+            assert self.timer is not None
+            self.away = True
+            self.timer.pause()
+
+    def come_back(self) -> None:
+        """Restart the clock from where it stopped."""
+        with self._lock:
+            assert self.timer is not None
+            self.away = False
+            if self.status == "active":
+                self.timer.resume()
 
     def coach_advice(self) -> dict:
         with self._lock:

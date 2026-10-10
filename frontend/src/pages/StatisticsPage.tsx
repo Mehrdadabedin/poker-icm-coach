@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { request } from "../services/api";
 import { Copyright } from "../components/Copyright";
-import { HomeButton } from "../components/HomeButton";
+import { PageHeader } from "../components/PageHeader";
 
 type Stats = { handsPlayed: number; handsWon: number; vpip: number; pfr: number; aggression: number; averagePot: number; bbWonLost: number; chipProfit: number; coachAgreement: number; icmMistakes: number; positionPerformance: Record<string, number> };
 
@@ -28,10 +28,10 @@ export function StatisticsPage() {
 
   return (
     <div className="page" data-testid="statistics-page">
+      <PageHeader />
       <h1 className="screen-title">SESSION STATISTICS</h1>
       <div className="toolbar">
         <input placeholder="table id" value={tableId} onChange={(e) => setTableId(e.target.value)} />
-        <HomeButton />
       </div>
       {stats && (
         <>
