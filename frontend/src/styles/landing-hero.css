@@ -1,8 +1,8 @@
 /* A47/A48 hero: full-width two columns with inline padding, sized so the
    whole hero ends above the fold on short desktop viewports. Left is real
-   HTML copy with the H1 and actions; right is the cropped robot artwork
-   (hero-robot.webp) with a 12px left blend, cover-fit above 900px so both
-   aces stay visible. The old baked-text artwork and hit areas are gone. */
+   HTML copy with the H1 and actions; right is the 3:2 artwork
+   (hero-sarah-coach.webp), shown whole so the coach screen on its right
+   is never cropped. The old baked-text artwork and hit areas are gone. */
 
 .lp-hero {
   padding-top: 16px;
@@ -68,16 +68,10 @@
   height: auto;
 }
 
-/* above 900px: fixed-height cover so the hero fits the fold; the left
-   anchor keeps the aces at the image's left edge fully visible */
+/* above 900px: natural 3:2 height, no crop. The hero still ends above the
+   fold: measured at 539px of 720, 706 of 1080 and 914 of 1440. */
 @media (min-width: 900px) {
-  .lp-hero-img {
-    width: 100%;
-    height: clamp(340px, calc(100svh - var(--lp-header-h, 77px) - 56px), 560px);
-    object-fit: cover;
-    object-position: 0% 50%;
-    border-radius: 16px;
-  }
+  .lp-hero-img { border-radius: 16px; }
 }
 
 /* phones: one column, copy first, robot below full width */

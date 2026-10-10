@@ -60,7 +60,7 @@ describe("public landing page (A47 rebuild)", () => {
     expect(screen.getByTestId("landing-start-training")).toHaveAttribute("href", "/login");
     expect(screen.getByTestId("landing-start-training").textContent).toContain("START TRAINING FREE");
     expect(screen.getByText(/Practice only, no real money/)).toBeInTheDocument();
-    expect(screen.getByTestId("landing-hero-visual")).toHaveAttribute("src", "/images/hero-robot-sarah.webp");
+    expect(screen.getByTestId("landing-hero-visual")).toHaveAttribute("src", "/images/hero-sarah-coach.webp");
     expect(document.querySelector(".lp-hero-hit")).toBeNull();
   });
 
