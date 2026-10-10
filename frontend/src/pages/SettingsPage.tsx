@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { request } from "../services/api";
 import { Copyright } from "../components/Copyright";
-import { HomeButton } from "../components/HomeButton";
+import { PageHeader } from "../components/PageHeader";
 import { invalidateDisplayPreferences } from "../services/preferences";
 import type { CardBack, SettingsPayload as Settings } from "../services/preferences";
 
@@ -35,10 +35,8 @@ export function SettingsPage() {
 
   return (
     <div className="page" data-testid="settings-page">
+      <PageHeader />
       <h1 className="screen-title">TOURNAMENT SETTINGS</h1>
-      <div className="toolbar">
-        <HomeButton />
-      </div>
       {settings ? (
         <div className="settings-grid">
           <label>

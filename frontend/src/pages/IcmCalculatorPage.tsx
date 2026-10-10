@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { icmEquities } from "../services/icmApi";
-import { HomeButton } from "../components/HomeButton";
+import { PageHeader } from "../components/PageHeader";
 import { Copyright } from "../components/Copyright";
 
 interface ResultRow {
@@ -65,6 +65,7 @@ export function IcmCalculatorPage() {
 
   return (
     <div className="page" data-testid="icm-calculator-page">
+      <PageHeader />
       <h1 className="screen-title">ICM CALCULATOR</h1>
       <div className="icm-form">
         <div className="icm-section">
@@ -120,7 +121,6 @@ export function IcmCalculatorPage() {
           <p className="icm-explanation">ICM equity represents a stack's fair share of the prize pool given current chip distribution. Short stacks receive more value than their chip percentage while big stacks receive less.</p>
         </div>
       )}
-      <div className="toolbar"><HomeButton /></div>
       <Copyright />
     </div>
   );

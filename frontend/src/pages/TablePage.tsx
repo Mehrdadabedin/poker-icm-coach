@@ -8,6 +8,7 @@ import { useAutoNext } from "../hooks/useAutoNext";
 import { useAutoFinish } from "../hooks/useAutoFinish";
 import { useGame } from "../hooks/useGame";
 import { useTableActions } from "../hooks/useTableActions";
+import { useTableAway } from "../hooks/useTableAway";
 import type { ActionKind, CoachAdvice } from "../models/game";
 import { tournamentChampion } from "../models/game";
 import { useDisplayPreferences } from "../services/preferences";
@@ -41,6 +42,7 @@ export function TablePage() {
       ? profiles : null;
   }, [state]);
   const actions = useTableActions({ tableId, refresh: refreshTable, navigate, lineup });
+  useTableAway(tableId, state?.tableLabel ?? "", state?.away);
   const hero = state?.players.find((p) => p.isHero);
   const champion = state ? tournamentChampion(state) : null;
   const previewWinner = winnerPreviewEnabled(import.meta.env.DEV, searchParams.get("testWinner"));
@@ -177,6 +179,7 @@ export function TablePage() {
       reviewOpen={showReview}
       username={getUsername()}
       onHome={() => navigate("/")}
+      onMistakes={() => navigate("/mistakes")}
       onLogout={async () => {
         await actions.signOut();
         setAuthed(false);

@@ -8,13 +8,15 @@ interface TableHeaderProps {
   handOver: boolean;
   isReview: boolean;
   onHome: () => void;
+  onMistakes: () => void;
   onLogout: () => void;
   onTogglePause: () => void;
 }
 
-/** Top bar: app title, table label, authenticated user and the HOME / PAUSE /
- * LOG OUT controls for the automatic next hand. No PLAY action exists here. */
-export function TableHeader({ state, username, paused, handOver, isReview, onHome, onLogout, onTogglePause }: TableHeaderProps) {
+/** Top bar: app title, table label, authenticated user and the HOME / MY
+ * MISTAKES / PAUSE / LOG OUT controls. HOME and MY MISTAKES step away from the
+ * table, which stops its clock; PAUSE only holds the automatic next hand. */
+export function TableHeader({ state, username, paused, handOver, isReview, onHome, onMistakes, onLogout, onTogglePause }: TableHeaderProps) {
   return (
     <div className="top-bar app-header" data-testid="app-header">
       <h1 className="screen-title header-title" data-testid="app-title"><BrandLogo /></h1>
@@ -25,6 +27,9 @@ export function TableHeader({ state, username, paused, handOver, isReview, onHom
         <span className="header-user" data-testid="header-username">{username ?? state.username ?? ""}</span>
         <button className="btn btn-small header-btn" onClick={onHome} data-testid="home-btn">
           HOME
+        </button>
+        <button className="btn btn-small header-btn" onClick={onMistakes} data-testid="mistakes-btn">
+          MY MISTAKES
         </button>
         <button className="btn btn-logout" onClick={onLogout} data-testid="logout-btn">
           LOG OUT

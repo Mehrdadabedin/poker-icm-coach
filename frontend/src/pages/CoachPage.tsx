@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { request } from "../services/api";
 import { Copyright } from "../components/Copyright";
-import { HomeButton } from "../components/HomeButton";
+import { PageHeader } from "../components/PageHeader";
 import { Card, POSITIONS_9MAX } from "../models/game";
 import { CardPicker, SUIT_SYMBOL, cardKey } from "../components/CoachCardPicker";
 
@@ -96,6 +96,7 @@ export function CoachPage() {
 
   return (
     <div className="page" data-testid="coach-page">
+      <PageHeader />
       <h1 className="screen-title">ICM COACH</h1>
       <div className="coach-mode-toggle">
         <button className={mode === "hand" ? "active" : ""} onClick={() => { setMode("hand"); setAdvice(null); }}>STARTING HAND</button>
@@ -138,7 +139,6 @@ export function CoachPage() {
           <label>SMALL BLIND<input type="number" min={0} value={smallBlind} onChange={(e) => setSmallBlind(Number(e.target.value))} /></label>
           <label>BIG BLIND<input type="number" min={1} value={bigBlind} onChange={(e) => setBigBlind(Number(e.target.value))} /></label>
           <button className="btn" onClick={run} disabled={running || !boardReady} data-testid="analyze-btn">ANALYZE</button>
-          <HomeButton />
         </div>
       </div>
 
