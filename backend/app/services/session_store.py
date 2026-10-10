@@ -19,6 +19,7 @@ if TYPE_CHECKING:  # runtime import would cycle: game_session marks its own end
     from app.services.game_session import GameSession
 
 MAX_TABLES_PER_USER = 20
+AWAY_TIMEOUT_FACTOR = 4  # 30 minutes idle becomes 2 hours while the hero is away
 
 
 def label_for_index(index: int) -> str:
@@ -115,7 +116,9 @@ def check_abandoned(session: GameSession, now: float | None = None) -> bool:
     """Mark a long-idle active table abandoned. An engaged table keeps
     refreshing last_seen through state(), so it is never caught by this."""
     now = now or time.time()
-    if session.status == "active" and now - session.last_seen > session.idle_timeout:
+    # Stepping away (to read mistakes, say) is not abandoning the table.
+    timeout = session.idle_timeout * (AWAY_TIMEOUT_FACTOR if session.away else 1)
+    if session.status == "active" and now - session.last_seen > timeout:
         session.status = "abandoned"
         return True
     return False

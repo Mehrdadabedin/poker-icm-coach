@@ -129,6 +129,7 @@ class GameStateModel(BaseModel):
     heroFinishPlace: int | None = None
     tableLabel: str = ""
     status: str = "active"
+    away: bool = False
     username: str | None = None
     handNumber: int
     players: list[PlayerStateModel]

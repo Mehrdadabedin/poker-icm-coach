@@ -62,6 +62,7 @@ def build_state_view(session) -> dict:
         "heroFinishPlace": session.hero_finish_place,
         "tableLabel": session.table_label,
         "status": session.status,
+        "away": session.away,
         "username": session.owner,
         "handNumber": tournament.hand_number,
         "players": players,
