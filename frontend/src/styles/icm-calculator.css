@@ -1,0 +1,152 @@
+.icm-form {
+  background: #1d242c;
+  border-radius: 10px;
+  padding: 16px;
+  margin: 12px 0;
+}
+
+.icm-section {
+  margin-bottom: 20px;
+}
+
+.icm-section h3 {
+  margin: 12px 0 8px;
+  color: var(--accent);
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
+
+.icm-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.icm-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.75rem;
+  color: var(--muted);
+  flex: 1;
+  min-width: 140px;
+}
+
+.icm-input {
+  min-height: 36px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #0f1318;
+  color: var(--text);
+  padding: 6px 10px;
+  font-size: 0.9rem;
+}
+
+.icm-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.icm-btn {
+  min-height: 36px;
+  border-radius: 6px;
+  border: 1px solid #444;
+  background: #243040;
+  color: var(--text);
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.icm-btn:hover:not(:disabled) {
+  background: #2c3540;
+  border-color: var(--accent);
+}
+
+.icm-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.icm-btn-small {
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 0.7rem;
+}
+
+.icm-btn-primary {
+  width: 100%;
+  margin-top: 12px;
+  background: #1565c0;
+  color: #fff;
+  border: none;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.icm-btn-primary:hover:not(:disabled) {
+  background: #1976d2;
+}
+
+.icm-error {
+  color: #ff6b6b;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  margin-top: 12px;
+}
+
+.icm-results {
+  background: #1d242c;
+  border-radius: 10px;
+  padding: 16px;
+  margin: 20px 0;
+}
+
+.icm-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  margin-bottom: 12px;
+}
+
+.icm-table th,
+.icm-table td {
+  border: 1px solid #2c3540;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.icm-table th {
+  background: #0f1318;
+  color: var(--accent);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.icm-table tbody tr:hover {
+  background: rgba(242, 193, 78, 0.05);
+}
+
+.icm-table .pos {
+  color: #81c784;
+  font-weight: 600;
+}
+
+.icm-table .neg {
+  color: #e57373;
+  font-weight: 600;
+}
+
+.icm-explanation {
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  margin: 0;
+}

@@ -12,6 +12,8 @@ import { CoachPage } from "./pages/CoachPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { StatisticsPage } from "./pages/StatisticsPage";
+import { MistakesPage } from "./pages/MistakesPage";
+import { IcmCalculatorPage } from "./pages/IcmCalculatorPage";
 import { TrainingPage } from "./pages/TrainingPage";
 import { BotProfilesPage } from "./pages/BotProfilesPage";
 import { OpponentChoicePage } from "./pages/OpponentChoicePage";
@@ -58,6 +60,8 @@ export function App() {
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/statistics" element={<StatisticsPage />} />
+        <Route path="/mistakes" element={<MistakesPage />} />
+        <Route path="/icm-calculator" element={<IcmCalculatorPage />} />
       </Routes>
     </HashRouter>
   );
