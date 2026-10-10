@@ -35,6 +35,15 @@ def list_hands(table_id: str, stage: str | None = None,
             "grade": r.grade,
             "level": r.level_index + 1,
             "blindLevel": r.blind_level,
+            "heroCards": [c.ascii() for c in r.hero_cards],
+            "decisions": [
+                {
+                    "street": d.street, "heroAction": d.hero_action,
+                    "coachAction": d.coach_action, "grade": d.grade,
+                    "icmPressure": d.icm_pressure, "explanation": d.explanation,
+                    "stackBb": d.stack_bb, "toCall": d.to_call, "board": d.board,
+                } for d in r.decisions
+            ],
         } for r in records
     ]}
 

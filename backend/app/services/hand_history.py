@@ -3,13 +3,28 @@ from __future__ import annotations
 
 import json
 import logging
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 from app.game.hand_result import HandAction
 from app.poker.card import Card
 
 logger = logging.getLogger(__name__)
+
+
+@dataclass(slots=True)
+class HandDecision:
+    """One hero decision with the coach's verdict from the moment it was made."""
+
+    street: str
+    hero_action: str
+    coach_action: str
+    grade: str
+    icm_pressure: str
+    explanation: str
+    stack_bb: float
+    to_call: int
+    board: list[str]
 
 
 @dataclass(slots=True)
@@ -35,6 +50,7 @@ class HandHistoryRecord:
     username: str = ""
     table_label: str = ""
     timestamp: str = ""
+    decisions: list[HandDecision] = field(default_factory=list)
 
     def net_chips(self) -> int:
         return self.ending_stack - self.starting_stack
@@ -116,6 +132,7 @@ def _record_to_dict(record: HandHistoryRecord) -> dict:
             {"seat": a.seat, "action": a.action, "amount": a.amount, "street": a.street}
             for a in record.actions
         ],
+        "decisions": [asdict(d) for d in record.decisions],
     }
 
 

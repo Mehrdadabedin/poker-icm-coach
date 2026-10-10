@@ -38,16 +38,27 @@ def _big_blind_of(blind_level: str) -> int:
         return 100
 
 
+def _preflop_action(r: HandHistoryRecord) -> str:
+    """The hand's first preflop decision: what VPIP, PFR and 3-bet measure.
+    Records without per-decision verdicts fall back to the summary field."""
+    first = next((d.hero_action for d in r.decisions if d.street == "preflop"), None)
+    return first if first is not None else (r.hero_decision or "")
+
+
+def _actions(r: HandHistoryRecord) -> list[str]:
+    return [d.hero_action for d in r.decisions] or [r.hero_decision or ""]
+
+
 def aggregate(records: list[HandHistoryRecord]) -> SessionStatistics:
     stats = SessionStatistics(hands_played=len(records))
     if not records:
         return stats
     stats.hands_won = sum(1 for r in records if 0 in r.winner_seats)
-    vpip_hands = sum(1 for r in records if (r.hero_decision or "") in _VPIP_ACTIONS)
-    pfr_hands = sum(1 for r in records if (r.hero_decision or "") in _PFR_ACTIONS)
-    threebet_hands = sum(1 for r in records if (r.hero_decision or "") in {"3-BET", "4-BET"})
-    aggressive = sum(1 for r in records if (r.hero_decision or "") in _AGGRESSIVE)
-    passive = sum(1 for r in records if (r.hero_decision or "") in _PASSIVE)
+    vpip_hands = sum(1 for r in records if _preflop_action(r) in _VPIP_ACTIONS)
+    pfr_hands = sum(1 for r in records if _preflop_action(r) in _PFR_ACTIONS)
+    threebet_hands = sum(1 for r in records if _preflop_action(r) in {"3-BET", "4-BET"})
+    aggressive = sum(1 for r in records for a in _actions(r) if a in _AGGRESSIVE)
+    passive = sum(1 for r in records for a in _actions(r) if a in _PASSIVE)
     stats.vpip = vpip_hands / stats.hands_played
     stats.pfr = pfr_hands / stats.hands_played
     stats.three_bet = threebet_hands / stats.hands_played

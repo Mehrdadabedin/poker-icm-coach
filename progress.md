@@ -65,6 +65,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 059 | Copyright Footer | 5 | complete | PASS (22 vitest, 3 e2e, layout) | © 2026 NEXORA — Created by Mehrdad Abedin on all nav pages |
 | 060 | Copyright Text Color (Gold Accent) | 5 | complete | PASS (build, layout) | footer color uses existing --accent (#f2c14e) gold; wording/layout unchanged |
 | 061 | Production CORS Origin (Render) | 5 | complete | PASS (preflight + 370 BE) | icm-master-frontend.onrender.com allowed; localhost 5173/4173/8080 preserved |
+| 062 | Coach Verdicts, My Mistakes Page, ICM Calculator | 6 | complete | PASS (7 BE + 11 FE new) | per-decision coach verdicts in hand history; grading vocabulary fix; /mistakes and /icm-calculator pages |
 
 ## Current Phase
 

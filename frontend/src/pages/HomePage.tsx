@@ -106,6 +106,8 @@ export function HomePage() {
         <button className="btn" onClick={() => navigate("/settings")}>TOURNAMENT SETTINGS</button>
         <button className="btn" onClick={() => navigate("/history")}>HAND HISTORY</button>
         <button className="btn" onClick={() => navigate("/statistics")}>STATISTICS</button>
+        <button className="btn" onClick={() => navigate("/mistakes")} data-testid="menu-mistakes">MY MISTAKES</button>
+        <button className="btn" onClick={() => navigate("/icm-calculator")} data-testid="menu-icm-calculator">ICM CALCULATOR</button>
         {isAdmin && (
           <button className="btn" onClick={() => navigate("/admin")} data-testid="menu-admin">ADMIN</button>
         )}
