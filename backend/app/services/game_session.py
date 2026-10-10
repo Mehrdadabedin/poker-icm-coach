@@ -9,12 +9,12 @@ import uuid
 from app.ai.ai_framework import AIDecisionProvider
 from app.game.actions import Action, ActionType
 from app.game.hand_engine import HandEngine
-from app.game.positions import position_labels
 from app.services import hand_history
 from app.services.elimination import apply_reentry_or_elimination, is_final_hand
 from app.services.game_state_view import build_state_view
-from app.services.hand_history import HandHistoryRecord, HandHistoryStore
+from app.services.hand_history import HandDecision, HandHistoryStore
 from app.services.session_coach import advice_dict, coach_request, grade_last_action
+from app.services.session_record import build_record, decision_verdict
 from app.services.session_store import mark_finished
 from app.strategy.coach import Coach, CoachRequest
 from app.tournament.tournament import build_default_tournament
@@ -68,6 +68,7 @@ class GameSession:
         self.coach_mode = "advanced"
         self._last_hero_action: str | None = None
         self._last_hero_request: CoachRequest | None = None
+        self._decisions: list[HandDecision] = []  # this hand's hero decisions
         self._lock = threading.RLock()
         self._history_file = hand_history.HistoryFileStore(self.history_dir, self.session_id)
 
@@ -80,6 +81,7 @@ class GameSession:
     def _begin_hand(self, first: bool = False) -> None:
         assert self.engine is not None and self.timer is not None
         self._last_hero_action = self._last_hero_request = None
+        self._decisions = []
         self.engine.start_hand()
         (self.timer.start if first else self.timer.resume)()
         self._advance_bots()
@@ -121,6 +123,7 @@ class GameSession:
             request = coach_request(self)
             self.engine.act(actor, action)
             self._last_hero_action, self._last_hero_request = f"{kind.upper()}", request
+            self._decisions.append(decision_verdict(self.coach, kind.upper(), request))
             self._advance_bots()
             if not self.engine.is_complete:
                 self.timer.resume()  # timer asserted non-null above
@@ -172,29 +175,7 @@ class GameSession:
             hero.sit_out = False
             hero.stack = self.tournament_starting_stack
     def _record_and_persist(self) -> None:
-        assert self.engine is not None
-        result = self.engine.result
-        if result is None:
-            return
-        positions = position_labels(self.tournament.button,
-                                    {p2.seat for p2 in self.tournament.active_players()},
-                                    len(self.tournament.players))
-        hero = self.tournament.players[self.hero_seat]
-        level = self.tournament.current_blind_level()
-        start = result.starting_stacks.get(self.hero_seat, hero.stack)
-        record = HandHistoryRecord(
-            hand_number=result.hand_number,
-            hero_cards=list(hero.hole_cards),
-            hero_position=positions.get(self.hero_seat, ""),
-            community_cards=list(result.community_cards),
-            starting_stack=start, ending_stack=hero.stack,
-            blind_level=f"{level.small}/{level.big}",
-            level_index=self.tournament.level_index,
-            actions=list(result.actions), pot_total=result.pot_total,
-            winner_seats=result.winner_seats(),
-            username=self.owner or "",
-            table_label=self.table_label,
-            timestamp=time.strftime("%Y-%m-%dT%H:%M:%S%z"),
-        )
-        self.history.append(record)
-        self._history_file.append(record)
+        record = build_record(self, self._decisions)
+        if record is not None:
+            self.history.append(record)
+            self._history_file.append(record)
