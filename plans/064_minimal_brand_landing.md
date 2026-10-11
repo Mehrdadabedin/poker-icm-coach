@@ -107,3 +107,7 @@ a phone-specific crop of the coach panel is a possible follow-up.
 - Footer: "© 2026 ICMBOT" on the left; "Practice only, no real money." and
   Cookie settings on the right, lined up with the header's edges. Stacked
   and centred on phones.
+- Watch the demo: a rounded button with a dark border and a light grey fill
+  (a little darker under the mouse), the same height as the gold Start
+  training free, instead of underlined text. Full width under the gold
+  button on phones.

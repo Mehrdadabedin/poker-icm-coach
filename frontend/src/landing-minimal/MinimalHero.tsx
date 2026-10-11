@@ -6,7 +6,7 @@ interface MinimalHeroProps {
 }
 
 /** Hero of the minimal landing: a very large headline, one sentence, ONE
- * primary button and a quiet text link that opens the demo video, then the
+ * primary button and a rounded outline button that opens the demo video, then the
  * picture of the ICM coach screen. */
 export function MinimalHero({ demoOpen, onWatchDemo }: MinimalHeroProps) {
   return (
@@ -24,7 +24,7 @@ export function MinimalHero({ demoOpen, onWatchDemo }: MinimalHeroProps) {
         </Link>
         <button
           type="button"
-          className="lm-link"
+          className="lm-btn lm-btn-outline"
           aria-expanded={demoOpen}
           onClick={onWatchDemo}
           data-testid="minimal-watch-demo"
