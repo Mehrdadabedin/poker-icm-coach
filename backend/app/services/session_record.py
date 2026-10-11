@@ -9,7 +9,7 @@ import time
 from typing import TYPE_CHECKING
 
 from app.game.positions import position_labels
-from app.services.hand_history import HandDecision, HandHistoryRecord
+from app.services.hand_history import HandDecision, HandHistoryRecord, HistoryFileStore
 from app.strategy.coach import Coach, CoachRequest
 from app.strategy.test_mode import compare_decisions
 
@@ -79,3 +79,20 @@ def build_record(session: GameSession, decisions: list[HandDecision]) -> HandHis
         record.grade = worst.grade
         record.icm_pressure = worst.icm_pressure
     return record
+
+
+def record_hand(session: GameSession, decisions: list[HandDecision],
+                history_file: HistoryFileStore) -> bool:
+    """Add the finished hand to the table's history and the history file.
+
+    Returns False while the hand is still being played (nothing recorded).
+    GameSession calls this when a hand ends, so My Mistakes and HAND HISTORY
+    list it at once (plan 068), and keeps the result so the call from
+    next_hand() does not record the same hand twice.
+    """
+    record = build_record(session, decisions)
+    if record is None:
+        return False
+    session.history.append(record)
+    history_file.append(record)
+    return True

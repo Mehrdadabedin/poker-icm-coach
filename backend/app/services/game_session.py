@@ -9,12 +9,11 @@ import uuid
 from app.ai.ai_framework import AIDecisionProvider
 from app.game.actions import Action, ActionType
 from app.game.hand_engine import HandEngine
-from app.services import hand_history
 from app.services.elimination import apply_reentry_or_elimination, is_final_hand
 from app.services.game_state_view import build_state_view
-from app.services.hand_history import HandDecision, HandHistoryStore
+from app.services.hand_history import HandDecision, HandHistoryStore, HistoryFileStore
 from app.services.session_coach import advice_dict, coach_request, grade_last_action
-from app.services.session_record import build_record, decision_verdict
+from app.services.session_record import decision_verdict, record_hand
 from app.services.session_store import mark_finished
 from app.strategy.coach import Coach, CoachRequest
 from app.tournament.tournament import build_default_tournament
@@ -71,7 +70,7 @@ class GameSession:
         self._last_hero_request: CoachRequest | None = None
         self._decisions: list[HandDecision] = []  # this hand's hero decisions
         self._lock = threading.RLock()
-        self._history_file = hand_history.HistoryFileStore(self.history_dir, self.session_id)
+        self._history_file = HistoryFileStore(self.history_dir, self.session_id)
 
     def start(self) -> None:
         with self._lock:
@@ -82,7 +81,7 @@ class GameSession:
     def _begin_hand(self, first: bool = False) -> None:
         assert self.engine is not None and self.timer is not None
         self._last_hero_action = self._last_hero_request = None
-        self._decisions = []
+        self._decisions, self._hand_recorded = [], False
         self.engine.start_hand()
         (self.timer.start if first else self.timer.resume)()
         self._advance_bots()
@@ -144,6 +143,7 @@ class GameSession:
         if self.engine.is_complete:
             assert self.timer is not None
             self.timer.pause()
+            self._record_and_persist()  # in My Mistakes now, not at the next deal
             # Finish now, not on the next next_hand(): the client stops calling
             # it once the champion screen shows, and the clock must stop too.
             if is_final_hand(self):
@@ -194,7 +194,6 @@ class GameSession:
             hero.sit_out = False
             hero.stack = self.tournament_starting_stack
     def _record_and_persist(self) -> None:
-        record = build_record(self, self._decisions)
-        if record is not None:
-            self.history.append(record)
-            self._history_file.append(record)
+        # once per hand: at its end (plan 068), then a no-op from next_hand()
+        if not self._hand_recorded:
+            self._hand_recorded = record_hand(self, self._decisions, self._history_file)
