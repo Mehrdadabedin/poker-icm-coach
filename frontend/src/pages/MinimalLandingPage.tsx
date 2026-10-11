@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useLandingWebMcp } from "../landing/useLandingWebMcp";
 import { MinimalClosing } from "../landing-minimal/MinimalClosing";
 import { MinimalDemo, scrollToDemo } from "../landing-minimal/MinimalDemo";
 import { MinimalFeatures } from "../landing-minimal/MinimalFeatures";
@@ -7,18 +9,21 @@ import { MinimalHeader } from "../landing-minimal/MinimalHeader";
 import { MinimalHero } from "../landing-minimal/MinimalHero";
 import { MinimalHow } from "../landing-minimal/MinimalHow";
 
-/** The minimalist brand landing page, served at /minimal for a side-by-side
- * comparison with the current one: one message, one action, one picture, then
- * How it works in three steps, three features and the same action again.
- * It shares no component or CSS with the current page, owns no auth state and
- * registers no WebMCP tools: every link goes to the sign-in flow at /login. */
+/** The landing page at / (plan 069): one message, one action, one picture,
+ * then How it works in three steps, three features and the same action again.
+ * It owns no auth state; every link goes to the sign-in flow at /login. The
+ * landing WebMCP tools (watch_demo, start_training, explain_icm) moved here
+ * from the old page, which stays at /classic for now. */
 export function MinimalLandingPage() {
+  const navigate = useNavigate();
   const [demoOpen, setDemoOpen] = useState(false);
 
   const watchDemo = () => {
     if (demoOpen) scrollToDemo();
     else setDemoOpen(true);
   };
+
+  useLandingWebMcp({ watchDemo, startTraining: () => navigate("/login"), demoTarget: "lm-demo" });
 
   return (
     <div className="lm-page" data-testid="minimal-landing-page">

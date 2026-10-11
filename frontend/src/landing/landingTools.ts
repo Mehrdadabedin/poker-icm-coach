@@ -11,6 +11,8 @@ import { LANDING_QUIZ_FACTS, LANDING_SPOT } from "./landingQuizData";
 export interface LandingToolActions {
   watchDemo: () => void;
   startTraining: () => void;
+  /** id of the demo section watch_demo reports; the old page's by default */
+  demoTarget?: string;
 }
 
 export function buildLandingTools(actions: LandingToolActions): WebMcpTool[] {
@@ -23,7 +25,7 @@ export function buildLandingTools(actions: LandingToolActions): WebMcpTool[] {
       annotations: readOnly,
       execute: () => {
         actions.watchDemo();
-        return { ok: true, target: "lp-demo" };
+        return { ok: true, target: actions.demoTarget ?? "lp-demo" };
       },
     },
     {
@@ -38,7 +40,7 @@ export function buildLandingTools(actions: LandingToolActions): WebMcpTool[] {
     {
       name: "explain_icm",
       description:
-        "Explains what the ICM coach recommends for the landing-page bubble spot, " +
+        "Explains ICM with one bubble spot: what the ICM coach recommends and why, " +
         "with the same answer the backend engine test pins.",
       inputSchema: noInput,
       annotations: readOnly,

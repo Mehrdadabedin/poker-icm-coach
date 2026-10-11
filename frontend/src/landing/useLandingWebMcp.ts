@@ -19,6 +19,7 @@ export function useLandingWebMcp(actions: LandingToolActions, enabled = true): v
     const currentActions: LandingToolActions = {
       watchDemo: () => latest.current.watchDemo(),
       startTraining: () => latest.current.startTraining(),
+      demoTarget: latest.current.demoTarget,
     };
     const attemptRegistration = () => {
       if (disposed) return;
