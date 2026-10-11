@@ -1,5 +1,6 @@
-/* A16 tests: the entry route ("/" = landing when signed out, the existing
- * home screen when signed in) and the unchanged sign-in / sign-up screen. */
+/* A16 tests: the entry route ("/" = the minimal landing page when signed
+ * out, plan 069; the existing home screen when signed in) and the unchanged
+ * sign-in / sign-up screen. */
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -29,9 +30,10 @@ async function openEntry() {
 describe("entry route", () => {
   beforeEach(() => localStorage.clear());
 
-  it("shows the landing page to a visitor without a session", async () => {
+  it("shows the minimal landing page to a visitor without a session (plan 069)", async () => {
     await openEntry();
-    expect(screen.getByTestId("landing-page")).toBeInTheDocument();
+    expect(screen.getByTestId("minimal-landing-page")).toBeInTheDocument();
+    expect(screen.queryByTestId("landing-page")).toBeNull();
     expect(screen.queryByTestId("home-page")).toBeNull();
   });
 

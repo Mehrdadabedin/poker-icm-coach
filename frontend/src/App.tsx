@@ -21,12 +21,12 @@ import { AuthCallbackPage } from "./pages/AuthCallbackPage";
 import { trackPageView } from "./analytics";
 import { AnalyticsConsentBanner } from "./components/AnalyticsConsentBanner";
 
-/** Public entry screen (A16): a visitor without a session gets the new landing
- * page; a signed-in user keeps the existing home screen, so HOME, the app menu
- * and every existing deep link behave exactly as before. The sign-in screen
- * itself is the existing HomePage and lives at /login. */
+/** Public entry screen (A16): a visitor without a session gets the minimal
+ * landing page (plan 069); a signed-in user keeps the home menu, so HOME and
+ * every existing deep link behave exactly as before. The sign-in screen is the
+ * existing HomePage at /login. */
 function EntryPage() {
-  return getToken() ? <HomePage /> : <LandingPage />;
+  return getToken() ? <HomePage /> : <MinimalLandingPage />;
 }
 
 function AnalyticsPageView() {
@@ -47,7 +47,10 @@ export function App() {
       <AnalyticsConsentBanner />
       <Routes>
         <Route path="/" element={<EntryPage />} />
-        <Route path="/minimal" element={<MinimalLandingPage />} />
+        {/* plan 069: the old landing page stays at /classic for a while to
+            compare; links shared to /minimal open the landing page at / */}
+        <Route path="/classic" element={<LandingPage />} />
+        <Route path="/minimal" element={<Navigate to="/" replace />} />
         <Route path="/login" element={<HomePage />} />
         <Route path="/change-password" element={<AdminChangePasswordPage />} />
         <Route path="/admin/:section?" element={<AdminPage />} />

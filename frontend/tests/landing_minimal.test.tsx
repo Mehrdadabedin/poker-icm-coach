@@ -1,7 +1,7 @@
-/* The minimal landing page at /minimal: a separate page to compare with the
- * current landing page, which keeps serving "/" (see landing.test.tsx). */
+/* The minimal landing page, the landing page at / since plan 069. The old
+ * page stays at /classic (see landing.test.tsx); /minimal links still work. */
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 
 vi.mock("../src/services/api", async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
@@ -27,16 +27,19 @@ describe("minimal landing page (/minimal)", () => {
   });
   afterEach(() => vi.restoreAllMocks());
 
-  it("is served at /minimal while / keeps the current landing page", async () => {
-    await openAt("#/minimal");
+  it("is the landing page at / for a visitor without a session (plan 069)", async () => {
+    await openAt("#/");
     expect(screen.getByTestId("minimal-landing-page")).toBeInTheDocument();
     expect(screen.queryByTestId("landing-page")).toBeNull();
   });
 
-  it("keeps the current landing page at /", async () => {
-    await openAt("#/");
+  it("keeps the old landing page at /classic, and old /minimal links still open this page", async () => {
+    await openAt("#/classic");
     expect(screen.getByTestId("landing-page")).toBeInTheDocument();
-    expect(screen.queryByTestId("minimal-landing-page")).toBeNull();
+    cleanup();
+    await openAt("#/minimal");
+    expect(screen.getByTestId("minimal-landing-page")).toBeInTheDocument();
+    expect(window.location.hash).toBe("#/");
   });
 
   it("shows the large headline, one sentence and the coach-screen picture", async () => {
