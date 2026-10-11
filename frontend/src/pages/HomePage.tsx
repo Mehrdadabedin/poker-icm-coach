@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { adminSummary, clearAuth, getToken, getUsername, logout, me } from "../services/api";
 import { Copyright } from "../components/Copyright";
 import { BrandLogo } from "../components/BrandLogo";
+import { HomeMenu } from "../components/HomeMenu";
 import { LoginForm } from "../components/LoginForm";
-import { useAwayTable } from "../hooks/useAwayTable";
 
 /** HOME screen: username login (A03) then start a practice tournament or
  * visit the tools. The authenticated username replaces "Hero" everywhere. */
 export function HomePage() {
-  const navigate = useNavigate();
-  const away = useAwayTable();
   const location = useLocation();
   const authNotice = (location.state as { authNotice?: string } | null)?.authNotice ?? null;
   const [user, setUser] = useState<string | null>(() => (getToken() ? getUsername() : null));
@@ -57,11 +55,6 @@ export function HomePage() {
     setUser(null);
   };
 
-  const startPractice = () => {
-    // A27: START PRACTICE now opens the opponent-choice screen.
-    navigate("/start");
-  };
-
   if (!user) {
     // The sign-in screen owns the full viewport: brand header, then the panel.
     return (
@@ -86,40 +79,26 @@ export function HomePage() {
     );
   }
 
+  // Plan 066: a white page under a black top bar; the logo's white letters
+  // need the dark band.
   return (
-    <div className="page home-page" data-testid="home-page">
-      <div className="top-bar app-header" data-testid="session-bar">
-        <h1 className="screen-title header-title" data-testid="app-title"><BrandLogo /></h1>
-        <div className="header-right">
-          <span className="header-user">Playing as <b data-testid="session-username">{user}</b></span>
-          <button className="btn btn-logout" onClick={() => void signOut()} data-testid="logout-btn">
-            LOG OUT
-          </button>
+    <div className="home-screen" data-testid="home-page">
+      <div className="home-band">
+        <div className="top-bar app-header" data-testid="session-bar">
+          <h1 className="screen-title header-title" data-testid="app-title"><BrandLogo /></h1>
+          <div className="header-right">
+            <span className="header-user">Playing as <b data-testid="session-username">{user}</b></span>
+            <button className="btn btn-logout" onClick={() => void signOut()} data-testid="logout-btn">
+              LOG OUT
+            </button>
+          </div>
         </div>
       </div>
-      <p className="home-tagline">9-player tournament practice with an ICM coach</p>
-      <div className="home-menu">
-        {away && (
-          <button className="btn btn-primary" onClick={() => navigate(`/table/${away.tableId}`)} data-testid="continue-table">
-            CONTINUE TABLE{away.label ? ` ${away.label}` : ""}
-          </button>
-        )}
-        <button className="btn btn-primary" onClick={startPractice} data-testid="start-practice">
-          START PRACTICE
-        </button>
-        <button className="btn" onClick={() => navigate("/bot-profiles")} data-testid="menu-bot-profiles">BOT PROFILES</button>
-        <button className="btn" onClick={() => navigate("/ranges")}>RANGES</button>
-        <button className="btn" onClick={() => navigate("/coach")}>ICM COACH</button>
-        <button className="btn" onClick={() => navigate("/settings")}>TOURNAMENT SETTINGS</button>
-        <button className="btn" onClick={() => navigate("/history")}>HAND HISTORY</button>
-        <button className="btn" onClick={() => navigate("/statistics")}>STATISTICS</button>
-        <button className="btn" onClick={() => navigate("/mistakes")} data-testid="menu-mistakes">MY MISTAKES</button>
-        <button className="btn" onClick={() => navigate("/icm-calculator")} data-testid="menu-icm-calculator">ICM CALCULATOR</button>
-        {isAdmin && (
-          <button className="btn" onClick={() => navigate("/admin")} data-testid="menu-admin">ADMIN</button>
-        )}
-      </div>
-      <Copyright />
+      <main className="home-body">
+        <p className="home-tagline">9-player tournament practice with an ICM coach</p>
+        <HomeMenu isAdmin={isAdmin} />
+        <Copyright />
+      </main>
     </div>
   );
 }

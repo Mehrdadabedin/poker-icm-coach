@@ -43,8 +43,8 @@ export function BotProfilesPage() {
     setCounts((c) => ({ ...c, [id]: Math.max(0, (c[id] ?? 0) - 1) }));
   };
 
-  // A27: BACK returns to the previous logical screen (e.g. the opponent
-  // choice for the CHOOSE flow); direct visits simply go back.
+  // A27: BACK returns to the previous screen (the home menu after START
+  // PRACTICE).
   const back = () => navigate(-1);
 
   const addBots = async () => {

@@ -29,6 +29,19 @@ export function awayTable(): AwayTable | null {
   }
 }
 
+/** Whether the remembered table can still be played. Tables live in server
+ * memory, so a deploy or restart ends them, and a finished tournament has
+ * nothing to continue. "unknown" (offline, server still waking up) hides the
+ * button but keeps the table for the next check. */
+export async function checkAwayTable(tableId: string): Promise<"live" | "gone" | "unknown"> {
+  try {
+    const state = await request<{ status?: string }>(`/api/game/${encodeURIComponent(tableId)}/state`);
+    return state.status === undefined || state.status === "active" ? "live" : "gone";
+  } catch (error) {
+    return error instanceof Error && error.message.startsWith("API 404") ? "gone" : "unknown";
+  }
+}
+
 export function stepAway(tableId: string, label: string): Promise<unknown> {
   try {
     localStorage.setItem(KEY, JSON.stringify({ tableId, label }));

@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { HashRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { AdminChangePasswordPage } from "./pages/AdminChangePasswordPage";
 import { AdminPage } from "./pages/AdminPage";
@@ -17,7 +17,6 @@ import { MistakesPage } from "./pages/MistakesPage";
 import { IcmCalculatorPage } from "./pages/IcmCalculatorPage";
 import { TrainingPage } from "./pages/TrainingPage";
 import { BotProfilesPage } from "./pages/BotProfilesPage";
-import { OpponentChoicePage } from "./pages/OpponentChoicePage";
 import { AuthCallbackPage } from "./pages/AuthCallbackPage";
 import { trackPageView } from "./analytics";
 import { AnalyticsConsentBanner } from "./components/AnalyticsConsentBanner";
@@ -56,7 +55,8 @@ export function App() {
         <Route path="/auth/callback" element={<AuthCallbackPage />} />
         <Route path="/training" element={<TrainingPage />} />
         <Route path="/bot-profiles" element={<BotProfilesPage />} />
-        <Route path="/start" element={<OpponentChoicePage />} />
+        {/* the random-opponents step is gone: old /start links pick the 8 bots */}
+        <Route path="/start" element={<Navigate to="/bot-profiles" replace />} />
         <Route path="/ranges" element={<RangesPage />} />
         <Route path="/coach" element={<CoachPage />} />
         <Route path="/settings" element={<SettingsPage />} />

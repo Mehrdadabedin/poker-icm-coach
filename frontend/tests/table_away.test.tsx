@@ -83,13 +83,23 @@ describe("page header", () => {
     expect(screen.queryByTestId("back-to-table")).toBeNull();
   });
 
-  it("offers BACK TO TABLE after stepping away, and goes there", () => {
+  it("offers BACK TO TABLE after stepping away, and goes there", async () => {
     localStorage.setItem(AWAY_KEY, JSON.stringify({ tableId: "T1", label: "B" }));
     at("/start", <PageHeader />);
-    const back = screen.getByTestId("back-to-table");
+    const back = await screen.findByTestId("back-to-table");
+    expect(request).toHaveBeenCalledWith("/api/game/T1/state");
     expect(back.textContent).toBe("BACK TO TABLE B");
     fireEvent.click(back);
     expect(screen.getByTestId("table-page")).toBeTruthy();
+  });
+
+  it("does not offer BACK TO TABLE for a table the server no longer has", async () => {
+    localStorage.setItem(AWAY_KEY, JSON.stringify({ tableId: "T1", label: "B" }));
+    request.mockRejectedValueOnce(new Error('API 404: {"detail":"table not found"}'));
+    at("/start", <PageHeader />);
+    await act(async () => undefined);
+    expect(screen.queryByTestId("back-to-table")).toBeNull();
+    expect(localStorage.getItem(AWAY_KEY)).toBeNull();
   });
 
   it("ignores a damaged stored table instead of crashing", () => {
