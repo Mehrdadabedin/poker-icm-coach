@@ -5,7 +5,7 @@ phase: 6
 status: complete
 depends_on: [62, 63]
 test_file: frontend/tests/landing_minimal.test.tsx
-implementation_files: [frontend/src/pages/MinimalLandingPage.tsx, frontend/src/landing-minimal/MinimalHeader.tsx, frontend/src/landing-minimal/MinimalHero.tsx, frontend/src/landing-minimal/MinimalProof.tsx, frontend/src/landing-minimal/MinimalFeatures.tsx, frontend/src/landing-minimal/MinimalDemo.tsx, frontend/src/landing-minimal/MinimalClosing.tsx, frontend/src/landing-minimal/MinimalFooter.tsx, frontend/src/styles/landing-minimal.css, frontend/src/styles/landing-minimal-proof.css]
+implementation_files: [frontend/src/pages/MinimalLandingPage.tsx, frontend/src/landing-minimal/MinimalHeader.tsx, frontend/src/landing-minimal/MinimalHero.tsx, frontend/src/landing-minimal/MinimalProductShot.tsx, frontend/src/landing-minimal/MinimalProof.tsx, frontend/src/landing-minimal/MinimalFeatures.tsx, frontend/src/landing-minimal/MinimalDemo.tsx, frontend/src/landing-minimal/MinimalClosing.tsx, frontend/src/landing-minimal/MinimalFooter.tsx, frontend/src/styles/landing-minimal.css, frontend/src/styles/landing-minimal-proof.css, frontend/src/styles/landing-minimal-shot.css]
 ---
 
 # Objective
@@ -43,3 +43,22 @@ Cookie settings link.
 - Frontend 252 passed (243 on main, plus 9 for this page).
 - Page height: 2298px on desktop (current: 5161), 1705px on a phone
   (current: 7325). Checked at 1280px and 375px.
+
+# Revision: light "study software" look
+
+The first version kept the dark, gold, robot look of the current page and
+read as the same page. Revised to a light page that presents ICMBOT as
+study software rather than a poker room:
+
+- Warm off-white background, near-black text, gold only on the main
+  button, a deeper amber (#8a5a00) for the accent word and icons.
+- Hero picture: a fresh screenshot of the real table with the ICM coach
+  panel (RAISE, "K8s is in the CO open range") in a plain browser frame,
+  instead of the robot artwork. 75 KB, 1680x805.
+- Wordmark: the poker-chip mark and "ICMBOT" set in type, because the logo
+  file is white lettering on black.
+- The mistake card turned white with a red edge.
+
+Results: frontend 252 passed; page height 2187px desktop, 1688px phone.
+On phones the product screenshot is a picture rather than readable text;
+a phone-specific crop of the coach panel is a possible follow-up.

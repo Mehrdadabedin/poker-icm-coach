@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { MinimalProductShot } from "./MinimalProductShot";
 
 interface MinimalHeroProps {
   demoOpen: boolean;
@@ -7,7 +8,7 @@ interface MinimalHeroProps {
 
 /** Hero of the minimal landing: a very large headline, one sentence, ONE
  * primary button and a quiet text link that opens the demo video, then the
- * hero picture at its natural 3:2 shape. */
+ * real product in a browser frame. */
 export function MinimalHero({ demoOpen, onWatchDemo }: MinimalHeroProps) {
   return (
     <section className="lm-hero" aria-labelledby="lm-hero-title" data-testid="minimal-hero">
@@ -33,14 +34,7 @@ export function MinimalHero({ demoOpen, onWatchDemo }: MinimalHeroProps) {
         </button>
       </div>
       <p className="lm-note" data-testid="minimal-note">Practice only. No real money. Browser and Android.</p>
-      <img
-        className="lm-hero-img"
-        src="/images/hero-sarah-coach.webp"
-        alt="ICMBOT robot with a human face holding two aces, the ICM coach screen floating beside it"
-        width={1200}
-        height={800}
-        data-testid="minimal-hero-visual"
-      />
+      <MinimalProductShot />
     </section>
   );
 }
