@@ -79,20 +79,26 @@ export function HomePage() {
     );
   }
 
+  // Plan 066: a white page under a black top bar; the logo's white letters
+  // need the dark band.
   return (
-    <div className="page home-page" data-testid="home-page">
-      <div className="top-bar app-header" data-testid="session-bar">
-        <h1 className="screen-title header-title" data-testid="app-title"><BrandLogo /></h1>
-        <div className="header-right">
-          <span className="header-user">Playing as <b data-testid="session-username">{user}</b></span>
-          <button className="btn btn-logout" onClick={() => void signOut()} data-testid="logout-btn">
-            LOG OUT
-          </button>
+    <div className="home-screen" data-testid="home-page">
+      <div className="home-band">
+        <div className="top-bar app-header" data-testid="session-bar">
+          <h1 className="screen-title header-title" data-testid="app-title"><BrandLogo /></h1>
+          <div className="header-right">
+            <span className="header-user">Playing as <b data-testid="session-username">{user}</b></span>
+            <button className="btn btn-logout" onClick={() => void signOut()} data-testid="logout-btn">
+              LOG OUT
+            </button>
+          </div>
         </div>
       </div>
-      <p className="home-tagline">9-player tournament practice with an ICM coach</p>
-      <HomeMenu isAdmin={isAdmin} />
-      <Copyright />
+      <main className="home-body">
+        <p className="home-tagline">9-player tournament practice with an ICM coach</p>
+        <HomeMenu isAdmin={isAdmin} />
+        <Copyright />
+      </main>
     </div>
   );
 }

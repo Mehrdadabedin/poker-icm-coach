@@ -80,9 +80,31 @@ describe("CONTINUE TABLE", () => {
     request.mockResolvedValue({ status: "active" });
     openHome();
     const button = await screen.findByTestId("continue-table");
-    expect(button).toHaveTextContent("CONTINUE TABLE B");
+    expect(button).toHaveTextContent("Continue table B");
     fireEvent.click(button);
     expect(screen.getByTestId("table-page")).toBeTruthy();
+  });
+});
+
+describe("menu cards (plan 066)", () => {
+  it("puts play first, then study, review and setup, each card with an icon and one line", async () => {
+    openHome();
+    await settle();
+    const menu = screen.getByRole("navigation", { name: "Main menu" });
+    const labels = Array.from(menu.querySelectorAll(".hm-label")).map((l) => l.textContent);
+    expect(labels).toEqual(["STUDY", "REVIEW", "SETUP"]);
+    const cards = Array.from(menu.querySelectorAll("button.hm-card"));
+    expect(cards.map((c) => c.querySelector(".hm-title")?.textContent)).toEqual([
+      "Start practice", "ICM coach", "Ranges", "ICM calculator",
+      "My mistakes", "Hand history", "Statistics", "Tournament settings",
+    ]);
+    for (const card of cards) {
+      expect(card.querySelector("svg.hm-icon")).toHaveAttribute("aria-hidden", "true");
+      expect(card.querySelector(".hm-desc")?.textContent).toBeTruthy();
+    }
+    // Start practice opens the lineup builder, so BOT PROFILES has no card
+    expect(screen.queryByTestId("menu-bot-profiles")).toBeNull();
+    expect(screen.getByTestId("home-page")).toHaveClass("home-screen");
   });
 });
 

@@ -21,17 +21,6 @@
   margin: 0 0 12px;
 }
 
-.home-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: min(320px, 90vw);
-}
-
-.home-menu .btn {
-  width: 100%;
-}
-
 .btn-primary {
   background: #1565c0;
   color: #fff;

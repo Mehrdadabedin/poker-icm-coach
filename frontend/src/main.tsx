@@ -38,6 +38,7 @@ import "./styles/winner.css";
 import "./styles/mistakes.css";
 import "./styles/icm-calculator.css";
 import "./styles/page-header.css";
+import "./styles/home-menu.css";
 
 initializeGoogleAnalytics();
 

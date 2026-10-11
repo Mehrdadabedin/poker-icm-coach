@@ -139,7 +139,7 @@ describe("lineup builder (A27)", () => {
 });
 
 describe("main menu (A26 preserved)", () => {
-  it("shows BOT PROFILES, hides TRAINING, START PRACTICE opens the lineup builder", async () => {
+  it("hides TRAINING; START PRACTICE opens the lineup builder, so BOT PROFILES has no entry", async () => {
     localStorage.setItem("icm_auth_token", "t-1");
     localStorage.setItem("icm_username", "Mehrdad");
     render(
@@ -151,7 +151,7 @@ describe("main menu (A26 preserved)", () => {
       </MemoryRouter>,
     );
     await act(async () => undefined);
-    expect(screen.getByTestId("menu-bot-profiles")).toBeInTheDocument();
+    expect(screen.queryByTestId("menu-bot-profiles")).toBeNull();
     expect(screen.queryByText("TRAINING")).toBeNull();
     await click("start-practice");
     expect(createTournament).not.toHaveBeenCalled();
