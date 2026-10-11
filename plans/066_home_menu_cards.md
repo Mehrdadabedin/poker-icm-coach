@@ -20,8 +20,9 @@ icon and one line each, in one dark colour on a white page.
   white "ICM" letters need a dark background. The bar keeps the logo,
   "Playing as", and LOG OUT.
 - Dark cards (#1d242c, 16px corners) with a gold line icon, a title and one
-  line saying what the page does. Under the mouse a card gets a little
-  lighter, rises 3px and gains a dark grey shadow.
+  line saying what the page does. Under the mouse a card turns a clearly
+  brighter slate (#3a4656, lighter border), rises 3px and gains a dark grey
+  shadow.
 - Order: Continue table (only for a live table, plan 065) and Start practice
   as two large cards; then STUDY (ICM coach, Ranges, ICM calculator), REVIEW
   (My mistakes, Hand history, Statistics) and SETUP (Tournament settings, and

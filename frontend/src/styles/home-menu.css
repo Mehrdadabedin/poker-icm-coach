@@ -31,9 +31,10 @@
   transition: background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
-/* under the mouse: a little lighter, lifted, with a dark grey shadow */
+/* under the mouse: a clearly brighter slate, lifted, with a dark grey shadow */
 .hm-card:hover {
-  background: #252e38;
+  background: #3a4656;
+  border-color: #5a6a80;
   box-shadow: 0 16px 32px -12px rgba(51, 51, 51, 0.55);
   transform: translateY(-3px);
 }
