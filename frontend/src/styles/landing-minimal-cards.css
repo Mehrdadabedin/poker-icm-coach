@@ -2,7 +2,7 @@
    under the mouse, used by How it works and by the features. Separate from
    landing-minimal.css, which is near the 200-line limit. */
 
-.lm-features-wrap { padding: clamp(64px, 10vw, 120px) 0; }
+.lm-features-wrap { padding: clamp(40px, 5vw, 64px) 0; }
 
 .lm-cards {
   display: grid;
