@@ -32,7 +32,7 @@ export function MinimalHero({ demoOpen, onWatchDemo }: MinimalHeroProps) {
           Watch the demo
         </button>
       </div>
-      <p className="lm-note" data-testid="minimal-note">Practice only. No real money. Browser and Android.</p>
+      <p className="lm-tagline" data-testid="minimal-tagline">PRACTICE · IMPROVE · WIN</p>
       <img
         className="lm-hero-img"
         src="/images/hero-coach-screen.webp"

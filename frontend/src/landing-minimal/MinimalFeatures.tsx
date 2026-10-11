@@ -1,15 +1,7 @@
-import type { ReactNode } from "react";
+import { MinimalCard, type CardContent } from "./MinimalCard";
 
-/** One quiet row of three features. The icons are inline SVG line drawings
- * that take their gold from CSS (currentColor) and add no image requests. */
-interface Feature {
-  id: string;
-  title: string;
-  text: string;
-  icon: ReactNode;
-}
-
-const FEATURES: Feature[] = [
+/** One row of three feature cards. */
+const FEATURES: CardContent[] = [
   {
     id: "coach",
     title: "Coach at every decision",
@@ -51,29 +43,9 @@ const FEATURES: Feature[] = [
 export function MinimalFeatures() {
   return (
     <section className="lm-features-wrap" aria-label="Features" data-testid="minimal-features">
-      <ul className="lm-features">
+      <ul className="lm-cards">
         {FEATURES.map((feature) => (
-          <li key={feature.id} className="lm-feature" data-testid={`minimal-feature-${feature.id}`}>
-            <svg
-              className="lm-feature-icon"
-              viewBox="0 0 24 24"
-              width="28"
-              height="28"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-              focusable="false"
-            >
-              {feature.icon}
-            </svg>
-            <div className="lm-feature-body">
-              <h2 className="lm-feature-title">{feature.title}</h2>
-              <p className="lm-feature-text">{feature.text}</p>
-            </div>
-          </li>
+          <MinimalCard key={feature.id} card={feature} heading="h2" testId={`minimal-feature-${feature.id}`} />
         ))}
       </ul>
     </section>

@@ -5,7 +5,7 @@ phase: 6
 status: complete
 depends_on: [62, 63]
 test_file: frontend/tests/landing_minimal.test.tsx
-implementation_files: [frontend/src/pages/MinimalLandingPage.tsx, frontend/src/landing-minimal/MinimalHeader.tsx, frontend/src/landing-minimal/MinimalHero.tsx, frontend/src/landing-minimal/MinimalProof.tsx, frontend/src/landing-minimal/MinimalFeatures.tsx, frontend/src/landing-minimal/MinimalDemo.tsx, frontend/src/landing-minimal/MinimalClosing.tsx, frontend/src/landing-minimal/MinimalFooter.tsx, frontend/src/styles/landing-minimal.css, frontend/src/styles/landing-minimal-proof.css, frontend/src/styles/landing-minimal-features.css, frontend/src/components/AnalyticsConsentBanner.tsx, frontend/src/styles/analytics-consent.css]
+implementation_files: [frontend/src/pages/MinimalLandingPage.tsx, frontend/src/landing-minimal/MinimalHeader.tsx, frontend/src/landing-minimal/MinimalHero.tsx, frontend/src/landing-minimal/MinimalHow.tsx, frontend/src/landing-minimal/MinimalCard.tsx, frontend/src/landing-minimal/MinimalFeatures.tsx, frontend/src/landing-minimal/MinimalDemo.tsx, frontend/src/landing-minimal/MinimalClosing.tsx, frontend/src/landing-minimal/MinimalFooter.tsx, frontend/src/styles/landing-minimal.css, frontend/src/styles/landing-minimal-sections.css, frontend/src/styles/landing-minimal-cards.css, frontend/src/components/AnalyticsConsentBanner.tsx, frontend/src/styles/analytics-consent.css]
 ---
 
 # Objective
@@ -90,3 +90,20 @@ a phone-specific crop of the coach panel is a possible follow-up.
 - Hero picture: the coach screen without the robot arm,
   hero-coach-screen.webp, 1602x982, 170 KB, replacing hero-coach-hand.webp.
   Shown at 880px wide at most (was 1040px).
+
+# Revision: How it works, tagline and footer
+
+- How it works replaces the My Mistakes proof card: the current landing
+  page's three steps (Sign up, Choose your opponents, Play and get graded)
+  as the same white rounded cards as the features, each with an icon (a
+  person with a plus, a robot head, a clipboard with a check) instead of a
+  number. The steps are an ordered list, so screen readers keep the order.
+  MinimalCard.tsx is shared by both rows; the card styles are in
+  landing-minimal-cards.css (renamed from -features), the other sections in
+  landing-minimal-sections.css (renamed from -proof).
+- Under the hero actions: the brand tagline "PRACTICE · IMPROVE · WIN" in
+  amber (the logo's gold is unreadable on the light page) replaces "Practice
+  only. No real money. Browser and Android."
+- Footer: "© 2026 ICMBOT" on the left; "Practice only, no real money." and
+  Cookie settings on the right, lined up with the header's edges. Stacked
+  and centred on phones.

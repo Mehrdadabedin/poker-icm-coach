@@ -152,20 +152,8 @@
 .lm-demo { max-width: 880px; margin: clamp(40px, 6vw, 72px) auto 0; }
 .lm-video { display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; background: #000; }
 
-/* the three features are cards, in landing-minimal-features.css */
-
-/* ---- footer line ---- */
-.lm-footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 6px 20px;
-  padding: 24px var(--lm-gutter) 32px;
-  border-top: 1px solid var(--lm-line);
-  color: var(--lm-muted);
-  font-size: 0.8rem;
-  text-align: center;
-}
+/* the cards are in landing-minimal-cards.css; the tagline, How it works, the
+   closing and the footer in landing-minimal-sections.css */
 
 /* phones: a smaller logo so Log in and Start free stay on one line, and
    centred hero actions */

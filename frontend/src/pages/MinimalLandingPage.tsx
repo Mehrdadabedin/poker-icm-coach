@@ -5,11 +5,11 @@ import { MinimalFeatures } from "../landing-minimal/MinimalFeatures";
 import { MinimalFooter } from "../landing-minimal/MinimalFooter";
 import { MinimalHeader } from "../landing-minimal/MinimalHeader";
 import { MinimalHero } from "../landing-minimal/MinimalHero";
-import { MinimalProof } from "../landing-minimal/MinimalProof";
+import { MinimalHow } from "../landing-minimal/MinimalHow";
 
 /** The minimalist brand landing page, served at /minimal for a side-by-side
  * comparison with the current one: one message, one action, one picture, then
- * one real My Mistakes card as proof, three features and the same action again.
+ * How it works in three steps, three features and the same action again.
  * It shares no component or CSS with the current page, owns no auth state and
  * registers no WebMCP tools: every link goes to the sign-in flow at /login. */
 export function MinimalLandingPage() {
@@ -26,7 +26,7 @@ export function MinimalLandingPage() {
       <main className="lm-main">
         <MinimalHero demoOpen={demoOpen} onWatchDemo={watchDemo} />
         {demoOpen && <MinimalDemo />}
-        <MinimalProof />
+        <MinimalHow />
         <MinimalFeatures />
         <MinimalClosing />
       </main>
