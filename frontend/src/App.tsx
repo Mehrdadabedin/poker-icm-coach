@@ -5,6 +5,7 @@ import { AdminChangePasswordPage } from "./pages/AdminChangePasswordPage";
 import { AdminPage } from "./pages/AdminPage";
 import { HomePage } from "./pages/HomePage";
 import { LandingPage } from "./pages/LandingPage";
+import { MinimalLandingPage } from "./pages/MinimalLandingPage";
 import { getToken } from "./services/api";
 import { TablePage } from "./pages/TablePage";
 import { RangesPage } from "./pages/RangesPage";
@@ -47,6 +48,7 @@ export function App() {
       <AnalyticsConsentBanner />
       <Routes>
         <Route path="/" element={<EntryPage />} />
+        <Route path="/minimal" element={<MinimalLandingPage />} />
         <Route path="/login" element={<HomePage />} />
         <Route path="/change-password" element={<AdminChangePasswordPage />} />
         <Route path="/admin/:section?" element={<AdminPage />} />
