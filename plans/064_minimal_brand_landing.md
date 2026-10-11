@@ -111,3 +111,10 @@ a phone-specific crop of the coach panel is a possible follow-up.
   (a little darker under the mouse), the same height as the gold Start
   training free, instead of underlined text. Full width under the gold
   button on phones.
+
+# Revision: tighter section spacing
+
+The gaps above How it works, between the two card rows and above the
+closing line were 136, 120 and 120px on a 1280px screen (72, 64 and 64 on a
+375px phone). They are now 80, 64 and 64px (48, 40 and 40 on a phone); the
+page is 168px shorter on a desktop.
