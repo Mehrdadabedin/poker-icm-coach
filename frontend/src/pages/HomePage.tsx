@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { adminSummary, clearAuth, getToken, getUsername, logout, me } from "../services/api";
 import { Copyright } from "../components/Copyright";
 import { BrandLogo } from "../components/BrandLogo";
+import { HomeMenu } from "../components/HomeMenu";
 import { LoginForm } from "../components/LoginForm";
-import { useAwayTable } from "../hooks/useAwayTable";
 
 /** HOME screen: username login (A03) then start a practice tournament or
  * visit the tools. The authenticated username replaces "Hero" everywhere. */
 export function HomePage() {
-  const navigate = useNavigate();
-  const away = useAwayTable();
   const location = useLocation();
   const authNotice = (location.state as { authNotice?: string } | null)?.authNotice ?? null;
   const [user, setUser] = useState<string | null>(() => (getToken() ? getUsername() : null));
@@ -57,11 +55,6 @@ export function HomePage() {
     setUser(null);
   };
 
-  const startPractice = () => {
-    // A27: START PRACTICE now opens the opponent-choice screen.
-    navigate("/start");
-  };
-
   if (!user) {
     // The sign-in screen owns the full viewport: brand header, then the panel.
     return (
@@ -98,27 +91,7 @@ export function HomePage() {
         </div>
       </div>
       <p className="home-tagline">9-player tournament practice with an ICM coach</p>
-      <div className="home-menu">
-        {away && (
-          <button className="btn btn-primary" onClick={() => navigate(`/table/${away.tableId}`)} data-testid="continue-table">
-            CONTINUE TABLE{away.label ? ` ${away.label}` : ""}
-          </button>
-        )}
-        <button className="btn btn-primary" onClick={startPractice} data-testid="start-practice">
-          START PRACTICE
-        </button>
-        <button className="btn" onClick={() => navigate("/bot-profiles")} data-testid="menu-bot-profiles">BOT PROFILES</button>
-        <button className="btn" onClick={() => navigate("/ranges")}>RANGES</button>
-        <button className="btn" onClick={() => navigate("/coach")}>ICM COACH</button>
-        <button className="btn" onClick={() => navigate("/settings")}>TOURNAMENT SETTINGS</button>
-        <button className="btn" onClick={() => navigate("/history")}>HAND HISTORY</button>
-        <button className="btn" onClick={() => navigate("/statistics")}>STATISTICS</button>
-        <button className="btn" onClick={() => navigate("/mistakes")} data-testid="menu-mistakes">MY MISTAKES</button>
-        <button className="btn" onClick={() => navigate("/icm-calculator")} data-testid="menu-icm-calculator">ICM CALCULATOR</button>
-        {isAdmin && (
-          <button className="btn" onClick={() => navigate("/admin")} data-testid="menu-admin">ADMIN</button>
-        )}
-      </div>
+      <HomeMenu isAdmin={isAdmin} />
       <Copyright />
     </div>
   );

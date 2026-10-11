@@ -111,7 +111,7 @@
 }
 .bot-profiles-page .btn-primary { display: block; margin: 18px auto 0; }
 
-/* ---- A27: CHOOSE YOUR OPPONENTS screen ---- */
+/* ---- a centred column of buttons (the TABLE ENDED screen) ---- */
 .opponent-choice {
   display: flex; flex-direction: column; gap: 14px; align-items: center;
   max-width: 420px; margin: 0 auto;

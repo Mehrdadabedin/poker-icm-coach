@@ -1,10 +1,10 @@
-/* A27: opponent choice + multi-BOT lineup builder (START PRACTICE flow). */
+/* A27: the multi-BOT lineup builder that START PRACTICE opens. The random-
+ * opponents step is gone: every practice table starts from a chosen lineup. */
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { act, render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { BotProfilesPage } from "../src/pages/BotProfilesPage";
 import { HomePage } from "../src/pages/HomePage";
-import { OpponentChoicePage } from "../src/pages/OpponentChoicePage";
 
 const { createTournament } = vi.hoisted(() => ({
   createTournament: vi.fn(async () => ({ tableId: "T1" })),
@@ -21,12 +21,11 @@ vi.mock("../src/services/api", async (importOriginal) => ({
   createTournament,
 }));
 
-function renderFlow(initial = "/start") {
+function renderFlow() {
   return render(
-    <MemoryRouter initialEntries={[initial]}>
+    <MemoryRouter initialEntries={["/", "/bot-profiles"]}>
       <Routes>
         <Route path="/" element={<div data-testid="home-page" />} />
-        <Route path="/start" element={<OpponentChoicePage />} />
         <Route path="/bot-profiles" element={<BotProfilesPage />} />
         <Route path="/table/:tableId" element={<div data-testid="table-stub" />} />
         <Route path="/login" element={<HomePage />} />
@@ -35,8 +34,9 @@ function renderFlow(initial = "/start") {
   );
 }
 
-function loadChoice() {
-  return renderFlow();
+async function openBuilder() {
+  renderFlow();
+  await act(async () => undefined);
 }
 
 const click = async (testid: string) => act(async () => screen.getByTestId(testid).click());
@@ -48,41 +48,23 @@ const add = (id: string, n: number) =>
 beforeEach(() => localStorage.clear());
 beforeEach(() => createTournament.mockClear());
 
-describe("START PRACTICE choice (A27)", () => {
-  it("renders RANDOM and CHOOSE options", async () => {
-    await loadChoice();
-    expect(screen.getByTestId("opponents-random")).toHaveTextContent("RANDOM OPPONENTS");
-    expect(screen.getByTestId("opponents-choose")).toHaveTextContent("CHOOSE OPPONENTS");
-  });
-  it("RANDOM keeps the legacy path with the stored single profile", async () => {
-    localStorage.setItem("icm_bot_profile", "alex");
-    await loadChoice();
-    await click("opponents-random");
-    expect(createTournament).toHaveBeenCalledWith(10, "tag");
-  });
-  it("RANDOM sends no profile when none is stored", async () => {
-    await loadChoice();
-    await click("opponents-random");
-    expect(createTournament).toHaveBeenCalledWith(10, undefined);
-  });
-  it("CHOOSE opens BOT PROFILES", async () => {
-    await loadChoice();
-    await click("opponents-choose");
-    expect(screen.getByTestId("bot-profiles-page")).toBeInTheDocument();
+describe("BACK (A27)", () => {
+  it("returns to the home menu", async () => {
+    await openBuilder();
+    await click("bot-profiles-back");
+    expect(screen.getByTestId("home-page")).toBeInTheDocument();
   });
 });
 
 describe("lineup builder (A27)", () => {
   it("shows the four personalities", async () => {
-    await loadChoice();
-    await click("opponents-choose");
+    await openBuilder();
     for (const id of ["alex", "sarah", "david", "emma"]) {
       expect(screen.getByTestId(`bot-profile-${id}`)).toBeInTheDocument();
     }
   });
   it("adds/removes with counts and never goes negative", async () => {
-    await loadChoice();
-    await click("opponents-choose");
+    await openBuilder();
     await click("bot-profile-add-alex");
     await click("bot-profile-add-alex");
     expect(screen.getByTestId("bot-profile-count-alex").textContent).toBe("2");
@@ -92,16 +74,14 @@ describe("lineup builder (A27)", () => {
     expect((screen.getByTestId("bot-profile-remove-alex") as HTMLButtonElement).disabled).toBe(true);
   });
   it("allows repeats of one profile up to 8 and stops at 8", async () => {
-    await loadChoice();
-    await click("opponents-choose");
+    await openBuilder();
     for (let i = 0; i < 9; i += 1) await click("bot-profile-add-alex");
     expect(screen.getByTestId("bot-profile-count-alex").textContent).toBe("8");
     expect(screen.getByTestId("bot-profiles-total").textContent).toContain("8 / 8");
     expect((screen.getByTestId("bot-profile-add-alex") as HTMLButtonElement).disabled).toBe(true);
   });
   it("requires exactly 8 before starting the table", async () => {
-    await loadChoice();
-    await click("opponents-choose");
+    await openBuilder();
     await click("bot-profile-add-alex");
     await click("add-bots-to-table");
     expect(screen.getByTestId("bot-profiles-error")).toHaveTextContent(
@@ -110,8 +90,7 @@ describe("lineup builder (A27)", () => {
     expect(createTournament).not.toHaveBeenCalled();
   });
   it("sends the example lineup (2 Alex + 1 Sarah + 3 David + 2 Emma)", async () => {
-    await loadChoice();
-    await click("opponents-choose");
+    await openBuilder();
     await add("alex", 2);
     await add("sarah", 1);
     await add("david", 3);
@@ -130,8 +109,7 @@ describe("lineup builder (A27)", () => {
   });
 
   it("shows the portrait image for every profile", async () => {
-    await loadChoice();
-    await click("opponents-choose");
+    await openBuilder();
     const expected = {
       alex: "/images/bot-profiles/alex.png",
       sarah: "/images/bot-profiles/sarah.png",
@@ -148,8 +126,7 @@ describe("lineup builder (A27)", () => {
     const { AuthError } = await import("../src/services/api");
     localStorage.setItem("icm_auth_token", "stale-token");
     createTournament.mockRejectedValueOnce(new AuthError("Authentication required (API 401)"));
-    await loadChoice();
-    await click("opponents-choose");
+    await openBuilder();
     for (let i = 0; i < 8; i += 1) await click("bot-profile-add-alex");
     expect(screen.getByTestId("bot-profiles-total").textContent).toContain("8 / 8");
     await click("add-bots-to-table");
@@ -159,23 +136,16 @@ describe("lineup builder (A27)", () => {
     );
     expect(screen.getByTestId("auth-submit")).toBeInTheDocument(); // login form
   });
-  it("BACK returns to the previous screen", async () => {
-    await loadChoice();
-    await click("opponents-choose");
-    await click("bot-profiles-back");
-    expect(screen.getByTestId("opponent-choice-page")).toBeInTheDocument();
-  });
 });
 
 describe("main menu (A26 preserved)", () => {
-  it("shows BOT PROFILES, hides TRAINING, START PRACTICE opens choice", async () => {
+  it("shows BOT PROFILES, hides TRAINING, START PRACTICE opens the lineup builder", async () => {
     localStorage.setItem("icm_auth_token", "t-1");
     localStorage.setItem("icm_username", "Mehrdad");
     render(
       <MemoryRouter initialEntries={["/"]}>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/start" element={<OpponentChoicePage />} />
           <Route path="/bot-profiles" element={<BotProfilesPage />} />
         </Routes>
       </MemoryRouter>,
@@ -185,7 +155,7 @@ describe("main menu (A26 preserved)", () => {
     expect(screen.queryByText("TRAINING")).toBeNull();
     await click("start-practice");
     expect(createTournament).not.toHaveBeenCalled();
-    expect(screen.getByTestId("opponent-choice-page")).toBeInTheDocument();
+    expect(screen.getByTestId("bot-profiles-page")).toBeInTheDocument();
   });
 });
 

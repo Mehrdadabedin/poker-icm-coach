@@ -4,6 +4,7 @@ import { winnerPreviewEnabled } from "./endgame";
 import { endgameOverlays } from "./endgameOverlays";
 import { LiveTableView } from "../components/LiveTableView";
 import { LoginForm } from "../components/LoginForm";
+import { TableGone } from "../components/TableGone";
 import { useAutoNext } from "../hooks/useAutoNext";
 import { useAutoFinish } from "../hooks/useAutoFinish";
 import { useGame } from "../hooks/useGame";
@@ -142,6 +143,7 @@ export function TablePage() {
       clearAuth();
       setAuthed(false);
     }
+    if (error.startsWith("API 404")) return <TableGone />;
     return <div className="error-box">API ERROR: {error}</div>;
   }
   if (!state) {
