@@ -62,3 +62,15 @@ study software rather than a poker room:
 Results: frontend 252 passed; page height 2187px desktop, 1688px phone.
 On phones the product screenshot is a picture rather than readable text;
 a phone-specific crop of the coach panel is a possible follow-up.
+
+# Revision: coach-screen picture and the logo
+
+- Hero picture: "Neon AI Poker Coach Interface" (a robot hand presenting the
+  ICMBOT table with the ICM coach panel), as hero-coach-hand.webp, 1536x1024,
+  159 KB. It replaces the browser-framed screenshot, whose component, CSS and
+  image were removed.
+- Logo: logo.png converted for light backgrounds as Logo/logo-on-light.png
+  (black background removed, white lettering turned near-black, gold and the
+  robot chip kept as drawn), 406x96 for a sharp 48px header (30px on phones).
+- Footer: Cookie settings removed from the footer, because the shared consent
+  banner already shows its own Cookie settings button on every page.
