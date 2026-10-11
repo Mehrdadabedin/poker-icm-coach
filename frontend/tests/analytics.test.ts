@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { createElement, type ComponentType } from "react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -90,15 +90,25 @@ describe("Google Analytics consent", () => {
     expect(queuedCommands().some((command) => command[0] === "event")).toBe(false);
   });
 
-  it("remembers the choice across mounts and lets visitors reopen settings", () => {
+  it("remembers the choice across mounts and lets the footer link reopen settings", () => {
     const firstRender = renderBanner();
     fireEvent.click(screen.getByRole("button", { name: "Reject analytics" }));
     firstRender.unmount();
 
     renderBanner();
     expect(screen.queryByRole("heading", { name: "Your privacy matters" })).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: "Cookie settings" }));
+    act(() => {
+      window.dispatchEvent(new CustomEvent("icmbot:cookie-settings"));
+    });
     expect(screen.getByRole("button", { name: "Accept analytics" })).toBeTruthy();
+  });
+
+  it("leaves no floating Cookie settings button once the visitor has chosen", () => {
+    renderBanner();
+    fireEvent.click(screen.getByRole("button", { name: "Accept analytics" }));
+
+    expect(screen.queryByRole("button", { name: "Cookie settings" })).toBeNull();
+    expect(document.body.querySelector("button")).toBeNull();
   });
 
   it("redacts table identifiers and omits query parameters after consent", () => {

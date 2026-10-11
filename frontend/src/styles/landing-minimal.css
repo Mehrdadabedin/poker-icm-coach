@@ -26,7 +26,13 @@
 .lm-page a:focus-visible,
 .lm-page button:focus-visible { outline: 2px solid var(--lm-accent); outline-offset: 3px; }
 
-/* ---- top bar: wordmark, a plain link, one button ---- */
+/* ---- top bar: a black band in the logo's own colour, a plain link, one
+   gold outline button (gold reads well on black) ---- */
+.lm-header-band { background: #07080a; }
+.lm-header-band .lm-login { color: #c9cfd8; }
+.lm-header-band .lm-login:hover { color: #fff; }
+.lm-header-band .lm-btn-quiet { border-color: var(--lm-gold); color: var(--lm-gold); }
+
 .lm-header {
   display: flex;
   align-items: center;
@@ -38,9 +44,8 @@
   padding: 20px var(--lm-gutter);
 }
 
-.lm-brand { display: flex; align-items: center; gap: 10px; margin: 0; }
-.lm-brand-mark { display: block; width: 32px; height: 32px; }
-.lm-brand-name { font-family: var(--lm-head); font-size: 1.25rem; font-weight: 800; letter-spacing: 0.02em; }
+.lm-brand { margin: 0; }
+.lm-brand-logo { display: block; width: auto; height: 48px; }
 
 .lm-nav { display: flex; align-items: center; gap: 22px; }
 
@@ -132,6 +137,17 @@
 }
 .lm-link:hover { color: var(--lm-accent); text-decoration-color: var(--lm-accent); }
 
+/* ---- the hero picture ---- */
+.lm-hero-img {
+  display: block;
+  width: 100%;
+  max-width: 1040px;
+  height: auto;
+  margin: clamp(44px, 7vw, 84px) auto 0;
+  border-radius: 16px;
+  box-shadow: 0 30px 60px -30px rgba(20, 20, 20, 0.45), 0 2px 6px rgba(20, 20, 20, 0.06);
+}
+
 /* ---- demo video: mounted only after "Watch the demo" ---- */
 .lm-demo { max-width: 880px; margin: clamp(40px, 6vw, 72px) auto 0; }
 .lm-video { display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; background: #000; }
@@ -168,10 +184,14 @@
   text-align: center;
 }
 
-/* phones: centred stack for the hero actions, features as a left-aligned list with the icon beside the text */
+/* phones: a smaller logo so Log in and Start free stay on one line, centred
+   hero actions, features as a left-aligned list with the icon beside the text */
 @media (max-width: 639px) {
-  .lm-nav { gap: 16px; }
-  .lm-brand-name { font-size: 1.1rem; }
+  .lm-nav { gap: 12px; }
+  .lm-login, .lm-btn-quiet { white-space: nowrap; }
+  .lm-btn-quiet { min-height: 38px; padding: 7px 14px; }
+  .lm-brand-logo { height: 30px; }
+  .lm-hero-img { border-radius: 10px; }
   .lm-btn-primary { width: 100%; max-width: 360px; }
   .lm-features { grid-template-columns: minmax(0, 1fr); gap: 28px; max-width: 420px; text-align: left; }
   .lm-feature { flex-direction: row; align-items: flex-start; gap: 16px; }

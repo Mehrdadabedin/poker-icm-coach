@@ -63,6 +63,7 @@
   text-align: center;
 }
 
+/* footer: Cookie settings as a plain text link beside the copyright line */
 .lm-footer-link {
   padding: 0;
   border: 0;
@@ -73,5 +74,5 @@
   text-underline-offset: 3px;
   cursor: pointer;
 }
+.lm-footer-link:hover { color: var(--lm-text); }
 
-.lm-footer-link:hover { color: var(--lm-accent); }
