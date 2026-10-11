@@ -39,9 +39,8 @@ scripts/demo-video/README.md.
 
 # Found, not changed
 
-- A hand reaches My Mistakes only when the next hand is dealt (the hand is
-  recorded in `_settle_hand` at `next_hand`), so a mistake is not listed
-  right after it is made.
+- A hand reached My Mistakes only when the next hand was dealt (the hand
+  was recorded in `_settle_hand` at `next_hand`). Fixed in plan 068.
 - scripts/record-promo made the previous video and is no longer used.
 
 # Tests
