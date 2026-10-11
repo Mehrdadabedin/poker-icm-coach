@@ -7,12 +7,12 @@ interface MinimalHeroProps {
 
 /** Hero of the minimal landing: a very large headline, one sentence, ONE
  * primary button and a quiet text link that opens the demo video, then the
- * picture of a robot hand presenting the ICM coach screen. */
+ * picture of the ICM coach screen. */
 export function MinimalHero({ demoOpen, onWatchDemo }: MinimalHeroProps) {
   return (
     <section className="lm-hero" aria-labelledby="lm-hero-title" data-testid="minimal-hero">
       <h1 className="lm-title" id="lm-hero-title">
-        Master tournament <span className="lm-accent">decisions.</span>
+        Master tournament <span className="lm-accent">decisions</span>
       </h1>
       <p className="lm-sub">
         Play 9-handed tournaments against 8 bots. The ICM coach shows the right
@@ -35,10 +35,10 @@ export function MinimalHero({ demoOpen, onWatchDemo }: MinimalHeroProps) {
       <p className="lm-note" data-testid="minimal-note">Practice only. No real money. Browser and Android.</p>
       <img
         className="lm-hero-img"
-        src="/images/hero-coach-hand.webp"
-        alt="A robot hand presents the ICMBOT table on a floating screen, where the ICM coach recommends a raise with K8s"
-        width={1536}
-        height={1024}
+        src="/images/hero-coach-screen.webp"
+        alt="The ICMBOT table on a floating screen, where the ICM coach recommends a raise with K8s"
+        width={1602}
+        height={982}
         data-testid="minimal-hero-visual"
       />
     </section>

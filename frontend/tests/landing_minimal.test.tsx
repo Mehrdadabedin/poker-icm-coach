@@ -41,13 +41,13 @@ describe("minimal landing page (/minimal)", () => {
 
   it("shows the large headline, one sentence and the coach-screen picture", async () => {
     await openAt("#/minimal");
-    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Master tournament decisions.");
+    expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Master tournament decisions");
     expect(screen.getByText("Play 9-handed tournaments against 8 bots. The ICM coach shows the right move, and why.")).toBeInTheDocument();
     expect(screen.getByTestId("minimal-note")).toHaveTextContent("Practice only. No real money. Browser and Android.");
     const picture = screen.getByTestId("minimal-hero-visual");
-    expect(picture).toHaveAttribute("src", "/images/hero-coach-hand.webp");
-    expect(picture).toHaveAttribute("width", "1536");
-    expect(picture).toHaveAttribute("height", "1024");
+    expect(picture).toHaveAttribute("src", "/images/hero-coach-screen.webp");
+    expect(picture).toHaveAttribute("width", "1602");
+    expect(picture).toHaveAttribute("height", "982");
     expect(picture.getAttribute("alt")).toContain("ICM coach recommends a raise");
   });
 
@@ -77,7 +77,7 @@ describe("minimal landing page (/minimal)", () => {
     }
   });
 
-  it("shows three features, each with an amber inline icon, a short title and one line", async () => {
+  it("shows three features as rounded cards, each with an amber inline icon, a short title and one line", async () => {
     await openAt("#/minimal");
     const items = screen.getByTestId("minimal-features").querySelectorAll("li.lm-feature");
     expect(items).toHaveLength(3);
@@ -89,10 +89,15 @@ describe("minimal landing page (/minimal)", () => {
       expect(icon).toHaveAttribute("aria-hidden", "true");
       expect(item.querySelectorAll("p")).toHaveLength(1);
     }
-    const css = (await import("fs")).readFileSync("src/styles/landing-minimal.css", "utf8");
+    const { readFileSync } = await import("fs");
+    const css = readFileSync("src/styles/landing-minimal.css", "utf8");
     // Light page: icons use the deeper amber, gold stays on the main button.
     expect(css).toContain("--lm-accent: #8a5a00");
-    expect(css).toMatch(/\.lm-feature-icon \{[^}]*color: var\(--lm-accent\)/);
+    const cards = readFileSync("src/styles/landing-minimal-features.css", "utf8");
+    expect(cards).toMatch(/\.lm-feature-icon \{[^}]*color: var\(--lm-accent\)/);
+    // white rounded cards that gain a dark grey shadow under the mouse
+    expect(cards).toMatch(/\.lm-feature \{[^}]*border-radius: 16px;[^}]*background: #fff;/);
+    expect(cards).toMatch(/\.lm-feature:hover \{[^}]*box-shadow: [^;]*rgba\(51, 51, 51, /);
   });
 
   it("opens the demo video only on Watch the demo, and never autoplays it", async () => {
