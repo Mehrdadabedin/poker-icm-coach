@@ -70,6 +70,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 064 | Minimalist Brand Landing Page (/minimal) | 6 | complete | PASS (9 FE) | separate page for comparison; proof card, one action, cookie settings; current landing unchanged |
 | 065 | Continue Table Only for a Live Table, Practice Starts from a Lineup | 6 | complete | PASS (9 FE new) | CONTINUE/BACK TO TABLE checked against the server; TABLE ENDED instead of API 404; RANDOM OPPONENTS removed, START PRACTICE opens the lineup builder |
 | 066 | Home Menu as Dark Cards on a White Page | 6 | complete | PASS (1 FE new) | option C chosen: dark cards with icon and one line, grouped Study/Review/Setup, white page under a black top bar; BOT PROFILES card dropped |
+| 067 | New Narrated Demo Video and a Reusable Pipeline | 6 | complete | PASS (no code change) | 49s demo with a female voice (ElevenLabs via OpenRouter): landing, menu, settings, bots, two hands, Continue table, My Mistakes; scripts/demo-video records, voices and assembles it |
 
 ## Current Phase
 
