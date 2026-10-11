@@ -24,6 +24,7 @@ import "./styles/landing-hero.css";
 import "./styles/landing-quiz.css";
 import "./styles/landing-coach.css";
 import "./styles/landing-faq.css";
+import "./styles/landing-minimal.css";
 import "./styles/brand.css";
 import "./styles/mobile.css";
 import "./styles/analytics-consent.css";
