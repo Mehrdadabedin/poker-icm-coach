@@ -39,22 +39,24 @@ describe("minimal landing page (/minimal)", () => {
     expect(screen.queryByTestId("minimal-landing-page")).toBeNull();
   });
 
-  it("shows the large headline, one sentence and the unchanged hero picture", async () => {
+  it("shows the large headline, one sentence and the real product as the picture", async () => {
     await openAt("#/minimal");
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Master tournament decisions.");
     expect(screen.getByText("Play 9-handed tournaments against 8 bots. The ICM coach shows the right move, and why.")).toBeInTheDocument();
     expect(screen.getByTestId("minimal-note")).toHaveTextContent("Practice only. No real money. Browser and Android.");
-    const picture = screen.getByTestId("minimal-hero-visual");
-    expect(picture).toHaveAttribute("src", "/images/hero-sarah-coach.webp");
-    expect(picture).toHaveAttribute("width", "1200");
-    expect(picture).toHaveAttribute("height", "800");
-    expect(picture).toHaveAttribute("alt", "ICMBOT robot with a human face holding two aces, the ICM coach screen floating beside it");
+    const frame = screen.getByTestId("minimal-product");
+    expect(frame).toHaveTextContent("icmbot.one");
+    const picture = within(frame).getByTestId("minimal-hero-visual");
+    expect(picture).toHaveAttribute("src", "/images/product-table.webp");
+    expect(picture).toHaveAttribute("width", "1680");
+    expect(picture).toHaveAttribute("height", "805");
+    expect(picture.getAttribute("alt")).toContain("ICM coach recommends a raise");
   });
 
   it("has a top bar with Log in and Start free only, and no section menu", async () => {
     await openAt("#/minimal");
     const header = screen.getByTestId("minimal-header");
-    expect(screen.getByTestId("minimal-brand")).toBeInTheDocument();
+    expect(screen.getByTestId("minimal-brand")).toHaveTextContent("ICMBOT");
     expect(screen.getByTestId("minimal-login")).toHaveAttribute("href", "#/login");
     expect(screen.getByTestId("minimal-login")).toHaveTextContent("Log in");
     expect(screen.getByTestId("minimal-signup")).toHaveAttribute("href", "#/login");
@@ -76,7 +78,7 @@ describe("minimal landing page (/minimal)", () => {
     }
   });
 
-  it("shows three features, each with a gold inline icon, a short title and one line", async () => {
+  it("shows three features, each with an amber inline icon, a short title and one line", async () => {
     await openAt("#/minimal");
     const items = screen.getByTestId("minimal-features").querySelectorAll("li.lm-feature");
     expect(items).toHaveLength(3);
@@ -89,8 +91,9 @@ describe("minimal landing page (/minimal)", () => {
       expect(item.querySelectorAll("p")).toHaveLength(1);
     }
     const css = (await import("fs")).readFileSync("src/styles/landing-minimal.css", "utf8");
-    expect(css).toContain("--lm-gold: #f2c14e");
-    expect(css).toMatch(/\.lm-feature-icon \{[^}]*color: var\(--lm-gold\)/);
+    // Light page: icons use the deeper amber, gold stays on the main button.
+    expect(css).toContain("--lm-accent: #8a5a00");
+    expect(css).toMatch(/\.lm-feature-icon \{[^}]*color: var\(--lm-accent\)/);
   });
 
   it("opens the demo video only on Watch the demo, and never autoplays it", async () => {
