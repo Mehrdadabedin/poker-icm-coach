@@ -55,7 +55,7 @@ describe("minimal landing page (/minimal)", () => {
     await openAt("#/minimal");
     const header = screen.getByTestId("minimal-header");
     const logo = within(screen.getByTestId("minimal-brand")).getByRole("img", { name: "ICMBOT" });
-    expect(logo).toHaveAttribute("src", "/Logo/logo-on-light.png");
+    expect(logo).toHaveAttribute("src", "/Logo/logo.png");
     expect(screen.getByTestId("minimal-login")).toHaveAttribute("href", "#/login");
     expect(screen.getByTestId("minimal-login")).toHaveTextContent("Log in");
     expect(screen.getByTestId("minimal-signup")).toHaveAttribute("href", "#/login");
@@ -132,7 +132,12 @@ describe("minimal landing page (/minimal)", () => {
     expect(screen.getByTestId("minimal-closing")).toHaveTextContent("Your next tournament starts here.");
     const footer = screen.getByTestId("minimal-footer");
     expect(footer).toHaveTextContent("© 2026 ICMBOT. Practice only, no real money.");
-    // the shared consent banner owns Cookie settings; the footer does not repeat it
-    expect(within(footer).queryByRole("button")).toBeNull();
+    // the consent banner has no floating button once a choice is saved, so the
+    // footer link is how a visitor changes it; it opens the shared banner
+    const opened = vi.fn();
+    window.addEventListener("icmbot:cookie-settings", opened);
+    fireEvent.click(within(footer).getByRole("button", { name: "Cookie settings" }));
+    window.removeEventListener("icmbot:cookie-settings", opened);
+    expect(opened).toHaveBeenCalledTimes(1);
   });
 });

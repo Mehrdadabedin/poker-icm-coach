@@ -1,9 +1,18 @@
-/** One footer line. Cookie settings is not repeated here: the shared consent
- * banner already shows its own Cookie settings button on every page. */
+/** One footer line with Cookie settings. The consent banner shows no floating
+ * button once a choice is saved, so this link (the same window event the
+ * current landing footer uses) is how a visitor changes their choice. */
 export function MinimalFooter() {
   return (
     <footer className="lm-footer" data-testid="minimal-footer">
       <span>© 2026 ICMBOT. Practice only, no real money.</span>
+      <button
+        type="button"
+        className="lm-footer-link"
+        onClick={() => window.dispatchEvent(new CustomEvent("icmbot:cookie-settings"))}
+        data-testid="minimal-cookie-settings"
+      >
+        Cookie settings
+      </button>
     </footer>
   );
 }

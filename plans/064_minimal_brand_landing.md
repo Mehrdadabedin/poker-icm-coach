@@ -5,7 +5,7 @@ phase: 6
 status: complete
 depends_on: [62, 63]
 test_file: frontend/tests/landing_minimal.test.tsx
-implementation_files: [frontend/src/pages/MinimalLandingPage.tsx, frontend/src/landing-minimal/MinimalHeader.tsx, frontend/src/landing-minimal/MinimalHero.tsx, frontend/src/landing-minimal/MinimalProductShot.tsx, frontend/src/landing-minimal/MinimalProof.tsx, frontend/src/landing-minimal/MinimalFeatures.tsx, frontend/src/landing-minimal/MinimalDemo.tsx, frontend/src/landing-minimal/MinimalClosing.tsx, frontend/src/landing-minimal/MinimalFooter.tsx, frontend/src/styles/landing-minimal.css, frontend/src/styles/landing-minimal-proof.css, frontend/src/styles/landing-minimal-shot.css]
+implementation_files: [frontend/src/pages/MinimalLandingPage.tsx, frontend/src/landing-minimal/MinimalHeader.tsx, frontend/src/landing-minimal/MinimalHero.tsx, frontend/src/landing-minimal/MinimalProof.tsx, frontend/src/landing-minimal/MinimalFeatures.tsx, frontend/src/landing-minimal/MinimalDemo.tsx, frontend/src/landing-minimal/MinimalClosing.tsx, frontend/src/landing-minimal/MinimalFooter.tsx, frontend/src/styles/landing-minimal.css, frontend/src/styles/landing-minimal-proof.css, frontend/src/components/AnalyticsConsentBanner.tsx, frontend/src/styles/analytics-consent.css]
 ---
 
 # Objective
@@ -69,8 +69,13 @@ a phone-specific crop of the coach panel is a possible follow-up.
   ICMBOT table with the ICM coach panel), as hero-coach-hand.webp, 1536x1024,
   159 KB. It replaces the browser-framed screenshot, whose component, CSS and
   image were removed.
-- Logo: logo.png converted for light backgrounds as Logo/logo-on-light.png
-  (black background removed, white lettering turned near-black, gold and the
-  robot chip kept as drawn), 406x96 for a sharp 48px header (30px on phones).
-- Footer: Cookie settings removed from the footer, because the shared consent
-  banner already shows its own Cookie settings button on every page.
+- Header: a full-width black band in the logo's own background colour
+  (#07080a), so the original logo.png sits on it unchanged; Log in in light
+  grey, Start free as a gold outline. The rest of the page stays light.
+- Cookie settings, on every page: the shared consent banner no longer leaves
+  a floating "Cookie settings" button at the bottom once a visitor has
+  accepted or rejected. The footer links on the current landing page and on
+  this page (a plain text link beside the copyright line) reopen the choice
+  through the same window event. Regression tests: the banner leaves no
+  button after a choice (analytics.test.ts), and this page's footer link
+  opens the banner (landing_minimal.test.tsx); both failed before the fix.

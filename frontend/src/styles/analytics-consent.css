@@ -40,8 +40,7 @@
   gap: 8px;
 }
 
-.analytics-consent__button,
-.analytics-cookie-settings {
+.analytics-consent__button {
   min-height: 44px;
   padding: 0 14px;
   border: 1px solid var(--accent, #f2c14e);
@@ -61,21 +60,7 @@
   color: var(--text, #e8e6e1);
 }
 
-.analytics-cookie-settings {
-  position: fixed;
-  z-index: 999;
-  /* bottom-LEFT: the copyright sits bottom-right, so the control must not
-     overlap it. Position only; the consent logic is unchanged. */
-  left: 12px;
-  right: auto;
-  bottom: max(12px, env(safe-area-inset-bottom));
-  background: #1d242c;
-  color: var(--text, #e8e6e1);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-}
-
-.analytics-consent__button:focus-visible,
-.analytics-cookie-settings:focus-visible {
+.analytics-consent__button:focus-visible {
   outline: 3px solid #fff;
   outline-offset: 2px;
 }

@@ -1,5 +1,5 @@
 /* Minimal landing (/minimal): the note under the hero actions, the My Mistakes
-   proof card, and the closing call to action, in the light
+   proof card, the closing call to action and the footer link, in the light
    palette of landing-minimal.css. Separate from
    landing-minimal.css, which is near the 200-line limit. The proof card is the
    page's only framed element, on purpose: it is the product itself. */
@@ -62,4 +62,17 @@
   padding: 0 var(--lm-gutter) clamp(72px, 10vw, 120px);
   text-align: center;
 }
+
+/* footer: Cookie settings as a plain text link beside the copyright line */
+.lm-footer-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.lm-footer-link:hover { color: var(--lm-text); }
 

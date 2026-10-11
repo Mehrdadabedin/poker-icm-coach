@@ -26,7 +26,13 @@
 .lm-page a:focus-visible,
 .lm-page button:focus-visible { outline: 2px solid var(--lm-accent); outline-offset: 3px; }
 
-/* ---- top bar: wordmark, a plain link, one button ---- */
+/* ---- top bar: a black band in the logo's own colour, a plain link, one
+   gold outline button (gold reads well on black) ---- */
+.lm-header-band { background: #07080a; }
+.lm-header-band .lm-login { color: #c9cfd8; }
+.lm-header-band .lm-login:hover { color: #fff; }
+.lm-header-band .lm-btn-quiet { border-color: var(--lm-gold); color: var(--lm-gold); }
+
 .lm-header {
   display: flex;
   align-items: center;
