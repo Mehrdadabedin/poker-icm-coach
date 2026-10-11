@@ -5,7 +5,7 @@ phase: 6
 status: complete
 depends_on: [62, 63]
 test_file: frontend/tests/landing_minimal.test.tsx
-implementation_files: [frontend/src/pages/MinimalLandingPage.tsx, frontend/src/landing-minimal/MinimalHeader.tsx, frontend/src/landing-minimal/MinimalHero.tsx, frontend/src/landing-minimal/MinimalProof.tsx, frontend/src/landing-minimal/MinimalFeatures.tsx, frontend/src/landing-minimal/MinimalDemo.tsx, frontend/src/landing-minimal/MinimalClosing.tsx, frontend/src/landing-minimal/MinimalFooter.tsx, frontend/src/styles/landing-minimal.css, frontend/src/styles/landing-minimal-proof.css, frontend/src/components/AnalyticsConsentBanner.tsx, frontend/src/styles/analytics-consent.css]
+implementation_files: [frontend/src/pages/MinimalLandingPage.tsx, frontend/src/landing-minimal/MinimalHeader.tsx, frontend/src/landing-minimal/MinimalHero.tsx, frontend/src/landing-minimal/MinimalProof.tsx, frontend/src/landing-minimal/MinimalFeatures.tsx, frontend/src/landing-minimal/MinimalDemo.tsx, frontend/src/landing-minimal/MinimalClosing.tsx, frontend/src/landing-minimal/MinimalFooter.tsx, frontend/src/styles/landing-minimal.css, frontend/src/styles/landing-minimal-proof.css, frontend/src/styles/landing-minimal-features.css, frontend/src/components/AnalyticsConsentBanner.tsx, frontend/src/styles/analytics-consent.css]
 ---
 
 # Objective
@@ -79,3 +79,14 @@ a phone-specific crop of the coach panel is a possible follow-up.
   through the same window event. Regression tests: the banner leaves no
   button after a choice (analytics.test.ts), and this page's footer link
   opens the banner (landing_minimal.test.tsx); both failed before the fix.
+
+# Revision: feature cards and the screen-only picture
+
+- Features: each one is a white rounded card (16px corners, thin border)
+  that rises a little and gains a dark grey shadow under the mouse, after
+  the DriveHUD feature cards. On phones the cards stack, icon beside the
+  text. The styles moved to landing-minimal-features.css.
+- Headline: "Master tournament decisions", without the full stop.
+- Hero picture: the coach screen without the robot arm,
+  hero-coach-screen.webp, 1602x982, 170 KB, replacing hero-coach-hand.webp.
+  Shown at 880px wide at most (was 1040px).
