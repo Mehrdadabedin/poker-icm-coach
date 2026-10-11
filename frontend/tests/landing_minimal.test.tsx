@@ -123,6 +123,9 @@ describe("minimal landing page (/minimal)", () => {
     await openAt("#/minimal");
     expect(screen.queryByTestId("minimal-video")).toBeNull();
     const watch = screen.getByRole("button", { name: "Watch the demo" });
+    // a rounded outline button beside the gold one, not a second gold button
+    expect(watch).toHaveClass("lm-btn", "lm-btn-outline");
+    expect(watch).not.toHaveClass("lm-btn-primary");
     expect(watch).toHaveAttribute("aria-expanded", "false");
 
     fireEvent.click(watch);

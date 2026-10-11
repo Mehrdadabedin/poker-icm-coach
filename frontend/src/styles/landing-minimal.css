@@ -123,19 +123,18 @@
   margin-top: 36px;
 }
 
-.lm-link {
-  padding: 4px 0;
-  border: 0;
-  background: transparent;
+/* Watch the demo: a rounded outline the same size as the gold button, so the
+   two read as a pair with the gold one still first */
+.lm-btn-outline {
+  min-height: 56px;
+  padding: 14px 32px;
+  border: 1.5px solid var(--lm-text);
+  background: rgba(20, 20, 20, 0.05);
   color: var(--lm-text);
-  font: inherit;
-  font-size: 1rem;
-  text-decoration: underline;
-  text-decoration-color: rgba(20, 20, 20, 0.3);
-  text-underline-offset: 5px;
+  font-size: 1.02rem;
   cursor: pointer;
 }
-.lm-link:hover { color: var(--lm-accent); text-decoration-color: var(--lm-accent); }
+.lm-btn-outline:hover { background: rgba(20, 20, 20, 0.1); }
 
 /* ---- the hero picture ---- */
 .lm-hero-img {
@@ -163,5 +162,5 @@
   .lm-btn-quiet { min-height: 38px; padding: 7px 14px; }
   .lm-brand-logo { height: 30px; }
   .lm-hero-img { border-radius: 10px; }
-  .lm-btn-primary { width: 100%; max-width: 360px; }
+  .lm-btn-primary, .lm-btn-outline { width: 100%; max-width: 360px; }
 }
