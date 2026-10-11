@@ -1,0 +1,77 @@
+/* Minimal landing (/minimal): the tagline under the hero actions, How it
+   works, the closing call to action and the footer, in the light palette of
+   landing-minimal.css. Separate from landing-minimal.css, which is near the
+   200-line limit. */
+
+/* the brand tagline, in amber: the logo's gold is unreadable on the light page */
+.lm-tagline {
+  margin: 22px 0 0;
+  color: var(--lm-accent);
+  font-family: var(--lm-head);
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+}
+
+.lm-how { margin-top: clamp(72px, 11vw, 136px); text-align: center; }
+.lm-how .lm-cards { margin-top: 32px; }
+
+.lm-how-title,
+.lm-closing-title {
+  margin: 0;
+  font-family: var(--lm-head);
+  font-size: clamp(1.5rem, 3.2vw, 2.15rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  text-wrap: balance; /* no lone last word on phones */
+}
+
+.lm-closing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  padding: 0 var(--lm-gutter) clamp(72px, 10vw, 120px);
+  text-align: center;
+}
+
+/* footer: copyright on the left; the practice note and Cookie settings on
+   the right, lined up with the header's edges */
+.lm-footer {
+  padding: 24px 0 32px;
+  border-top: 1px solid var(--lm-line);
+  color: var(--lm-muted);
+  font-size: 0.8rem;
+}
+
+.lm-footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 24px;
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 var(--lm-gutter);
+}
+
+.lm-footer-right { display: flex; flex-wrap: wrap; gap: 6px 20px; }
+
+.lm-footer-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.lm-footer-link:hover { color: var(--lm-text); }
+
+/* phones: the two footer groups stacked and centred */
+@media (max-width: 639px) {
+  .lm-footer-inner { flex-direction: column; text-align: center; }
+  .lm-footer-right { justify-content: center; }
+}

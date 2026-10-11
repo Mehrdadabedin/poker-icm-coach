@@ -43,7 +43,9 @@ describe("minimal landing page (/minimal)", () => {
     await openAt("#/minimal");
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Master tournament decisions");
     expect(screen.getByText("Play 9-handed tournaments against 8 bots. The ICM coach shows the right move, and why.")).toBeInTheDocument();
-    expect(screen.getByTestId("minimal-note")).toHaveTextContent("Practice only. No real money. Browser and Android.");
+    expect(screen.getByTestId("minimal-tagline")).toHaveTextContent("PRACTICE · IMPROVE · WIN");
+    // the practice-only note lives in the footer, not under the hero button
+    expect(screen.getByTestId("minimal-hero")).not.toHaveTextContent("Practice only");
     const picture = screen.getByTestId("minimal-hero-visual");
     expect(picture).toHaveAttribute("src", "/images/hero-coach-screen.webp");
     expect(picture).toHaveAttribute("width", "1602");
@@ -79,12 +81,12 @@ describe("minimal landing page (/minimal)", () => {
 
   it("shows three features as rounded cards, each with an amber inline icon, a short title and one line", async () => {
     await openAt("#/minimal");
-    const items = screen.getByTestId("minimal-features").querySelectorAll("li.lm-feature");
+    const items = screen.getByTestId("minimal-features").querySelectorAll("li.lm-card");
     expect(items).toHaveLength(3);
     const titles = Array.from(items).map((item) => item.querySelector("h2")?.textContent);
     expect(titles).toEqual(["Coach at every decision", "Find your mistakes", "ICM calculator"]);
     for (const item of Array.from(items)) {
-      const icon = item.querySelector("svg.lm-feature-icon");
+      const icon = item.querySelector("svg.lm-card-icon");
       expect(icon).toHaveAttribute("stroke", "currentColor");
       expect(icon).toHaveAttribute("aria-hidden", "true");
       expect(item.querySelectorAll("p")).toHaveLength(1);
@@ -93,11 +95,27 @@ describe("minimal landing page (/minimal)", () => {
     const css = readFileSync("src/styles/landing-minimal.css", "utf8");
     // Light page: icons use the deeper amber, gold stays on the main button.
     expect(css).toContain("--lm-accent: #8a5a00");
-    const cards = readFileSync("src/styles/landing-minimal-features.css", "utf8");
-    expect(cards).toMatch(/\.lm-feature-icon \{[^}]*color: var\(--lm-accent\)/);
+    const cards = readFileSync("src/styles/landing-minimal-cards.css", "utf8");
+    expect(cards).toMatch(/\.lm-card-icon \{[^}]*color: var\(--lm-accent\)/);
     // white rounded cards that gain a dark grey shadow under the mouse
-    expect(cards).toMatch(/\.lm-feature \{[^}]*border-radius: 16px;[^}]*background: #fff;/);
-    expect(cards).toMatch(/\.lm-feature:hover \{[^}]*box-shadow: [^;]*rgba\(51, 51, 51, /);
+    expect(cards).toMatch(/\.lm-card \{[^}]*border-radius: 16px;[^}]*background: #fff;/);
+    expect(cards).toMatch(/\.lm-card:hover \{[^}]*box-shadow: [^;]*rgba\(51, 51, 51, /);
+  });
+
+  it("shows How it works as three ordered step cards with an icon each, not a number", async () => {
+    await openAt("#/minimal");
+    const how = screen.getByTestId("minimal-how");
+    expect(within(how).getByRole("heading", { level: 2 })).toHaveTextContent("How it works");
+    const steps = how.querySelectorAll("ol > li.lm-card");
+    expect(Array.from(steps).map((step) => step.querySelector("h3")?.textContent))
+      .toEqual(["Sign up", "Choose your opponents", "Play and get graded"]);
+    expect(steps[2]).toHaveTextContent("Every decision is graded PREFERRED, ACCEPTABLE or SUBOPTIMAL.");
+    for (const step of Array.from(steps)) {
+      expect(step.querySelector("svg.lm-card-icon")).toHaveAttribute("aria-hidden", "true");
+      expect(step.textContent).not.toMatch(/\d/);
+    }
+    // the mistake card it replaces is gone
+    expect(screen.queryByText("See exactly where you went wrong.")).toBeNull();
   });
 
   it("opens the demo video only on Watch the demo, and never autoplays it", async () => {
@@ -123,20 +141,16 @@ describe("minimal landing page (/minimal)", () => {
     expect(play).not.toHaveBeenCalled();
   });
 
-  it("shows one real My Mistakes card as proof", async () => {
-    await openAt("#/minimal");
-    const proof = screen.getByTestId("minimal-proof");
-    expect(within(proof).getByRole("heading", { level: 2 })).toHaveTextContent("See exactly where you went wrong.");
-    expect(proof).toHaveTextContent("You: CALL \u2192 Coach: FOLD");
-    expect(proof).toHaveTextContent("54o is not in the MP open range.");
-    expect(proof).toHaveTextContent("5\u26664\u2660");
-  });
-
-  it("ends with the closing line and one footer line", async () => {
+  it("ends with the closing line and a footer: copyright left, note and Cookie settings right", async () => {
     await openAt("#/minimal");
     expect(screen.getByTestId("minimal-closing")).toHaveTextContent("Your next tournament starts here.");
     const footer = screen.getByTestId("minimal-footer");
-    expect(footer).toHaveTextContent("© 2026 ICMBOT. Practice only, no real money.");
+    const [left, right] = Array.from(footer.querySelector(".lm-footer-inner")?.children ?? []);
+    expect(left).toHaveTextContent(/^© 2026 ICMBOT$/);
+    expect(right).toHaveTextContent("Practice only, no real money.Cookie settings");
+    const { readFileSync } = await import("fs");
+    const sections = readFileSync("src/styles/landing-minimal-sections.css", "utf8");
+    expect(sections).toMatch(/\.lm-footer-inner \{[^}]*justify-content: space-between;/);
     // the consent banner has no floating button once a choice is saved, so the
     // footer link is how a visitor changes it; it opens the shared banner
     const opened = vi.fn();
