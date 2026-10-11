@@ -42,7 +42,8 @@ describe("minimal landing page (/minimal)", () => {
   it("shows the large headline, one sentence and the unchanged hero picture", async () => {
     await openAt("#/minimal");
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Master tournament decisions.");
-    expect(screen.getByText("Play 9-handed tournaments against 8 bots. The ICM coach tells you what to do, and why.")).toBeInTheDocument();
+    expect(screen.getByText("Play 9-handed tournaments against 8 bots. The ICM coach shows the right move, and why.")).toBeInTheDocument();
+    expect(screen.getByTestId("minimal-note")).toHaveTextContent("Practice only. No real money. Browser and Android.");
     const picture = screen.getByTestId("minimal-hero-visual");
     expect(picture).toHaveAttribute("src", "/images/hero-sarah-coach.webp");
     expect(picture).toHaveAttribute("width", "1200");
@@ -62,13 +63,17 @@ describe("minimal landing page (/minimal)", () => {
     expect(within(header).queryAllByRole("button")).toHaveLength(0);
   });
 
-  it("offers exactly one primary button, going to /login", async () => {
+  it("offers one action: the hero button, repeated once at the end", async () => {
     await openAt("#/minimal");
+    const hero = screen.getByTestId("minimal-hero");
+    expect(hero.querySelectorAll(".lm-btn-primary")).toHaveLength(1);
     const primary = document.querySelectorAll(".lm-btn-primary");
-    expect(primary).toHaveLength(1);
-    expect(primary[0]).toBe(screen.getByTestId("minimal-start"));
-    expect(primary[0]).toHaveAttribute("href", "#/login");
-    expect(primary[0]).toHaveTextContent("Start training free");
+    expect(Array.from(primary).map((b) => b.getAttribute("data-testid")))
+      .toEqual(["minimal-start", "minimal-closing-start"]);
+    for (const button of primary) {
+      expect(button).toHaveAttribute("href", "#/login");
+      expect(button).toHaveTextContent("Start training free");
+    }
   });
 
   it("shows three features, each with a gold inline icon, a short title and one line", async () => {
@@ -111,10 +116,24 @@ describe("minimal landing page (/minimal)", () => {
     expect(play).not.toHaveBeenCalled();
   });
 
-  it("ends with one tiny footer line", async () => {
+  it("shows one real My Mistakes card as proof", async () => {
     await openAt("#/minimal");
+    const proof = screen.getByTestId("minimal-proof");
+    expect(within(proof).getByRole("heading", { level: 2 })).toHaveTextContent("See exactly where you went wrong.");
+    expect(proof).toHaveTextContent("You: CALL \u2192 Coach: FOLD");
+    expect(proof).toHaveTextContent("54o is not in the MP open range.");
+    expect(proof).toHaveTextContent("5\u26664\u2660");
+  });
+
+  it("ends with the closing line and a footer whose Cookie settings opens the consent banner", async () => {
+    await openAt("#/minimal");
+    expect(screen.getByTestId("minimal-closing")).toHaveTextContent("Your next tournament starts here.");
     const footer = screen.getByTestId("minimal-footer");
-    expect(footer).toHaveTextContent("Practice only, no real money. Browser and Android.");
     expect(footer).toHaveTextContent("© 2026 ICMBOT");
+    const opened = vi.fn();
+    window.addEventListener("icmbot:cookie-settings", opened);
+    fireEvent.click(within(footer).getByTestId("minimal-cookie-settings"));
+    window.removeEventListener("icmbot:cookie-settings", opened);
+    expect(opened).toHaveBeenCalledTimes(1);
   });
 });

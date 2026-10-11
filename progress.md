@@ -67,6 +67,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 061 | Production CORS Origin (Render) | 5 | complete | PASS (preflight + 370 BE) | icm-master-frontend.onrender.com allowed; localhost 5173/4173/8080 preserved |
 | 062 | Coach Verdicts, My Mistakes Page, ICM Calculator | 6 | complete | PASS (7 BE + 11 FE new) | per-decision coach verdicts in hand history; grading vocabulary fix; /mistakes and /icm-calculator pages |
 | 063 | Stepping Away from the Table, One Page Header | 6 | complete | PASS (5 BE + 9 FE new) | clock stops off the table (HOME, MY MISTAKES, back button), resumes on return; MY MISTAKES in table header; shared PageHeader |
+| 064 | Minimalist Brand Landing Page (/minimal) | 6 | complete | PASS (9 FE) | separate page for comparison; proof card, one action, cookie settings; current landing unchanged |
 
 ## Current Phase
 

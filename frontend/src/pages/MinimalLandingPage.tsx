@@ -1,14 +1,17 @@
 import { useState } from "react";
+import { MinimalClosing } from "../landing-minimal/MinimalClosing";
 import { MinimalDemo, scrollToDemo } from "../landing-minimal/MinimalDemo";
 import { MinimalFeatures } from "../landing-minimal/MinimalFeatures";
 import { MinimalFooter } from "../landing-minimal/MinimalFooter";
 import { MinimalHeader } from "../landing-minimal/MinimalHeader";
 import { MinimalHero } from "../landing-minimal/MinimalHero";
+import { MinimalProof } from "../landing-minimal/MinimalProof";
 
-/** A minimal alternative to the public landing page, served at /minimal for a
- * side-by-side comparison with the current one. It shares no component or CSS
- * with it, owns no auth state and registers no WebMCP tools: every link goes
- * to the existing sign-in flow at /login. */
+/** The minimalist brand landing page, served at /minimal for a side-by-side
+ * comparison with the current one: one message, one action, one picture, then
+ * one real My Mistakes card as proof, three features and the same action again.
+ * It shares no component or CSS with the current page, owns no auth state and
+ * registers no WebMCP tools: every link goes to the sign-in flow at /login. */
 export function MinimalLandingPage() {
   const [demoOpen, setDemoOpen] = useState(false);
 
@@ -23,7 +26,9 @@ export function MinimalLandingPage() {
       <main className="lm-main">
         <MinimalHero demoOpen={demoOpen} onWatchDemo={watchDemo} />
         {demoOpen && <MinimalDemo />}
+        <MinimalProof />
         <MinimalFeatures />
+        <MinimalClosing />
       </main>
       <MinimalFooter />
     </div>

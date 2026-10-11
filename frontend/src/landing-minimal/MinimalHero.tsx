@@ -15,8 +15,8 @@ export function MinimalHero({ demoOpen, onWatchDemo }: MinimalHeroProps) {
         Master tournament <span className="lm-accent">decisions.</span>
       </h1>
       <p className="lm-sub">
-        Play 9-handed tournaments against 8 bots. The ICM coach tells you what
-        to do, and why.
+        Play 9-handed tournaments against 8 bots. The ICM coach shows the right
+        move, and why.
       </p>
       <div className="lm-actions">
         <Link className="lm-btn lm-btn-primary" to="/login" data-testid="minimal-start">
@@ -32,6 +32,7 @@ export function MinimalHero({ demoOpen, onWatchDemo }: MinimalHeroProps) {
           Watch the demo
         </button>
       </div>
+      <p className="lm-note" data-testid="minimal-note">Practice only. No real money. Browser and Android.</p>
       <img
         className="lm-hero-img"
         src="/images/hero-sarah-coach.webp"
