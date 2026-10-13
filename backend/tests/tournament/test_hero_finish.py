@@ -86,3 +86,15 @@ def test_reentry_level_has_no_finish_place() -> None:
     s.next_hand()
     assert hero.awaiting_reentry and not hero.is_eliminated
     assert s.hero_finish_place is None
+
+
+def test_winning_the_tournament_places_first() -> None:
+    """Only a bust set a place, so a won tournament was saved with none and the
+    Report counted no wins (plan 078)."""
+    s = session_at_level()
+    for player in s.tournament.players:
+        if not player.is_human:
+            player.stack = 0
+    s.next_hand()
+    assert s.status == "finished"
+    assert s.hero_finish_place == 1

@@ -108,4 +108,7 @@ def settle_status(session: GameSession) -> None:
     mark_finished(session)
     if sum(1 for p in session.tournament.players if not p.is_eliminated and not p.sit_out) <= 1:
         session.status = "finished"
+        hero = session.tournament.players[session.hero_seat]
+        if not hero.is_eliminated and not hero.sit_out:
+            session.hero_finish_place = 1  # only a bust set a place, so a win had none (078)
     history_archive.archive.save_tournament(session)
