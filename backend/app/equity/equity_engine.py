@@ -8,9 +8,9 @@ from __future__ import annotations
 import random
 from dataclasses import dataclass
 
+from app.equity.fast_eval import IntCard, score, to_int
 from app.poker.card import Card, Rank, Suit
 from app.poker.deck import Deck
-from app.poker.hand_evaluator import best_hand, compare_hands
 from app.strategy.hand_codec import HandCell
 
 
@@ -24,6 +24,11 @@ class EquityResult:
 
 def _all_cards() -> list[Card]:
     return [Card(rank=r, suit=s) for r in Rank for s in Suit]
+
+
+# every card as plain integers, built once: the simulations score hands from
+# these instead of Card objects (plan 074)
+_INT: dict[Card, IntCard] = {c: to_int(c) for c in _all_cards()}
 
 
 def _remaining(used: list[Card]) -> list[Card]:
@@ -69,12 +74,11 @@ def hero_vs_hand(hero: list[Card], villain: list[Card], board: list[Card],
 
 def _compare(hero: list[Card], villain: list[Card], street: list[Card],
              wins: int, ties: int) -> tuple[int, int]:
-    h = best_hand(hero + street)
-    v = best_hand(villain + street)
-    result = compare_hands(h, v)
-    if result > 0:
+    h = score([_INT[c] for c in hero + street])
+    v = score([_INT[c] for c in villain + street])
+    if h > v:
         wins += 1
-    elif result == 0:
+    elif h == v:
         ties += 1
     return wins, ties
 
@@ -146,26 +150,39 @@ def hero_vs_range(hero: list[Card], cells: set[HandCell], board: list[Card],
 
 
 def hero_vs_weighted(hero: list[Card], combos: list[tuple[list[Card], float]],
-                     board: list[Card], trials: int = 3000, seed: int | None = None) -> EquityResult:
-    """Hero vs an opponent hand drawn from weighted combos (Monte Carlo estimate).
+                     board: list[Card], trials: int = 1000, seed: int | None = None) -> EquityResult:
+    """Hero vs an opponent hand drawn from weighted combos.
 
     The weights say how likely the opponent is to play each combo the way they
-    did (plan 073); combos that use a card already seen are dropped.
+    did (plan 073); combos that use a card already seen are dropped. On the
+    river every combo is scored once (exact); before it, runouts are sampled.
     """
-    rng = random.Random(seed)
     used = set(hero + board)
     live = [(cards, w) for cards, w in combos if w > 0 and not used.intersection(cards)]
     if not live:
         raise ValueError("no live combos in the weighted range")
-    pool = [c for c in _all_cards() if c not in used]
-    picks = rng.choices([cards for cards, _ in live], weights=[w for _, w in live], k=trials)
+    h_int, b_int = [_INT[c] for c in hero], [_INT[c] for c in board]
+    if len(board) == 5:
+        mine = score(h_int + b_int)
+        won = total = 0.0
+        for cards, w in live:
+            theirs = score([_INT[c] for c in cards] + b_int)
+            won += w * (1.0 if mine > theirs else 0.5 if mine == theirs else 0.0)
+            total += w
+        return EquityResult(equity=won / total, method="exact", n=len(live))
+    rng = random.Random(seed)
+    pool = [_INT[c] for c in _all_cards() if c not in used]
+    picks = rng.choices([[_INT[c] for c in cards] for cards, _ in live],
+                        weights=[w for _, w in live], k=trials)
+    needed = 5 - len(board)
     wins = ties = 0
     for villain in picks:
-        street = list(board)
-        needed = 5 - len(board)
-        if needed:
-            street += rng.sample([c for c in pool if c not in villain], needed)
-        wins, ties = _compare(hero, villain, street, wins, ties)
+        street = b_int + rng.sample([c for c in pool if c not in villain], needed)
+        mine, theirs = score(h_int + street), score(villain + street)
+        if mine > theirs:
+            wins += 1
+        elif mine == theirs:
+            ties += 1
     equity = (wins + ties / 2) / trials
     return EquityResult(equity=equity, method="estimate", ci_half=1.96 * (equity * (1 - equity) / trials) ** 0.5, n=trials)
 
