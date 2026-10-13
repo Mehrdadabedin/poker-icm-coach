@@ -7,7 +7,7 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 from app.game.hand_result import HandAction
-from app.poker.card import Card
+from app.poker.card import Card, card_from_str
 
 logger = logging.getLogger(__name__)
 
@@ -108,12 +108,13 @@ class HistoryFileStore:
             return
         try:
             with self._path.open("a", encoding="utf-8") as fh:
-                fh.write(json.dumps(_record_to_dict(record), default=str) + "\n")
+                fh.write(json.dumps(record_to_dict(record), default=str) + "\n")
         except OSError:  # pragma: no cover - env dependent
             logger.warning("could not persist hand %s", record.hand_number)
 
 
-def _record_to_dict(record: HandHistoryRecord) -> dict:
+def record_to_dict(record: HandHistoryRecord) -> dict:
+    """The hand as JSON: the history file and the saved history (plan 076)."""
     return {
         "hand_number": record.hand_number,
         "username": record.username,
@@ -133,7 +134,35 @@ def _record_to_dict(record: HandHistoryRecord) -> dict:
             for a in record.actions
         ],
         "decisions": [asdict(d) for d in record.decisions],
+        "hero_decision": record.hero_decision,
+        "coach_recommendation": record.coach_recommendation,
+        "grade": record.grade,
+        "icm_pressure": record.icm_pressure,
+        "tournament_stage": record.tournament_stage,
     }
+
+
+def record_from_dict(data: dict) -> HandHistoryRecord:
+    """A saved hand back as a record; fields older rows lack take defaults."""
+    record = HandHistoryRecord(
+        hand_number=data["hand_number"],
+        hero_cards=[card_from_str(c) for c in data.get("hero_cards", [])],
+        hero_position=data.get("hero_position", ""),
+        community_cards=[card_from_str(c) for c in data.get("community_cards", [])],
+        starting_stack=data.get("starting_stack", 0), ending_stack=data.get("ending_stack", 0),
+        blind_level=data.get("blind_level", ""), level_index=data.get("level_index", 1),
+        actions=[HandAction(**a) for a in data.get("actions", [])],
+        pot_total=data.get("pot_total", 0), winner_seats=list(data.get("winner_seats", [])),
+        username=data.get("username", ""), table_label=data.get("table_label", ""),
+        timestamp=data.get("timestamp", ""),
+        decisions=[HandDecision(**d) for d in data.get("decisions", [])],
+    )
+    record.hero_decision = data.get("hero_decision")
+    record.coach_recommendation = data.get("coach_recommendation")
+    record.grade = data.get("grade")
+    record.icm_pressure = data.get("icm_pressure", "LOW")
+    record.tournament_stage = data.get("tournament_stage", "")
+    return record
 
 
 def replay(record: HandHistoryRecord) -> str:

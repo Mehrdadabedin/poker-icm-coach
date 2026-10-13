@@ -37,6 +37,9 @@ class Settings(BaseSettings):
     # survive redeploys on hosts with an ephemeral disk such as Render. The
     # files above then only seed an empty database once.
     auth_storage: Literal["file", "database"] = "file"
+    # Saved hand history per user and tournament (plan 076). "auto" saves it in
+    # the database when accounts live there (AUTH_STORAGE=database).
+    history_storage: Literal["auto", "database", "off"] = "auto"
     # Initial Admin identities (A01): comma-separated usernames granted
     # Admin level on this deployment. Usernames only; no secrets.
     admin_usernames: str = ""

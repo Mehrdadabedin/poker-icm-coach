@@ -12,11 +12,14 @@ from app.api.routes_admin import router as admin_router
 from app.api.routes_auth import router as auth_router
 from app.api.routes_away import router as away_router
 from app.api.routes_game import router as game_router
+from app.api.routes_history import router as history_router
 from app.api.routes_meta import router as meta_router
 from app.api.routes_oauth import router as oauth_router
 from app.core.config import settings
 from app.core.version import app_version
+from app.database.session import engine
 from app.services.auth import auth_store
+from app.services.history_archive import bind_history_archive
 from app.services.session_store import session_store
 from app.services.user_registry_admin import bootstrap_admin
 
@@ -29,6 +32,8 @@ async def lifespan(_: FastAPI):
     manual users.json edit or env admin identity is required for the demo.
     Tests use TestClient without lifespan, so this never writes in-test."""
     bootstrap_admin()
+    bind_history_archive(engine, settings.history_storage == "database" or (
+        settings.history_storage == "auto" and settings.auth_storage == "database"))
     yield
 
 
@@ -45,6 +50,7 @@ app.include_router(oauth_router)
 app.include_router(game_router)
 app.include_router(away_router)
 app.include_router(meta_router)
+app.include_router(history_router)
 
 
 @app.get("/api/health")

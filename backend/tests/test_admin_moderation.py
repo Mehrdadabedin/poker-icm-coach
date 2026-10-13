@@ -98,7 +98,8 @@ def test_delete_removes_the_account_its_logins_and_its_tables(admin: TestClient)
     response = admin.delete("/api/admin/users/ModGone")
     assert response.status_code == 200
     assert response.json() == {
-        "username": "ModGone", "deleted": True, "logins_revoked": 2, "tables_closed": 1}
+        "username": "ModGone", "deleted": True, "logins_revoked": 2, "tables_closed": 1,
+        "history_deleted": 0}  # no history database in the test suite (plan 076)
     assert session_store.get(table_id) is None, "the deleted user's table is still live"
     assert target.get("/api/auth/me").status_code == 401
     assert _password_login("ModGone") == 401

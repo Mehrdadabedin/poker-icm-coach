@@ -9,7 +9,9 @@ import time
 from typing import TYPE_CHECKING
 
 from app.game.positions import position_labels
+from app.services import history_archive
 from app.services.hand_history import HandDecision, HandHistoryRecord, HistoryFileStore
+from app.services.session_store import mark_finished
 from app.strategy.coach import Coach, CoachRequest
 from app.strategy.test_mode import compare_decisions
 
@@ -95,4 +97,14 @@ def record_hand(session: GameSession, decisions: list[HandDecision],
         return False
     session.history.append(record)
     history_file.append(record)
+    history_archive.archive.save_hand(session, record)  # kept across deploys (plan 076)
     return True
+
+
+def settle_status(session: GameSession) -> None:
+    """Finish the tournament once the hero is out with no live opponent, or one
+    player remains, and save its status and finish place (plan 076)."""
+    mark_finished(session)
+    if sum(1 for p in session.tournament.players if not p.is_eliminated and not p.sit_out) <= 1:
+        session.status = "finished"
+    history_archive.archive.save_tournament(session)
