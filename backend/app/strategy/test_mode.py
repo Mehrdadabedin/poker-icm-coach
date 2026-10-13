@@ -75,5 +75,9 @@ def _acceptable(hero: str, coach: str) -> bool:
         ("BET", "RAISE"), ("RAISE", "BET"), ("FOLD", "CHECK"), ("CHECK", "FOLD"),
         ("ALL-IN", "RESHOVE"), ("RESHOVE", "ALL-IN"),
         ("RAISE", "4-BET"), ("4-BET", "RAISE"), ("ALL-IN", "CALL JAM"),
+        # The coach raises only where calling is profitable too (postflop: equity
+        # clears its call threshold by 5 points; preflop: a hand it opens or
+        # 3-bets for value), so a call there leaves value but is not a mistake (072).
+        ("CALL", "RAISE"), ("CALL", "3-BET"), ("CALL", "OPEN RAISE"),
     }
     return (hero, coach) in pairs

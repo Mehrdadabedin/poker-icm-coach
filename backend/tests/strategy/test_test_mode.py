@@ -60,3 +60,16 @@ def test_real_mistakes_stay_suboptimal() -> None:
     for hero, coach in [("ALL_IN", "FOLD"), ("CALL", "FOLD"), ("FOLD", "OPEN JAM"),
                         ("FOLD", "CALL JAM")]:
         assert compare_decisions(hero, coach).grade == Grade.SUBOPTIMAL, f"{hero} vs {coach}"
+
+
+def test_calling_where_the_coach_raises_is_acceptable() -> None:
+    """Plan 072: the coach says RAISE only when calling is also profitable, so a
+    call there leaves value but is not a mistake (My Mistakes listed it)."""
+    for hero, coach in [("CALL", "RAISE"), ("CALL", "3-BET"), ("CALL", "OPEN RAISE")]:
+        result = compare_decisions(hero, coach)
+        assert result.grade == Grade.ACCEPTABLE, f"{hero} vs {coach} graded {result.grade}"
+
+
+def test_folding_or_calling_off_where_the_coach_disagrees_stays_a_mistake() -> None:
+    for hero, coach in [("FOLD", "RAISE"), ("FOLD", "3-BET"), ("CALL", "FOLD"), ("RAISE", "FOLD")]:
+        assert compare_decisions(hero, coach).grade == Grade.SUBOPTIMAL, f"{hero} vs {coach}"
