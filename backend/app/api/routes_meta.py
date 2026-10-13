@@ -8,10 +8,41 @@ from app.api.routes_game import get_session
 from app.core.tournament_settings import settings as tournament_settings
 from app.icm.icm_engine import ICMEngine
 from app.schemas.settings_schemas import SettingsUpdate
+from app.services.hand_history import HandHistoryRecord
 from app.services.session_store import session_store
 from app.services.statistics import aggregate
 
 router = APIRouter(prefix="/api")
+
+
+def hand_view(r: HandHistoryRecord) -> dict:
+    """One hand as the hands API shows it: the live table and the saved
+    history (plan 076) answer in the same shape."""
+    return {
+        "handNumber": r.hand_number,
+        "username": r.username,
+        "tableLabel": r.table_label,
+        "timestamp": r.timestamp,
+        "heroPosition": r.hero_position,
+        "pot": r.pot_total,
+        "winnerSeats": r.winner_seats,
+        "stage": r.tournament_stage,
+        "net": r.net_chips(),
+        "heroDecision": r.hero_decision,
+        "coachRecommendation": r.coach_recommendation,
+        "grade": r.grade,
+        "level": r.level_index + 1,
+        "blindLevel": r.blind_level,
+        "heroCards": [c.ascii() for c in r.hero_cards],
+        "decisions": [
+            {
+                "street": d.street, "heroAction": d.hero_action,
+                "coachAction": d.coach_action, "grade": d.grade,
+                "icmPressure": d.icm_pressure, "explanation": d.explanation,
+                "stackBb": d.stack_bb, "toCall": d.to_call, "board": d.board,
+            } for d in r.decisions
+        ],
+    }
 
 
 @router.get("/game/{table_id}/hands")
@@ -19,33 +50,7 @@ def list_hands(table_id: str, stage: str | None = None,
                user: str = Depends(require_user)) -> dict:
     session = get_session(table_id, user)
     records = session.history.filter(stage=stage) if stage else session.history.all()
-    return {"hands": [
-        {
-            "handNumber": r.hand_number,
-            "username": r.username,
-            "tableLabel": r.table_label,
-            "timestamp": r.timestamp,
-            "heroPosition": r.hero_position,
-            "pot": r.pot_total,
-            "winnerSeats": r.winner_seats,
-            "stage": r.tournament_stage,
-            "net": r.net_chips(),
-            "heroDecision": r.hero_decision,
-            "coachRecommendation": r.coach_recommendation,
-            "grade": r.grade,
-            "level": r.level_index + 1,
-            "blindLevel": r.blind_level,
-            "heroCards": [c.ascii() for c in r.hero_cards],
-            "decisions": [
-                {
-                    "street": d.street, "heroAction": d.hero_action,
-                    "coachAction": d.coach_action, "grade": d.grade,
-                    "icmPressure": d.icm_pressure, "explanation": d.explanation,
-                    "stackBb": d.stack_bb, "toCall": d.to_call, "board": d.board,
-                } for d in r.decisions
-            ],
-        } for r in records
-    ]}
+    return {"hands": [hand_view(r) for r in records]}
 
 
 @router.get("/game/{table_id}/statistics")

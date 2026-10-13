@@ -15,6 +15,8 @@ from __future__ import annotations
 import time
 from typing import TYPE_CHECKING
 
+from app.services import history_archive
+
 if TYPE_CHECKING:  # runtime import would cycle: game_session marks its own end
     from app.services.game_session import GameSession
 
@@ -120,6 +122,7 @@ def check_abandoned(session: GameSession, now: float | None = None) -> bool:
     timeout = session.idle_timeout * (AWAY_TIMEOUT_FACTOR if session.away else 1)
     if session.status == "active" and now - session.last_seen > timeout:
         session.status = "abandoned"
+        history_archive.archive.save_tournament(session)  # plan 076
         return True
     return False
 

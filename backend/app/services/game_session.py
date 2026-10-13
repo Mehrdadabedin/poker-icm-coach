@@ -13,8 +13,7 @@ from app.services.elimination import apply_reentry_or_elimination, is_final_hand
 from app.services.game_state_view import build_state_view
 from app.services.hand_history import HandDecision, HandHistoryStore, HistoryFileStore
 from app.services.session_coach import advice_dict, coach_request, grade_last_action
-from app.services.session_record import decision_verdict, record_hand
-from app.services.session_store import mark_finished
+from app.services.session_record import decision_verdict, record_hand, settle_status
 from app.strategy.coach import Coach, CoachRequest
 from app.tournament.tournament import build_default_tournament
 from app.tournament.tournament_timer import TournamentTimer
@@ -103,10 +102,7 @@ class GameSession:
         tournament when one player remains (no new hand starts)."""
         self._record_and_persist()
         self._apply_reentry_or_eliminate()
-        mark_finished(self)
-        if sum(1 for p in self.tournament.players
-               if not p.is_eliminated and not p.sit_out) <= 1:
-            self.status = "finished"
+        settle_status(self)
 
     def phase(self) -> str:
         if self.engine is None:
