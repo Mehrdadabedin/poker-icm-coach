@@ -55,6 +55,7 @@ def advice_dict(rec: CoachRecommendation) -> dict:
     """The coach recommendation in the API's camelCase shape."""
     return {
         "recommendedAction": rec.recommended_action,
+        "street": rec.street,  # the panel says "BET on the flop" (plan 075)
         "confidence": rec.confidence,
         "reasoning": rec.reasoning,
         "alternativeAction": rec.alternative_action,

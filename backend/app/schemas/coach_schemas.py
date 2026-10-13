@@ -56,6 +56,7 @@ class CoachResponseModel(BaseModel):
     ev: dict | None = None
     outs: dict | None = None
     education: str = ""
+    street: str = ""  # the street the advice is for, shown next to the action (plan 075)
 
 
 class RangeGridResponse(BaseModel):

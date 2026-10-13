@@ -54,6 +54,10 @@
   color: #4f9dff;
 }
 
+/* the street the advice is for, next to the action: "BET on the flop" (plan 075) */
+.coach-recommendation-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
+.coach-street { color: #9fc5ff; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.5px; }
+
 .confidence {
   color: var(--muted);
   font-size: 0.8rem;
