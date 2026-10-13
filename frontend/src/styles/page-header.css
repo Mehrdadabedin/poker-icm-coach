@@ -12,3 +12,17 @@
   .page-header .header-user { display: none; }
   .page-header .header-right > .btn { min-height: 36px; padding: 0 12px; font-size: 0.78rem; }
 }
+
+/* The table header had the same problem on narrow phones: the logo, the
+   table label and four buttons need about 520px, so at 375px the buttons slid
+   over the logo. Below 600px they get their own centred row under the logo
+   and the username gives way; wider screens keep the single row, which saves
+   height on the table (plan 063 revision). */
+@media (max-width: 599px) {
+  .table-header { flex-wrap: wrap; justify-content: center; row-gap: 4px; }
+  .table-header .header-title { flex: 1 1 100%; display: flex; justify-content: center; }
+  .table-header .header-right { flex: 1 1 100%; flex-wrap: wrap; justify-content: center; gap: 6px; }
+  .table-header .header-user { display: none; }
+  .table-header .header-right > .btn { min-height: 32px; min-width: 0; padding: 0 8px; font-size: 0.72rem; }
+  .table-header .header-right > .header-icon-btn { min-width: 36px; }
+}

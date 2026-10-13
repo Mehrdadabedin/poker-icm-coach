@@ -60,3 +60,14 @@ Closing the browser runs no page cleanup, so that table keeps the normal
   1172) with the same decision pending. HOME froze it and showed CONTINUE
   TABLE A; leaving by typing an address froze it and showed BACK TO TABLE A.
   Checked at 1280px and 375px.
+
+# Revision: table header on narrow phones
+
+On a 375px phone the table header's buttons (HOME, MY MISTAKES, LOG OUT,
+pause) slid over the logo: the logo, the table label and four buttons need
+about 520px in one row. Below 600px the table header now does what the page
+header already did: the logo gets a centred row and the table label and
+buttons a compact centred row under it; the username gives way. Wider
+screens keep the single row, which saves height on the table. Measured on a
+live local table: buttons over the logo 2 -> 0 at 360 and 375px, 1 -> 0 at
+414px; header 89px tall; no horizontal scroll; 1280px unchanged (78px).
