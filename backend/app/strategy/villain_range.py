@@ -12,11 +12,10 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 from app.ai.preflop_ranges import open_range_for
-from app.equity.equity_engine import _all_cards, hero_vs_weighted, range_combos
+from app.equity.equity_engine import _INT, _all_cards, hero_vs_weighted, range_combos
+from app.equity.fast_eval import score
 from app.game.hand_result import HandAction
 from app.poker.card import Card
-from app.poker.hand_evaluator import best_hand
-from app.poker.hand_rank import HandCategory
 from app.strategy.hand_codec import HandCell, parse_range
 
 AGGRESSIVE = ("bet", "raise", "all_in")
@@ -30,7 +29,7 @@ ANY_TWO = frozenset(
 WEIGHTS = {True: {"made": 1.0, "draw": 0.7, "air": 0.2},   # they bet or raised
            False: {"made": 1.0, "draw": 0.8, "air": 0.6}}  # they only checked or called
 SEED = 7
-TRIALS = 3000
+TRIALS = 1000  # about +-3 points; 3,000 took over 5 s on Render's free instance (plan 074)
 
 
 @dataclass(frozen=True, slots=True)
@@ -79,30 +78,40 @@ def preflop_cells(read: VillainRead, stack_bb: int) -> frozenset[HandCell]:
 def _fit(combo: list[Card], board: list[Card]) -> str:
     """made: two pair or better, or a pair that uses a hole card; draw: four to a
     flush or to a straight with a hole card in it; air: everything else."""
-    rank = best_hand(combo + board)
-    if rank.category >= HandCategory.TWO_PAIR:
+    hole, table = [_INT[c] for c in combo], [_INT[c] for c in board]
+    category = score(hole + table)[0]
+    if category >= 2:
         return "made"
-    hole = {c.rank.value for c in combo}
-    if rank.category == HandCategory.PAIR and (
-            combo[0].rank == combo[1].rank or hole & {c.rank.value for c in board}):
+    hole_ranks = {r for r, _ in hole}
+    if category == 1 and (len(hole_ranks) == 1 or hole_ranks & {r for r, _ in table}):
         return "made"
     if len(board) < 5:
-        cards = combo + board
-        if any(sum(c.suit == s for c in cards) >= 4 and any(c.suit == s for c in combo)
-               for s in {c.suit for c in combo}):
+        cards = hole + table
+        if any(sum(1 for _, t in cards if t == s) >= 4 for s in {s for _, s in hole}):
             return "draw"
-        ranks = {c.rank.value for c in cards} | ({1} if any(c.rank.value == 14 for c in cards) else set())
+        ranks = {r for r, _ in cards}
+        mine = set(hole_ranks)
+        if 14 in ranks:
+            ranks.add(1)
+        if 14 in mine:
+            mine.add(1)
         for low in range(1, 11):
             window = set(range(low, low + 5))
-            if len(window & ranks) >= 4 and window & (hole | ({1} if 14 in hole else set())):
+            if len(window & ranks) >= 4 and window & mine:
                 return "draw"
     return "air"
 
 
+@lru_cache(maxsize=256)
+def _full_combos(cells: frozenset[HandCell]) -> tuple[tuple[Card, Card], ...]:
+    """Every combo of a range from the full deck, built once per range (plan 074)."""
+    return tuple((a, b) for a, b in range_combos(cells, _all_cards()))
+
+
 def weighted_range(cells: frozenset[HandCell], board: list[Card], dead: list[Card],
                    aggressive: bool) -> list[tuple[list[Card], float]]:
-    pool = [c for c in _all_cards() if c not in dead and c not in board]
-    combos = range_combos(cells, pool)
+    seen = set(dead) | set(board)
+    combos = [[a, b] for a, b in _full_combos(cells) if a not in seen and b not in seen]
     if not board:
         return [(combo, 1.0) for combo in combos]
     weights = WEIGHTS[aggressive]
