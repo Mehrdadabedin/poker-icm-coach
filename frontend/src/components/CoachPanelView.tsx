@@ -1,5 +1,10 @@
 import { CoachAdvice } from "../models/game";
 
+/** Which street the advice is for, next to the action (plan 075). */
+const STREET_LABEL: Record<string, string> = {
+  preflop: "preflop", flop: "on the flop", turn: "on the turn", river: "on the river",
+};
+
 interface CoachPanelViewProps {
   coach: CoachAdvice;
   className?: string;
@@ -25,7 +30,12 @@ export function CoachPanelView({ coach, className = "coach-panel", testId, colla
           </button>
         )}
       </div>
-      <div className="coach-recommendation">{coach.recommendedAction}</div>
+      <div className="coach-recommendation-row">
+        <div className="coach-recommendation">{coach.recommendedAction}</div>
+        {coach.street && STREET_LABEL[coach.street] && (
+          <span className="coach-street" data-testid="coach-street">{STREET_LABEL[coach.street]}</span>
+        )}
+      </div>
       {!collapsed && (
         <>
           <p>{coach.reasoning}</p>

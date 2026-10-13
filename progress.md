@@ -78,6 +78,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 072 | A Call Where the Coach Raises Is Acceptable, Not a Mistake | 6 | complete | PASS (2 BE new) | CALL vs RAISE / 3-BET / OPEN RAISE graded ACCEPTABLE; real mistakes stay SUBOPTIMAL |
 | 073 | The Coach Prices Decisions Against the Opponent's Likely Hands | 6 | complete | PASS (9 BE new) | opponent read from the action log; equity vs their weighted range; raise needs 65%; range pairs and 'A2s+' parsing fixed |
 | 074 | Coach Answers 7x Faster | 6 | complete | PASS (2 BE new) | integer hand scoring for equity; exact river; 1,000 trials; combos cached; coach answer 350 -> 48 ms median |
+| 075 | The Coach Says Which Street Its Advice Is For | 6 | complete | PASS (2 BE + 5 FE new) | advice carries its street; panel shows e.g. 'BET on the flop'; action word unchanged |
 
 ## Current Phase
 

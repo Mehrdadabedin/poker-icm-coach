@@ -164,7 +164,7 @@ export function tournamentChampion(
 /** Shared shape for the ICM coach's advice on the current decision, rendered
  * by both the live table sidebar and the post-hand review. */
 export interface CoachAdvice {
-  recommendedAction: string;
+  recommendedAction: string; street?: string; // the street the advice is for (plan 075)
   reasoning: string;
   detail: Record<string, string>;
 }

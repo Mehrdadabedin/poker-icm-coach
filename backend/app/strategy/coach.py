@@ -69,6 +69,7 @@ class CoachRecommendation:
     ev: dict | None = None
     outs: dict | None = None
     education: str = ""
+    street: str = ""  # the street the advice is for (plan 075)
 
 class Coach:
     """Produces a recommendation for any hero decision point."""
@@ -97,6 +98,7 @@ class Coach:
             risk_premium=rp_label, ev=ev,
             outs=outs,
             education=education_for(req, analyses, ev, outs, action, amount),
+            street=req.street,
         )
 
     def _decide(self, req: CoachRequest, a: Analyses) -> tuple[str, str, str]:
