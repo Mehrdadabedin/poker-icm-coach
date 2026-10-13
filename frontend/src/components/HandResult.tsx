@@ -1,8 +1,7 @@
-import { HandReview, formatChips, reviewResultMeta } from "../models/game";
+import { HandReview, reviewResultMeta } from "../models/game";
 
 interface HandResultProps {
   review: HandReview;
-  username?: string | null;
   onReview: () => void;
   onNext: () => void;
   countdown: number | null;
@@ -13,24 +12,22 @@ interface HandResultProps {
   showResultLabels?: boolean;
 }
 
-/** Compact post-hand result (A10/A16): stays on the table, never auto-opens
- * the detailed history. The player chooses REVIEW THE HAND or NEXT HAND. */
-export function HandResult({ review, username, onReview, onNext, countdown, paused, showResultLabels = true }: HandResultProps) {
+/** Compact post-hand result (A10/A16, plan 071): one box in the result's
+ * colour with the result, the chips and the countdown on the left and
+ * REVIEW HAND / NEXT HAND on the right, so NEXT HAND is in view without
+ * scrolling. The hand, pot and stack are on the table and in the review. */
+export function HandResult({ review, onReview, onNext, countdown, paused, showResultLabels = true }: HandResultProps) {
   const { title, subtitle, glyph } = reviewResultMeta(review);
 
   return (
-    <div className="hand-result" data-testid="hand-result" role="status" aria-label={`${title}, ${subtitle}`}>
-      <div className={`result-banner result-${title.toLowerCase().replace(" ", "-")}`}>
-        <div className="result-title" data-testid="hand-result-title">
-          {showResultLabels ? title : glyph}
-        </div>
-        {username && <div className="result-username">{username}</div>}
-        <div className="result-subtitle" data-testid="hand-result-subtitle">{subtitle}</div>
-      </div>
-      <div className="result-meta">
-        <span>HAND #{review.handNumber}</span>
-        <span>POT {formatChips(review.pot)}</span>
-        <span>STACK {formatChips(review.heroStart)} → {formatChips(review.heroEnd)}</span>
+    <div className={`hand-result result-${title.toLowerCase().replace(" ", "-")}`} data-testid="hand-result"
+      role="status" aria-label={`${title}, ${subtitle}`}>
+      <div className="result-summary">
+        <span className="result-title" data-testid="hand-result-title">{showResultLabels ? title : glyph}</span>
+        <span className="result-subtitle" data-testid="hand-result-subtitle">{subtitle}</span>
+        <span className="result-flow" data-testid="result-flow">
+          {paused ? "PAUSED: study the hand" : `Next hand in ${countdown ?? "…"}`}
+        </span>
       </div>
       <div className="result-actions">
         <button className="btn btn-compact btn-primary" onClick={onReview} data-testid="review-hand-btn" aria-label="Review the hand">
@@ -39,13 +36,6 @@ export function HandResult({ review, username, onReview, onNext, countdown, paus
         <button className="btn btn-compact" onClick={onNext} data-testid="next-hand-btn" aria-label="Next hand">
           NEXT HAND ▶
         </button>
-      </div>
-      <div className="result-flow" data-testid="result-flow">
-        {paused ? (
-          <span className="flow-paused">PAUSED — study the hand</span>
-        ) : (
-          <span className="flow-countdown">NEXT HAND IN {countdown ?? "…"}</span>
-        )}
       </div>
     </div>
   );

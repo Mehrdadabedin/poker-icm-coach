@@ -11,31 +11,31 @@ scaling the seat boxes proportionally so nothing overlaps.
 detected with the standard `min-aspect-ratio` media query.
 */
 
-/* ---- compact post-hand result panel (base styles, Phase 8) ---- */
+/* ---- compact post-hand result (plan 071): one box in the result's colour,
+   the result on the left and both buttons on the right, so NEXT HAND is in
+   view without scrolling. The colour comes from .result-you-won etc. ---- */
 .hand-result {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
   width: 100%;
   max-width: 720px;
   margin: 8px auto 0;
-  background: #1d242c;
-  border: 1px solid #333;
+  padding: 10px 14px;
   border-radius: 12px;
-  padding: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
-.hand-result .result-banner { margin-bottom: 8px; }
-.hand-result .result-title { font-size: 1.5rem; }
-.result-meta {
-  display: flex; flex-wrap: wrap; gap: 8px;
-  font-size: 0.78rem; color: var(--muted); margin-bottom: 10px;
+.result-summary {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px;
+  flex: 1 1 220px; min-width: 0;
 }
-.result-actions {
-  display: flex; gap: 8px; align-items: center; justify-content: center;
-}
-.result-flow {
-  display: flex; justify-content: center;
-  font-size: 0.72rem; color: var(--muted); margin-top: 8px;
-}
+.hand-result .result-title { font-size: 1.3rem; letter-spacing: 1.5px; }
+.hand-result .result-subtitle { margin: 0; font-size: 1rem; }
+.result-flow { flex-basis: 100%; font-size: 0.75rem; color: rgba(255, 255, 255, 0.75); }
+.result-actions { display: flex; gap: 8px; flex: 1 1 260px; }
+.result-actions .btn { flex: 1 1 0; }
 
 /* ---- phones & small tablets PORTRAIT: no horizontal scroll, one screen ---- */
 @media (max-width: 767px) and (max-aspect-ratio: 4/3) {
@@ -93,7 +93,6 @@ detected with the standard `min-aspect-ratio` media query.
   }
 
   .result-actions .btn { min-height: 38px; font-size: 0.8rem; }
-  .result-meta { font-size: 0.7rem; }
   .hand-review { padding: 8px; }
   .result-grid { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
 }
