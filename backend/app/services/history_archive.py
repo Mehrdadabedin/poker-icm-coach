@@ -44,6 +44,9 @@ class NullArchive:
     def hands(self, owner: str, tournament_id: str) -> list[dict[str, Any]] | None:
         return None
 
+    def hands_by_tournament(self, owner: str, ids: list[str]) -> dict[str, list[dict[str, Any]]]:
+        return {}
+
     def delete_owner(self, owner: str) -> int:
         return 0
 
@@ -116,6 +119,20 @@ class DatabaseArchive(NullArchive):
             if connection.execute(mine).first() is None:
                 return None
             return [row.record for row in connection.execute(query)]
+
+    def hands_by_tournament(self, owner: str, ids: list[str]) -> dict[str, list[dict[str, Any]]]:
+        """The Report's hands (plan 078): several tournaments in one query,
+        each oldest first. Only the owner's hands match."""
+        if not ids:
+            return {}
+        query = (select(history_hands.c.tournament_id, history_hands.c.record)
+                 .where(history_hands.c.owner == owner, history_hands.c.tournament_id.in_(ids))
+                 .order_by(history_hands.c.tournament_id, history_hands.c.hand_number))
+        found: dict[str, list[dict[str, Any]]] = {}
+        with self._engine.connect() as connection:
+            for row in connection.execute(query):
+                found.setdefault(row.tournament_id, []).append(row.record)
+        return found
 
     def delete_owner(self, owner: str) -> int:
         """Remove a deleted account's history; returns the tournaments removed."""

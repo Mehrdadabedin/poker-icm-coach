@@ -11,6 +11,7 @@ import uuid
 from collections.abc import Iterator
 
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import Engine, create_engine, inspect, text
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -105,23 +106,42 @@ def test_the_end_of_a_tournament_is_saved_once(db: Engine) -> None:
     assert first["ended_at"] is not None and second["ended_at"] == first["ended_at"]
 
 
-def test_a_user_sees_only_their_own_tournaments_through_the_api(db: Engine) -> None:
-    history_archive.bind_history_archive(db, True)
-    owner, other = login_client("HistOwner"), login_client("HistOther")
-    table = owner.post("/api/tournament", json={
+def _api_hand(client: TestClient) -> str:
+    """Start a table through the API and play its first hand; returns its id."""
+    table: str = client.post("/api/tournament", json={
         "players": 9, "starting_stack": 45000, "blind_level_minutes": 20,
         "ante_mode": "none", "fast_mode": 1.0}).json()["tableId"]
     for _ in range(60):
-        state = owner.get(f"/api/game/{table}/state").json()
+        state = client.get(f"/api/game/{table}/state").json()
         if state["phase"] == "handOver":
             break
-        owner.post(f"/api/game/{table}/action", json={"kind": "call" if state["toCall"] else "check"})
+        client.post(f"/api/game/{table}/action", json={"kind": "call" if state["toCall"] else "check"})
+    return table
+
+
+def test_a_user_sees_only_their_own_tournaments_through_the_api(db: Engine) -> None:
+    history_archive.bind_history_archive(db, True)
+    owner, other = login_client("HistOwner"), login_client("HistOther")
+    table = _api_hand(owner)
     listed = owner.get("/api/history/tournaments").json()["tournaments"]
     assert [t["tableId"] for t in listed] == [table] and listed[0]["hands"] == 1
     saved = owner.get(f"/api/history/tournaments/{table}/hands").json()["hands"]
     assert saved == owner.get(f"/api/game/{table}/hands").json()["hands"]  # same shape as live
     assert other.get(f"/api/history/tournaments/{table}/hands").status_code == 404
     assert other.get("/api/history/tournaments").json()["tournaments"] == []
+
+
+def test_the_report_reads_only_the_users_own_saved_hands(db: Engine) -> None:
+    archive = history_archive.bind_history_archive(db, True)
+    owner, other = login_client("ReportOwner"), login_client("ReportOther")
+    table = _api_hand(owner)
+    report = owner.get("/api/history/report").json()
+    assert (report["summary"]["tournaments"], report["summary"]["hands"]) == (1, 1)
+    assert report["stack"]["tableId"] == table and len(report["stack"]["points"]) == 2
+    assert owner.get(f"/api/history/report?tournament={table}&period=7d").json()["summary"]["hands"] == 1
+    assert other.get(f"/api/history/report?tournament={table}").status_code == 404
+    assert other.get("/api/history/report").json()["summary"]["tournaments"] == 0
+    assert archive.hands_by_tournament("ReportOther", [table]) == {}
 
 
 def test_deleting_a_user_removes_their_history(db: Engine) -> None:
