@@ -76,7 +76,6 @@ export function LiveTableView(props: LiveTableViewProps) {
             {cover ? null : handOver && state.review ? (
               <HandResult
                 review={state.review}
-                username={state.username}
                 onReview={onReview}
                 onNext={onNext}
                 countdown={countdown}

@@ -89,6 +89,19 @@ describe("A10 compact result + optional review", () => {
     expect(screen.getByTestId("next-hand-btn")).toBeInTheDocument();
   });
 
+  it("is one compact box: result, chips, countdown and both buttons, no hand line (plan 071)", () => {
+    const lost = { ...review, heroWon: false, chop: false, heroNet: -12112 };
+    render(<HandResult review={lost} onReview={() => undefined} onNext={() => undefined} countdown={4} paused={false} />);
+    const box = screen.getByTestId("hand-result");
+    expect(box).toHaveClass("result-you-lost");
+    expect(box).toContainElement(screen.getByTestId("hand-result-title"));
+    expect(box).toContainElement(screen.getByTestId("review-hand-btn"));
+    expect(box).toContainElement(screen.getByTestId("next-hand-btn"));
+    expect(box.textContent).not.toMatch(/HAND #|POT |STACK /);
+    expect(box.querySelectorAll(":scope > *")).toHaveLength(2); // the result, the buttons
+    expect(screen.getByTestId("result-flow")).toHaveTextContent("Next hand in 4");
+  });
+
   it("shows paused state without advancing", () => {
     render(<HandResult review={review} onReview={() => undefined} onNext={() => undefined} countdown={9} paused />);
     expect(screen.getByTestId("result-flow")).toHaveTextContent("PAUSED");
