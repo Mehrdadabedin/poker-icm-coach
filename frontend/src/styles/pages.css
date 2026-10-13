@@ -185,3 +185,6 @@
 .app-version {
   opacity: 0.75;
 }
+
+/* the hand a Report leak linked to (plan 078) */
+.history-focus td { background: rgba(242, 193, 78, 0.16); }

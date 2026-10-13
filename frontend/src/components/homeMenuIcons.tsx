@@ -43,10 +43,10 @@ export const MENU_ICONS = {
       <path d="M12 8v4l3 2" />
     </>
   ),
-  statistics: (
+  report: (
     <>
-      <path d="M4 20h16" />
-      <path d="M7 16v-5M12 16V7M17 16v-8" />
+      <rect x="4" y="3" width="16" height="18" rx="2" />
+      <path d="M8 17v-3M12 17V9M16 17v-6" />
     </>
   ),
   settings: (

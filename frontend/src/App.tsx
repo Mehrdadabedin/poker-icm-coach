@@ -12,6 +12,7 @@ import { RangesPage } from "./pages/RangesPage";
 import { CoachPage } from "./pages/CoachPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { HistoryPage } from "./pages/HistoryPage";
+import { ReportPage } from "./pages/ReportPage";
 import { StatisticsPage } from "./pages/StatisticsPage";
 import { MistakesPage } from "./pages/MistakesPage";
 import { IcmCalculatorPage } from "./pages/IcmCalculatorPage";
@@ -64,6 +65,7 @@ export function App() {
         <Route path="/coach" element={<CoachPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/history" element={<HistoryPage />} />
+        <Route path="/report" element={<ReportPage />} />
         <Route path="/statistics" element={<StatisticsPage />} />
         <Route path="/mistakes" element={<MistakesPage />} />
         <Route path="/icm-calculator" element={<IcmCalculatorPage />} />

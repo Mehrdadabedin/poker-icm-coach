@@ -106,6 +106,18 @@ describe("Hand History", () => {
     expect(screen.getByTestId("history-none")).toBeTruthy();
   });
 
+  it("opens the tournament and marks the hand a Report leak links to (plan 078)", async () => {
+    answer("live1", SAVED);
+    render(<MemoryRouter initialEntries={["/history?table=old1&hand=1"]}><HistoryPage /></MemoryRouter>);
+    await act(async () => undefined);
+    await act(async () => undefined);
+    expect((screen.getByTestId("history-tournament") as HTMLSelectElement).value).toBe("old1");
+    expect(screen.getByTestId("history-hand-1")).toHaveClass("history-focus");
+    fireEvent.change(screen.getByTestId("history-tournament"), { target: { value: "live1" } });
+    await act(async () => undefined);
+    expect(screen.getByTestId("history-hand-1")).not.toHaveClass("history-focus");
+  });
+
   it("writes places as 1st, 2nd, 3rd, 11th, 22nd", () => {
     expect([1, 2, 3, 4, 11, 12, 13, 21, 22].map(ordinal)).toEqual(
       ["1st", "2nd", "3rd", "4th", "11th", "12th", "13th", "21st", "22nd"]);
