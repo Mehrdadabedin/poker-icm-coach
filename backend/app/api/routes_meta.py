@@ -26,6 +26,7 @@ def hand_view(r: HandHistoryRecord) -> dict:
         "heroPosition": r.hero_position,
         "pot": r.pot_total,
         "winnerSeats": r.winner_seats,
+        "seatNames": r.seat_names,
         "stage": r.tournament_stage,
         "net": r.net_chips(),
         "heroDecision": r.hero_decision,

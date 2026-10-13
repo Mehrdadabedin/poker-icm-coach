@@ -79,5 +79,7 @@ def _acceptable(hero: str, coach: str) -> bool:
         # clears its call threshold by 5 points; preflop: a hand it opens or
         # 3-bets for value), so a call there leaves value but is not a mistake (072).
         ("CALL", "RAISE"), ("CALL", "3-BET"), ("CALL", "OPEN RAISE"),
+        # it bets only when nobody has bet, so a check risks no chips (077)
+        ("CHECK", "BET"),
     }
     return (hero, coach) in pairs

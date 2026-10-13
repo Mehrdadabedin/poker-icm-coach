@@ -73,3 +73,11 @@ def test_calling_where_the_coach_raises_is_acceptable() -> None:
 def test_folding_or_calling_off_where_the_coach_disagrees_stays_a_mistake() -> None:
     for hero, coach in [("FOLD", "RAISE"), ("FOLD", "3-BET"), ("CALL", "FOLD"), ("RAISE", "FOLD")]:
         assert compare_decisions(hero, coach).grade == Grade.SUBOPTIMAL, f"{hero} vs {coach}"
+
+
+def test_checking_where_the_coach_bets_is_acceptable() -> None:
+    """Plan 077: the coach says BET only when nobody has bet (CHECK is its
+    listed alternative), so checking risks no chips; it only misses value."""
+    assert compare_decisions("CHECK", "BET").grade == Grade.ACCEPTABLE
+    # folding when checking is free stays a mistake
+    assert compare_decisions("FOLD", "BET").grade == Grade.SUBOPTIMAL

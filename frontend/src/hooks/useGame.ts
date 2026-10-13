@@ -10,14 +10,20 @@ export function useGame(tableId: string | null) {
   const tableIdRef = useRef(tableId);
   tableIdRef.current = tableId;
   const inFlight = useRef(false);
+  // A table the server no longer has stays gone: an open tab on it used to ask
+  // every 350 ms forever (plan 077). Other errors keep polling, so an outage recovers.
+  const goneRef = useRef<string | null>(null);
 
   const refresh = useCallback(async () => {
-    if (!tableIdRef.current) return;
+    const id = tableIdRef.current;
+    if (!id || goneRef.current === id) return;
     try {
-      setState(await api.getState(tableIdRef.current));
+      setState(await api.getState(id));
       setError(null);
     } catch (e) {
-      setError((e as Error).message);
+      const message = (e as Error).message;
+      if (message.startsWith("API 404")) goneRef.current = id;
+      setError(message);
     }
   }, []);
 
