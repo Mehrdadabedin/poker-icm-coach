@@ -13,7 +13,7 @@ from app.game.hand_setup import blind_seats
 from app.game.positions import position_labels
 from app.poker.card import Card
 from app.strategy.bubble import bubble_pressure, detect_stage
-from app.strategy.coach import _preflop_equity
+from app.strategy.coach_analysis import _preflop_equity
 from app.strategy.hand_codec import RANK_CHAR
 from app.strategy.range_matrix import cell_name
 

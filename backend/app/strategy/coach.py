@@ -12,7 +12,6 @@ from app.strategy.baseline_ranges import PREMIUM_HANDS, matrix_for_position
 from app.strategy.coach_analysis import (
     Analyses,
     _cell_key,
-    _preflop_equity,
     analyze_request,
     risk_premium_for,
     win_probability_for,
@@ -26,8 +25,12 @@ from app.strategy.coach_ev import (
 )
 from app.strategy.push_fold import PushFoldEngine
 from app.strategy.stack_analysis import SHORT_BB
+from app.strategy.villain_range import VillainRead
 
 LATE_POSITIONS = ("CO", "BTN", "SB")
+# a raise is called mostly by the stronger part of the betting range, so being
+# ahead of the pot odds is not enough to raise for value (plan 073)
+RAISE_MIN_EQUITY = 0.65
 
 @dataclass(slots=True)
 class CoachRequest:
@@ -52,6 +55,7 @@ class CoachRequest:
     level_index: int = 1
     mode: str = "advanced"
     exact_cards: bool = False
+    villain: VillainRead | None = None  # who bet into the hero, and how (plan 073)
 
 @dataclass(slots=True)
 class CoachRecommendation:
@@ -125,7 +129,7 @@ class Coach:
             if a.stack_bb <= 14:
                 return "RESHOVE", "ALL-IN", f"{name} is premium; stack {a.stack_bb} BB is short."
             return "3-BET", "CALL", f"{name} is premium and can raise for value."
-        est = _preflop_equity(name)
+        est = a.equity  # against the raiser's range when the coach can read it (plan 073)
         if est >= a.pot_odds + 0.06:
             return "CALL", "FOLD", f"{name} equity ~{est:.0%} clears pot odds {a.pot_odds:.0%}."
         icm_note = f" ICM pressure {a.pressure}." if a.extra.get("icm_ev_class") == "NEGATIVE" else ""
@@ -141,7 +145,7 @@ class Coach:
                 return "CHECK", "BET", f"Medium equity {equity:.0%}, keep pot small."
             return "CHECK", "FOLD", f"Weak equity {equity:.0%}, no value to bet."
         required = a.pot_odds + 0.08
-        if equity >= required + 0.05:
+        if equity >= max(required + 0.05, RAISE_MIN_EQUITY):
             return "RAISE", "CALL", f"Equity {equity:.0%} beats pot odds {a.pot_odds:.0%}."
         if equity >= required:
             return "CALL", "FOLD", f"Equity {equity:.0%} about equal to pot odds {a.pot_odds:.0%}."

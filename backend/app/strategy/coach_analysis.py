@@ -82,6 +82,13 @@ def win_probability_for(req) -> float:
     survives. It is cached because a single recommendation asks for it twice,
     once for the decision and once for the outs report.
     """
+    villain = getattr(req, "villain", None)
+    if villain is not None:  # plan 073: against the opponent's likely hands
+        from app.strategy.villain_range import equity_vs
+
+        equity = equity_vs(req.hero, req.board, villain, req.stack / max(req.big_blind, 1))
+        if equity is not None:
+            return equity
     if len(req.board) >= 3:
         # Sorted because equity does not depend on the order the cards arrive
         # in, and an unsorted key gave the same hand two cache entries and two

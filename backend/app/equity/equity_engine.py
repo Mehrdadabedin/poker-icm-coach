@@ -98,15 +98,14 @@ def hero_vs_random(hero: list[Card], board: list[Card], trials: int = 5000,
     return EquityResult(equity=equity, method="estimate", ci_half=1.96 * (equity * (1 - equity) / trials) ** 0.5, n=trials)
 
 
-def _range_combos(cells: set[HandCell], pool: list[Card]) -> list[list[Card]]:
+def range_combos(cells: set[HandCell] | frozenset[HandCell], pool: list[Card]) -> list[list[Card]]:
     combos: list[list[Card]] = []
     for cell in cells:
         if cell.suited is None:
-            suits = [c.suit for c in pool if c.rank.value == cell.hi]
-            for s in suits:
-                pair = [c for c in pool if c.rank.value == cell.hi and c.suit == s]
-                if len(pair) >= 2:
-                    combos.append(pair[:2])
+            # every two of the live cards of that rank (6 when none is dead); this
+            # used to look for two cards of one suit, so no pair ever made a combo
+            same = [c for c in pool if c.rank.value == cell.hi]
+            combos += [[same[i], same[j]] for i in range(len(same)) for j in range(i + 1, len(same))]
         elif cell.suited:
             for c1 in pool:
                 if c1.rank.value == cell.hi:
@@ -130,7 +129,7 @@ def hero_vs_range(hero: list[Card], cells: set[HandCell], board: list[Card],
     rng = random.Random(seed)
     used = set(hero + board + (opponent_cards or []))
     pool = [c for c in _all_cards() if c not in used]
-    combos = _range_combos(cells, pool)
+    combos = range_combos(cells, pool)
     if not combos:
         raise ValueError("range has no combos left in the deck")
     wins = ties = 0
@@ -141,6 +140,31 @@ def hero_vs_range(hero: list[Card], cells: set[HandCell], board: list[Card],
         if needed:
             rest = [c for c in pool if c not in villain]
             street += rng.sample(rest, needed)
+        wins, ties = _compare(hero, villain, street, wins, ties)
+    equity = (wins + ties / 2) / trials
+    return EquityResult(equity=equity, method="estimate", ci_half=1.96 * (equity * (1 - equity) / trials) ** 0.5, n=trials)
+
+
+def hero_vs_weighted(hero: list[Card], combos: list[tuple[list[Card], float]],
+                     board: list[Card], trials: int = 3000, seed: int | None = None) -> EquityResult:
+    """Hero vs an opponent hand drawn from weighted combos (Monte Carlo estimate).
+
+    The weights say how likely the opponent is to play each combo the way they
+    did (plan 073); combos that use a card already seen are dropped.
+    """
+    rng = random.Random(seed)
+    used = set(hero + board)
+    live = [(cards, w) for cards, w in combos if w > 0 and not used.intersection(cards)]
+    if not live:
+        raise ValueError("no live combos in the weighted range")
+    pool = [c for c in _all_cards() if c not in used]
+    picks = rng.choices([cards for cards, _ in live], weights=[w for _, w in live], k=trials)
+    wins = ties = 0
+    for villain in picks:
+        street = list(board)
+        needed = 5 - len(board)
+        if needed:
+            street += rng.sample([c for c in pool if c not in villain], needed)
         wins, ties = _compare(hero, villain, street, wins, ties)
     equity = (wins + ties / 2) / trials
     return EquityResult(equity=equity, method="estimate", ci_half=1.96 * (equity * (1 - equity) / trials) ** 0.5, n=trials)

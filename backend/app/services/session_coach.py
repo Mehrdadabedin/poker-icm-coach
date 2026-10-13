@@ -8,9 +8,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from app.game.hand_setup import in_hand_seats
 from app.game.positions import position_labels
 from app.strategy.coach import Coach, CoachRecommendation, CoachRequest
 from app.strategy.test_mode import compare_decisions
+from app.strategy.villain_range import read_villain
 
 if TYPE_CHECKING:  # pragma: no cover - import cycle guard
     from app.services.game_session import GameSession
@@ -44,6 +46,8 @@ def coach_request(session: GameSession) -> CoachRequest:
         facing_raise=(engine._street.current_bet > level.big),
         hero_seat=session.hero_seat, level_index=tournament.level_index,
         mode=session.coach_mode,
+        villain=read_villain(engine._log, session.hero_seat, in_hand_seats(tournament.players),
+                             positions, engine.street),
     )
 
 
