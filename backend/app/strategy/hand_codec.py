@@ -72,8 +72,9 @@ def parse_shorthand(token: str) -> list[HandCell]:
             for rank in range(base.hi, 15):
                 cells.append(HandCell(rank, rank, None))
         else:
-            # suited/offsuit: A2s+ -> A2s, A3s, ..., AKs (hi fixed)
-            for lo in range(base.lo, base.hi + 1):
+            # suited/offsuit: A2s+ -> A2s, A3s, ..., AKs (hi fixed); stopping at
+            # hi + 1 added "AAs", which is not a hand (plan 073)
+            for lo in range(base.lo, base.hi):
                 cells.append(HandCell(base.hi, lo, base.suited))
         return cells
     return [parse_hand(token)]
