@@ -1,5 +1,6 @@
 /* MY MISTAKES (plan 062): lists SUBOPTIMAL decisions from the hand history,
- * grouped and filterable, with the coach's line; clear empty states. */
+ * grouped and filterable, with the coach's line; clear empty states. A mistake
+ * in a hand the hero won stays listed, marked WON, and can be hidden (plan 070). */
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
@@ -17,12 +18,12 @@ const decision = (street: string, heroAction: string, coachAction: string, grade
 });
 
 const HANDS = [
-  { handNumber: 1, heroPosition: "BTN", level: 1, blindLevel: "100/100", heroCards: ["Ah", "7c"],
+  { handNumber: 1, heroPosition: "BTN", level: 1, blindLevel: "100/100", heroCards: ["Ah", "7c"], net: -4500,
     decisions: [decision("preflop", "ALL-IN", "FOLD", "SUBOPTIMAL")] },
-  { handNumber: 2, heroPosition: "BB", level: 1, blindLevel: "100/100", heroCards: ["Kd", "Qs"],
+  { handNumber: 2, heroPosition: "BB", level: 1, blindLevel: "100/100", heroCards: ["Kd", "Qs"], net: 1200,
     decisions: [decision("preflop", "CALL", "CALL", "PREFERRED"),
                 { ...decision("flop", "CALL", "FOLD", "SUBOPTIMAL"), board: ["2h", "9s", "Jd"] }] },
-  { handNumber: 3, heroPosition: "CO", level: 2, blindLevel: "150/300", heroCards: ["9h", "9d"],
+  { handNumber: 3, heroPosition: "CO", level: 2, blindLevel: "150/300", heroCards: ["9h", "9d"], net: -100,
     decisions: [decision("preflop", "FOLD", "OPEN JAM", "SUBOPTIMAL")] },
 ];
 
@@ -43,7 +44,7 @@ describe("My Mistakes page", () => {
   it("lists only SUBOPTIMAL decisions, newest hand first, with counts", async () => {
     answer("T1", HANDS);
     await renderPage();
-    expect(screen.getByTestId("mistakes-summary").textContent).toBe("3 mistakes in 4 decisions over 3 hands.");
+    expect(screen.getByTestId("mistakes-summary").textContent).toBe("3 mistakes in 4 decisions over 3 hands; 1 in a hand you won.");
     const ids = screen.getAllByTestId(/^mistake-\d/).map((el) => el.getAttribute("data-testid"));
     expect(ids).toEqual(["mistake-3-preflop", "mistake-2-flop", "mistake-1-preflop"]);
     expect(screen.getByTestId("mistakes-filter-call").textContent).toBe("Wrong call (1)");
@@ -72,6 +73,42 @@ describe("My Mistakes page", () => {
       .toEqual(["mistake-1-preflop"]);
     fireEvent.click(screen.getByTestId("mistakes-filter-all"));
     expect(screen.getAllByTestId(/^mistake-\d/)).toHaveLength(3);
+  });
+
+  it("marks a mistake in a hand you won, and can hide those hands", async () => {
+    answer("T1", HANDS);
+    await renderPage();
+    const won = screen.getByTestId("mistake-2-flop");
+    expect(won).toHaveClass("mistake-won");
+    expect(won.textContent).toContain("WON");
+    expect(screen.getByTestId("mistake-1-preflop")).not.toHaveClass("mistake-won");
+    expect(screen.getByTestId("mistake-1-preflop").textContent).not.toContain("WON");
+
+    const hide = screen.getByTestId("mistakes-hide-won");
+    expect(hide.textContent).toBe("Hide won hands (1)");
+    fireEvent.click(hide);
+    expect(hide).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getAllByTestId(/^mistake-\d/).map((el) => el.getAttribute("data-testid")))
+      .toEqual(["mistake-3-preflop", "mistake-1-preflop"]);
+    expect(screen.getByTestId("mistakes-filter-all").textContent).toBe("All (2)");
+    expect(screen.getByTestId("mistakes-filter-call").textContent).toBe("Wrong call (0)");
+    fireEvent.click(hide);
+    expect(screen.getAllByTestId(/^mistake-\d/)).toHaveLength(3);
+  });
+
+  it("says so when the filters hide every mistake", async () => {
+    answer("T1", [HANDS[1]]);
+    await renderPage();
+    fireEvent.click(screen.getByTestId("mistakes-hide-won"));
+    expect(screen.queryAllByTestId(/^mistake-\d/)).toHaveLength(0);
+    expect(screen.getByTestId("mistakes-none-shown")).toBeTruthy();
+  });
+
+  it("offers no hide button when no mistake is in a won hand", async () => {
+    answer("T1", [HANDS[0], HANDS[2]]);
+    await renderPage();
+    expect(screen.queryByTestId("mistakes-hide-won")).toBeNull();
+    expect(screen.getByTestId("mistakes-summary").textContent).toBe("2 mistakes in 2 decisions over 2 hands.");
   });
 
   it("says so when every decision matched the coach", async () => {

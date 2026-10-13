@@ -24,6 +24,13 @@
   background: #1d242c;
 }
 
+/* a mistake in a hand the hero won (plan 070): still listed, softer edge */
+.mistake-won { border-left-color: #c9a227; }
+.mistake-won-tag {
+  padding: 1px 8px; border-radius: 12px; background: rgba(46, 125, 50, 0.25);
+  color: #a5d6a7; font-weight: 700; font-size: 0.7rem; letter-spacing: 1px;
+}
+
 .mistake-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; color: var(--muted); font-size: 0.8rem; }
 
 .mistake-street { text-transform: uppercase; letter-spacing: 1px; color: var(--accent); }
