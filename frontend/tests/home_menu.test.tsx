@@ -96,7 +96,7 @@ describe("menu cards (plan 066)", () => {
     const cards = Array.from(menu.querySelectorAll("button.hm-card"));
     expect(cards.map((c) => c.querySelector(".hm-title")?.textContent)).toEqual([
       "Start practice", "ICM coach", "Ranges", "ICM calculator",
-      "My mistakes", "Hand history", "Statistics", "Tournament settings",
+      "My mistakes", "Hand history", "Report", "Tournament settings",
     ]);
     for (const card of cards) {
       expect(card.querySelector("svg.hm-icon")).toHaveAttribute("aria-hidden", "true");
@@ -104,6 +104,8 @@ describe("menu cards (plan 066)", () => {
     }
     // Start practice opens the lineup builder, so BOT PROFILES has no card
     expect(screen.queryByTestId("menu-bot-profiles")).toBeNull();
+    // the Report (plan 078) replaces Statistics, which asked for a table id
+    expect(screen.queryByTestId("menu-statistics")).toBeNull();
     expect(screen.getByTestId("home-page")).toHaveClass("home-screen");
     // under the mouse a card turns a clearly brighter slate than its #1d242c
     const css = (await import("fs")).readFileSync("src/styles/home-menu.css", "utf8");

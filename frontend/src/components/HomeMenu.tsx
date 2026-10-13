@@ -24,7 +24,7 @@ const GROUPS: { label: string; entries: Entry[] }[] = [
     entries: [
       { to: "/mistakes", icon: "mistakes", title: "My mistakes", text: "Decisions the coach played differently", testId: "menu-mistakes" },
       { to: "/history", icon: "history", title: "Hand history", text: "Hands from your current tournament", testId: "menu-history" },
-      { to: "/statistics", icon: "statistics", title: "Statistics", text: "VPIP, PFR and coach agreement", testId: "menu-statistics" },
+      { to: "/report", icon: "report", title: "Report", text: "Results, leaks and progress across tournaments", testId: "menu-report" },
     ],
   },
   {
