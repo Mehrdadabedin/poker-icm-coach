@@ -75,6 +75,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 069 | The Minimal Page Becomes the Landing Page | 6 | complete | PASS (1 FE new) | / shows the minimal page when signed out; old page at /classic; /minimal redirects to /; landing WebMCP tools moved |
 | 070 | Mistakes in Won Hands Are Marked, and Can Be Hidden | 6 | complete | PASS (3 FE new) | WON label and gold edge for mistakes in won hands; Hide won hands toggle; still listed by default |
 | 071 | Compact Hand Result Box | 6 | complete | PASS (1 FE new) | result, chips, countdown and both buttons in one coloured box; no username or hand line; NEXT HAND in view without scrolling |
+| 072 | A Call Where the Coach Raises Is Acceptable, Not a Mistake | 6 | complete | PASS (2 BE new) | CALL vs RAISE / 3-BET / OPEN RAISE graded ACCEPTABLE; real mistakes stay SUBOPTIMAL |
 
 ## Current Phase
 
