@@ -1,4 +1,6 @@
-/* One graded mistake: the hand, the decision point, and the coach's line. */
+/* One graded mistake: the hand, the decision point, and the coach's line.
+ * A mistake in a hand the hero won is marked WON with a softer edge: the
+ * decision was still worse than the coach's line (plan 070). */
 
 export type Decision = {
   street: string; heroAction: string; coachAction: string; grade: string;
@@ -7,7 +9,7 @@ export type Decision = {
 
 export type Mistake = {
   handNumber: number; heroCards: string[]; heroPosition: string;
-  level: number; blindLevel: string; decision: Decision;
+  level: number; blindLevel: string; decision: Decision; won: boolean;
 };
 
 const SUITS: Record<string, string> = { s: "♠", h: "♥", d: "♦", c: "♣" };
@@ -22,8 +24,9 @@ function CardFace({ card }: { card: string }) {
 export function MistakeCard({ mistake }: { mistake: Mistake }) {
   const d = mistake.decision;
   return (
-    <article className="mistake" data-testid={`mistake-${mistake.handNumber}-${d.street}`}>
+    <article className={mistake.won ? "mistake mistake-won" : "mistake"} data-testid={`mistake-${mistake.handNumber}-${d.street}`}>
       <header className="mistake-head">
+        {mistake.won && <span className="mistake-won-tag">WON</span>}
         <span>Hand #{mistake.handNumber}</span>
         <span>Level {mistake.level} ({mistake.blindLevel})</span>
         <span>{mistake.heroPosition}</span>

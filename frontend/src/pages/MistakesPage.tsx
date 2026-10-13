@@ -1,6 +1,8 @@
 /* MY MISTAKES (plan 062): every decision the coach graded SUBOPTIMAL at the
  * active table, grouped by what went wrong, newest hand first. The verdicts
- * come from the hand history, which keeps the coach's call for each decision. */
+ * come from the hand history, which keeps the coach's call for each decision.
+ * Mistakes in hands the hero won stay listed, marked WON, and can be hidden
+ * (plan 070): winning does not make the decision right. */
 import { useEffect, useState } from "react";
 import { request } from "../services/api";
 import { Copyright } from "../components/Copyright";
@@ -9,7 +11,7 @@ import { MistakeCard, type Decision, type Mistake } from "../components/MistakeC
 
 type HandRow = {
   handNumber: number; heroPosition: string; level: number; blindLevel: string;
-  heroCards: string[]; decisions: Decision[];
+  heroCards: string[]; decisions: Decision[]; net: number;
 };
 
 const CATEGORIES = [
@@ -26,13 +28,14 @@ function mistakesOf(hands: HandRow[]): Mistake[] {
   return hands.reduceRight<Mistake[]>((acc, h) => acc.concat(h.decisions
     .filter((d) => d.grade === "SUBOPTIMAL")
     .map((d) => ({ handNumber: h.handNumber, heroCards: h.heroCards, heroPosition: h.heroPosition,
-                   level: h.level, blindLevel: h.blindLevel, decision: d }))), []);
+                   level: h.level, blindLevel: h.blindLevel, decision: d, won: h.net > 0 }))), []);
 }
 
 export function MistakesPage() {
   const [hands, setHands] = useState<HandRow[]>([]);
   const [status, setStatus] = useState<"loading" | "noTable" | "ready" | "error">("loading");
   const [filter, setFilter] = useState<CategoryKey>("all");
+  const [hideWon, setHideWon] = useState(false);
 
   useEffect(() => {
     request<{ tableId: string | null }>("/api/active-table")
@@ -45,9 +48,11 @@ export function MistakesPage() {
   }, []);
 
   const all = mistakesOf(hands);
+  const wonCount = all.filter((m) => m.won).length;
+  const visible = hideWon ? all.filter((m) => !m.won) : all;
   const decided = hands.reduce((n, h) => n + h.decisions.length, 0);
   const active = CATEGORIES.find((c) => c.key === filter);
-  const shown = active ? all.filter((m) => active.match(m.decision.heroAction)) : all;
+  const shown = active ? visible.filter((m) => active.match(m.decision.heroAction)) : visible;
 
   return (
     <div className="page" data-testid="mistakes-page">
@@ -61,22 +66,31 @@ export function MistakesPage() {
       {status === "ready" && (
         <>
           <p className="note" data-testid="mistakes-summary">
-            {all.length} mistake{all.length === 1 ? "" : "s"} in {decided} decision{decided === 1 ? "" : "s"} over {hands.length} hand{hands.length === 1 ? "" : "s"}.
+            {all.length} mistake{all.length === 1 ? "" : "s"} in {decided} decision{decided === 1 ? "" : "s"} over {hands.length} hand{hands.length === 1 ? "" : "s"}
+            {wonCount > 0 ? `; ${wonCount} in a hand you won.` : "."}
           </p>
           <div className="mistakes-filters" role="group" aria-label="Filter mistakes">
             <button type="button" className={filter === "all" ? "mistakes-filter active" : "mistakes-filter"}
-              onClick={() => setFilter("all")} data-testid="mistakes-filter-all">All ({all.length})</button>
+              onClick={() => setFilter("all")} data-testid="mistakes-filter-all">All ({visible.length})</button>
             {CATEGORIES.map((c) => (
               <button key={c.key} type="button" className={filter === c.key ? "mistakes-filter active" : "mistakes-filter"}
                 onClick={() => setFilter(c.key)} data-testid={`mistakes-filter-${c.key}`}>
-                {c.label} ({all.filter((m) => c.match(m.decision.heroAction)).length})
+                {c.label} ({visible.filter((m) => c.match(m.decision.heroAction)).length})
               </button>
             ))}
+            {wonCount > 0 && (
+              <button type="button" className={hideWon ? "mistakes-filter active" : "mistakes-filter"}
+                aria-pressed={hideWon} onClick={() => setHideWon((v) => !v)} data-testid="mistakes-hide-won">
+                Hide won hands ({wonCount})
+              </button>
+            )}
           </div>
           {all.length === 0 ? (
             <p className="note" data-testid="mistakes-none">
               No mistakes yet: every decision matched the coach or was a close alternative.
             </p>
+          ) : shown.length === 0 ? (
+            <p className="note" data-testid="mistakes-none-shown">No mistakes to show with these filters.</p>
           ) : (
             <div className="mistakes-list">
               {shown.map((m) => <MistakeCard key={`${m.handNumber}-${m.decision.street}-${m.decision.heroAction}`} mistake={m} />)}
