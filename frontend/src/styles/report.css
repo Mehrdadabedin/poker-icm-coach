@@ -1,0 +1,92 @@
+/* REPORT page (plan 078): the dark mock-up the owner approved on 2026-10-13. */
+
+.report-page .toolbar select { min-width: 0; max-width: 100%; }
+
+.report-kpis { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 10px; margin-top: 6px; }
+
+.report-kpi {
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 12px; border: 1px solid #2c3540; border-radius: 12px; background: #1d242c;
+}
+.report-kpi b { font-size: 1.4rem; color: #f3f1ea; }
+.report-kpi span { font-size: 0.78rem; color: var(--muted); }
+.report-kpi i { font-style: normal; font-size: 0.7rem; }
+.report-kpi i.good { color: #7fd18b; }
+.report-kpi i.bad { color: #ef9a9a; }
+
+.report-card {
+  margin-top: 14px; padding: 14px 16px; min-width: 0;
+  border: 1px solid #2c3540; border-radius: 12px; background: #1d242c;
+}
+.report-card h2 { margin: 0 0 4px; font-size: 0.9rem; letter-spacing: 1.2px; color: var(--accent); }
+.report-card .report-h2-gap { margin-top: 16px; }
+.report-sub { margin: 0 0 10px; font-size: 0.78rem; color: var(--muted); }
+.legend-agree { color: var(--accent); }
+.legend-miss { color: #ef9a9a; }
+
+.report-two { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 14px; }
+
+.report-scroll { overflow-x: auto; }
+
+/* charts: the SVG stretches, labels and dots are HTML so text keeps its size */
+.chart { padding-left: 38px; }
+.chart-plot { position: relative; height: 180px; }
+.chart-plot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.chart-grid { stroke: #3a4653; stroke-width: 1; stroke-dasharray: 4 4; }
+.band-a { fill: #232b34; }
+.band-b { fill: #1d242c; }
+.line-stack, .line-agree, .line-miss { fill: none; stroke-width: 2.5; stroke-linejoin: round; }
+.line-stack, .line-agree { stroke: var(--accent); }
+.line-miss { stroke: #e53935; }
+.chart-tick {
+  position: absolute; right: calc(100% + 6px); transform: translateY(-50%);
+  font-size: 0.66rem; color: #6b7480; white-space: nowrap;
+}
+.chart-band { position: absolute; top: 3px; padding-left: 4px; font-size: 0.66rem; color: #6b7480; }
+.chart-dot {
+  position: absolute; width: 9px; height: 9px; border-radius: 50%; transform: translate(-50%, -50%);
+}
+.dot-mistake, .dot-miss { background: #e53935; }
+.dot-agree { background: var(--accent); }
+.chart-x { display: flex; justify-content: space-between; margin-top: 6px; font-size: 0.72rem; color: var(--muted); }
+
+.report-heat { width: 100%; border-collapse: separate; border-spacing: 3px; font-size: 0.8rem; }
+.report-heat th { color: var(--muted); font-weight: 500; text-align: center; padding: 4px; }
+.report-heat td { text-align: center; font-weight: 700; padding: 7px 4px; border-radius: 4px; color: #f3f1ea; }
+.report-heat td.heat-empty { background: #232b34; color: #6b7480; font-weight: 400; }
+
+.report-leaks { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+.report-leaks li { padding: 6px 0; border-bottom: 1px solid #2c3540; font-size: 0.85rem; }
+.report-leaks li::marker { color: #ef9a9a; font-weight: 700; }
+.leak-count { margin-left: 8px; color: #ef9a9a; font-size: 0.75rem; white-space: nowrap; }
+.leak-hands { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.leak-hands a {
+  padding: 1px 8px; border: 1px solid #2c3540; border-radius: 12px;
+  color: #4f9dff; font-size: 0.72rem; text-decoration: none;
+}
+.leak-hands a:hover { border-color: #4f9dff; }
+
+.report-bars { display: grid; gap: 8px; }
+.report-bar { display: grid; grid-template-columns: 96px minmax(0, 1fr) 32px; gap: 8px; align-items: center; font-size: 0.8rem; }
+.bar-track { height: 14px; }
+.bar { display: block; height: 100%; border-radius: 4px; }
+.bar-call { background: #e53935; }
+.bar-fold { background: #e57c35; }
+.bar-allin { background: #e5a935; }
+.bar-other { background: #6b7480; }
+
+.report-stats td:nth-child(2), .report-stats td:nth-child(3) { white-space: nowrap; }
+.verdict-ok { color: #7fd18b; }
+.verdict-warn { color: #f2c14e; }
+.verdict-muted { color: #6b7480; }
+
+@media (max-width: 860px) {
+  .report-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .report-two { grid-template-columns: minmax(0, 1fr); gap: 0; }
+}
+
+@media (max-width: 480px) {
+  .report-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .report-page .toolbar select { width: 100%; }
+  .chart-plot { height: 150px; }
+}

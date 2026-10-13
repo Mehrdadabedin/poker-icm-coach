@@ -81,7 +81,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 075 | The Coach Says Which Street Its Advice Is For | 6 | complete | PASS (2 BE + 5 FE new) | advice carries its street; panel shows e.g. 'BET on the flop'; action word unchanged |
 | 076 | Hand History Saved Per User and Tournament | 6 | complete | PASS (7 BE new, PostgreSQL) | history_tournaments/history_hands; saved when a hand ends; survives deploys; /api/history; deleted with the user |
 | 077 | Hand History Lists Your Tournaments, Names Winners, Filters Hands | 6 | complete | PASS (8 FE + 3 BE new) | tournament list, winners by name, filters; CHECK vs BET acceptable; no polling after a 404 |
-| 078 | Report Page | 6 | in-progress | PASS (8 BE new + 2 BE, PostgreSQL) | /api/history/report: summary, stack graph, mistake map, leaks, types, player stats, progress; a win places 1st; page next |
+| 078 | Report Page | 6 | complete | PASS (10 BE + 11 FE new, PostgreSQL) | /api/history/report and #/report: summary, stack graph, mistake map, leaks linking to Hand History, types, player stats, progress; a win places 1st; Report replaces Statistics in the menu |
 
 ## Current Phase
 

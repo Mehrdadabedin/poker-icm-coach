@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { request } from "../services/api";
 import { Copyright } from "../components/Copyright";
 import { HistoryFiltersBar } from "../components/HistoryFiltersBar";
@@ -12,8 +13,11 @@ import {
  * with the live table selected; its hands grouped by blind level, winners by
  * name, and filters. Saved tournaments come from the history database (plan
  * 076); the live table's hands come from the table itself, so the list still
- * works where no history is saved. */
+ * works where no history is saved. A Report leak links here with
+ * ?table=<id>&hand=<n>: that tournament opens with the hand marked (078). */
 export function HistoryPage() {
+  const [params] = useSearchParams();
+  const linked = { table: params.get("table"), hand: Number(params.get("hand")) || null };
   const [tournaments, setTournaments] = useState<TournamentRow[]>([]);
   const [liveId, setLiveId] = useState<string | null>(null);
   const [selected, setSelected] = useState("");
@@ -34,7 +38,8 @@ export function HistoryPage() {
       setTournaments(rows);
       setLiveId(active.tableId);
       setLoaded(true);
-      const first = active.tableId ?? rows[0]?.tableId;
+      const wanted = rows.some((r) => r.tableId === linked.table) ? linked.table : null;
+      const first = wanted ?? active.tableId ?? rows[0]?.tableId;
       if (first) choose(first, active.tableId);
     });
   }, []);
@@ -45,6 +50,12 @@ export function HistoryPage() {
     const path = id === live ? `/api/game/${id}/hands` : `/api/history/tournaments/${id}/hands`;
     request<{ hands: HandRow[] }>(path).then((d) => setHands(d.hands)).catch(() => setHands([]));
   };
+
+  const focus = selected === linked.table ? linked.hand : null;
+  useEffect(() => {
+    if (focus === null) return;
+    document.querySelector(`[data-testid="history-hand-${focus}"]`)?.scrollIntoView?.({ block: "center" });
+  }, [focus, hands]);
 
   const shown = filterHands(hands, filters);
   const groups = new Map<number, HandRow[]>();
@@ -83,7 +94,8 @@ export function HistoryPage() {
             </thead>
             <tbody>
               {rows.map((h) => (
-                <tr key={h.handNumber} data-testid={`history-hand-${h.handNumber}`}>
+                <tr key={h.handNumber} data-testid={`history-hand-${h.handNumber}`}
+                  className={h.handNumber === focus ? "history-focus" : undefined}>
                   <td>{h.handNumber}</td><td>{h.heroPosition}</td><td>{h.pot.toLocaleString()}</td>
                   <td>{winnerNames(h)}</td>
                   <td className={h.net >= 0 ? "pos" : "neg"}>{h.net >= 0 ? "+" : ""}{h.net.toLocaleString()}</td>

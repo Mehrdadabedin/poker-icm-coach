@@ -24,17 +24,21 @@ export function ordinal(n: number): string {
   return `${n}${suffix}`;
 }
 
-/** "Table A · 13 Oct, 16:20 · finished 5th · 18 hands". A tournament still
- * marked active whose table is gone (a deploy or restart ended it) is
- * "unfinished"; the live one is "in progress". */
+/** A tournament still marked active whose table is gone (a deploy or restart
+ * ended it) is "unfinished"; the live one is "in progress". */
+export function tournamentState(t: Pick<TournamentRow, "tableId" | "status" | "finishPlace">,
+  liveId: string | null): string {
+  return t.tableId === liveId ? "in progress"
+    : t.status === "finished" ? (t.finishPlace ? `finished ${ordinal(t.finishPlace)}` : "finished")
+      : t.status === "abandoned" ? "abandoned" : "unfinished";
+}
+
+/** "Table A · 13 Oct, 16:20 · finished 5th · 18 hands". */
 export function tournamentLabel(t: TournamentRow, liveId: string | null): string {
   const when = t.startedAt
     ? new Date(t.startedAt).toLocaleString(undefined, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
     : "";
-  const state = t.tableId === liveId ? "in progress"
-    : t.status === "finished" ? (t.finishPlace ? `finished ${ordinal(t.finishPlace)}` : "finished")
-      : t.status === "abandoned" ? "abandoned" : "unfinished";
-  return [`Table ${t.tableLabel}`, when, state, `${t.hands} hand${t.hands === 1 ? "" : "s"}`]
+  return [`Table ${t.tableLabel}`, when, tournamentState(t, liveId), `${t.hands} hand${t.hands === 1 ? "" : "s"}`]
     .filter(Boolean).join(" · ");
 }
 
