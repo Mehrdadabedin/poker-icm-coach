@@ -18,7 +18,7 @@ interface TableHeaderProps {
  * table, which stops its clock; PAUSE only holds the automatic next hand. */
 export function TableHeader({ state, username, paused, handOver, isReview, onHome, onMistakes, onLogout, onTogglePause }: TableHeaderProps) {
   return (
-    <div className="top-bar app-header" data-testid="app-header">
+    <div className="top-bar app-header table-header" data-testid="app-header">
       <h1 className="screen-title header-title" data-testid="app-title"><BrandLogo /></h1>
       <div className="header-right">
         {state.tableLabel && (

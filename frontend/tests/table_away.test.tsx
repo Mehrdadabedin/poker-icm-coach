@@ -126,6 +126,20 @@ describe("table header", () => {
   });
 });
 
+describe("table header on a narrow phone", () => {
+  it("puts its buttons on their own row below 600px, so they never cover the logo", async () => {
+    render(
+      <TableHeader state={{ tableLabel: "A" } as TableState} username="Admin" paused={false}
+        handOver={false} isReview={false} onHome={vi.fn()} onMistakes={vi.fn()}
+        onLogout={vi.fn()} onTogglePause={vi.fn()} />,
+    );
+    expect(screen.getByTestId("app-header")).toHaveClass("table-header");
+    const css = (await import("fs")).readFileSync("src/styles/page-header.css", "utf8");
+    expect(css).toMatch(/@media \(max-width: 599px\) \{[^@]*\.table-header \{ flex-wrap: wrap;/);
+    expect(css).toMatch(/\.table-header \.header-right \{ flex: 1 1 100%;/);
+  });
+});
+
 describe("BACK TO TABLE after leaving by any route", () => {
   it("appears once the table page has closed, even though the page rendered first", async () => {
     at("/start", <PageHeader />);
