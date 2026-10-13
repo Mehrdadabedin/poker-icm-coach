@@ -148,7 +148,11 @@
 
 .history-group {
   margin: 12px 0;
+  overflow-x: auto; /* a phone scrolls the hands table, not the page (plan 077) */
 }
+
+/* Hand History filters (plan 077): the checkbox sits beside its words */
+.toolbar .history-mistakes-only { flex-direction: row; align-items: center; gap: 6px; font-size: 0.85rem; }
 
 .history-group-title {
   color: var(--accent);

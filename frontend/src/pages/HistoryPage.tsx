@@ -1,56 +1,79 @@
 import { useEffect, useState } from "react";
 import { request } from "../services/api";
 import { Copyright } from "../components/Copyright";
+import { HistoryFiltersBar } from "../components/HistoryFiltersBar";
 import { PageHeader } from "../components/PageHeader";
+import {
+  NO_FILTERS, filterHands, tournamentLabel, winnerNames,
+  type HandRow, type HistoryFilters, type TournamentRow,
+} from "../models/history";
 
-type HandRow = {
-  handNumber: number; heroPosition: string; pot: number; winnerSeats: number[];
-  net: number; heroDecision: string | null; coachRecommendation: string | null;
-  grade: string | null; level: number; blindLevel: string;
-};
-
-/** HAND HISTORY: auto-loads the active tournament table and groups by blind level. */
+/** HAND HISTORY (plan 077): the user's tournaments in a list, newest first,
+ * with the live table selected; its hands grouped by blind level, winners by
+ * name, and filters. Saved tournaments come from the history database (plan
+ * 076); the live table's hands come from the table itself, so the list still
+ * works where no history is saved. */
 export function HistoryPage() {
+  const [tournaments, setTournaments] = useState<TournamentRow[]>([]);
+  const [liveId, setLiveId] = useState<string | null>(null);
+  const [selected, setSelected] = useState("");
   const [hands, setHands] = useState<HandRow[]>([]);
-  const [tableId, setTableId] = useState("");
+  const [filters, setFilters] = useState<HistoryFilters>(NO_FILTERS);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    // auto-detect the caller's most recent tournament table (per-user)
-    request<{ tableId: string | null; tableLabel: string | null }>("/api/active-table")
-      .then((d) => {
-        if (d.tableId) load(d.tableId);
-      })
-      .catch(() => undefined)
-      .finally(() => setLoaded(true));
+    const live = request<{ tableId: string | null; tableLabel: string | null }>("/api/active-table")
+      .catch(() => ({ tableId: null, tableLabel: null }));
+    const saved = request<{ tournaments: TournamentRow[] }>("/api/history/tournaments")
+      .then((d) => d.tournaments).catch(() => [] as TournamentRow[]);
+    void Promise.all([live, saved]).then(([active, list]) => {
+      const rows = active.tableId && !list.some((t) => t.tableId === active.tableId)
+        ? [{ tableId: active.tableId, tableLabel: active.tableLabel ?? "", startedAt: null, endedAt: null,
+             status: "active", finishPlace: null, hands: 0 }, ...list]
+        : list;
+      setTournaments(rows);
+      setLiveId(active.tableId);
+      setLoaded(true);
+      const first = active.tableId ?? rows[0]?.tableId;
+      if (first) choose(first, active.tableId);
+    });
   }, []);
 
-  const load = (id: string) => {
-    setTableId(id);
-    if (!id) { setHands([]); return; }
-    request<{ hands: HandRow[] }>(`/api/game/${id}/hands`)
-      .then((data) => setHands(data.hands))
-      .catch(() => undefined);
+  const choose = (id: string, live: string | null = liveId) => {
+    setSelected(id);
+    setFilters(NO_FILTERS);
+    const path = id === live ? `/api/game/${id}/hands` : `/api/history/tournaments/${id}/hands`;
+    request<{ hands: HandRow[] }>(path).then((d) => setHands(d.hands)).catch(() => setHands([]));
   };
 
-  // group by blind level (Level 1, Level 2, ...) preserving hand order
+  const shown = filterHands(hands, filters);
   const groups = new Map<number, HandRow[]>();
-  for (const h of hands) {
-    const list = groups.get(h.level) ?? [];
-    list.push(h);
-    groups.set(h.level, list);
-  }
+  for (const h of shown) groups.set(h.level, [...(groups.get(h.level) ?? []), h]);
 
   return (
     <div className="page" data-testid="history-page">
       <PageHeader />
       <h1 className="screen-title">HAND HISTORY</h1>
-      <div className="toolbar">
-        <input placeholder="table id" value={tableId} onChange={(e) => load(e.target.value)} data-testid="history-table-input" />
-      </div>
-      <p className="note">
-        {tableId ? `Tournament table: ${tableId} — ${hands.length} completed hand(s)` : loaded ? "No active table yet — start a practice session first." : "Loading active table…"}
-      </p>
+      {!loaded && <p className="note">Loading your tournaments…</p>}
+      {loaded && tournaments.length === 0 && (
+        <p className="note" data-testid="history-none">No tournaments yet: start a practice session first.</p>
+      )}
+      {tournaments.length > 0 && (
+        <>
+          <div className="toolbar">
+            <select value={selected} onChange={(e) => choose(e.target.value)} aria-label="Tournament"
+              data-testid="history-tournament">
+              {tournaments.map((t) => <option key={t.tableId} value={t.tableId}>{tournamentLabel(t, liveId)}</option>)}
+            </select>
+          </div>
+          <HistoryFiltersBar hands={hands} filters={filters} onChange={setFilters} />
+          <p className="note" data-testid="history-count">
+            {shown.length === hands.length
+              ? `${hands.length} completed hand${hands.length === 1 ? "" : "s"}`
+              : `${shown.length} of ${hands.length} hands match the filters`}
+          </p>
+        </>
+      )}
       {[...groups.entries()].map(([level, rows]) => (
         <div key={level} className="history-group" data-testid={`history-level-${level}`}>
           <h3 className="history-group-title">LEVEL {level} ({rows[0].blindLevel} blinds)</h3>
@@ -60,9 +83,9 @@ export function HistoryPage() {
             </thead>
             <tbody>
               {rows.map((h) => (
-                <tr key={h.handNumber}>
+                <tr key={h.handNumber} data-testid={`history-hand-${h.handNumber}`}>
                   <td>{h.handNumber}</td><td>{h.heroPosition}</td><td>{h.pot.toLocaleString()}</td>
-                  <td>{h.winnerSeats.join(",")}</td>
+                  <td>{winnerNames(h)}</td>
                   <td className={h.net >= 0 ? "pos" : "neg"}>{h.net >= 0 ? "+" : ""}{h.net.toLocaleString()}</td>
                   <td>{h.heroDecision ?? "—"}</td><td>{h.coachRecommendation ?? "—"}</td>
                   <td>{h.grade ?? "—"}</td>
@@ -72,7 +95,6 @@ export function HistoryPage() {
           </table>
         </div>
       ))}
-      {hands.length === 0 && loaded && <p className="note">No completed hands recorded yet.</p>}
       <Copyright />
     </div>
   );

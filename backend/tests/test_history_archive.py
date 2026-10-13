@@ -82,6 +82,7 @@ def test_a_hand_is_saved_when_it_ends_and_outlives_a_restart(db: Engine) -> None
     again = record_from_dict(saved)
     assert again.hand_number == live.hand_number and again.net_chips() == live.net_chips()
     assert again.decisions == live.decisions and again.hero_cards == live.hero_cards
+    assert again.seat_names == live.seat_names and len(again.seat_names) == 9
 
 
 def test_saving_the_same_hand_twice_counts_it_once(db: Engine) -> None:

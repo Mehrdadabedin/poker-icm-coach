@@ -51,6 +51,7 @@ class HandHistoryRecord:
     table_label: str = ""
     timestamp: str = ""
     decisions: list[HandDecision] = field(default_factory=list)
+    seat_names: list[str] = field(default_factory=list)  # by seat, so winners read as names (077)
 
     def net_chips(self) -> int:
         return self.ending_stack - self.starting_stack
@@ -139,6 +140,7 @@ def record_to_dict(record: HandHistoryRecord) -> dict:
         "grade": record.grade,
         "icm_pressure": record.icm_pressure,
         "tournament_stage": record.tournament_stage,
+        "seat_names": record.seat_names,
     }
 
 
@@ -156,6 +158,7 @@ def record_from_dict(data: dict) -> HandHistoryRecord:
         username=data.get("username", ""), table_label=data.get("table_label", ""),
         timestamp=data.get("timestamp", ""),
         decisions=[HandDecision(**d) for d in data.get("decisions", [])],
+        seat_names=list(data.get("seat_names", [])),  # hands saved before plan 077 have none
     )
     record.hero_decision = data.get("hero_decision")
     record.coach_recommendation = data.get("coach_recommendation")

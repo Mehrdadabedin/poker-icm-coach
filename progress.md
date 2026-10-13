@@ -80,6 +80,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 074 | Coach Answers 7x Faster | 6 | complete | PASS (2 BE new) | integer hand scoring for equity; exact river; 1,000 trials; combos cached; coach answer 350 -> 48 ms median |
 | 075 | The Coach Says Which Street Its Advice Is For | 6 | complete | PASS (2 BE + 5 FE new) | advice carries its street; panel shows e.g. 'BET on the flop'; action word unchanged |
 | 076 | Hand History Saved Per User and Tournament | 6 | complete | PASS (7 BE new, PostgreSQL) | history_tournaments/history_hands; saved when a hand ends; survives deploys; /api/history; deleted with the user |
+| 077 | Hand History Lists Your Tournaments, Names Winners, Filters Hands | 6 | complete | PASS (8 FE + 3 BE new) | tournament list, winners by name, filters; CHECK vs BET acceptable; no polling after a 404 |
 
 ## Current Phase
 

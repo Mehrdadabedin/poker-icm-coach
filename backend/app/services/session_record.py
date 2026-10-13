@@ -73,6 +73,7 @@ def build_record(session: GameSession, decisions: list[HandDecision]) -> HandHis
         table_label=session.table_label,
         timestamp=time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         decisions=list(decisions),
+        seat_names=[p.name for p in tournament.players],
     )
     if decisions:
         worst = max(decisions, key=lambda d: _SEVERITY.get(d.grade, 0))

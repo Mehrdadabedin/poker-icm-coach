@@ -66,3 +66,21 @@ def test_the_hands_api_lists_the_hand_that_just_ended() -> None:
     assert state["phase"] == "handOver"
     hands = client.get(f"/api/game/{table}/hands").json()["hands"]
     assert [h["handNumber"] for h in hands] == [state["handNumber"]]
+
+
+def test_a_hand_names_every_seat_so_winners_read_as_names() -> None:
+    """Plan 077: Hand History showed winners as seat numbers ("5", "0")."""
+    client = login_client("SeatNamesUser")
+    table = client.post("/api/tournament", json={
+        "players": 9, "starting_stack": 45000, "blind_level_minutes": 20,
+        "ante_mode": "none", "fast_mode": 1.0,
+    }).json()["tableId"]
+    for _ in range(60):
+        state = client.get(f"/api/game/{table}/state").json()
+        if state["phase"] == "handOver":
+            break
+        kind = "call" if state["toCall"] else "check"
+        client.post(f"/api/game/{table}/action", json={"kind": kind})
+    [hand] = client.get(f"/api/game/{table}/hands").json()["hands"]
+    names = [p["name"] for p in sorted(state["players"], key=lambda p: p["seat"])]
+    assert hand["seatNames"] == names and hand["seatNames"][0] == "SeatNamesUser"
