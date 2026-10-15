@@ -49,3 +49,6 @@ backend/*.sqlite3
 
 # Runtime hand-history files (A07 best-effort persistence)
 backend/data/
+
+# coach benchmark equity cache (plan 080): rebuilt by tests/benchmark/build.py
+backend/tests/benchmark/.cache/

@@ -2,10 +2,10 @@
 id: 080
 title: Coach Accuracy (next phase)
 phase: 7
-status: planned
+status: in-progress
 depends_on: [72, 73, 74]
 test_file: backend/tests/test_coach_benchmark.py
-implementation_files: [backend/app/ai/preflop_ranges.py, backend/app/strategy/baseline_ranges.py, backend/app/strategy/coach.py, backend/app/strategy/test_mode.py]
+implementation_files: [backend/tests/benchmark/build.py, backend/tests/benchmark/nash.py, backend/tests/benchmark/equity_table.py, backend/tests/benchmark/spots.py, backend/tests/data/coach_benchmark.json, backend/app/ai/preflop_ranges.py, backend/app/strategy/baseline_ranges.py, backend/app/strategy/coach.py, backend/app/strategy/test_mode.py]
 ---
 
 # Objective
@@ -36,10 +36,11 @@ at the edge of a range should not be graded like a clear error.
 
 # Plan, in order (each step one pull request)
 
-A. **Measure first.** A benchmark of about 200 reference spots with expected
-   actions, from sources the project may use: the Swayne study notes, push
-   and fold (Nash) charts for 15 BB and less, published open charts. A test
-   prints agreement by category; every later step must raise it.
+A. **Measure first (done, 15 Oct).** See "Step A: benchmark" below.
+B0. **Short stacks, from step A (do first).** Use our own Nash results for
+   small blind shoves and big blind calls at 20 BB and less; read a small
+   blind shove as a shoving range, not an open; drop the 6% margin when
+   calling an all-in (no betting is left); price bubble calls with ICM.
 B1. **Close decisions.** Hands within a few combos of a range edge grade
    ACCEPTABLE either way, and the panel says "close decision". Small.
 B2. **More depth bands:** 10, 15, 20, 25, 30, 40, 60, 100+ BB, with deep
@@ -57,6 +58,52 @@ D. **Optional plain-language reasons:** the decision stays rule-based; an
    AI model (Haiku via the monthly API credit) rewrites the reason only for
    hands opened in My Mistakes, not every decision. Roughly 1,500 input and
    200 output tokens each, well under a cent; check the price first.
+
+# Step A: benchmark
+
+The owner chose maths as the judge, with nothing copied from any book or
+other source. `uv run python -m tests.benchmark.build` writes
+tests/data/coach_benchmark.json from our own code:
+
+- An all-in equity table for the 169 hand classes, simulated (3,000
+  showdowns per pair, 16 minutes on 4 cores, cached, not committed).
+- Heads-up push/fold Nash (chip EV) solved by fictitious play: at 10 BB the
+  small blind shoves 58.1% and the big blind calls 37.6%.
+- Big blind calls on a three-handed bubble (two paid), priced with the exact
+  ICM model against the small blind's Nash shoving range.
+- 204 spots: per stack, the six hands nearest the edge on each side; hands
+  whose two choices differ by less than 0.1 BB (0.3% of the prize pool on
+  the bubble) are close calls and left out.
+
+Checked, not copied: the solver's per-hand thresholds were compared once
+with a published heads-up push/fold table (read in the browser, kept in a
+temporary file, then deleted). Calls: 169 of 169 hands within 0.75 BB;
+shoves: 147 of 153, the rest are suited hands where shove and fold are
+nearly equal.
+
+Coach scores today (the test's floors; a coach change may raise them, never
+lower them):
+
+| Category | Right | Lost on misses |
+|---|---|---|
+| Small blind shove, 3-10 BB | 36/72 (50%) | 4.57 BB |
+| Big blind call vs shove, 4-20 BB | 42/84 (50%) | 10.53 BB |
+| Bubble call (ICM) | 27/48 (56%) | 12.50% of prize pool |
+
+The coach folds almost every spot near the edge. Over all hands:
+
+| Spot | Maths plays | Coach plays | Same answer |
+|---|---|---|---|
+| Small blind shove, 3 BB | 76.8% | 21.3% | 44.5% |
+| Small blind shove, 10 BB | 57.8% | 18.1% | 60.3% |
+| Big blind call, 4 BB | 74.1% | 13.9% | 39.8% |
+| Big blind call, 20 BB | 21.7% | 5.1% | 83.4% |
+
+Causes, from the coach's own reasons: its small blind jam range is about
+20% at every depth ("84o is not in the SB jam range" at 3 BB); a small
+blind shove is read as an opening range, so the caller's equity is
+underestimated; calls need pot odds plus 6% even when all-in; ICM only
+changes the wording, not the call.
 
 # Not planned
 

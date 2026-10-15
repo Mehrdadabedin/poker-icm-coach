@@ -1,0 +1,3199 @@
+{
+ "about": "Heads-up push/fold Nash (chip EV) and three-handed bubble calls (exact ICM). Equity simulated, 3000 showdowns per class pair. Built by tests/benchmark/build.py.",
+ "nashRanges": {
+  "3": {
+   "shovePct": 76.8,
+   "callPct": 92.8
+  },
+  "4": {
+   "shovePct": 73.8,
+   "callPct": 74.1
+  },
+  "5": {
+   "shovePct": 71.9,
+   "callPct": 62.0
+  },
+  "6": {
+   "shovePct": 68.3,
+   "callPct": 54.4
+  },
+  "8": {
+   "shovePct": 61.7,
+   "callPct": 45.4
+  },
+  "10": {
+   "shovePct": 58.1,
+   "callPct": 37.6
+  },
+  "12": {
+   "shovePct": 52.9,
+   "callPct": 33.0
+  },
+  "15": {
+   "shovePct": 45.7,
+   "callPct": 28.8
+  },
+  "20": {
+   "shovePct": 40.0,
+   "callPct": 21.7
+  }
+ },
+ "spots": [
+  {
+   "id": "sb_shove-3-84o",
+   "category": "sb_shove",
+   "hand": "84o",
+   "cards": [
+    "8s",
+    "4h"
+   ],
+   "stacks": [
+    3
+   ],
+   "truth": "FOLD",
+   "gap": 0.104,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-3-43s",
+   "category": "sb_shove",
+   "hand": "43s",
+   "cards": [
+    "4s",
+    "3s"
+   ],
+   "stacks": [
+    3
+   ],
+   "truth": "FOLD",
+   "gap": 0.113,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-3-54o",
+   "category": "sb_shove",
+   "hand": "54o",
+   "cards": [
+    "5s",
+    "4h"
+   ],
+   "stacks": [
+    3
+   ],
+   "truth": "FOLD",
+   "gap": 0.144,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-3-74o",
+   "category": "sb_shove",
+   "hand": "74o",
+   "cards": [
+    "7s",
+    "4h"
+   ],
+   "stacks": [
+    3
+   ],
+   "truth": "FOLD",
+   "gap": 0.144,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-3-52s",
+   "category": "sb_shove",
+   "hand": "52s",
+   "cards": [
+    "5s",
+    "2s"
+   ],
+   "stacks": [
+    3
+   ],
+   "truth": "FOLD",
+   "gap": 0.153,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-3-64o",
+   "category": "sb_shove",
+   "hand": "64o",
+   "cards": [
+    "6s",
+    "4h"
+   ],
+   "stacks": [
+    3
+   ],
+   "truth": "FOLD",
+   "gap": 0.156,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-3-T4o",
+   "category": "sb_shove",
+   "hand": "T4o",
+   "cards": [
+    "Ts",
+    "4h"
+   ],
+   "stacks": [
+    3
+   ],
+   "truth": "JAM",
+   "gap": 0.112,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-3-65s",
+   "category": "sb_shove",
+   "hand": "65s",
+   "cards": [
+    "6s",
+    "5s"
+   ],
+   "stacks": [
+    3
+   ],
+   "truth": "JAM",
+   "gap": 0.128,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-3-94s",
+   "category": "sb_shove",
+   "hand": "94s",
+   "cards": [
+    "9s",
+    "4s"
+   ],
+   "stacks": [
+    3
+   ],
+   "truth": "JAM",
+   "gap": 0.14,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-3-75s",
+   "category": "sb_shove",
+   "hand": "75s",
+   "cards": [
+    "7s",
+    "5s"
+   ],
+   "stacks": [
+    3
+   ],
+   "truth": "JAM",
+   "gap": 0.143,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-3-J2o",
+   "category": "sb_shove",
+   "hand": "J2o",
+   "cards": [
+    "Js",
+    "2h"
+   ],
+   "stacks": [
+    3
+   ],
+   "truth": "JAM",
+   "gap": 0.155,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-3-T5o",
+   "category": "sb_shove",
+   "hand": "T5o",
+   "cards": [
+    "Ts",
+    "5h"
+   ],
+   "stacks": [
+    3
+   ],
+   "truth": "JAM",
+   "gap": 0.17,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-4-52s",
+   "category": "sb_shove",
+   "hand": "52s",
+   "cards": [
+    "5s",
+    "2s"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "FOLD",
+   "gap": 0.102,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-4-T2o",
+   "category": "sb_shove",
+   "hand": "T2o",
+   "cards": [
+    "Ts",
+    "2h"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "FOLD",
+   "gap": 0.115,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-4-54o",
+   "category": "sb_shove",
+   "hand": "54o",
+   "cards": [
+    "5s",
+    "4h"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "FOLD",
+   "gap": 0.118,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-4-42s",
+   "category": "sb_shove",
+   "hand": "42s",
+   "cards": [
+    "4s",
+    "2s"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "FOLD",
+   "gap": 0.148,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-4-64o",
+   "category": "sb_shove",
+   "hand": "64o",
+   "cards": [
+    "6s",
+    "4h"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "FOLD",
+   "gap": 0.157,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-4-94o",
+   "category": "sb_shove",
+   "hand": "94o",
+   "cards": [
+    "9s",
+    "4h"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "FOLD",
+   "gap": 0.163,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-4-J3o",
+   "category": "sb_shove",
+   "hand": "J3o",
+   "cards": [
+    "Js",
+    "3h"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "JAM",
+   "gap": 0.116,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-4-75s",
+   "category": "sb_shove",
+   "hand": "75s",
+   "cards": [
+    "7s",
+    "5s"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "JAM",
+   "gap": 0.125,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-4-T3s",
+   "category": "sb_shove",
+   "hand": "T3s",
+   "cards": [
+    "Ts",
+    "3s"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "JAM",
+   "gap": 0.13,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-4-85s",
+   "category": "sb_shove",
+   "hand": "85s",
+   "cards": [
+    "8s",
+    "5s"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "JAM",
+   "gap": 0.136,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-4-65s",
+   "category": "sb_shove",
+   "hand": "65s",
+   "cards": [
+    "6s",
+    "5s"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "JAM",
+   "gap": 0.142,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-4-95s",
+   "category": "sb_shove",
+   "hand": "95s",
+   "cards": [
+    "9s",
+    "5s"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "JAM",
+   "gap": 0.145,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-5-95o",
+   "category": "sb_shove",
+   "hand": "95o",
+   "cards": [
+    "9s",
+    "5h"
+   ],
+   "stacks": [
+    5
+   ],
+   "truth": "FOLD",
+   "gap": 0.106,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-5-T4o",
+   "category": "sb_shove",
+   "hand": "T4o",
+   "cards": [
+    "Ts",
+    "4h"
+   ],
+   "stacks": [
+    5
+   ],
+   "truth": "FOLD",
+   "gap": 0.112,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-5-64o",
+   "category": "sb_shove",
+   "hand": "64o",
+   "cards": [
+    "6s",
+    "4h"
+   ],
+   "stacks": [
+    5
+   ],
+   "truth": "FOLD",
+   "gap": 0.125,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-5-62s",
+   "category": "sb_shove",
+   "hand": "62s",
+   "cards": [
+    "6s",
+    "2s"
+   ],
+   "stacks": [
+    5
+   ],
+   "truth": "FOLD",
+   "gap": 0.133,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-5-32s",
+   "category": "sb_shove",
+   "hand": "32s",
+   "cards": [
+    "3s",
+    "2s"
+   ],
+   "stacks": [
+    5
+   ],
+   "truth": "FOLD",
+   "gap": 0.135,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-5-72s",
+   "category": "sb_shove",
+   "hand": "72s",
+   "cards": [
+    "7s",
+    "2s"
+   ],
+   "stacks": [
+    5
+   ],
+   "truth": "FOLD",
+   "gap": 0.147,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-5-97o",
+   "category": "sb_shove",
+   "hand": "97o",
+   "cards": [
+    "9s",
+    "7h"
+   ],
+   "stacks": [
+    5
+   ],
+   "truth": "JAM",
+   "gap": 0.101,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-5-87o",
+   "category": "sb_shove",
+   "hand": "87o",
+   "cards": [
+    "8s",
+    "7h"
+   ],
+   "stacks": [
+    5
+   ],
+   "truth": "JAM",
+   "gap": 0.105,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-5-95s",
+   "category": "sb_shove",
+   "hand": "95s",
+   "cards": [
+    "9s",
+    "5s"
+   ],
+   "stacks": [
+    5
+   ],
+   "truth": "JAM",
+   "gap": 0.106,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-5-T4s",
+   "category": "sb_shove",
+   "hand": "T4s",
+   "cards": [
+    "Ts",
+    "4s"
+   ],
+   "stacks": [
+    5
+   ],
+   "truth": "JAM",
+   "gap": 0.119,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-5-85s",
+   "category": "sb_shove",
+   "hand": "85s",
+   "cards": [
+    "8s",
+    "5s"
+   ],
+   "stacks": [
+    5
+   ],
+   "truth": "JAM",
+   "gap": 0.134,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-5-J6o",
+   "category": "sb_shove",
+   "hand": "J6o",
+   "cards": [
+    "Js",
+    "6h"
+   ],
+   "stacks": [
+    5
+   ],
+   "truth": "JAM",
+   "gap": 0.14,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-6-85o",
+   "category": "sb_shove",
+   "hand": "85o",
+   "cards": [
+    "8s",
+    "5h"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "FOLD",
+   "gap": 0.1,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-6-82s",
+   "category": "sb_shove",
+   "hand": "82s",
+   "cards": [
+    "8s",
+    "2s"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "FOLD",
+   "gap": 0.101,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-6-J2o",
+   "category": "sb_shove",
+   "hand": "J2o",
+   "cards": [
+    "Js",
+    "2h"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "FOLD",
+   "gap": 0.111,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-6-95o",
+   "category": "sb_shove",
+   "hand": "95o",
+   "cards": [
+    "9s",
+    "5h"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "FOLD",
+   "gap": 0.122,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-6-T5o",
+   "category": "sb_shove",
+   "hand": "T5o",
+   "cards": [
+    "Ts",
+    "5h"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "FOLD",
+   "gap": 0.122,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-6-64o",
+   "category": "sb_shove",
+   "hand": "64o",
+   "cards": [
+    "6s",
+    "4h"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "FOLD",
+   "gap": 0.126,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-6-95s",
+   "category": "sb_shove",
+   "hand": "95s",
+   "cards": [
+    "9s",
+    "5s"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "JAM",
+   "gap": 0.1,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-6-Q2o",
+   "category": "sb_shove",
+   "hand": "Q2o",
+   "cards": [
+    "Qs",
+    "2h"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "JAM",
+   "gap": 0.101,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-6-T5s",
+   "category": "sb_shove",
+   "hand": "T5s",
+   "cards": [
+    "Ts",
+    "5s"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "JAM",
+   "gap": 0.116,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-6-J2s",
+   "category": "sb_shove",
+   "hand": "J2s",
+   "cards": [
+    "Js",
+    "2s"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "JAM",
+   "gap": 0.127,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-6-85s",
+   "category": "sb_shove",
+   "hand": "85s",
+   "cards": [
+    "8s",
+    "5s"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "JAM",
+   "gap": 0.138,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-6-Q3o",
+   "category": "sb_shove",
+   "hand": "Q3o",
+   "cards": [
+    "Qs",
+    "3h"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "JAM",
+   "gap": 0.147,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-8-J6o",
+   "category": "sb_shove",
+   "hand": "J6o",
+   "cards": [
+    "Js",
+    "6h"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.103,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-8-92s",
+   "category": "sb_shove",
+   "hand": "92s",
+   "cards": [
+    "9s",
+    "2s"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.108,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-8-Q2o",
+   "category": "sb_shove",
+   "hand": "Q2o",
+   "cards": [
+    "Qs",
+    "2h"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.112,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-8-J5o",
+   "category": "sb_shove",
+   "hand": "J5o",
+   "cards": [
+    "Js",
+    "5h"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.12,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-8-42s",
+   "category": "sb_shove",
+   "hand": "42s",
+   "cards": [
+    "4s",
+    "2s"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.129,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-8-83s",
+   "category": "sb_shove",
+   "hand": "83s",
+   "cards": [
+    "8s",
+    "3s"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.146,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-8-85s",
+   "category": "sb_shove",
+   "hand": "85s",
+   "cards": [
+    "8s",
+    "5s"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "JAM",
+   "gap": 0.123,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-8-T8o",
+   "category": "sb_shove",
+   "hand": "T8o",
+   "cards": [
+    "Ts",
+    "8h"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "JAM",
+   "gap": 0.124,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-8-98o",
+   "category": "sb_shove",
+   "hand": "98o",
+   "cards": [
+    "9s",
+    "8h"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "JAM",
+   "gap": 0.125,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-8-Q7o",
+   "category": "sb_shove",
+   "hand": "Q7o",
+   "cards": [
+    "Qs",
+    "7h"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "JAM",
+   "gap": 0.142,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-8-J8o",
+   "category": "sb_shove",
+   "hand": "J8o",
+   "cards": [
+    "Js",
+    "8h"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "JAM",
+   "gap": 0.144,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-8-J5s",
+   "category": "sb_shove",
+   "hand": "J5s",
+   "cards": [
+    "Js",
+    "5s"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "JAM",
+   "gap": 0.149,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-10-T6o",
+   "category": "sb_shove",
+   "hand": "T6o",
+   "cards": [
+    "Ts",
+    "6h"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.114,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-10-92s",
+   "category": "sb_shove",
+   "hand": "92s",
+   "cards": [
+    "9s",
+    "2s"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.122,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-10-42s",
+   "category": "sb_shove",
+   "hand": "42s",
+   "cards": [
+    "4s",
+    "2s"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.134,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-10-83s",
+   "category": "sb_shove",
+   "hand": "83s",
+   "cards": [
+    "8s",
+    "3s"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.142,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-10-82s",
+   "category": "sb_shove",
+   "hand": "82s",
+   "cards": [
+    "8s",
+    "2s"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.153,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-10-85o",
+   "category": "sb_shove",
+   "hand": "85o",
+   "cards": [
+    "8s",
+    "5h"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.158,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-10-64s",
+   "category": "sb_shove",
+   "hand": "64s",
+   "cards": [
+    "6s",
+    "4s"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "JAM",
+   "gap": 0.103,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-10-T8o",
+   "category": "sb_shove",
+   "hand": "T8o",
+   "cards": [
+    "Ts",
+    "8h"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "JAM",
+   "gap": 0.11,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-10-K2o",
+   "category": "sb_shove",
+   "hand": "K2o",
+   "cards": [
+    "Ks",
+    "2h"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "JAM",
+   "gap": 0.111,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-10-J6s",
+   "category": "sb_shove",
+   "hand": "J6s",
+   "cards": [
+    "Js",
+    "6s"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "JAM",
+   "gap": 0.114,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-10-98o",
+   "category": "sb_shove",
+   "hand": "98o",
+   "cards": [
+    "9s",
+    "8h"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "JAM",
+   "gap": 0.125,
+   "unit": "BB"
+  },
+  {
+   "id": "sb_shove-10-Q3s",
+   "category": "sb_shove",
+   "hand": "Q3s",
+   "cards": [
+    "Qs",
+    "3s"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "JAM",
+   "gap": 0.126,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-4-75o",
+   "category": "bb_call",
+   "hand": "75o",
+   "cards": [
+    "7s",
+    "5h"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "FOLD",
+   "gap": 0.102,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-4-52s",
+   "category": "bb_call",
+   "hand": "52s",
+   "cards": [
+    "5s",
+    "2s"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "FOLD",
+   "gap": 0.106,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-4-83s",
+   "category": "bb_call",
+   "hand": "83s",
+   "cards": [
+    "8s",
+    "3s"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "FOLD",
+   "gap": 0.107,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-4-T3o",
+   "category": "bb_call",
+   "hand": "T3o",
+   "cards": [
+    "Ts",
+    "3h"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "FOLD",
+   "gap": 0.108,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-4-85o",
+   "category": "bb_call",
+   "hand": "85o",
+   "cards": [
+    "8s",
+    "5h"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "FOLD",
+   "gap": 0.11,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-4-82s",
+   "category": "bb_call",
+   "hand": "82s",
+   "cards": [
+    "8s",
+    "2s"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "FOLD",
+   "gap": 0.123,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-4-T2s",
+   "category": "bb_call",
+   "hand": "T2s",
+   "cards": [
+    "Ts",
+    "2s"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "CALL",
+   "gap": 0.129,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-4-J3o",
+   "category": "bb_call",
+   "hand": "J3o",
+   "cards": [
+    "Js",
+    "3h"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "CALL",
+   "gap": 0.131,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-4-54s",
+   "category": "bb_call",
+   "hand": "54s",
+   "cards": [
+    "5s",
+    "4s"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "CALL",
+   "gap": 0.133,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-4-75s",
+   "category": "bb_call",
+   "hand": "75s",
+   "cards": [
+    "7s",
+    "5s"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "CALL",
+   "gap": 0.157,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-4-87o",
+   "category": "bb_call",
+   "hand": "87o",
+   "cards": [
+    "8s",
+    "7h"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "CALL",
+   "gap": 0.167,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-4-T3s",
+   "category": "bb_call",
+   "hand": "T3s",
+   "cards": [
+    "Ts",
+    "3s"
+   ],
+   "stacks": [
+    4
+   ],
+   "truth": "CALL",
+   "gap": 0.167,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-6-Q2o",
+   "category": "bb_call",
+   "hand": "Q2o",
+   "cards": [
+    "Qs",
+    "2h"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "FOLD",
+   "gap": 0.115,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-6-J2s",
+   "category": "bb_call",
+   "hand": "J2s",
+   "cards": [
+    "Js",
+    "2s"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "FOLD",
+   "gap": 0.12,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-6-T7o",
+   "category": "bb_call",
+   "hand": "T7o",
+   "cards": [
+    "Ts",
+    "7h"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "FOLD",
+   "gap": 0.129,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-6-T5s",
+   "category": "bb_call",
+   "hand": "T5s",
+   "cards": [
+    "Ts",
+    "5s"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "FOLD",
+   "gap": 0.148,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-6-J6o",
+   "category": "bb_call",
+   "hand": "J6o",
+   "cards": [
+    "Js",
+    "6h"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "FOLD",
+   "gap": 0.184,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-6-T4s",
+   "category": "bb_call",
+   "hand": "T4s",
+   "cards": [
+    "Ts",
+    "4s"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "FOLD",
+   "gap": 0.203,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-6-T8o",
+   "category": "bb_call",
+   "hand": "T8o",
+   "cards": [
+    "Ts",
+    "8h"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "CALL",
+   "gap": 0.122,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-6-J5s",
+   "category": "bb_call",
+   "hand": "J5s",
+   "cards": [
+    "Js",
+    "5s"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "CALL",
+   "gap": 0.133,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-6-97s",
+   "category": "bb_call",
+   "hand": "97s",
+   "cards": [
+    "9s",
+    "7s"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "CALL",
+   "gap": 0.148,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-6-Q5o",
+   "category": "bb_call",
+   "hand": "Q5o",
+   "cards": [
+    "Qs",
+    "5h"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "CALL",
+   "gap": 0.189,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-6-J6s",
+   "category": "bb_call",
+   "hand": "J6s",
+   "cards": [
+    "Js",
+    "6s"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "CALL",
+   "gap": 0.21,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-6-T7s",
+   "category": "bb_call",
+   "hand": "T7s",
+   "cards": [
+    "Ts",
+    "7s"
+   ],
+   "stacks": [
+    6
+   ],
+   "truth": "CALL",
+   "gap": 0.243,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-8-T7s",
+   "category": "bb_call",
+   "hand": "T7s",
+   "cards": [
+    "Ts",
+    "7s"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.141,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-8-Q2s",
+   "category": "bb_call",
+   "hand": "Q2s",
+   "cards": [
+    "Qs",
+    "2s"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.171,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-8-Q6o",
+   "category": "bb_call",
+   "hand": "Q6o",
+   "cards": [
+    "Qs",
+    "6h"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.19,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-8-J6s",
+   "category": "bb_call",
+   "hand": "J6s",
+   "cards": [
+    "Js",
+    "6s"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.211,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-8-97s",
+   "category": "bb_call",
+   "hand": "97s",
+   "cards": [
+    "9s",
+    "7s"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.272,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-8-J5s",
+   "category": "bb_call",
+   "hand": "J5s",
+   "cards": [
+    "Js",
+    "5s"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.288,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-8-K3o",
+   "category": "bb_call",
+   "hand": "K3o",
+   "cards": [
+    "Ks",
+    "3h"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "CALL",
+   "gap": 0.12,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-8-Q5s",
+   "category": "bb_call",
+   "hand": "Q5s",
+   "cards": [
+    "Qs",
+    "5s"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "CALL",
+   "gap": 0.18,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-8-T8s",
+   "category": "bb_call",
+   "hand": "T8s",
+   "cards": [
+    "Ts",
+    "8s"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "CALL",
+   "gap": 0.191,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-8-K4o",
+   "category": "bb_call",
+   "hand": "K4o",
+   "cards": [
+    "Ks",
+    "4h"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "CALL",
+   "gap": 0.207,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-8-J9o",
+   "category": "bb_call",
+   "hand": "J9o",
+   "cards": [
+    "Js",
+    "9h"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "CALL",
+   "gap": 0.259,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-8-Q6s",
+   "category": "bb_call",
+   "hand": "Q6s",
+   "cards": [
+    "Qs",
+    "6s"
+   ],
+   "stacks": [
+    8
+   ],
+   "truth": "CALL",
+   "gap": 0.33,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-10-Q5s",
+   "category": "bb_call",
+   "hand": "Q5s",
+   "cards": [
+    "Qs",
+    "5s"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.15,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-10-K4o",
+   "category": "bb_call",
+   "hand": "K4o",
+   "cards": [
+    "Ks",
+    "4h"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.188,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-10-98s",
+   "category": "bb_call",
+   "hand": "98s",
+   "cards": [
+    "9s",
+    "8s"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.232,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-10-J7s",
+   "category": "bb_call",
+   "hand": "J7s",
+   "cards": [
+    "Js",
+    "7s"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.259,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-10-T9o",
+   "category": "bb_call",
+   "hand": "T9o",
+   "cards": [
+    "Ts",
+    "9h"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.295,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-10-K3o",
+   "category": "bb_call",
+   "hand": "K3o",
+   "cards": [
+    "Ks",
+    "3h"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.297,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-10-Q7s",
+   "category": "bb_call",
+   "hand": "Q7s",
+   "cards": [
+    "Qs",
+    "7s"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "CALL",
+   "gap": 0.103,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-10-K2s",
+   "category": "bb_call",
+   "hand": "K2s",
+   "cards": [
+    "Ks",
+    "2s"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "CALL",
+   "gap": 0.181,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-10-T9s",
+   "category": "bb_call",
+   "hand": "T9s",
+   "cards": [
+    "Ts",
+    "9s"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "CALL",
+   "gap": 0.294,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-10-K6o",
+   "category": "bb_call",
+   "hand": "K6o",
+   "cards": [
+    "Ks",
+    "6h"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "CALL",
+   "gap": 0.298,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-10-K3s",
+   "category": "bb_call",
+   "hand": "K3s",
+   "cards": [
+    "Ks",
+    "3s"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "CALL",
+   "gap": 0.304,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-10-Q9o",
+   "category": "bb_call",
+   "hand": "Q9o",
+   "cards": [
+    "Qs",
+    "9h"
+   ],
+   "stacks": [
+    10
+   ],
+   "truth": "CALL",
+   "gap": 0.39,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-12-T9s",
+   "category": "bb_call",
+   "hand": "T9s",
+   "cards": [
+    "Ts",
+    "9s"
+   ],
+   "stacks": [
+    12
+   ],
+   "truth": "FOLD",
+   "gap": 0.119,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-12-K3s",
+   "category": "bb_call",
+   "hand": "K3s",
+   "cards": [
+    "Ks",
+    "3s"
+   ],
+   "stacks": [
+    12
+   ],
+   "truth": "FOLD",
+   "gap": 0.125,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-12-K6o",
+   "category": "bb_call",
+   "hand": "K6o",
+   "cards": [
+    "Ks",
+    "6h"
+   ],
+   "stacks": [
+    12
+   ],
+   "truth": "FOLD",
+   "gap": 0.158,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-12-K2s",
+   "category": "bb_call",
+   "hand": "K2s",
+   "cards": [
+    "Ks",
+    "2s"
+   ],
+   "stacks": [
+    12
+   ],
+   "truth": "FOLD",
+   "gap": 0.237,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-12-J8s",
+   "category": "bb_call",
+   "hand": "J8s",
+   "cards": [
+    "Js",
+    "8s"
+   ],
+   "stacks": [
+    12
+   ],
+   "truth": "FOLD",
+   "gap": 0.357,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-12-Q7s",
+   "category": "bb_call",
+   "hand": "Q7s",
+   "cards": [
+    "Qs",
+    "7s"
+   ],
+   "stacks": [
+    12
+   ],
+   "truth": "FOLD",
+   "gap": 0.362,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-12-K7o",
+   "category": "bb_call",
+   "hand": "K7o",
+   "cards": [
+    "Ks",
+    "7h"
+   ],
+   "stacks": [
+    12
+   ],
+   "truth": "CALL",
+   "gap": 0.162,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-12-Q8s",
+   "category": "bb_call",
+   "hand": "Q8s",
+   "cards": [
+    "Qs",
+    "8s"
+   ],
+   "stacks": [
+    12
+   ],
+   "truth": "CALL",
+   "gap": 0.171,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-12-J9s",
+   "category": "bb_call",
+   "hand": "J9s",
+   "cards": [
+    "Js",
+    "9s"
+   ],
+   "stacks": [
+    12
+   ],
+   "truth": "CALL",
+   "gap": 0.184,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-12-K5s",
+   "category": "bb_call",
+   "hand": "K5s",
+   "cards": [
+    "Ks",
+    "5s"
+   ],
+   "stacks": [
+    12
+   ],
+   "truth": "CALL",
+   "gap": 0.273,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-12-22",
+   "category": "bb_call",
+   "hand": "22",
+   "cards": [
+    "2s",
+    "2h"
+   ],
+   "stacks": [
+    12
+   ],
+   "truth": "CALL",
+   "gap": 0.394,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-12-K8o",
+   "category": "bb_call",
+   "hand": "K8o",
+   "cards": [
+    "Ks",
+    "8h"
+   ],
+   "stacks": [
+    12
+   ],
+   "truth": "CALL",
+   "gap": 0.548,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-15-K6s",
+   "category": "bb_call",
+   "hand": "K6s",
+   "cards": [
+    "Ks",
+    "6s"
+   ],
+   "stacks": [
+    15
+   ],
+   "truth": "FOLD",
+   "gap": 0.144,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-15-K8o",
+   "category": "bb_call",
+   "hand": "K8o",
+   "cards": [
+    "Ks",
+    "8h"
+   ],
+   "stacks": [
+    15
+   ],
+   "truth": "FOLD",
+   "gap": 0.338,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-15-J9s",
+   "category": "bb_call",
+   "hand": "J9s",
+   "cards": [
+    "Js",
+    "9s"
+   ],
+   "stacks": [
+    15
+   ],
+   "truth": "FOLD",
+   "gap": 0.377,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-15-JTo",
+   "category": "bb_call",
+   "hand": "JTo",
+   "cards": [
+    "Js",
+    "Th"
+   ],
+   "stacks": [
+    15
+   ],
+   "truth": "FOLD",
+   "gap": 0.482,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-15-Q8s",
+   "category": "bb_call",
+   "hand": "Q8s",
+   "cards": [
+    "Qs",
+    "8s"
+   ],
+   "stacks": [
+    15
+   ],
+   "truth": "FOLD",
+   "gap": 0.491,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-15-K5s",
+   "category": "bb_call",
+   "hand": "K5s",
+   "cards": [
+    "Ks",
+    "5s"
+   ],
+   "stacks": [
+    15
+   ],
+   "truth": "FOLD",
+   "gap": 0.505,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-15-A2o",
+   "category": "bb_call",
+   "hand": "A2o",
+   "cards": [
+    "As",
+    "2h"
+   ],
+   "stacks": [
+    15
+   ],
+   "truth": "CALL",
+   "gap": 0.158,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-15-A3o",
+   "category": "bb_call",
+   "hand": "A3o",
+   "cards": [
+    "As",
+    "3h"
+   ],
+   "stacks": [
+    15
+   ],
+   "truth": "CALL",
+   "gap": 0.312,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-15-JTs",
+   "category": "bb_call",
+   "hand": "JTs",
+   "cards": [
+    "Js",
+    "Ts"
+   ],
+   "stacks": [
+    15
+   ],
+   "truth": "CALL",
+   "gap": 0.388,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-15-QJo",
+   "category": "bb_call",
+   "hand": "QJo",
+   "cards": [
+    "Qs",
+    "Jh"
+   ],
+   "stacks": [
+    15
+   ],
+   "truth": "CALL",
+   "gap": 0.418,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-15-K9o",
+   "category": "bb_call",
+   "hand": "K9o",
+   "cards": [
+    "Ks",
+    "9h"
+   ],
+   "stacks": [
+    15
+   ],
+   "truth": "CALL",
+   "gap": 0.438,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-15-K8s",
+   "category": "bb_call",
+   "hand": "K8s",
+   "cards": [
+    "Ks",
+    "8s"
+   ],
+   "stacks": [
+    15
+   ],
+   "truth": "CALL",
+   "gap": 0.539,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-20-JTs",
+   "category": "bb_call",
+   "hand": "JTs",
+   "cards": [
+    "Js",
+    "Ts"
+   ],
+   "stacks": [
+    20
+   ],
+   "truth": "FOLD",
+   "gap": 0.216,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-20-A4o",
+   "category": "bb_call",
+   "hand": "A4o",
+   "cards": [
+    "As",
+    "4h"
+   ],
+   "stacks": [
+    20
+   ],
+   "truth": "FOLD",
+   "gap": 0.235,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-20-K8s",
+   "category": "bb_call",
+   "hand": "K8s",
+   "cards": [
+    "Ks",
+    "8s"
+   ],
+   "stacks": [
+    20
+   ],
+   "truth": "FOLD",
+   "gap": 0.434,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-20-22",
+   "category": "bb_call",
+   "hand": "22",
+   "cards": [
+    "2s",
+    "2h"
+   ],
+   "stacks": [
+    20
+   ],
+   "truth": "FOLD",
+   "gap": 0.567,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-20-A3o",
+   "category": "bb_call",
+   "hand": "A3o",
+   "cards": [
+    "As",
+    "3h"
+   ],
+   "stacks": [
+    20
+   ],
+   "truth": "FOLD",
+   "gap": 0.614,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-20-Q9s",
+   "category": "bb_call",
+   "hand": "Q9s",
+   "cards": [
+    "Qs",
+    "9s"
+   ],
+   "stacks": [
+    20
+   ],
+   "truth": "FOLD",
+   "gap": 0.663,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-20-A5o",
+   "category": "bb_call",
+   "hand": "A5o",
+   "cards": [
+    "As",
+    "5h"
+   ],
+   "stacks": [
+    20
+   ],
+   "truth": "CALL",
+   "gap": 0.113,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-20-33",
+   "category": "bb_call",
+   "hand": "33",
+   "cards": [
+    "3s",
+    "3h"
+   ],
+   "stacks": [
+    20
+   ],
+   "truth": "CALL",
+   "gap": 0.167,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-20-A6o",
+   "category": "bb_call",
+   "hand": "A6o",
+   "cards": [
+    "As",
+    "6h"
+   ],
+   "stacks": [
+    20
+   ],
+   "truth": "CALL",
+   "gap": 0.21,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-20-A2s",
+   "category": "bb_call",
+   "hand": "A2s",
+   "cards": [
+    "As",
+    "2s"
+   ],
+   "stacks": [
+    20
+   ],
+   "truth": "CALL",
+   "gap": 0.384,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-20-QTs",
+   "category": "bb_call",
+   "hand": "QTs",
+   "cards": [
+    "Qs",
+    "Ts"
+   ],
+   "stacks": [
+    20
+   ],
+   "truth": "CALL",
+   "gap": 0.399,
+   "unit": "BB"
+  },
+  {
+   "id": "bb_call-20-KTo",
+   "category": "bb_call",
+   "hand": "KTo",
+   "cards": [
+    "Ks",
+    "Th"
+   ],
+   "stacks": [
+    20
+   ],
+   "truth": "CALL",
+   "gap": 0.489,
+   "unit": "BB"
+  },
+  {
+   "id": "bubble_call-20-10-10-JTs",
+   "category": "bubble_call",
+   "hand": "JTs",
+   "cards": [
+    "Js",
+    "Ts"
+   ],
+   "stacks": [
+    20,
+    10,
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.478,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-20-10-10-A2o",
+   "category": "bubble_call",
+   "hand": "A2o",
+   "cards": [
+    "As",
+    "2h"
+   ],
+   "stacks": [
+    20,
+    10,
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.601,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-20-10-10-Q9s",
+   "category": "bubble_call",
+   "hand": "Q9s",
+   "cards": [
+    "Qs",
+    "9s"
+   ],
+   "stacks": [
+    20,
+    10,
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.608,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-20-10-10-33",
+   "category": "bubble_call",
+   "hand": "33",
+   "cards": [
+    "3s",
+    "3h"
+   ],
+   "stacks": [
+    20,
+    10,
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.656,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-20-10-10-K8o",
+   "category": "bubble_call",
+   "hand": "K8o",
+   "cards": [
+    "Ks",
+    "8h"
+   ],
+   "stacks": [
+    20,
+    10,
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.77,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-20-10-10-K6s",
+   "category": "bubble_call",
+   "hand": "K6s",
+   "cards": [
+    "Ks",
+    "6s"
+   ],
+   "stacks": [
+    20,
+    10,
+    10
+   ],
+   "truth": "FOLD",
+   "gap": 0.786,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-20-10-10-K9o",
+   "category": "bubble_call",
+   "hand": "K9o",
+   "cards": [
+    "Ks",
+    "9h"
+   ],
+   "stacks": [
+    20,
+    10,
+    10
+   ],
+   "truth": "CALL",
+   "gap": 0.366,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-20-10-10-44",
+   "category": "bubble_call",
+   "hand": "44",
+   "cards": [
+    "4s",
+    "4h"
+   ],
+   "stacks": [
+    20,
+    10,
+    10
+   ],
+   "truth": "CALL",
+   "gap": 0.481,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-20-10-10-QTs",
+   "category": "bubble_call",
+   "hand": "QTs",
+   "cards": [
+    "Qs",
+    "Ts"
+   ],
+   "stacks": [
+    20,
+    10,
+    10
+   ],
+   "truth": "CALL",
+   "gap": 0.559,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-20-10-10-K8s",
+   "category": "bubble_call",
+   "hand": "K8s",
+   "cards": [
+    "Ks",
+    "8s"
+   ],
+   "stacks": [
+    20,
+    10,
+    10
+   ],
+   "truth": "CALL",
+   "gap": 0.627,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-20-10-10-A5o",
+   "category": "bubble_call",
+   "hand": "A5o",
+   "cards": [
+    "As",
+    "5h"
+   ],
+   "stacks": [
+    20,
+    10,
+    10
+   ],
+   "truth": "CALL",
+   "gap": 0.683,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-20-10-10-A6o",
+   "category": "bubble_call",
+   "hand": "A6o",
+   "cards": [
+    "As",
+    "6h"
+   ],
+   "stacks": [
+    20,
+    10,
+    10
+   ],
+   "truth": "CALL",
+   "gap": 0.731,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-10-10-20-K5s",
+   "category": "bubble_call",
+   "hand": "K5s",
+   "cards": [
+    "Ks",
+    "5s"
+   ],
+   "stacks": [
+    10,
+    10,
+    20
+   ],
+   "truth": "FOLD",
+   "gap": 0.546,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-10-10-20-K7o",
+   "category": "bubble_call",
+   "hand": "K7o",
+   "cards": [
+    "Ks",
+    "7h"
+   ],
+   "stacks": [
+    10,
+    10,
+    20
+   ],
+   "truth": "FOLD",
+   "gap": 0.583,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-10-10-20-22",
+   "category": "bubble_call",
+   "hand": "22",
+   "cards": [
+    "2s",
+    "2h"
+   ],
+   "stacks": [
+    10,
+    10,
+    20
+   ],
+   "truth": "FOLD",
+   "gap": 0.655,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-10-10-20-Q8s",
+   "category": "bubble_call",
+   "hand": "Q8s",
+   "cards": [
+    "Qs",
+    "8s"
+   ],
+   "stacks": [
+    10,
+    10,
+    20
+   ],
+   "truth": "FOLD",
+   "gap": 0.663,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-10-10-20-J9s",
+   "category": "bubble_call",
+   "hand": "J9s",
+   "cards": [
+    "Js",
+    "9s"
+   ],
+   "stacks": [
+    10,
+    10,
+    20
+   ],
+   "truth": "FOLD",
+   "gap": 0.694,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-10-10-20-K4s",
+   "category": "bubble_call",
+   "hand": "K4s",
+   "cards": [
+    "Ks",
+    "4s"
+   ],
+   "stacks": [
+    10,
+    10,
+    20
+   ],
+   "truth": "FOLD",
+   "gap": 0.778,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-10-10-20-A4o",
+   "category": "bubble_call",
+   "hand": "A4o",
+   "cards": [
+    "As",
+    "4h"
+   ],
+   "stacks": [
+    10,
+    10,
+    20
+   ],
+   "truth": "CALL",
+   "gap": 0.381,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-10-10-20-K9o",
+   "category": "bubble_call",
+   "hand": "K9o",
+   "cards": [
+    "Ks",
+    "9h"
+   ],
+   "stacks": [
+    10,
+    10,
+    20
+   ],
+   "truth": "CALL",
+   "gap": 0.49,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-10-10-20-44",
+   "category": "bubble_call",
+   "hand": "44",
+   "cards": [
+    "4s",
+    "4h"
+   ],
+   "stacks": [
+    10,
+    10,
+    20
+   ],
+   "truth": "CALL",
+   "gap": 0.559,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-10-10-20-QTs",
+   "category": "bubble_call",
+   "hand": "QTs",
+   "cards": [
+    "Qs",
+    "Ts"
+   ],
+   "stacks": [
+    10,
+    10,
+    20
+   ],
+   "truth": "CALL",
+   "gap": 0.605,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-10-10-20-K8s",
+   "category": "bubble_call",
+   "hand": "K8s",
+   "cards": [
+    "Ks",
+    "8s"
+   ],
+   "stacks": [
+    10,
+    10,
+    20
+   ],
+   "truth": "CALL",
+   "gap": 0.645,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-10-10-20-A5o",
+   "category": "bubble_call",
+   "hand": "A5o",
+   "cards": [
+    "As",
+    "5h"
+   ],
+   "stacks": [
+    10,
+    10,
+    20
+   ],
+   "truth": "CALL",
+   "gap": 0.678,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-30-8-8-Q8o",
+   "category": "bubble_call",
+   "hand": "Q8o",
+   "cards": [
+    "Qs",
+    "8h"
+   ],
+   "stacks": [
+    30,
+    8,
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.31,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-30-8-8-Q6s",
+   "category": "bubble_call",
+   "hand": "Q6s",
+   "cards": [
+    "Qs",
+    "6s"
+   ],
+   "stacks": [
+    30,
+    8,
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.359,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-30-8-8-J9o",
+   "category": "bubble_call",
+   "hand": "J9o",
+   "cards": [
+    "Js",
+    "9h"
+   ],
+   "stacks": [
+    30,
+    8,
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.561,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-30-8-8-K4o",
+   "category": "bubble_call",
+   "hand": "K4o",
+   "cards": [
+    "Ks",
+    "4h"
+   ],
+   "stacks": [
+    30,
+    8,
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.709,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-30-8-8-T8s",
+   "category": "bubble_call",
+   "hand": "T8s",
+   "cards": [
+    "Ts",
+    "8s"
+   ],
+   "stacks": [
+    30,
+    8,
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.753,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-30-8-8-Q5s",
+   "category": "bubble_call",
+   "hand": "Q5s",
+   "cards": [
+    "Qs",
+    "5s"
+   ],
+   "stacks": [
+    30,
+    8,
+    8
+   ],
+   "truth": "FOLD",
+   "gap": 0.785,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-30-8-8-K6o",
+   "category": "bubble_call",
+   "hand": "K6o",
+   "cards": [
+    "Ks",
+    "6h"
+   ],
+   "stacks": [
+    30,
+    8,
+    8
+   ],
+   "truth": "CALL",
+   "gap": 0.407,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-30-8-8-K3s",
+   "category": "bubble_call",
+   "hand": "K3s",
+   "cards": [
+    "Ks",
+    "3s"
+   ],
+   "stacks": [
+    30,
+    8,
+    8
+   ],
+   "truth": "CALL",
+   "gap": 0.408,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-30-8-8-JTo",
+   "category": "bubble_call",
+   "hand": "JTo",
+   "cards": [
+    "Js",
+    "Th"
+   ],
+   "stacks": [
+    30,
+    8,
+    8
+   ],
+   "truth": "CALL",
+   "gap": 0.608,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-30-8-8-22",
+   "category": "bubble_call",
+   "hand": "22",
+   "cards": [
+    "2s",
+    "2h"
+   ],
+   "stacks": [
+    30,
+    8,
+    8
+   ],
+   "truth": "CALL",
+   "gap": 0.676,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-30-8-8-Q9o",
+   "category": "bubble_call",
+   "hand": "Q9o",
+   "cards": [
+    "Qs",
+    "9h"
+   ],
+   "stacks": [
+    30,
+    8,
+    8
+   ],
+   "truth": "CALL",
+   "gap": 0.692,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-30-8-8-J9s",
+   "category": "bubble_call",
+   "hand": "J9s",
+   "cards": [
+    "Js",
+    "9s"
+   ],
+   "stacks": [
+    30,
+    8,
+    8
+   ],
+   "truth": "CALL",
+   "gap": 0.754,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-8-12-12-ATo",
+   "category": "bubble_call",
+   "hand": "ATo",
+   "cards": [
+    "As",
+    "Th"
+   ],
+   "stacks": [
+    8,
+    12,
+    12
+   ],
+   "truth": "FOLD",
+   "gap": 0.481,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-8-12-12-A9s",
+   "category": "bubble_call",
+   "hand": "A9s",
+   "cards": [
+    "As",
+    "9s"
+   ],
+   "stacks": [
+    8,
+    12,
+    12
+   ],
+   "truth": "FOLD",
+   "gap": 0.716,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-8-12-12-77",
+   "category": "bubble_call",
+   "hand": "77",
+   "cards": [
+    "7s",
+    "7h"
+   ],
+   "stacks": [
+    8,
+    12,
+    12
+   ],
+   "truth": "FOLD",
+   "gap": 0.958,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-8-12-12-KQs",
+   "category": "bubble_call",
+   "hand": "KQs",
+   "cards": [
+    "Ks",
+    "Qs"
+   ],
+   "stacks": [
+    8,
+    12,
+    12
+   ],
+   "truth": "FOLD",
+   "gap": 0.967,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-8-12-12-A8s",
+   "category": "bubble_call",
+   "hand": "A8s",
+   "cards": [
+    "As",
+    "8s"
+   ],
+   "stacks": [
+    8,
+    12,
+    12
+   ],
+   "truth": "FOLD",
+   "gap": 1.521,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-8-12-12-KJs",
+   "category": "bubble_call",
+   "hand": "KJs",
+   "cards": [
+    "Ks",
+    "Js"
+   ],
+   "stacks": [
+    8,
+    12,
+    12
+   ],
+   "truth": "FOLD",
+   "gap": 1.824,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-8-12-12-AJo",
+   "category": "bubble_call",
+   "hand": "AJo",
+   "cards": [
+    "As",
+    "Jh"
+   ],
+   "stacks": [
+    8,
+    12,
+    12
+   ],
+   "truth": "CALL",
+   "gap": 0.398,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-8-12-12-ATs",
+   "category": "bubble_call",
+   "hand": "ATs",
+   "cards": [
+    "As",
+    "Ts"
+   ],
+   "stacks": [
+    8,
+    12,
+    12
+   ],
+   "truth": "CALL",
+   "gap": 0.793,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-8-12-12-88",
+   "category": "bubble_call",
+   "hand": "88",
+   "cards": [
+    "8s",
+    "8h"
+   ],
+   "stacks": [
+    8,
+    12,
+    12
+   ],
+   "truth": "CALL",
+   "gap": 1.003,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-8-12-12-AQo",
+   "category": "bubble_call",
+   "hand": "AQo",
+   "cards": [
+    "As",
+    "Qh"
+   ],
+   "stacks": [
+    8,
+    12,
+    12
+   ],
+   "truth": "CALL",
+   "gap": 1.314,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-8-12-12-AJs",
+   "category": "bubble_call",
+   "hand": "AJs",
+   "cards": [
+    "As",
+    "Js"
+   ],
+   "stacks": [
+    8,
+    12,
+    12
+   ],
+   "truth": "CALL",
+   "gap": 1.578,
+   "unit": "% prize pool"
+  },
+  {
+   "id": "bubble_call-8-12-12-AQs",
+   "category": "bubble_call",
+   "hand": "AQs",
+   "cards": [
+    "As",
+    "Qs"
+   ],
+   "stacks": [
+    8,
+    12,
+    12
+   ],
+   "truth": "CALL",
+   "gap": 2.387,
+   "unit": "% prize pool"
+  }
+ ]
+}
