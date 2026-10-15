@@ -1,4 +1,4 @@
-"""Chip Expected Value for a call decision (Swayne-based conceptual model).
+"""Chip Expected Value for a call decision (standard conceptual model).
 
 EV = P(win) x amount-won - P(lose) x amount-invested.
 

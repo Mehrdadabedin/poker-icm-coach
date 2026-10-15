@@ -1,6 +1,6 @@
 ---
 id: 055
-title: Swayne-Based Card/EV Explanations
+title: Card/EV Explanations
 phase: 5
 status: complete
 depends_on: [51, 52]
@@ -10,7 +10,7 @@ implementation_files: [backend/app/strategy/education.py, backend/app/strategy/c
 
 # Objective
 
-Add concise educational explanations to ICM Coach based on Swayne concepts
+Add concise educational explanations to ICM Coach based on standard concepts
 (169 classes, exact combos, card strength, opponents, position, pot size,
 probability, outs, pot odds, EV, positive/negative EV, making vs winning a
 hand). No book text copied.

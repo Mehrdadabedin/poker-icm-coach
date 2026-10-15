@@ -1,6 +1,6 @@
 """Postflop outs and improvement probability from the actual remaining deck.
 
-Swayne's model: 47 unknown cards after the flop, 46 after the turn. Instead of
+The standard model: 47 unknown cards after the flop, 46 after the turn. Instead of
 hard-coded generic probabilities, every card not in the hero's hand or on the
 board is enumerated, and an out is a card that improves the hero's made-hand
 category. "Probability of making a hand" and "winning probability" are
