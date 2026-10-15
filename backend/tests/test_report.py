@@ -138,3 +138,12 @@ def test_the_report_needs_a_signed_in_user_and_a_known_period() -> None:
     assert (report["summary"]["tournaments"], report["stack"], report["leaks"]) == (0, None, [])
     assert client.get("/api/history/report?period=1y").status_code == 422
     assert client.get("/api/history/report?tournament=nope").status_code == 404
+
+
+def test_a_leak_lists_each_hand_once_and_counts_every_decision() -> None:
+    """Calling twice preflop in one hand listed that hand twice (seen on 15 Oct)."""
+    twice = dec("preflop", "CALL", "FOLD", BAD)
+    hands = {"a": [hand(1, twice, twice, pos="UTG"), hand(2, twice, pos="UTG")]}
+    [leak] = build_report([row("a", 1)], [], hands, period="30d", tournament=None)["leaks"]
+    assert leak["count"] == 3
+    assert leak["hands"] == [{"tableId": "a", "handNumber": 2}, {"tableId": "a", "handNumber": 1}]

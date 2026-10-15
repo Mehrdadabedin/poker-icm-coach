@@ -112,6 +112,11 @@ def _heatmap(records: list[HandHistoryRecord]) -> dict[str, Any]:
     }
 
 
+def _distinct(found: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Each example hand once: one hand can repeat the same mistake."""
+    return list({(f["tableId"], f["handNumber"]): f for f in found}.values())
+
+
 def _leaks(rows: list[Row], hands: Hands) -> list[dict[str, Any]]:
     """The most repeated mistakes: same seat, street, action and coach advice.
     Newest hands first, so a tie goes to the more recent leak."""
@@ -124,7 +129,7 @@ def _leaks(rows: list[Row], hands: Hands) -> list[dict[str, Any]]:
                         {"tableId": row["id"], "handNumber": h.hand_number})
     top = sorted(groups.items(), key=lambda item: -len(item[1]))[:LEAKS]
     return [{"position": p, "street": s, "heroAction": hero, "coachAction": coach,
-             "count": len(found), "hands": found[:LEAK_EXAMPLES]}
+             "count": len(found), "hands": _distinct(found)[:LEAK_EXAMPLES]}
             for (p, s, hero, coach), found in top]
 
 
