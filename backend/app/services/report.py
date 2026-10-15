@@ -13,6 +13,7 @@ from typing import Any, Literal
 
 from app.game.positions import POSITION_ORDER
 from app.services.hand_history import HandHistoryRecord
+from app.services.report_sizing import bet_sizes
 from app.services.report_stats import player_stats
 
 Period = Literal["7d", "30d", "90d", "all"]
@@ -157,5 +158,6 @@ def build_report(current: list[Row], previous: list[Row], hands: Hands, *,
         "leaks": _leaks(current, hands),
         "mistakeTypes": _mistake_types(records),
         "stats": player_stats(records),
+        "betSizes": bet_sizes(records),
         "progress": _progress(current, hands),
     }

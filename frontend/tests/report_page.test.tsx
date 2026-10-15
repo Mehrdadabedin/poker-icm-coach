@@ -73,6 +73,7 @@ describe("Report page", () => {
     expect(within(summary).getByText("▲ 6 vs previous 30 days")).toHaveClass("good");
     expect(within(summary).getByText("▼ 2.1 vs previous 30 days")).toHaveClass("good"); // fewer mistakes is good
     expect(screen.getByTestId("report-count").textContent).toBe("6 hands, 15 decisions graded by the coach");
+    expect(screen.queryByTestId("report-bet-sizes")).toBeNull(); // a backend from before plan 079 sends none
   });
 
   it("filters by period, or by one tournament which turns the period off", async () => {
@@ -139,6 +140,14 @@ describe("Report page", () => {
     fireEvent.change(screen.getByTestId("report-tournament"), { target: { value: "c1" } });
     await act(async () => undefined);
     expect(screen.getByTestId("report-progress-one").textContent).toBe("Choose All tournaments to see progress over time.");
+  });
+
+  it("adds the bet sizes card when the report has them (plan 079)", async () => {
+    const buckets = (["under25", "third", "half", "twoThirds", "pot", "over"] as const).map((size) => ({ size, count: size === "half" ? 2 : 0 }));
+    answer({ ...REPORT, betSizes: (["flop", "turn", "river"] as const).map((street) => ({ street, bets: 2, buckets })) });
+    await open();
+    expect(screen.getByTestId("report-bet-sizes")).toBeTruthy();
+    expect(screen.getByText("BET SIZES")).toBeTruthy();
   });
 
   it("says so when the period has no saved tournament, and when loading fails", async () => {
