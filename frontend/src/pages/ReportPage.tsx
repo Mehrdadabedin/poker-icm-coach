@@ -3,6 +3,7 @@ import { request } from "../services/api";
 import { Copyright } from "../components/Copyright";
 import { PageHeader } from "../components/PageHeader";
 import { ProgressChart, StackChart } from "../components/ReportCharts";
+import { ReportBetSizes } from "../components/ReportBetSizes";
 import { Leaks, MistakeMap, MistakeTypes, PlayerStats, SummaryCards } from "../components/ReportSections";
 import { tournamentLabel, tournamentState, type TournamentRow } from "../models/history";
 import { PERIODS, type Period, type Report } from "../models/report";
@@ -115,6 +116,13 @@ export function ReportPage() {
                 </p>}
             </section>
           </div>
+          {shown.betSizes && shown.betSizes.length > 0 && (
+            <section className="report-card">
+              <h2>BET SIZES</h2>
+              <p className="report-sub">How big your first bet on each street is, as a share of the pot. Raises are not counted.</p>
+              <ReportBetSizes key={`${shown.period}-${shown.tournament ?? ""}`} sizes={shown.betSizes} />
+            </section>
+          )}
         </>
       )}
       <Copyright />

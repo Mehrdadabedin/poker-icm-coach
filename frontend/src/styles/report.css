@@ -90,3 +90,17 @@
   .report-page .toolbar select { width: 100%; }
   .chart-plot { height: 150px; }
 }
+
+/* bet sizes (plan 079): street tabs, one column per size */
+.report-tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.report-tab { padding: 5px 14px; border: 1px solid #3a4653; border-radius: 16px; background: #0f1318; color: var(--text); font-size: 0.8rem; cursor: pointer; }
+.report-tab.active { border-color: var(--accent); color: var(--accent); }
+.size-bars { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; align-items: end; }
+.size-col { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.size-col b { font-size: 0.85rem; color: #f3f1ea; }
+.size-track { display: flex; align-items: flex-end; width: 70%; height: 120px; }
+.size-bar { display: block; width: 100%; border-radius: 4px 4px 0 0; }
+.size-under25 { background: #4f9dff; } .size-third { background: #2bb3a3; } .size-half { background: #7fd18b; }
+.size-twoThirds { background: #f2c14e; } .size-pot { background: #e57c35; } .size-over { background: #e53935; }
+.size-label { font-size: 0.7rem; color: var(--muted); text-align: center; }
+.report-insight { margin: 12px 0 0; padding: 8px 12px; border-left: 4px solid var(--accent); border-radius: 0 8px 8px 0; background: rgba(242, 193, 78, 0.08); font-size: 0.82rem; }

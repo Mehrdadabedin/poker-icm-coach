@@ -41,7 +41,11 @@ export type Report = {
   mistakeTypes: { type: "call" | "fold" | "allin" | "other"; count: number }[];
   stats: PlayerStat[];
   progress: (ReportTournament & Rates)[];
+  betSizes?: StreetSizes[];  // optional: a backend from before plan 079 has none
 };
+
+export type SizeKey = "under25" | "third" | "half" | "twoThirds" | "pot" | "over";
+export type StreetSizes = { street: "flop" | "turn" | "river"; bets: number; buckets: { size: SizeKey; count: number }[] };
 
 export const TYPE_LABELS = { call: "Wrong call", fold: "Wrong fold", allin: "Wrong all-in", other: "Other" };
 
@@ -90,3 +94,26 @@ export function change(now: number | null, before: number | null | undefined, pe
 
 export const historyLink = (tableId: string, hand: number): string =>
   `/history?table=${encodeURIComponent(tableId)}&hand=${hand}`;
+
+export const SIZE_LABELS: Record<SizeKey, string> = {
+  under25: "Under 25%", third: "About 1/3", half: "About 1/2", twoThirds: "2/3 to 3/4", pot: "Pot", over: "Over pot",
+};
+
+const SIZE_PHRASES: Record<SizeKey, string> = {
+  under25: "under a quarter of the pot", third: "about a third of the pot", half: "about half the pot",
+  twoThirds: "two thirds to three quarters of the pot", pot: "about the size of the pot", over: "bigger than the pot",
+};
+
+/** One line about the sizes on a street, or a note when there are too few. */
+export function sizingInsight(s: StreetSizes): string {
+  if (s.bets < FEW_CHANCES) return `Only ${s.bets} ${s.street} bet${s.bets === 1 ? "" : "s"} so far: play more hands for a pattern.`;
+  const share = (k: SizeKey) => (s.buckets.find((b) => b.size === k)?.count ?? 0) / s.bets;
+  if (share("under25") >= 0.4) {
+    return `Most of your ${s.street} bets are under a quarter of the pot. A tiny bet gives opponents a cheap call; 1/3 to 2/3 of the pot usually works better.`;
+  }
+  if (share("over") >= 0.4) {
+    return `Most of your ${s.street} bets are bigger than the pot. Overbets risk a lot of chips; keep them for your strongest hands.`;
+  }
+  const top = s.buckets.reduce((a, b) => (b.count > a.count ? b : a));
+  return `Your most common ${s.street} bet is ${SIZE_PHRASES[top.size]} (${Math.round((100 * top.count) / s.bets)}% of your bets).`;
+}
