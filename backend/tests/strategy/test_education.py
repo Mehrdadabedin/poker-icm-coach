@@ -1,4 +1,4 @@
-"""Swayne-concept education tests (Atomic Part 055)."""
+"""Concept education tests (Atomic Part 055)."""
 from __future__ import annotations
 
 from app.strategy.education import education_note

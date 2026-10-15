@@ -116,7 +116,7 @@ def outs_for(req) -> dict | None:
 
 def education_for(req, a: Analyses, ev: dict | None, outs: dict | None,
                   action: str = "CALL", amount: int | None = None) -> str:
-    """Concise Swayne-concepts note derived from the actual analysis."""
+    """Concise concept note derived from the actual analysis."""
     from app.strategy.education import education_note
 
     ev = ev or chip_ev_for(req, a, action, amount)

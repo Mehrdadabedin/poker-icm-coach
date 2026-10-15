@@ -1,4 +1,4 @@
-"""Concise Swayne-concept explanations for the ICM Coach.
+"""Concise concept explanations for the ICM Coach.
 
 Educational notes are derived from the actual analysis (hand class, exact
 cards, opponents, position, pot odds, EV, outs). They supplement the
