@@ -71,9 +71,10 @@ async function heroTurnOrHandOver(limitMs = 60000) {
       return "over";
     }
     if (st.waitingForHero) {
-      const fold = page.locator(".hero-controls .btn-fold");
-      await fold.waitFor({ timeout: 10000 });
-      while (!(await fold.isEnabled().catch(() => false))) await pause(100);
+      // wait until a button answers: FOLD is greyed out when checking is free,
+      // CALL when the only answers to an all-in are fold or all-in
+      await page.locator(".hero-controls .btn-fold:enabled, .hero-controls .btn-call:enabled")
+        .first().waitFor({ timeout: 15000 });
       await glideTop();
       return "turn";
     }
@@ -111,14 +112,29 @@ function choiceFor(advice) {
   return advice.split(" ")[0] || "CALL";
 }
 
+let raises = 0;
 async function act(choice) {
   const c = page.locator(".hero-controls");
-  if (choice === "FOLD") return press(c.locator(".btn-fold"));
-  if (choice === "CALL" || choice === "CHECK") return press(c.locator(".btn-call"));
+  if (choice === "FOLD") {
+    // FOLD is greyed out when checking is free (plan 081): check instead
+    const fold = c.locator(".btn-fold");
+    return press((await fold.isEnabled()) ? fold : c.locator(".btn-call"));
+  }
+  if (choice === "CALL" || choice === "CHECK") {
+    // calling an all-in bigger than the stack is the ALL-IN button
+    const call = c.locator(".btn-call");
+    return press((await call.isEnabled()) ? call : c.locator(".btn-allin"));
+  }
   if (choice === "ALL-IN") return press(c.locator(".btn-allin"));
-  await press(c.getByRole("button", { name: /^(raise|bet)$/i }).first());
-  await pause(400);
-  return press(page.locator(".bet-sizing .btn-confirm"));
+  // tap a size, let the viewer see the yellow button change, then Enter
+  const sizes = ["3x", "2.5x", "1/2", "2/3"].map((k) => page.locator(`[data-testid="size-${k}"]`));
+  for (const size of sizes) {
+    if (await size.isVisible().catch(() => false)) { mark(raises ? `raise-pick-${raises}` : "raise-pick"); await press(size); break; }
+  }
+  await pause(1100);
+  await page.keyboard.press("Enter");
+  mark(raises ? `raise-done-${raises}` : "raise-done");
+  raises += 1;
 }
 
 // follow the coach to the end of the hand; the first decision may be forced
@@ -139,35 +155,43 @@ async function finishHand(label, firstChoice) {
 
 // a hand worth showing: skip hands the coach folds at once
 async function showcaseHand() {
-  for (let n = 0; n < 20; n += 1) {
+  for (let n = 0; n < 40; n += 1) {
     await nextHandIfOver();
     if ((await heroTurnOrHandOver()) === "over") continue;
-    if ((await coachSays()).startsWith("FOLD")) {
+    const advice = await coachSays();
+    if (choiceFor(advice) !== "RAISE") {
       mark(`skip-${n}`);
-      await act("FOLD");
+      await act(advice.startsWith("CHECK") ? "CHECK" : "FOLD");
       await heroTurnOrHandOver();
       continue;
     }
     mark("showcase-start");
     return finishHand("showcase");
   }
-  throw new Error("no playable hand in 20 deals");
+  throw new Error("no raising hand in 40 deals");
 }
 
 // a hand with one decision against the coach, so My Mistakes has an entry
 async function mistakeHand() {
-  for (let n = 0; n < 10; n += 1) {
+  for (let n = 0; n < 20; n += 1) {
     await nextHandIfOver();
     if ((await heroTurnOrHandOver()) === "over") continue;
     const advice = await coachSays();
+    // a real mistake needs a real fold: calling a free check is not one
+    const canFold = await page.locator(".hero-controls .btn-fold").isEnabled();
+    if (!advice.startsWith("FOLD") || !canFold) {
+      await act(choiceFor(advice) === "RAISE" ? "CALL" : advice.startsWith("CHECK") ? "CHECK" : "CALL");
+      await heroTurnOrHandOver();
+      continue;
+    }
     mark("mistake-start");
-    return finishHand("mistake", advice.startsWith("FOLD") ? "CALL" : "FOLD");
+    return finishHand("mistake", "CALL");
   }
-  throw new Error("no hero decision in 10 deals");
+  throw new Error("no fold advice in 20 deals");
 }
 
 // 1. the minimal landing page, then sign in as the demo player
-await page.goto(`${SITE}/#/minimal`);
+await page.goto(`${SITE}/#/`);
 await tid("minimal-hero").waitFor();
 mark("landing");
 await pause(3500);
@@ -183,16 +207,7 @@ await toTop();
 mark("menu");
 await pause(2600);
 
-// 2. settings, then choose the bots and start a table
-await glideTo("menu-settings");
-await press(tid("menu-settings"));
-await toTop();
-mark("settings");
-await pause(3000);
-await press(tid("home-btn"));
-await tid("start-practice").waitFor();
-await toTop();
-await pause(800);
+// 2. choose the bots and start a table
 await press(tid("start-practice"));
 await toTop();
 mark("bots");
@@ -204,41 +219,51 @@ await press(tid("add-bots-to-table"));
 await page.locator(".hero-controls, [data-testid=next-hand-btn]").first().waitFor({ timeout: 30000 });
 mark("table");
 
-// 3. one hand the coach plays, then HOME and Continue table
+// 3. a hand that starts with a raise: the coach's advice, a size, then Enter
 await showcaseHand();
-await pause(2500);
-await press(tid("home-btn"));
-await tid("continue-table").waitFor({ timeout: 15000 });
-await toTop();
-mark("menu-continue");
-await pause(2200);
-await press(tid("continue-table"));
-mark("back-on-table");
-await pause(1000);
+await pause(2000);
 
-// 4. a hand against the coach, My Mistakes, back to the table
+// 4. a call where the coach folds, then My Mistakes
 await mistakeHand();
-await pause(2200);
+await pause(1800);
 await nextHandIfOver();
 mark("next-dealt");
-await pause(900);
+await pause(700);
 await press(tid("mistakes-btn"));
 await toTop();
 mark("mistakes");
-await pause(4500);
-await press(tid("back-to-table"));
-mark("table-again");
-await pause(2200);
+await pause(4000);
 
-// 5. one more tool from the menu
+// 5. Hand History, then the Report, gliding down through it
 await press(tid("home-btn"));
-await tid("menu-icm-calculator").waitFor();
+await tid("menu-history").waitFor();
 await toTop();
-await pause(700);
-await press(tid("menu-icm-calculator"));
+await pause(500);
+await press(tid("menu-history"));
 await toTop();
-mark("calculator");
-await pause(3500);
+await tid("history-tournament").waitFor();
+mark("history");
+await pause(3200);
+await press(tid("home-btn"));
+await tid("menu-report").waitFor();
+await toTop();
+await pause(500);
+await press(tid("menu-report"));
+await toTop();
+await tid("report-summary").waitFor({ timeout: 20000 });
+mark("report");
+await pause(3000);
+await glideTo("report-stack-chart");
+mark("report-stack");
+await pause(2200);
+await glideTo("report-heatmap");
+mark("report-map");
+await pause(2600);
+await glideTo("report-bet-sizes");
+mark("report-sizes");
+await pause(1200);
+await press(tid("report-sizes-river"));
+await pause(2200);
 mark("end");
 
 await context.close(); // finishes the video file

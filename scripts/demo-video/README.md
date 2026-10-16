@@ -1,11 +1,12 @@
-# ICMBOT demo video (plan 067)
+# ICMBOT demo video (plans 067 and 082)
 
 Makes `frontend/public/videos/ICMBOT_promo.mp4`, the narrated demo on the
-landing pages: minimal landing page, sign in as `demoplayer`, the menu,
-Tournament settings, choosing 8 bots, one hand that follows the coach,
-HOME and Continue table, one hand against the coach, My Mistakes, back to
-the table, the ICM calculator, then the end card (the video poster). The
-poster `ICMBOT_video_poster.png` is not changed.
+landing pages: the landing page, sign in as `demoplayer`, choosing 8 bots, a
+hand where the coach bets or raises and the size is picked with the size
+buttons and Enter, a call where the coach folds, My Mistakes, Hand History,
+the Report (summary, stack graph, mistake map, leaks, bet sizes), then the
+end card (the video poster, no note). The poster `ICMBOT_video_poster.png`
+is not changed.
 
 The older `scripts/record-promo` made the previous video (old landing page,
 Piper voice) and is not used by this pipeline.
@@ -14,19 +15,33 @@ Piper voice) and is not used by this pipeline.
 
 | File | Job |
 |---|---|
+| `seed_history.py` | Gives `demoplayer` five saved tournaments, so Hand History and the Report have real numbers. |
 | `record_demo.mjs` | Drives the local app with Playwright and records `TAKE_DIR/*.webm`, plus `marks.json` (a timestamp per step). |
 | `demo_scenes.json` | The scenes (start and end as a mark name plus seconds), the narration lines, the voice and the end card. |
 | `narrate.py` | Makes `lineNN.wav` per line with text-to-speech; only changed lines are requested again. |
-| `endcard.mjs` | Renders the end card: the poster plus the "AI-generated voice" note. |
+| `endcard.mjs` | Renders the end card: the poster (a `note` in the scenes file would add a corner note). |
 | `assemble.py` | Cuts the take into scenes, times each to its line (sped up to 2x, or holding the last frame), adds the end card, evens out the volume (-16 LUFS) and writes the MP4. |
 
 ## Run
 
-1. Start a local backend that keeps nothing on disk, and the dev site:
+1. Start the local PostgreSQL, give the demo account its history, and start
+   a backend that saves history there but keeps accounts in memory:
 
    ```bash
-   cd backend && AUTH_STORAGE=file AUTH_USERS_FILE= AUTH_SESSIONS_FILE= HISTORY_DIR= CORS_ORIGINS=http://localhost:5175 uv run uvicorn app.main:app --port 8766
+   docker compose up -d postgres
    ```
+
+   ```bash
+   cd backend && uv run python ../scripts/demo-video/seed_history.py demoplayer
+   ```
+
+   ```bash
+   cd backend && AUTH_STORAGE=file AUTH_USERS_FILE= AUTH_SESSIONS_FILE= HISTORY_DIR= HISTORY_STORAGE=database CORS_ORIGINS=http://localhost:5175 uv run uvicorn app.main:app --port 8766
+   ```
+
+   Start a fresh backend for each take: table labels count up per process,
+   and the live table should be "Table A". Reseed if an earlier take left
+   tables in the history.
 
    ```bash
    cd frontend && VITE_API_URL=http://localhost:8766 npx vite --port 5175 --strictPort
@@ -41,13 +56,15 @@ Piper voice) and is not used by this pipeline.
    node scripts/demo-video/record_demo.mjs /tmp/take /tmp/demoplayer.pass
    ```
 
-   The script skips hands the coach folds at once, plays one hand following
-   the coach, and answers the first decision of the next hand against the
-   coach so My Mistakes has an entry. A full run takes 1 to 2 minutes.
+   The script skips hands until the coach bets or raises and plays that hand
+   with the coach, then finds a spot where the coach folds and calls instead,
+   so My Mistakes has an entry. A full run takes about 1.5 minutes.
 
 3. Voice. The key is read from `~/.config/icmbot/openrouter_key` (or
-   `OPENROUTER_API_KEY`) and never printed. The voice is ElevenLabs
-   "jessica" through OpenRouter, about 3 cents for the whole script:
+   `OPENROUTER_API_KEY`) and never printed. The voice is ElevenLabs v4
+   "jessica" through OpenRouter ("sarah" also sounds good), a few cents for
+   the whole script. Write the name as "ICM Bot" in the lines: written
+   "ICMBOT", every voice says "ICM B-O-T".
 
    ```bash
    uv run python scripts/demo-video/narrate.py scripts/demo-video/demo_scenes.json /tmp/lines

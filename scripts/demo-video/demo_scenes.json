@@ -1,34 +1,31 @@
 {
   "voice": {
     "provider": "openrouter",
-    "model": "elevenlabs/eleven-multilingual-v2",
+    "model": "elevenlabs/eleven-v4",
     "voice": "jessica"
   },
   "scenes": [
     { "from": ["landing", 0], "to": ["login", 0],
-      "line": "Meet ICMBOT, the ICM coach for tournament poker." },
-    { "from": ["login", 0], "to": ["settings", 0],
-      "line": "Sign in, and everything you need is one click away." },
-    { "from": ["settings", 0], "to": ["settings", 3.1],
-      "line": "Set your stacks, blinds and speed," },
-    { "from": ["settings", 3.1], "to": ["table", 1.0],
-      "line": "then pick the eight bots you want to face." },
-    { "from": ["showcase-start", -0.3], "to": ["showcase-over", 2.4],
-      "line": "At every decision, the ICM coach shows the right move, and why, and grades the move you make." },
-    { "from": ["showcase-over", 2.4], "to": ["back-on-table", 0.6],
-      "line": "Step away whenever you like. Continue table takes you right back." },
-    { "from": ["mistake-start", -0.4], "to": ["mistake-over", 1.5],
+      "line": "Meet ICM Bot, the ICM coach for tournament poker." },
+    { "from": ["login", 0], "to": ["table", 1.0],
+      "line": "Sign in, pick eight bots, and your tournament begins." },
+    { "from": ["showcase-start", -0.3], "to": ["raise-pick", 0],
+      "line": "At every decision, the coach shows the best move, and why." },
+    { "from": ["raise-pick", -0.2], "to": ["raise-done", 2.4],
+      "line": "Raising takes two taps: pick a size, then press Enter." },
+    { "from": ["mistake-start", -0.3], "to": ["mistake-start", 4.5],
       "line": "Go against the coach, and you'll know it." },
-    { "from": ["next-dealt", 0], "to": ["table-again", 0],
-      "line": "My Mistakes collects every decision the coach would play differently, with the reason." },
-    { "from": ["table-again", 0], "to": ["table-again", 2.6],
-      "line": "One click, and you're back at the table." },
-    { "from": ["table-again", 2.6], "to": ["end", 0],
-      "line": "Study spots with the ICM calculator, ranges and your statistics." }
+    { "from": ["mistakes", -0.3], "to": ["mistakes", 3.8],
+      "line": "My Mistakes lists every decision the coach would play differently, with the reason." },
+    { "from": ["history", -0.3], "to": ["history", 3.0],
+      "line": "Hand History keeps every tournament, hand by hand." },
+    { "from": ["report", -0.3], "to": ["report-stack", 2.0],
+      "line": "And the new Report shows your results, and your stack, hand by hand," },
+    { "from": ["report-map", -0.6], "to": ["end", 0],
+      "line": "where you make mistakes, your biggest leaks, and how you size your bets." }
   ],
   "endCard": {
     "image": "frontend/public/videos/ICMBOT_video_poster.png",
-    "note": "AI-generated voice",
-    "line": "ICMBOT. Practice only, no real money. Start training free at icmbot dot one."
+    "line": "ICM Bot. Practice only, no real money. Start training free at ICM bot dot one."
   }
 }
