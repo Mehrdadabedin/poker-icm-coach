@@ -1,5 +1,7 @@
-// Renders the end card: the video poster at 1920x1080 with a small note in the
-// corner (OpenAI's terms ask that viewers are told the voice is AI-generated).
+// Renders the end card: the video poster at 1920x1080. The owner asked for no
+// "AI-generated voice" note (plan 082); that note was for OpenAI's voices,
+// and the video uses an ElevenLabs voice. A "note" in the scenes file still
+// draws one in the corner.
 // Usage (from the repo root): node scripts/demo-video/endcard.mjs SCENES_JSON OUT_PNG
 import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
