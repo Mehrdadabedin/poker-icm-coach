@@ -92,6 +92,9 @@ export function LiveTableView(props: LiveTableViewProps) {
                 disabled={!state.waitingForHero}
                 submitting={acting}
                 showLabels={showLabels}
+                street={state.street}
+                heroBet={hero?.bet ?? 0}
+                actionLog={state.actionLog}
                 onAction={(kind: ActionKind, amount?: number) => onAction(kind, amount)}
               />
             )}
