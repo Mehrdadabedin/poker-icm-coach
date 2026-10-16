@@ -53,10 +53,20 @@ describe("HeroControls", () => {
     expect(screen.queryByText("CHECK")).not.toBeInTheDocument();
   });
 
-  it("emits fold action", async () => {
-    const onAction = renderControls();
+  it("emits fold action when facing a bet", async () => {
+    const onAction = renderControls({
+      legalActions: [{ kind: "fold" }, { kind: "call" }, { kind: "raise", minAmount: 1000, maxAmount: 20000 }, { kind: "all_in" }],
+      toCall: 350,
+    });
     await userEvent.click(screen.getByText("FOLD"));
     expect(onAction).toHaveBeenCalledWith("fold");
+  });
+
+  it("greys out FOLD when checking is free", () => {
+    renderControls();
+    const fold = screen.getByText("FOLD") as HTMLButtonElement;
+    expect(fold.disabled).toBe(true);
+    expect(fold.title).toBe("Checking is free");
   });
 
   it("emits check action", async () => {
@@ -71,13 +81,11 @@ describe("HeroControls", () => {
     expect(onAction).toHaveBeenCalledWith("all_in", 20000);
   });
 
-  it("opens bet sizing and confirms amount", async () => {
+  it("bets the size shown on the yellow button; typing an amount still works", async () => {
     const onAction = renderControls();
-    await userEvent.click(screen.getByText("BET"));
     const input = screen.getByTestId("bet-amount") as HTMLInputElement;
-    expect(input).toBeInTheDocument();
     fireEvent.change(input, { target: { value: "600" } });
-    await userEvent.click(screen.getByText("CONFIRM"));
+    await userEvent.click(screen.getByTestId("size-play"));
     expect(onAction).toHaveBeenCalledWith("bet", 600);
   });
 

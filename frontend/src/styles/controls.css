@@ -66,29 +66,6 @@
   flex: 0 1 auto;
 }
 
-.btn-confirm {
-  background: #1565c0;
-  color: #fff;
-}
-
-.bet-sizing {
-  display: flex;
-  gap: 6px;
-  align-items: center;
-  margin-top: 8px;
-  flex-wrap: wrap;
-}
-
-.bet-sizing input {
-  width: 110px;
-  min-height: 44px;
-  font-size: 1rem;
-  border-radius: 8px;
-  border: 1px solid #444;
-  background: #0f1318;
-  color: var(--text);
-  padding: 4px 8px;
-}
 
 
 /* Desktop header controls. LOG OUT is the reference box: 30px tall, 6px
