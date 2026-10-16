@@ -34,7 +34,7 @@ const STEPS: CardContent[] = [
   {
     id: "graded",
     title: "Play and get graded",
-    text: "Every decision is graded PREFERRED, ACCEPTABLE or SUBOPTIMAL.",
+    text: "Every decision is graded Preferred, Acceptable or Suboptimal.",
     icon: (
       <>
         <rect x="5" y="4" width="14" height="17" rx="2" />

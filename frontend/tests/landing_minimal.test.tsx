@@ -112,7 +112,7 @@ describe("minimal landing page (/minimal)", () => {
     const steps = how.querySelectorAll("ol > li.lm-card");
     expect(Array.from(steps).map((step) => step.querySelector("h3")?.textContent))
       .toEqual(["Sign up", "Choose your opponents", "Play and get graded"]);
-    expect(steps[2]).toHaveTextContent("Every decision is graded PREFERRED, ACCEPTABLE or SUBOPTIMAL.");
+    expect(steps[2]).toHaveTextContent("Every decision is graded Preferred, Acceptable or Suboptimal.");
     for (const step of Array.from(steps)) {
       expect(step.querySelector("svg.lm-card-icon")).toHaveAttribute("aria-hidden", "true");
       expect(step.textContent).not.toMatch(/\d/);
