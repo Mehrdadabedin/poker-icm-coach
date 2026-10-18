@@ -14,9 +14,11 @@ def test_preflop_aa_vs_kk_known() -> None:
 
 
 def test_preflop_aa_vs_kk_headsup() -> None:
-    result = hero_vs_hand(hero=[H("Ah"), H("Ad")], villain=[H("Ks"), H("Kd")], board=[])
+    result = hero_vs_hand(hero=[H("Ah"), H("Ad")], villain=[H("Ks"), H("Kd")], board=[], seed=5)
     assert result.method == "estimate"  # preflop uses Monte Carlo
-    assert abs(result.equity - 0.8123) < 0.015
+    # 0.8195: exact, all 1,712,304 boards enumerated. 0.01 is 3.8 SD at the
+    # default 20000 trials, so a reseeded stream still passes (0 of 2000 seeds fail)
+    assert abs(result.equity - 0.8195) < 0.01
 
 
 def test_preflop_aa_vs_random() -> None:
