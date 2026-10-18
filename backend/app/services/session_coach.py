@@ -31,6 +31,7 @@ def coach_request(session: GameSession) -> CoachRequest:
         {p.seat for p in tournament.players if not p.is_eliminated and not p.sit_out},
         len(tournament.players),
     )
+    in_hand = in_hand_seats(tournament.players)
     return CoachRequest(
         hero=list(hero.hole_cards),
         position=positions.get(session.hero_seat, ""),
@@ -46,8 +47,9 @@ def coach_request(session: GameSession) -> CoachRequest:
         facing_raise=(engine._street.current_bet > level.big),
         hero_seat=session.hero_seat, level_index=tournament.level_index,
         mode=session.coach_mode,
-        villain=read_villain(engine._log, session.hero_seat, in_hand_seats(tournament.players),
-                             positions, engine.street),
+        villain=read_villain(engine._log, session.hero_seat, in_hand, positions, engine.street),
+        opponents=tuple(p.stack for p in tournament.players
+                        if p.seat in in_hand and p.seat != session.hero_seat),
     )
 
 

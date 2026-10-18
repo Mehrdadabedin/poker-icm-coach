@@ -19,9 +19,10 @@ from tests.benchmark.spots import played, request_for
 
 DATA = json.loads((Path(__file__).parent / "data" / "coach_benchmark.json").read_text())
 SPOTS: list[dict[str, Any]] = DATA["spots"]
-# category -> lowest share of spots the coach must get right: the scores on
-# 15 Oct 2026, before any coach change (plan 080 step A)
-FLOORS = {"sb_shove": 36 / 72, "bb_call": 42 / 84, "bubble_call": 27 / 48}
+# category -> lowest share of spots the coach must get right. Step A (15 Oct
+# 2026) scored 36/72, 42/84 and 27/48. Step B0 (18 Oct) gave the small blind
+# the same solver, so 100% there confirms the wiring, not the maths.
+FLOORS = {"sb_shove": 1.0, "bb_call": 42 / 84, "bubble_call": 27 / 48}
 
 
 @pytest.fixture(scope="module")

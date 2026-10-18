@@ -41,7 +41,7 @@ def request_for(spot: dict[str, Any]) -> CoachRequest:
         table = [round((s - 0.5) * BB), round((s - 1) * BB)] + [s * BB] * 7
         return CoachRequest(**base, position="SB", stack=table[0], pot=BB + BB // 2, to_call=BB // 2,
                             players_remaining=9, paid_positions=6, stacks=table,
-                            payout=NINE_HANDED_PAYOUT, facing_raise=False)
+                            payout=NINE_HANDED_PAYOUT, facing_raise=False, opponents=(table[1],))
     if spot["category"] == "bb_call":
         s = stacks[0]
         table = [round((s - 1) * BB)] + [s * BB] * 7 + [0]
