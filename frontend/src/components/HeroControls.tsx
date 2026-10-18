@@ -112,7 +112,7 @@ export function HeroControls({
         {sizeKind && (
           <button className="btn btn-size" disabled={acting} aria-label={sizeLabel} title={sizeLabel}
             data-testid="size-play" onClick={playSize}>
-            {showLabels ? <>{sizeLabel}<small>{note} · Enter</small></> : GLYPH[sizeKind]}
+            {showLabels ? <>{sizeLabel}<small>{note}<span className="key-hint"> · Enter</span></small></> : GLYPH[sizeKind]}
           </button>
         )}
         {has("all_in") && (
