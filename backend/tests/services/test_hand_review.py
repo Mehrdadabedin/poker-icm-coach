@@ -1,6 +1,10 @@
 """Hand-review payload tests: showdown reveals, results, bot explanations."""
 from __future__ import annotations
 
+import random
+
+from app.game.actions import Action, ActionType
+from app.services.game_session import GameSession
 from tests.api_helpers import login_client
 
 client = login_client()
@@ -85,14 +89,22 @@ def test_bot_explanations_track_real_state() -> None:
         assert e["seat"] != review["heroSeat"]
 
 
+def _always_fold(_ctx: object, _provider: object) -> Action:
+    return Action(ActionType.FOLD)
+
+
 def test_walk_reveals_no_cards() -> None:
     """When everyone folds to one player there is no showdown reveal."""
-    table_id = _create_table()
-    for _ in range(30):
-        _state, review = _play_to_completion(table_id)
-        if len(review["showdown"]) == 1:
-            entry = review["showdown"][0]
-            assert entry["cards"] == [], "walk winner cards should stay hidden"
-            return
-        _next(table_id)
-    raise AssertionError("no walk hand found in 30 hands")
+    # Every seat folds, so the first hand is a walk. Waiting up to 30 random
+    # hands for one failed a pre-push run on 2026-10-18.
+    session = GameSession(rng=random.Random(7))
+    session.provider.strategy = _always_fold
+    session.start()
+    while session.phase() != "handOver":
+        session.hero_action("fold")
+    review = session.state()["review"]
+    assert review["winningHandName"] == "Uncontested (all others folded)"
+    assert len(review["showdown"]) == 1
+    entry = review["showdown"][0]
+    assert entry["seat"] == review["winners"][0]
+    assert entry["cards"] == [], "walk winner cards should stay hidden"
