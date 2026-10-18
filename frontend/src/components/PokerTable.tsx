@@ -103,7 +103,10 @@ export function PokerTable({ state, children, overlay, cover, top }: PokerTableP
           );
         })}
         <div className={state.communityCards.length === 0 ? "board board-is-empty" : "board"}>
-          {state.communityCards.length === 0 && <span className="board-empty">DEALING…</span>}
+          {/* no cards yet: the logo printed on the cloth (plan 090) */}
+          {state.communityCards.length === 0 && (
+            <img className="felt-logo" src="/Logo/logo-felt.png" alt="" aria-hidden="true" data-testid="felt-logo" />
+          )}
           {state.communityCards.map((c, i) => (
             <CardView key={i} card={c} />
           ))}
