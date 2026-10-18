@@ -20,6 +20,7 @@ describe("Capacitor configuration", () => {
     const text = readFileSync(resolve(__dirname, "../capacitor.config.ts"), "utf8");
     expect(text).toContain('url: "https://icmbot.one"');
     expect(text).toContain("cleartext: false");
+    expect(text).toContain('appendUserAgent: "ICMBOTApp"');  // the site knows it runs in the app (plan 085)
   });
 
   it("has android platform directory after cap add", () => {
