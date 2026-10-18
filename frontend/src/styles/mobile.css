@@ -61,7 +61,10 @@ detected with the standard `min-aspect-ratio` media query.
     margin: 0 0 2px; justify-content: center;
     transform: none;
   }
-  .table-felt .board .playing-card { width: 32px; }
+  /* The board and the hero's cards are what a player reads: as big as five
+     cards fit across (56px, less on very narrow phones); face-down cards
+     of other seats stay small (plan 084). */
+  .table-felt .board .playing-card { width: min(56px, calc((100vw - 72px) / 5)); }
 
   .table-felt .seat {
     position: relative;
@@ -75,7 +78,11 @@ detected with the standard `min-aspect-ratio` media query.
   }
   .table-felt .seat .seat-cards .playing-card { width: 34px; }
   .table-felt .seat.seat-hero { width: 104px; }
-  .table-felt .seat.seat-hero .seat-cards .playing-card { width: 40px; }
+  /* 60px cards overlap so the hero's seat keeps three seats to a row; each
+     card's corner (rank and suit) stays in view */
+  .table-felt .seat.seat-hero .seat-cards { gap: 0; }
+  .table-felt .seat.seat-hero .seat-cards .playing-card { width: 60px; }
+  .table-felt .seat.seat-hero .seat-cards .playing-card + .playing-card { margin-left: -26px; }
   .table-felt .seat .seat-stack { font-size: 0.58rem; }
   .table-felt .seat .dealer-button { width: 16px; height: 16px; font-size: 0.55rem; }
 
@@ -85,6 +92,9 @@ detected with the standard `min-aspect-ratio` media query.
   /* Phase 4: action controls compact at the bottom-center, below the felt
      (never covering player information); buttons share width evenly. */
   .hero-controls { width: 100%; padding: 6px; margin-top: 2px; }
+  /* bigger cards made the table taller: the buttons stay at the bottom of
+     the screen while the table scrolls under them (plan 084) */
+  .hero-controls { position: sticky; bottom: 0; z-index: 20; box-shadow: 0 -6px 14px rgba(0, 0, 0, 0.45); }
   .hero-controls .hero-info { font-size: 0.68rem; gap: 6px; }
   .hero-controls .controls-row { gap: 5px; justify-content: center; }
   .hero-controls .controls-row .btn {

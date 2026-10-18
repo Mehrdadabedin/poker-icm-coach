@@ -87,6 +87,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 081 | Betting Controls | 7 | complete | PASS (11 FE new) | preflop sizes in BB, postflop in pot shares with pot-size raise maths, - and +, Enter/F/C/K, FOLD greyed out when checking is free |
 | 082 | Demo Video With Reports | 7 | complete | PASS (frames reviewed) | 51 s video: betting, My Mistakes, Hand History, Report; ElevenLabs v4 jessica says "ICM Bot"; no AI-voice note; seeded demo history |
 | 083 | Android App | 7 | complete | BUILD OK (debug APK) | app opens icmbot.one; name ICMBOT; favicon chip launcher icons; install steps |
+| 084 | Bigger Cards on Phones | 7 | complete | PASS (4 FE new) | portrait phones: board 56px (was 32), hero 60px (was 40) overlapped, controls stick to the bottom, no Enter hint on touch |
 
 ## Current Phase
 
