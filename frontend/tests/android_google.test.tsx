@@ -68,13 +68,12 @@ describe("starting Google sign-in in the app", () => {
 });
 
 describe("finishing it when Chrome hands back the link", () => {
-  it("trades the code and the verifier for a session, then goes home", async () => {
+  it("trades the code and the verifier for a session, for the sign-in landing page", async () => {
     localStorage.setItem(VERIFIER_KEY, "v".repeat(43));
     const fetch = answer(200, { token: "tok-1", username: "guser" });
-    expect(await finishAppGoogle(`${APP_LINK}?code=abc`)).toBe("/");
+    expect(await finishAppGoogle(`${APP_LINK}?code=abc`)).toBe("/auth/callback?token=tok-1&username=guser");
     const [, init] = fetch.mock.calls[0] as [string, RequestInit];
     expect(JSON.parse(String(init.body))).toEqual({ code: "abc", verifier: "v".repeat(43) });
-    expect(getToken()).toBe("tok-1");
     expect(localStorage.getItem(VERIFIER_KEY)).toBeNull();
   });
 
@@ -95,15 +94,19 @@ describe("finishing it when Chrome hands back the link", () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
-  it("follows the link from a running app and closes the Chrome tab", async () => {
-    await openApp("#/login");
+  it("follows the link from a running app to the menu and closes the Chrome tab", async () => {
+    // "#/": the app opens on the sign-in form at "/", so going "home" alone
+    // left the form on screen with "Signed in as" under it (owner's phone, 18 Oct)
+    await openApp("#/");
+    expect(screen.getByTestId("login-panel")).toBeTruthy();
     localStorage.setItem(VERIFIER_KEY, "v".repeat(43));
     // the exchange gives the session; the home page then asks who is signed in
     vi.spyOn(globalThis, "fetch").mockImplementation(async (input) => new Response(JSON.stringify(
       String(input).endsWith("/app-exchange") ? { token: "tok-2", username: "guser" } : { username: "guser" })));
     await vi.waitFor(() => expect(links.listeners).toHaveLength(1));
     await act(async () => links.listeners[0]({ url: `${APP_LINK}?code=abc` }));
-    await vi.waitFor(() => expect(window.location.hash).toBe("#/"));
+    await vi.waitFor(() => expect(screen.getByTestId("session-username")).toHaveTextContent("guser"));
+    expect(window.location.hash).toBe("#/");
     expect(getToken()).toBe("tok-2");
     await vi.waitFor(() => expect(browser.close).toHaveBeenCalled());
   });
