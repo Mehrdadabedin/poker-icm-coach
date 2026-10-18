@@ -7,6 +7,8 @@ const config: CapacitorConfig = {
   appId: "com.pokericmcoach.app",
   appName: "ICMBOT",
   webDir: "dist",
+  // lets the site know it runs in the app: no landing page, no Google button (plan 085)
+  appendUserAgent: "ICMBOTApp",
   server: {
     url: "https://icmbot.one",
     cleartext: false,

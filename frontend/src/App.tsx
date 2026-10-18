@@ -7,6 +7,7 @@ import { HomePage } from "./pages/HomePage";
 import { LandingPage } from "./pages/LandingPage";
 import { MinimalLandingPage } from "./pages/MinimalLandingPage";
 import { getToken } from "./services/api";
+import { inAndroidApp } from "./services/platform";
 import { TablePage } from "./pages/TablePage";
 import { RangesPage } from "./pages/RangesPage";
 import { CoachPage } from "./pages/CoachPage";
@@ -25,9 +26,10 @@ import { AnalyticsConsentBanner } from "./components/AnalyticsConsentBanner";
 /** Public entry screen (A16): a visitor without a session gets the minimal
  * landing page (plan 069); a signed-in user keeps the home menu, so HOME and
  * every existing deep link behave exactly as before. The sign-in screen is the
- * existing HomePage at /login. */
+ * existing HomePage at /login. The Android app skips the landing page and
+ * opens on sign-in (plan 085). */
 function EntryPage() {
-  return getToken() ? <HomePage /> : <MinimalLandingPage />;
+  return getToken() || inAndroidApp() ? <HomePage /> : <MinimalLandingPage />;
 }
 
 function AnalyticsPageView() {
