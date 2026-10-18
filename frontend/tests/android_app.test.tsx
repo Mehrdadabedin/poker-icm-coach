@@ -1,6 +1,6 @@
 /* The Android app (plan 085): it opens on sign-in instead of the landing
- * page, and has no Google button (Google blocks its sign-in in app web views).
- * The website is unchanged. */
+ * page. Its Google button was hidden until plan 088 ran the sign-in in a
+ * Chrome tab (tests/android_google.test.tsx). The website is unchanged. */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, render, screen } from "@testing-library/react";
 import { APP_USER_AGENT, inAndroidApp } from "../src/services/platform";
@@ -42,12 +42,12 @@ describe("knowing the page runs in the app", () => {
 });
 
 describe("in the app", () => {
-  it("opens on sign-in, without the landing page or the Google button", async () => {
+  it("opens on sign-in, without the landing page, with the Google button", async () => {
     asApp(true);
     await openAt("#/");
     expect(screen.getByTestId("login-panel")).toBeTruthy();
     expect(screen.queryByTestId("minimal-hero")).toBeNull();
-    expect(screen.queryByTestId("provider-google")).toBeNull();
+    expect(screen.getByTestId("provider-google")).toBeTruthy();
   });
 });
 

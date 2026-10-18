@@ -1,4 +1,6 @@
 import { googleSignInUrl, type AuthProviders } from "../services/api";
+import { startAppGoogle } from "../services/appGoogle";
+import { inAndroidApp } from "../services/platform";
 import { ArrowRightIcon, GoogleIcon } from "./AuthIcons";
 
 type ProviderKind = "phone" | "google" | "apple";
@@ -46,6 +48,11 @@ export function ProviderButtons({ providers, onNotice }: ProviderButtonsProps) {
 
   const chooseGoogle = () => {
     if (googleAvailable) {
+      if (inAndroidApp()) {
+        // Google blocks its sign-in in app web views: a Chrome tab runs it (plan 088)
+        void startAppGoogle();
+        return;
+      }
       // Server-side flow: the backend holds the client secret and returns the
       // browser to /#/auth/callback with the session token.
       window.location.href = googleSignInUrl();
