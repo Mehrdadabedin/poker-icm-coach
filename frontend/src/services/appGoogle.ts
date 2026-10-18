@@ -3,7 +3,7 @@
  * one-time code back on its own link. Any app can claim that link, so the code
  * is worth nothing without the verifier kept here (PKCE): the server only
  * holds its SHA-256. */
-import { API_BASE, saveAuth } from "./api";
+import { API_BASE } from "./api";
 
 export const APP_LINK = "com.pokericmcoach.app://auth";
 const VERIFIER_KEY = "icmbot.google.verifier";
@@ -49,6 +49,8 @@ export async function finishAppGoogle(link: string): Promise<string | null> {
   }).catch(() => null);
   if (!response?.ok) return failed(response?.status === 403 ? "account_suspended" : "google_signin_failed");
   const { token, username } = (await response.json()) as { token: string; username: string };
-  saveAuth(token, username);
-  return "/";
+  // The website's own landing page saves the session and opens the menu. Going
+  // straight to "/" did nothing in the app: its sign-in form already is "/", so
+  // the form stayed and only "Signed in as" changed.
+  return `/auth/callback?${new URLSearchParams({ token, username })}`;
 }

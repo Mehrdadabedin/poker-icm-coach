@@ -41,3 +41,14 @@ manifest has the link and the Custom Tabs query.
 
 Not checked: the full flow on a phone. It needs the backend and site
 deployed and the new APK installed.
+
+# On the owner's phone (18 Oct)
+
+Google sign-in worked, but the app stayed on the sign-in form with "Signed in
+as meaantonio38" under it. The app opens on the form at "/", and the app went
+"home" to "/" after signing in, so nothing remounted and the form kept its
+signed-out state. The test had started at "#/login", where going to "/" does
+remount. Now the app goes through /auth/callback, the page the website lands
+on, which saves the session and opens the menu. The test starts at "#/" and
+waits for the menu; with the old code it fails ("Unable to find
+session-username"). Site-only change: no new APK.
