@@ -2,6 +2,8 @@
    with a slider, and the amount box. The yellow button shows the size. */
 
 .btn-size small { display: block; font-size: 0.7rem; font-weight: 600; opacity: 0.8; }
+/* a touch screen has no Enter key to point at (plan 084) */
+@media (hover: none) { .key-hint { display: none; } }
 
 .bet-sizer { margin-top: 10px; display: grid; gap: 8px; }
 
