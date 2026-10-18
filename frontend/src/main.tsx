@@ -9,6 +9,7 @@ import "./styles/felt.css";
 import "./styles/placement.css";
 import "./styles/controls.css";
 import "./styles/bet-sizer.css";
+import "./styles/coach-mobile.css";
 import "./styles/pages.css";
 import "./styles/coach-panel.css";
 import "./styles/review.css";
