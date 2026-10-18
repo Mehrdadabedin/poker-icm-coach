@@ -3,6 +3,7 @@ import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { AdminChangePasswordPage } from "./pages/AdminChangePasswordPage";
 import { AdminPage } from "./pages/AdminPage";
+import { AppLinkListener } from "./components/AppLinkListener";
 import { HomePage } from "./pages/HomePage";
 import { LandingPage } from "./pages/LandingPage";
 import { MinimalLandingPage } from "./pages/MinimalLandingPage";
@@ -48,6 +49,7 @@ export function App() {
     <HashRouter>
       <AnalyticsPageView />
       <AnalyticsConsentBanner />
+      <AppLinkListener />
       <Routes>
         <Route path="/" element={<EntryPage />} />
         {/* plan 069: the old landing page stays at /classic for a while to

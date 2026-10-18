@@ -1,7 +1,7 @@
 // API client for the FastAPI backend (part 034 endpoints + A03 auth).
 import { ActionKind, TableState } from "../models/game";
 
-const API_BASE = import.meta.env.VITE_API_URL ?? "";
+export const API_BASE = import.meta.env.VITE_API_URL ?? "";
 const TOKEN_KEY = "icm_auth_token";
 const USERNAME_KEY = "icm_username";
 

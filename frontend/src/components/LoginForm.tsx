@@ -13,7 +13,6 @@ import { AuthField } from "./AuthField";
 import { AuthSwitch, SignedInNote, type AuthMode } from "./AuthFooter";
 import { AuthMessages } from "./AuthMessages";
 import { ProviderButtons } from "./ProviderButtons";
-import { inAndroidApp } from "../services/platform";
 
 interface LoginFormProps {
   onLogin: (username: string) => void;
@@ -119,8 +118,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
 
   return (
     <div className="login-panel" data-testid="login-panel">
-      {/* Google blocks its sign-in inside app web views: hidden in the Android app (plan 085) */}
-      {!inAndroidApp() && <ProviderButtons providers={providers} onNotice={setNotice} />}
+      <ProviderButtons providers={providers} onNotice={setNotice} />
 
       <form
         className="auth-form"

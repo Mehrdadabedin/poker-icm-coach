@@ -91,6 +91,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 085 | Android App Opens on Sign-in | 7 | complete | PASS (3 FE new) | app skips the landing page; no Google button in the app; user agent marker ICMBOTApp |
 | 086 | Coach SPR Is Stack Over Pot | 7 | complete | PASS (3 BE new) | SPR was the pot in BB (0.8 for 108 BB); now effective stack / pot, which also fixes the bet rule "SPR <= 3" |
 | 087 | Coach Card on Phones | 7 | complete | PASS (9 FE new) | portrait phones: coach card first on the felt on the hero's turn, gone after acting; replaces the empty board preflop, sits above it postflop; Details rows |
+| 088 | Google Sign-in in the Android App | 7 | complete | PASS (7 BE + 5 FE new) | Chrome tab, one-time code back on com.pokericmcoach.app://auth, traded with a PKCE verifier; website flow unchanged; needs the new APK |
 
 ## Current Phase
 

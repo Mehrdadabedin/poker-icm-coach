@@ -7,11 +7,17 @@ change: the API already allows icmbot.one.
 
 Limits:
 
-- Google sign-in does not work inside the app: Google blocks sign-in in app
-  web views. Username and password work.
 - It needs an internet connection, like the site.
-- For the Play Store, a Trusted Web Activity (the site in Chrome, where
-  Google sign-in works) is the usual way to ship a website as an app.
+- A change to the app itself (plugins, `AndroidManifest.xml`) needs a new
+  APK; a change to the site does not.
+
+Google sign-in (plan 088): Google blocks its sign-in page in app web views,
+so the app opens it in a Chrome tab (`@capacitor/browser`). When it ends,
+the backend sends `com.pokericmcoach.app://auth?code=...` (registered in
+`AndroidManifest.xml`), Android brings the app back, and the app trades the
+one-time code plus a verifier it kept for a session (`@capacitor/app` hears
+the link). The code alone is useless, so another app that catches the link
+cannot sign in. APKs built before plan 088 hide the Google button.
 
 ## Requirements
 
