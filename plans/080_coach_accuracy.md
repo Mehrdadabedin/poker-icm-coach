@@ -5,7 +5,7 @@ phase: 7
 status: in-progress
 depends_on: [72, 73, 74]
 test_file: backend/tests/test_coach_benchmark.py
-implementation_files: [backend/tests/benchmark/build.py, backend/tests/benchmark/nash.py, backend/tests/benchmark/equity_table.py, backend/tests/benchmark/spots.py, backend/tests/data/coach_benchmark.json, backend/app/ai/preflop_ranges.py, backend/app/strategy/baseline_ranges.py, backend/app/strategy/coach.py, backend/app/strategy/test_mode.py]
+implementation_files: [backend/tests/benchmark/build.py, backend/tests/benchmark/export.py, backend/app/strategy/allin_preflop.py, backend/app/strategy/short_stack.py, backend/tests/benchmark/nash.py, backend/tests/benchmark/equity_table.py, backend/tests/benchmark/spots.py, backend/tests/data/coach_benchmark.json, backend/app/ai/preflop_ranges.py, backend/app/strategy/baseline_ranges.py, backend/app/strategy/coach.py, backend/app/strategy/test_mode.py]
 ---
 
 # Objective
@@ -37,7 +37,7 @@ at the edge of a range should not be graded like a clear error.
 # Plan, in order (each step one pull request)
 
 A. **Measure first (done, 15 Oct).** See "Step A: benchmark" below.
-B0. **Short stacks, from step A (do first).** Use our own Nash results for
+B0. **Short stacks, from step A (done, 18 Oct; see "Step B0" below).** Use our own Nash results for
    small blind shoves and big blind calls at 20 BB and less; read a small
    blind shove as a shoving range, not an open; drop the 6% margin when
    calling an all-in (no betting is left); price bubble calls with ICM.
@@ -104,6 +104,33 @@ Causes, from the coach's own reasons: its small blind jam range is about
 blind shove is read as an opening range, so the caller's equity is
 underestimated; calls need pot odds plus 6% even when all-in; ICM only
 changes the wording, not the call.
+
+# Step B0: short stacks (18 Oct)
+
+`uv run python -m tests.benchmark.export` writes app/strategy/data/
+allin_preflop.json (92 KB): heads-up Nash shoving and calling ranges for 2 to
+20 BB and the class-against-class equity table, from the same solver.
+
+- Folded to the small blind at 10 BB effective or less: shove or fold by Nash
+  at the nearest solved depth. The effective depth counts the big blind.
+- Heads-up against an all-in: equity from the table (the live simulation was
+  out by about 3 points; the edge is 0.5 point), a small blind shove read as
+  the Nash shoving range, a call at the pot odds with no margin, and ICM when
+  two or more places are paid. A call that puts the hero all-in is ALL-IN.
+- ICM had a bug: the shover's chips vanished in every outcome, as if the
+  shover were out. The pot now goes to whoever wins it.
+
+| Category | Step A | Step B0 |
+|---|---|---|
+| Small blind shove | 36/72 | 72/72 |
+| Big blind call | 42/84 | 84/84 |
+| Bubble call (ICM) | 27/48 | 48/48 (chips alone: 24/48) |
+
+The coach now uses the solver the benchmark is built with, so the first two
+rows confirm the wiring, not the maths. The bubble row also checks the ICM
+pricing. Not covered: open shoves from other positions (multi-way, still the
+old ranges), small blind play from 11 to 20 BB (raise or fold), all-ins with
+more than one opponent, and ICM for the small blind's own shove.
 
 # Not planned
 

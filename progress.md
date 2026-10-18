@@ -83,7 +83,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 077 | Hand History Lists Your Tournaments, Names Winners, Filters Hands | 6 | complete | PASS (8 FE + 3 BE new) | tournament list, winners by name, filters; CHECK vs BET acceptable; no polling after a 404 |
 | 078 | Report Page | 6 | complete | PASS (10 BE + 11 FE new, PostgreSQL) | /api/history/report and #/report: summary, stack graph, mistake map, leaks linking to Hand History, types, player stats, progress; a win places 1st; Report replaces Statistics in the menu |
 | 079 | Report Bet Sizes | 6 | complete | PASS (4 BE + 4 FE new) | first bets per street as a share of the pot, rebuilt pot checked against the live table; leak hands listed once |
-| 080 | Coach Accuracy | 7 | in-progress | PASS (2 BE new, benchmark) | step A: 204-spot maths benchmark (heads-up Nash, bubble ICM); coach 50%/50%/56%, far too tight with short stacks; next B0 short stacks |
+| 080 | Coach Accuracy | 7 | in-progress | PASS (2 BE new, benchmark; B0 17 BE new) | step A: 204-spot maths benchmark, coach 50%/50%/56%; B0 short stacks: Nash SB shoves, all-in calls at pot odds with ICM, 100%/100%/100%; next B1 close decisions |
 | 081 | Betting Controls | 7 | complete | PASS (11 FE new) | preflop sizes in BB, postflop in pot shares with pot-size raise maths, - and +, Enter/F/C/K, FOLD greyed out when checking is free |
 | 082 | Demo Video With Reports | 7 | complete | PASS (frames reviewed) | 51 s video: betting, My Mistakes, Hand History, Report; ElevenLabs v4 jessica says "ICM Bot"; no AI-voice note; seeded demo history |
 | 083 | Android App | 7 | complete | BUILD OK (debug APK) | app opens icmbot.one; name ICMBOT; favicon chip launcher icons; install steps |
