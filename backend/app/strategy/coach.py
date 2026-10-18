@@ -24,7 +24,7 @@ from app.strategy.coach_ev import (
     outs_for,
 )
 from app.strategy.push_fold import PushFoldEngine
-from app.strategy.short_stack import sb_shove
+from app.strategy.short_stack import allin_call, sb_shove
 from app.strategy.stack_analysis import SHORT_BB
 from app.strategy.villain_range import VillainRead
 
@@ -110,7 +110,7 @@ class Coach:
         return self._postflop(req, a)
 
     def _preflop(self, req: CoachRequest, a: Analyses) -> tuple[str, str, str]:
-        short = None if req.facing_raise else sb_shove(req, a)
+        short = allin_call(req, a) if req.facing_raise else sb_shove(req, a)
         if short:
             return short
         name = a.hand_name

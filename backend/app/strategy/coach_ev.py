@@ -40,7 +40,8 @@ def chip_ev_for(req, a: Analyses, action: str = "CALL",
                 "chipRecommendation": "FOLD"}
     if req.to_call <= 0 and action not in ("RAISE", "3-BET", "RESHOVE", "OPEN JAM", "ALL-IN"):
         return None
-    win = win_prob(req)
+    # the decision's own equity when it priced the spot itself (plan 080)
+    win = a.extra["win"] if "win" in a.extra else win_prob(req)
     risk = action_risk(req, action, amount)
     if risk <= 0:
         return None
@@ -78,6 +79,9 @@ def icm_ev_for(req, a: Analyses, action: str, amount: int | None = None) -> Anal
         a.icm_ev = f"FOLD (fold equity {eq_fold:.3f})"
         a.extra["icm_ev_class"] = "NEUTRAL"
         return a
+    if "allin_icm" in a.extra:  # an all-in call priced with the pot going to its winner
+        eq_fold, ev = a.extra["allin_icm"]
+        return _label(a, action, eq_fold, ev)
     risk = action_risk(req, action, amount)
     if risk <= 0:
         return a
@@ -91,7 +95,10 @@ def icm_ev_for(req, a: Analyses, action: str, amount: int | None = None) -> Anal
         eq_lose = icm_equities(stacks_lose, payouts)[hero]
     except ValueError:
         return a
-    ev = win * eq_win + (1 - win) * eq_lose
+    return _label(a, action, eq_fold, win * eq_win + (1 - win) * eq_lose)
+
+
+def _label(a: Analyses, action: str, eq_fold: float, ev: float) -> Analyses:
     margin = eq_fold - ev
     label = "NEGATIVE" if margin > 0.005 else ("POSITIVE" if margin < -0.005 else "NEUTRAL")
     a.icm_ev = f"{action} vs FOLD: {label} (fold {eq_fold:.3f} vs {action.lower()} {ev:.3f})"
