@@ -67,7 +67,8 @@ def test_landing_quiz_spot_detail_matches_the_landing_copy() -> None:
     assert detail["STACK"] == "1,400 chips (14.0 BB)"
     assert detail["ICM PRESSURE"] == "VERY HIGH"
     assert detail["RISK PREMIUM"] == "HIGH"
-    assert detail["SPR"] == "24.0"
+    # 1,400 behind against a 2,400 pot; it read 24.0, the pot in BB (plan 086)
+    assert detail["SPR"] == "0.6"
     assert detail["ICM EV"].startswith("FOLD")
     assert rec.education == (
         "KJo starting-hand class from BB vs 3 opponent(s): pot odds "

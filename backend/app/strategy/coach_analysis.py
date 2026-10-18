@@ -111,7 +111,8 @@ def analyze_request(req) -> Analyses:
         stack_bb=stack_bb,
         eff_stack_bb=round(effective / bb, 1),
         pot_odds=pot_odds(req.to_call, req.pot),
-        spr=round(req.pot / bb, 1),
+        # stack-to-pot ratio; it was the pot in big blinds (plan 086)
+        spr=round(effective / max(req.pot, 1), 1),
         effective=effective,
         hand_name=_cell_key(req.hero),
     )
