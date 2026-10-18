@@ -1,0 +1,46 @@
+/* The table's menu on phones (plan 089). One ☰ button at the top left replaces
+   HOME, MY MISTAKES, PAUSE and LOG OUT: held upright they took a second header
+   row, sideways a third of the width. Scoped to the table header, so the home
+   screen keeps its own LOG OUT. */
+
+.header-menu-btn,
+.table-menu,
+.table-menu-backdrop { display: none; }
+
+@media (max-width: 959px) {
+  .app-header.table-header { flex-wrap: nowrap; gap: 8px; }
+
+  .app-header.table-header .header-menu-btn {
+    display: grid; place-items: center; flex: 0 0 auto;
+    width: 40px; height: 40px; padding: 0;
+    border: 1px solid rgba(242, 193, 78, 0.45); border-radius: 10px;
+    background: rgba(255, 255, 255, 0.06); color: #f2c14e; cursor: pointer;
+  }
+
+  .app-header.table-header .header-right > button { display: none; }
+
+  .table-menu-backdrop {
+    display: block; position: fixed; inset: 0; z-index: 60;
+    background: rgba(0, 0, 0, 0.4);
+  }
+
+  .table-menu {
+    display: grid; gap: 6px; position: fixed; z-index: 61;
+    top: 56px; left: 8px; width: min(260px, calc(100vw - 16px));
+    padding: 10px; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px;
+    background: #1d242c; box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+    animation: table-menu-in 140ms ease-out;
+  }
+  .table-menu-user { margin: 0 0 4px; font-size: 0.75rem; color: #9aa3ad; }
+  .table-menu-user b { color: #e8e6e1; }
+  .table-menu button {
+    min-height: 44px; padding: 0 12px; border: none; border-radius: 8px;
+    background: #f2c14e; color: #17191b; font-weight: 800; font-size: 0.85rem;
+    letter-spacing: 0.5px; text-align: left; cursor: pointer;
+  }
+  .table-menu button:disabled { opacity: 0.45; cursor: default; }
+  .table-menu .table-menu-logout { background: #1565c0; color: #fff; }
+}
+
+@keyframes table-menu-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .table-menu { animation: none; } }

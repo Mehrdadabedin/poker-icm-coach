@@ -1,5 +1,7 @@
+import { useCallback, useState } from "react";
 import { TableState } from "../models/game";
 import { BrandLogo } from "./BrandLogo";
+import { MenuIcon, TableMenu } from "./TableMenu";
 
 interface TableHeaderProps {
   state: TableState;
@@ -15,16 +17,24 @@ interface TableHeaderProps {
 
 /** Top bar: app title, table label, authenticated user and the HOME / MY
  * MISTAKES / PAUSE / LOG OUT controls. HOME and MY MISTAKES step away from the
- * table, which stops its clock; PAUSE only holds the automatic next hand. */
+ * table, which stops its clock; PAUSE only holds the automatic next hand. On
+ * phones the four controls sit behind the ☰ button (plan 089). */
 export function TableHeader({ state, username, paused, handOver, isReview, onHome, onMistakes, onLogout, onTogglePause }: TableHeaderProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  const name = username ?? state.username ?? "";
   return (
     <div className="top-bar app-header table-header" data-testid="app-header">
+      <button type="button" className="header-menu-btn" aria-label="Menu" aria-expanded={menuOpen}
+        aria-controls="table-menu" data-testid="menu-btn" onClick={() => setMenuOpen((open) => !open)}>
+        <MenuIcon />
+      </button>
       <h1 className="screen-title header-title" data-testid="app-title"><BrandLogo /></h1>
       <div className="header-right">
         {state.tableLabel && (
           <span className="tbl-label" data-testid="table-label">TABLE {state.tableLabel}</span>
         )}
-        <span className="header-user" data-testid="header-username">{username ?? state.username ?? ""}</span>
+        <span className="header-user" data-testid="header-username">{name}</span>
         <button className="btn btn-small header-btn" onClick={onHome} data-testid="home-btn">
           HOME
         </button>
@@ -46,6 +56,10 @@ export function TableHeader({ state, username, paused, handOver, isReview, onHom
           <span className="header-pause-label">{paused ? " RESUME" : " PAUSE"}</span>
         </button>
       </div>
+      {menuOpen && (
+        <TableMenu username={name} paused={paused} canPause={handOver && !isReview} onHome={onHome}
+          onMistakes={onMistakes} onLogout={onLogout} onTogglePause={onTogglePause} onClose={closeMenu} />
+      )}
     </div>
   );
 }

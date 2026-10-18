@@ -1,17 +1,18 @@
-/* The coach card at the top of the table on phones (plan 087). Elsewhere it
-   is hidden: the side panel shows the same advice next to the table. */
+/* The coach card on phones: above the table held upright (plan 087), beside
+   it sideways (plan 089, table-landscape.css). Elsewhere it is hidden: the
+   side panel shows the same advice next to the table. */
 
-.mobile-coach { display: none; }
+.mobile-coach {
+  display: none;
+  padding: 7px 10px; border: 1px solid #4f9dff; border-radius: 10px;
+  background: #0f2a4a; color: #e8e6e1; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  animation: mobile-coach-in 180ms ease-out;
+}
 
 @media (max-width: 767px) and (max-aspect-ratio: 4/3) {
-  .table-felt .mobile-coach {
-    display: block; order: -2; flex: 0 0 100%;
-    padding: 7px 10px; border: 1px solid #4f9dff; border-radius: 10px;
-    background: #0f2a4a; color: #e8e6e1; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
-    animation: mobile-coach-in 180ms ease-out;
-  }
+  .table-wrap > .mobile-coach { display: block; margin: 0 0 6px; }
   /* preflop the empty board strip gives its place to the card */
-  .table-felt .mobile-coach ~ .board.board-is-empty { display: none; }
+  .table-wrap:has(> .mobile-coach) .board.board-is-empty { display: none; }
 }
 
 .mobile-coach-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
@@ -30,4 +31,4 @@
 .mobile-coach-rows dd { margin: 0; text-align: right; }
 
 @keyframes mobile-coach-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .table-felt .mobile-coach { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .mobile-coach { animation: none; } }

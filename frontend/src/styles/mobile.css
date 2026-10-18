@@ -2,13 +2,9 @@
 
 Desktop uses absolute data-seat placement on a 16:9 oval felt
 (placement.css). On PORTRAIT phones and tablets we keep the compact centered
-flex layout (board row + players wrap). In LANDSCAPE we reuse the exact
-DESKTOP composition — the same 16:9 oval felt with its percentage-based
-data-seat positions — and simply size/centre it for the short rotated viewport,
-scaling the seat boxes proportionally so nothing overlaps.
-
-`orientation: landscape` is not reliable in browsers, so landscape is
-detected with the standard `min-aspect-ratio` media query.
+flex layout (board row + players wrap). LANDSCAPE phones reuse the desktop
+oval with its percentage-based data-seat positions, beside a column with the
+coach card and the buttons: table-landscape.css (plan 089).
 */
 
 /* ---- compact post-hand result (plan 071): one box in the result's colour,
@@ -114,64 +110,4 @@ detected with the standard `min-aspect-ratio` media query.
   .table-felt .board .playing-card { width: 48px; }
 }
 
-/* ---- LANDSCAPE phones & small tablets (<=959px, wider than tall) ----
-   Reuse the DESKTOP table composition: the 16:9 oval felt with its
-   percentage-based data-seat positions, sized from the available
-   landscape height (100vh minus the header/status and the action strip) and
-   centered. Seat/card sizes are scaled proportionally so all 9 players and
-   the hero hole cards stay visible without overlapping, and the action
-   buttons sit directly below the table. Desktop (>=960px) is untouched. */
-@media (max-width: 959px) and (min-aspect-ratio: 5/4) {
-  .table-wrap { width: 100%; }
-
-  .table-felt {
-    display: block;
-    position: relative;
-    /* Balanced LANDSCAPE width: the table uses ~82% of the viewport width,
-       leaving comfortable space around the complete playable interface while
-       keeping the wide horizontal oval. data-seat positions are
-       percentage-based and scale with the container. Height uses the same
-       measured chrome reserve (~102px for header, status and the action
-       strip) so all UI stays on screen. */
-    width: 82vw;
-    height: calc(100vh - 102px);
-    max-width: 82vw;
-    aspect-ratio: auto;
-    min-height: 0;
-    margin: 0 auto;
-    padding: 0;
-  }
-
-  .table-felt .board {
-    position: absolute;
-    left: 50%; top: 50%;
-    transform: translate(-50%, -50%);
-  }
-  .table-felt .board .playing-card { width: 38px; }
-
-  /* data-seat positions are percentage-based and scale with the felt;
-     only the seat boxes are scaled so neighbours never touch. */
-  .table-felt .seat {
-    position: absolute;
-    width: 10%;
-    min-height: 0;
-    padding: 0 2px;
-    font-size: 0.5rem;
-    line-height: 1.15;
-  }
-  .table-felt .seat.seat-hero { width: 14%; }
-  .table-felt .seat .seat-cards .playing-card { width: 22px; }
-  .table-felt .seat.seat-hero .seat-cards .playing-card { width: 24px; }
-  .table-felt .seat .seat-stack { font-size: 0.48rem; }
-  .table-felt .seat .dealer-button { width: 13px; height: 13px; font-size: 0.48rem; }
-
-  .table-header,
-  .table-status { font-size: 0.6rem; padding: 2px 6px; margin-bottom: 2px; }
-
-  .hero-controls { padding: 2px; margin-top: 2px; }
-  .hero-controls .hero-info { font-size: 0.6rem; margin-bottom: 2px; }
-  .hero-controls .controls-row .btn {
-    min-height: 34px; min-width: 0; flex: 1 1 0;
-    padding: 2px 4px; font-size: 0.72rem;
-  }
-}
+/* LANDSCAPE phones & small tablets: table-landscape.css (plan 089). */
