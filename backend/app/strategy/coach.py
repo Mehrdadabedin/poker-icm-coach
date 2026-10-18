@@ -24,6 +24,7 @@ from app.strategy.coach_ev import (
     outs_for,
 )
 from app.strategy.push_fold import PushFoldEngine
+from app.strategy.short_stack import allin_call, sb_shove
 from app.strategy.stack_analysis import SHORT_BB
 from app.strategy.villain_range import VillainRead
 
@@ -56,6 +57,7 @@ class CoachRequest:
     mode: str = "advanced"
     exact_cards: bool = False
     villain: VillainRead | None = None  # who bet into the hero, and how (plan 073)
+    opponents: tuple[int, ...] = ()  # chips behind of each opponent still in the hand (plan 080)
 
 @dataclass(slots=True)
 class CoachRecommendation:
@@ -108,6 +110,9 @@ class Coach:
         return self._postflop(req, a)
 
     def _preflop(self, req: CoachRequest, a: Analyses) -> tuple[str, str, str]:
+        short = allin_call(req, a) if req.facing_raise else sb_shove(req, a)
+        if short:
+            return short
         name = a.hand_name
         premium = name in PREMIUM_HANDS
         if not req.facing_raise or req.to_call == 0:

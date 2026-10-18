@@ -16,7 +16,10 @@ from app.strategy.coach import CoachRequest
 from app.strategy.villain_range import read_villain
 
 BB = 100
-NINE_HANDED_PAYOUT = [0.4, 0.25, 0.15, 0.1, 0.06, 0.04]
+# The heads-up spots are priced in chips, so they say winner-takes-all: ICM
+# then equals chip EV. With the nine-handed payout the coach, which uses ICM
+# whenever two or more places are paid, would answer a different question.
+CHIP_EV_PAYOUT = [1.0]
 BUBBLE_PAYOUT = [0.65, 0.35]  # three players left, two paid
 PLAYS = {"OPEN JAM", "RESHOVE", "ALL-IN", "RAISE", "3-BET", "CALL", "CALL JAM", "OPEN RAISE"}
 
@@ -40,17 +43,18 @@ def request_for(spot: dict[str, Any]) -> CoachRequest:
         s = stacks[0]
         table = [round((s - 0.5) * BB), round((s - 1) * BB)] + [s * BB] * 7
         return CoachRequest(**base, position="SB", stack=table[0], pot=BB + BB // 2, to_call=BB // 2,
-                            players_remaining=9, paid_positions=6, stacks=table,
-                            payout=NINE_HANDED_PAYOUT, facing_raise=False)
+                            players_remaining=9, paid_positions=1, stacks=table,
+                            payout=CHIP_EV_PAYOUT, facing_raise=False, opponents=(table[1],))
     if spot["category"] == "bb_call":
         s = stacks[0]
         table = [round((s - 1) * BB)] + [s * BB] * 7 + [0]
         return CoachRequest(**base, position="BB", stack=table[0], pot=(s + 1) * BB, to_call=(s - 1) * BB,
-                            players_remaining=9, paid_positions=6, stacks=table, payout=NINE_HANDED_PAYOUT,
-                            facing_raise=True, villain=_shoved_into(s, 8, {0: "BB", 8: "SB"}))
+                            players_remaining=9, paid_positions=1, stacks=table, payout=CHIP_EV_PAYOUT,
+                            facing_raise=True, villain=_shoved_into(s, 8, {0: "BB", 8: "SB"}),
+                            opponents=(0,))
     btn, sb, bb = stacks  # bubble_call: button folded, small blind shoved
     table = [round((bb - 1) * BB), round(btn * BB), 0]
     return CoachRequest(**base, position="BB", stack=table[0], pot=round((sb + 1) * BB),
-                        to_call=round((min(sb, bb) - 1) * BB), players_remaining=3, paid_positions=2,
+                        to_call=round((sb - 1) * BB), players_remaining=3, paid_positions=2,
                         stacks=table, payout=BUBBLE_PAYOUT, facing_raise=True,
-                        villain=_shoved_into(sb, 2, {0: "BB", 1: "BTN", 2: "SB"}))
+                        villain=_shoved_into(sb, 2, {0: "BB", 1: "BTN", 2: "SB"}), opponents=(0,))
