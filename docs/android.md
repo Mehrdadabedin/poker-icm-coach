@@ -1,45 +1,60 @@
-# Android Build (Capacitor)
+# Android app (Capacitor)
 
-The React app is packaged as an Android application with Capacitor.
+The Android app opens the live site, https://icmbot.one, inside an app
+window (`server.url` in `frontend/capacitor.config.ts`). It always shows the
+latest version, so a site update needs no new app, and it needs no backend
+change: the API already allows icmbot.one.
+
+Limits:
+
+- Google sign-in does not work inside the app: Google blocks sign-in in app
+  web views. Username and password work.
+- It needs an internet connection, like the site.
+- For the Play Store, a Trusted Web Activity (the site in Chrome, where
+  Google sign-in works) is the usual way to ship a website as an app.
 
 ## Requirements
 
 - Node 22+, npm
-- JDK 17+
-- Android SDK (platform-tools, build-tools, platforms;android-34)
-- `ANDROID_HOME` environment variable set (e.g. `~/Android/Sdk`)
+- JDK 17+ (21 works)
+- Android SDK with platform 36 and build-tools 35; `ANDROID_HOME` set
+  (e.g. `~/Android/Sdk`)
 
 ## Build the APK
 
 ```bash
-cd frontend
-npm install
-npm run cap:sync          # builds web assets + syncs into android/
-cd android
-./gradlew assembleRelease # -> app/build/outputs/apk/release/app-release.apk
+cd frontend && npm run cap:sync
 ```
-
-For a fast debug build: `./gradlew assembleDebug`.
-
-## Backend URL
-
-The APK communicates with the FastAPI backend over HTTP. `capacitor.config.ts`
-sets `server.url` (default `http://localhost:8000`). For a physical device,
-change it to the development machine's LAN IP:
 
 ```bash
-npx cap run android --mode development
+cd frontend/android && ./gradlew assembleDebug
 ```
 
-## Honest status note
+The APK is `frontend/android/app/build/outputs/apk/debug/app-debug.apk`
+(about 24 MB). A debug APK installs on any phone; a Play Store release
+needs a signing key (`./gradlew assembleRelease` with a keystore).
 
-The Android *project* is fully generated and the web build must pass before
-sync. Producing a signed `app-release.apk` requires the Android SDK and JDK,
-which are **not installed in this development environment**. The exact
-commands above produce the APK on any machine with the SDK installed; a CI
-workflow (`gradle` job) can automate this.
+## Install on a phone
 
-## Notes
+Either:
 
-- Offline/local play is NOT implemented; the APK requires the backend.
-- `cleartext: true` allows HTTP during development; use HTTPS in production.
+1. **USB:** on the phone, turn on Developer options (tap Build number seven
+   times in Settings, About phone), then USB debugging, connect the cable,
+   accept the prompt on the phone, and run:
+
+   ```bash
+   adb install -r frontend/android/app/build/outputs/apk/debug/app-debug.apk
+   ```
+
+2. **Copy the file:** send the APK to the phone (cable, Google Drive, or a
+   message to yourself), open it, and allow "Install unknown apps" for the
+   app you opened it with when Android asks.
+
+## Icons
+
+`scripts/android_icons.py` makes every launcher icon size from the site's
+favicon chip (`frontend/public/icon-192.png`) on a dark background:
+
+```bash
+uv run --project backend --with pillow python scripts/android_icons.py
+```

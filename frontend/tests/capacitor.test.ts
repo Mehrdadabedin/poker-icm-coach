@@ -13,7 +13,13 @@ describe("Capacitor configuration", () => {
   it("defines the app id and name", () => {
     const text = readFileSync(resolve(__dirname, "../capacitor.config.ts"), "utf8");
     expect(text).toContain("com.pokericmcoach.app");
-    expect(text).toContain("ICM BOT");
+    expect(text).toContain('appName: "ICMBOT"');  // the brand, one word (plan 083)
+  });
+
+  it("opens the live site, which the API already allows (plan 083)", () => {
+    const text = readFileSync(resolve(__dirname, "../capacitor.config.ts"), "utf8");
+    expect(text).toContain('url: "https://icmbot.one"');
+    expect(text).toContain("cleartext: false");
   });
 
   it("has android platform directory after cap add", () => {
