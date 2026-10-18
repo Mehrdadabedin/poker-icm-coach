@@ -20,8 +20,15 @@
   border-radius: 10px;
 }
 
-.board-empty {
-  color: rgba(255, 255, 255, 0.75);
-  font-size: 0.7rem;
-  letter-spacing: 2px;
+/* No cards on the board yet: the logo, faint, as if printed on the cloth
+   (plan 090). A "DEALING…" label in a dark box used to sit here. */
+/* Behind the seats where they meet; the table is its own layer for that. The
+   image is logo-felt.png, the logo with its black background made transparent
+   (scripts/felt_logo.py). */
+.board.board-is-empty { background: none; padding: 0; z-index: -1; }
+/* sized from the table, not the screen: side panels can make the table narrow */
+.table-felt { container-type: inline-size; isolation: isolate; }
+.felt-logo {
+  display: block; width: clamp(90px, 25cqw, 280px); height: auto;
+  opacity: 0.3; pointer-events: none; user-select: none;
 }
