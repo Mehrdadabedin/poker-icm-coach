@@ -1,0 +1,33 @@
+/* The coach card at the top of the table on phones (plan 087). Elsewhere it
+   is hidden: the side panel shows the same advice next to the table. */
+
+.mobile-coach { display: none; }
+
+@media (max-width: 767px) and (max-aspect-ratio: 4/3) {
+  .table-felt .mobile-coach {
+    display: block; order: -2; flex: 0 0 100%;
+    padding: 7px 10px; border: 1px solid #4f9dff; border-radius: 10px;
+    background: #0f2a4a; color: #e8e6e1; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+    animation: mobile-coach-in 180ms ease-out;
+  }
+  /* preflop the empty board strip gives its place to the card */
+  .table-felt .mobile-coach ~ .board.board-is-empty { display: none; }
+}
+
+.mobile-coach-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.mobile-coach-tag { font-size: 0.66rem; font-weight: 700; letter-spacing: 1px; color: #8fc1ff; }
+.mobile-coach-action { padding: 1px 8px; border-radius: 6px; background: #2c3540; color: #fff; font-size: 0.85rem; }
+.mobile-coach-action.act-fold { background: #c62828; }
+.mobile-coach-action.act-call, .mobile-coach-action.act-check { background: #2e7d32; }
+.mobile-coach-action.act-raise, .mobile-coach-action.act-bet, .mobile-coach-action.act-open,
+.mobile-coach-action.act-3-bet { background: #f2c14e; color: #241c05; }
+.mobile-coach-action.act-all-in, .mobile-coach-action.act-reshove { background: #4f2683; }
+.mobile-coach-why { margin: 4px 0 2px; font-size: 0.8rem; color: #d6e4f5; }
+.mobile-coach-more { padding: 0; border: none; background: none; color: #8fc1ff; font-size: 0.72rem; cursor: pointer; }
+.mobile-coach-rows { display: grid; gap: 2px; margin: 6px 0 0; font-size: 0.7rem; }
+.mobile-coach-rows div { display: flex; justify-content: space-between; gap: 8px; padding-top: 2px; border-top: 1px solid rgba(143, 193, 255, 0.15); }
+.mobile-coach-rows dt { color: #9aa3ad; }
+.mobile-coach-rows dd { margin: 0; text-align: right; }
+
+@keyframes mobile-coach-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .table-felt .mobile-coach { animation: none; } }

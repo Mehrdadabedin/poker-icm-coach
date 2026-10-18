@@ -9,6 +9,8 @@ interface PokerTableProps {
   overlay?: React.ReactNode;
   /** Covers the whole table area: bars, felt and controls (champion screen). */
   cover?: React.ReactNode;
+  /** First on the felt: the coach card on phones (plan 087). */
+  top?: React.ReactNode;
 }
 
 const ACT_LABEL: Record<string, string> = {
@@ -21,7 +23,7 @@ const ACT_LABEL: Record<string, string> = {
 };
 
 /** The 9-seat poker table: seats, community board, pot, header info. */
-export function PokerTable({ state, children, overlay, cover }: PokerTableProps) {
+export function PokerTable({ state, children, overlay, cover, top }: PokerTableProps) {
   // A43: an eliminated BOT leaves the felt entirely; the hero seat stays.
   const sorted = [...state.players]
     .filter((pl) => !pl.sitsOut || pl.isHero)
@@ -85,6 +87,7 @@ export function PokerTable({ state, children, overlay, cover }: PokerTableProps)
         <span className="tbl-info">{isReview ? "HAND COMPLETE" : "LIVE HAND"}</span>
       </div>
       <div className="table-felt">
+        {top}
         {sorted.map((p) => {
           const reveal = revealBySeat.get(p.seat);
           return (
@@ -99,7 +102,7 @@ export function PokerTable({ state, children, overlay, cover }: PokerTableProps)
             />
           );
         })}
-        <div className="board">
+        <div className={state.communityCards.length === 0 ? "board board-is-empty" : "board"}>
           {state.communityCards.length === 0 && <span className="board-empty">DEALING…</span>}
           {state.communityCards.map((c, i) => (
             <CardView key={i} card={c} />

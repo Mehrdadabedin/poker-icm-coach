@@ -2,6 +2,7 @@ import type { ActionKind, CoachAdvice, TableState } from "../models/game";
 import { HandResult } from "./HandResult";
 import { HandReview } from "./HandReview";
 import { HeroControls } from "./HeroControls";
+import { MobileCoachCard } from "./MobileCoachCard";
 import { PokerTable } from "./PokerTable";
 import { TableHeader } from "./TableHeader";
 import { TableSidebar } from "./TableSidebar";
@@ -47,6 +48,9 @@ export function LiveTableView(props: LiveTableViewProps) {
   const hero = state.players.find((p) => p.isHero);
   const handOver = state.phase === "handOver" && !!state.review;
   const isReview = handOver && reviewOpen;
+  // the hero's turn, with advice for this street: older advice never shows
+  const coachNow = coach && state.waitingForHero && !acting && !handOver
+    && (!coach.street || coach.street === state.street) ? coach : null;
 
   return (
     <div className="table-page" data-testid="table-page">
@@ -72,7 +76,8 @@ export function LiveTableView(props: LiveTableViewProps) {
         />
       ) : (
         <>
-          <PokerTable state={state} overlay={overlay} cover={cover}>
+          <PokerTable state={state} overlay={overlay} cover={cover}
+            top={coachNow ? <MobileCoachCard coach={coachNow} /> : null}>
             {cover ? null : handOver && state.review ? (
               <HandResult
                 review={state.review}
