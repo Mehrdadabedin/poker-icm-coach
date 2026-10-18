@@ -89,6 +89,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 083 | Android App | 7 | complete | BUILD OK (debug APK) | app opens icmbot.one; name ICMBOT; favicon chip launcher icons; install steps |
 | 084 | Bigger Cards on Phones | 7 | complete | PASS (4 FE new) | portrait phones: board 56px (was 32), hero 60px (was 40) overlapped, controls stick to the bottom, no Enter hint on touch |
 | 085 | Android App Opens on Sign-in | 7 | complete | PASS (3 FE new) | app skips the landing page; no Google button in the app; user agent marker ICMBOTApp |
+| 086 | Coach SPR Is Stack Over Pot | 7 | complete | PASS (3 BE new) | SPR was the pot in BB (0.8 for 108 BB); now effective stack / pot, which also fixes the bet rule "SPR <= 3" |
 
 ## Current Phase
 
