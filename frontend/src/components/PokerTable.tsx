@@ -9,7 +9,7 @@ interface PokerTableProps {
   overlay?: React.ReactNode;
   /** Covers the whole table area: bars, felt and controls (champion screen). */
   cover?: React.ReactNode;
-  /** First on the felt: the coach card on phones (plan 087). */
+  /** Right before the felt: the coach card on phones (plans 087, 089). */
   top?: React.ReactNode;
 }
 
@@ -86,8 +86,8 @@ export function PokerTable({ state, children, overlay, cover, top }: PokerTableP
         )}
         <span className="tbl-info">{isReview ? "HAND COMPLETE" : "LIVE HAND"}</span>
       </div>
+      {top}
       <div className="table-felt">
-        {top}
         {sorted.map((p) => {
           const reveal = revealBySeat.get(p.seat);
           return (

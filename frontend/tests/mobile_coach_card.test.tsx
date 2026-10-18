@@ -34,10 +34,11 @@ function view(state: Partial<TableState>, extra: Partial<LiveTableViewProps> = {
 }
 
 describe("coach card on phones", () => {
-  it("shows the advice first on the felt on the hero's turn", () => {
+  it("shows the advice right before the felt on the hero's turn", () => {
     view({});
     const card = screen.getByTestId("mobile-coach");
-    expect(card.parentElement?.firstElementChild).toBe(card);
+    // outside the felt since plan 089, so a phone held sideways can put it beside the table
+    expect(card.nextElementSibling).toHaveClass("table-felt");
     expect(card).toHaveTextContent("ICM COACH · FLOP");
     expect(screen.getByTestId("mobile-coach-action")).toHaveTextContent("FOLD");
     expect(screen.getByTestId("mobile-coach-action")).toHaveClass("act-fold");
@@ -73,12 +74,13 @@ describe("coach card on phones", () => {
     expect(document.querySelector(".board")).toHaveClass("board-is-empty");
   });
 
-  it("is shown on phones held upright only, and replaces only an empty board", () => {
+  it("is shown on phones only, and upright replaces only an empty board", () => {
     const css = readFileSync("src/styles/coach-mobile.css", "utf8");
-    expect(css).toMatch(/^\.mobile-coach \{ display: none; \}$/m);
+    expect(css).toMatch(/^\.mobile-coach \{\n\s*display: none;/m);
     const phone = css.slice(css.indexOf("@media (max-width: 767px) and (max-aspect-ratio: 4/3)"));
-    expect(phone).toMatch(/\.table-felt \.mobile-coach \{\s*display: block; order: -2;/);
-    expect(phone).toMatch(/\.table-felt \.mobile-coach ~ \.board\.board-is-empty \{ display: none; \}/);
+    expect(phone).toContain(".table-wrap > .mobile-coach { display: block; margin: 0 0 6px; }");
+    expect(phone).toContain(".table-wrap:has(> .mobile-coach) .board.board-is-empty { display: none; }");
+    // sideways it sits beside the table: tests/table_landscape.test.ts
     expect(readFileSync("src/main.tsx", "utf8")).toContain('import "./styles/coach-mobile.css";');
   });
 });

@@ -1,0 +1,72 @@
+/* Phones and small tablets held sideways (plan 089): wider than tall and at
+   most 959px wide. The table used to take 82% of the width with the buttons
+   below it, off the bottom of an 850x390 screen, and the hero's cards were
+   24px wide. Now the table takes the left and the full height, and a column on
+   the right holds the coach card and the buttons, so one screen shows it all.
+
+   `orientation: landscape` is not reliable in browsers, so landscape is
+   detected with `min-aspect-ratio`. */
+@media (max-width: 959px) and (min-aspect-ratio: 5/4) {
+  .app-header.table-header { min-height: 0; padding: 2px 8px; margin-bottom: 2px; }
+  .app-header.table-header .brand-logo { height: 30px; max-height: 30px; }
+  .app-header.table-header .header-menu-btn { width: 34px; height: 34px; }
+  .app-header.table-header { font-size: 0.65rem; }
+  .table-menu { top: 44px; }
+
+  .table-wrap {
+    display: grid; width: 100%;
+    grid-template-columns: minmax(0, 1fr) min(300px, 36vw);
+    grid-template-rows: auto auto auto minmax(0, 1fr);
+    grid-template-areas: "info info" "felt coach" "felt controls" "felt extra";
+    column-gap: 8px; align-items: start;
+  }
+  .table-wrap > .table-header { grid-area: info; font-size: 0.6rem; padding: 1px 6px; margin: 0 0 2px; }
+  .table-wrap > .table-status { display: none; }
+  .table-wrap > .mobile-coach { grid-area: coach; display: block; margin: 0 0 6px; padding: 6px 8px; }
+  .table-wrap > .hero-controls,
+  .table-wrap > .hand-result { grid-area: controls; margin: 0; }
+  .table-wrap > .comparison-box { grid-area: extra; margin: 6px 0 0; font-size: 0.7rem; }
+
+  /* the header is about 40px, the level row 15px, plus their margins */
+  .table-wrap > .table-felt {
+    grid-area: felt; display: block; position: relative;
+    width: 100%; max-width: none; height: calc(100vh - 66px); min-height: 240px;
+    aspect-ratio: auto; margin: 0; padding: 0;
+  }
+
+  .table-felt .board { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+  .table-felt .board .playing-card { width: 42px; }
+
+  /* data-seat positions are percentages of the felt; only the boxes shrink */
+  .table-felt .seat {
+    position: absolute; width: 13%; min-height: 0; padding: 0 2px;
+    font-size: 0.55rem; line-height: 1.15;
+  }
+  .table-felt .seat .seat-cards .playing-card { width: 24px; }
+  .table-felt .seat .seat-stack { font-size: 0.5rem; }
+  .table-felt .seat .dealer-button { width: 13px; height: 13px; font-size: 0.48rem; }
+  /* the bot portrait covered the name and the stack: a badge on the corner */
+  .table-felt .seat .seat-bot-portrait { width: 18px; height: 18px; top: -7px; right: -7px; border-width: 1px; }
+  /* the cards the player reads: 44px, overlapped so the seat stays narrow */
+  .table-felt .seat.seat-hero { width: 17%; }
+  .table-felt .seat.seat-hero .seat-cards { gap: 0; }
+  .table-felt .seat.seat-hero .seat-cards .playing-card { width: 44px; }
+  .table-felt .seat.seat-hero .seat-cards .playing-card + .playing-card { margin-left: -14px; }
+
+  .hero-controls { padding: 6px; }
+  .hero-controls .hero-info { font-size: 0.6rem; flex-wrap: wrap; gap: 2px 8px; margin-bottom: 4px; }
+  .hero-controls .controls-row { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+  .hero-controls .controls-row .btn {
+    min-height: 38px; min-width: 0; margin: 0; padding: 2px 4px; font-size: 0.72rem;
+  }
+  .hero-controls .controls-row .btn small { font-size: 0.6rem; }
+  .bet-sizer { margin-top: 6px; gap: 4px; }
+  .size-presets { gap: 4px; }
+  .size-preset { min-height: 30px; padding: 2px; border-radius: 8px; }
+  .size-preset b { font-size: 0.75rem; }
+  .size-preset span { font-size: 0.58rem; }
+  .size-slider { grid-template-columns: 30px minmax(0, 1fr) 30px 72px; gap: 4px; }
+  .size-step { width: 30px; height: 30px; }
+  .size-amount input { padding: 2px 6px; font-size: 0.8rem; }
+  .size-amount small { display: none; }
+}
