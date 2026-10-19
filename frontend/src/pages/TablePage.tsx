@@ -47,15 +47,15 @@ export function TablePage() {
   const hero = state?.players.find((p) => p.isHero);
   const champion = state ? tournamentChampion(state) : null;
   const previewWinner = winnerPreviewEnabled(import.meta.env.DEV, searchParams.get("testWinner"));
-  const championShown = previewWinner || champion !== null;
+  const championShown = previewWinner || champion !== null || !!state?.standings;
   const heroPendingReentry = !!hero?.awaitingReentry;
   const heroOut = !!hero && hero.sitsOut && !heroPendingReentry;
-  const eliminationModalOpen = heroPendingReentry || (heroOut && !watchToEnd);
+  const eliminationModalOpen = (heroPendingReentry || heroOut) && !watchToEnd;
 
   useAutoFinish({
     enabled: watchToEnd,
     paused,
-    heroOut,
+    heroOut: heroOut || heroPendingReentry, // plan 092: WATCH is offered while re-entry is open too
     phase: state?.phase,
     handNumber: state?.handNumber,
     playersRemaining: state?.playersRemaining,
@@ -160,6 +160,7 @@ export function TablePage() {
     eliminationModalOpen,
     onContinue: actions.continueReentry,
     onWatch: () => setWatchToEnd(true),
+    onEnd: () => void actions.endGame(),
     onNewGame: () => void actions.startNewGame(),
   });
 

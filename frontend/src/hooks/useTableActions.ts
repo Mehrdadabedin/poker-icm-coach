@@ -6,6 +6,7 @@ import {
   logout,
   nextHand as requestNextHand,
   reentry as requestReentry,
+  request,
   sendAction,
 } from "../services/api";
 
@@ -39,6 +40,15 @@ export function useTableActions({
     }
   }, [tableId, refresh]);
 
+  /** Plan 092: the busted hero ends the tournament; places follow the chips. */
+  const endGame = useCallback(async () => {
+    try {
+      await request<TableState>(`/api/game/${encodeURIComponent(tableId)}/end`, { method: "POST" });
+    } finally {
+      refresh();
+    }
+  }, [tableId, refresh]);
+
   /** A44: fresh tournament, same band lineup, starts at Level 1. */
   const startNewGame = useCallback(async () => {
     const next = await createTournament(10, undefined, lineup ?? undefined);
@@ -56,7 +66,7 @@ export function useTableActions({
     navigate("/");
   }, [navigate]);
 
-  return { act, nextHand, continueReentry, startNewGame, signOut };
+  return { act, nextHand, continueReentry, endGame, startNewGame, signOut };
 }
 
 export type { TableState };

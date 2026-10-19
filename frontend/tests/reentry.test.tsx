@@ -5,13 +5,12 @@ import { ReentryModal } from "../src/components/ReentryModal";
 import { autoFinishActive } from "../src/pages/TablePage";
 
 describe("ReentryModal (A39)", () => {
-  it("shows the Level 1-5 re-entry state with exactly the two actions", () => {
+  it("shows the Level 1-5 re-entry state: continue, watch, end or start again (plan 092)", () => {
     render(<ReentryModal available onContinue={() => undefined} onNewGame={() => undefined} />);
     expect(screen.getByText("YOU LOST THE ALL-IN")).toBeInTheDocument();
-    expect(screen.getByText("Re-entry is still available.")).toBeInTheDocument();
-    expect(screen.getByTestId("reentry-continue")).toHaveTextContent("CONTINUE TOURNAMENT");
-    expect(screen.getByTestId("reentry-new-game")).toHaveTextContent("START NEW GAME");
-    expect(screen.getAllByRole("button")).toHaveLength(2);
+    expect(screen.getByText(/^Re-entry is still available\./)).toBeInTheDocument();
+    expect(screen.getAllByRole("button").map((b) => b.textContent))
+      .toEqual(["CONTINUE TOURNAMENT", "WATCH TO THE END", "END GAME", "START NEW GAME"]);
   });
 
   it("fires CONTINUE TOURNAMENT and START NEW GAME", () => {
