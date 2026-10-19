@@ -6,6 +6,7 @@ cards revealed. Bot decision explanations live in bot_review.py.
 """
 from __future__ import annotations
 
+from app.game.hand_result import HandWinner
 from app.game.hand_setup import blind_seats
 from app.game.positions import position_labels
 from app.poker.card import card_model
@@ -13,6 +14,14 @@ from app.poker.hand_evaluator import best_hand
 from app.poker.hand_rank import CATEGORY_NAMES, HandCategory
 from app.services.bot_review import build_explanations, hand_pressure
 from app.strategy.hand_codec import RANK_CHAR
+
+
+def hero_chopped(winners: list[HandWinner], hero: int) -> bool:
+    """A chop is the hero sharing a pot with a tied hand. Winning the main pot
+    while another player takes a side pot is a win: the owner's hand on 19 Oct
+    read CHOPPED for a main pot won outright, and a hero who lost while two
+    others tied read CHOPPED too."""
+    return any(hero in w.seats and len(w.seats) > 1 for w in winners)
 
 
 def hand_description(hand) -> str:
@@ -49,7 +58,7 @@ def build_review(session) -> dict | None:
     hero_end = result.ending_stacks.get(hero, 0)
     winners = result.winner_seats()
     hero_won = hero in winners
-    chop = len(winners) > 1 or any(len(w.seats) > 1 for w in result.winners)
+    chop = hero_chopped(result.winners, hero)
 
     real_showdown = len(result.showed_down) > 1
     showdown = []

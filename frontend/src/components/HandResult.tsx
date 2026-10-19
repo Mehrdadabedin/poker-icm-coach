@@ -1,4 +1,5 @@
-import { HandReview, reviewResultMeta } from "../models/game";
+import { HandReview } from "../models/game";
+import { reviewResultMeta } from "../models/handResult";
 
 interface HandResultProps {
   review: HandReview;
