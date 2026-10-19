@@ -48,7 +48,6 @@ export function endgameOverlays(input: EndgameOverlayInput): { cover?: ReactNode
         onContinue={input.onContinue}
         onWatch={input.onWatch}
         onEnd={input.onEnd}
-        onNewGame={input.onNewGame}
       />
     ),
   };
