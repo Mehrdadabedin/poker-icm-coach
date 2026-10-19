@@ -178,3 +178,8 @@
   color: #fff;
   font-weight: 800;
 }
+
+/* The hero's cards in the coach's reason (CoachReason): the My Mistakes card
+   chips, sized to sit inside a line of text. */
+.reason-cards { display: inline-flex; gap: 3px; margin: 0 3px 0 0; vertical-align: 1px; }
+.reason-cards .mistake-card { min-width: 0; padding: 0 5px; font-size: 0.9em; line-height: 1.45; }

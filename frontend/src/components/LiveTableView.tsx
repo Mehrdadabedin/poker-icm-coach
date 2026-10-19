@@ -77,7 +77,7 @@ export function LiveTableView(props: LiveTableViewProps) {
       ) : (
         <>
           <PokerTable state={state} overlay={overlay} cover={cover}
-            top={coachNow ? <MobileCoachCard coach={coachNow} /> : null}>
+            top={coachNow ? <MobileCoachCard coach={coachNow} heroCards={hero?.holeCards} /> : null}>
             {cover ? null : handOver && state.review ? (
               <HandResult
                 review={state.review}
@@ -115,6 +115,7 @@ export function LiveTableView(props: LiveTableViewProps) {
               heroSeat={state.heroSeat}
               nameBySeat={nameBySeat}
               coach={coach}
+              heroCards={hero?.holeCards}
               tableId={state.tableId}
               handNumber={state.handNumber}
               currentLevel={state.level}

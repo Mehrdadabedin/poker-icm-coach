@@ -123,7 +123,7 @@ export function HandReview({ review, coach, comparison, totalPlayers, nameBySeat
                   <b>{comparison.grade}</b> — {comparison.explanation}
                 </div>
               )}
-              {coach && <CoachPanelView coach={coach} testId="review-coach-panel" />}
+              {coach && <CoachPanelView coach={coach} testId="review-coach-panel" heroCards={review.heroCards} />}
             </>
           )}
         </div>

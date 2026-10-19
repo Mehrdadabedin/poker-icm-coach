@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CoachAdvice, HandHistoryEntry, TableAction } from "../models/game";
+import { Card, CoachAdvice, HandHistoryEntry, TableAction } from "../models/game";
 import { request } from "../services/api";
 import { ActionHistory, HistoryView } from "./ActionHistory";
 import { CoachPanelView } from "./CoachPanelView";
@@ -9,6 +9,7 @@ interface TableSidebarProps {
   heroSeat: number;
   nameBySeat: Map<number, string>;
   coach: CoachAdvice | null;
+  heroCards?: Card[] | null;
   tableId: string;
   handNumber: number;
   currentLevel?: number;
@@ -26,7 +27,7 @@ interface TableSidebarProps {
  * view shows OVERALL PERFORMANCE above the history, RESULTS BY POSITION the
  * breakdowns. Both read the table owner's completed hands (one read-only
  * GET). The switch never touches game, table, timer or history data. */
-export function TableSidebar({ actions, heroSeat, nameBySeat, coach, tableId, handNumber, currentLevel,
+export function TableSidebar({ actions, heroSeat, nameBySeat, coach, heroCards, tableId, handNumber, currentLevel,
                               coachCollapsed, historyCollapsed, onToggleCoach, onToggleHistory }: TableSidebarProps) {
   const [view, setView] = useState<HistoryView>("history");
   const [hands, setHands] = useState<HandHistoryEntry[] | null>(null);
@@ -67,6 +68,7 @@ export function TableSidebar({ actions, heroSeat, nameBySeat, coach, tableId, ha
           testId="coach-panel"
           collapsed={coachCollapsed}
           onToggle={onToggleCoach}
+          heroCards={heroCards}
         />
       )}
     </div>

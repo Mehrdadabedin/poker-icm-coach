@@ -1,5 +1,6 @@
 import { useState } from "react";
-import type { CoachAdvice } from "../models/game";
+import type { Card, CoachAdvice } from "../models/game";
+import { CoachReason } from "./CoachReason";
 
 const STREET: Record<string, string> = { preflop: "PREFLOP", flop: "FLOP", turn: "TURN", river: "RIVER" };
 
@@ -7,7 +8,7 @@ const STREET: Record<string, string> = { preflop: "PREFLOP", flop: "FLOP", turn:
  * the side panel would sit far below the table. It shows during the hero's
  * turn and goes when the hero acts; Details opens the factor rows. The
  * desktop hides it and keeps the side panel. */
-export function MobileCoachCard({ coach }: { coach: CoachAdvice }) {
+export function MobileCoachCard({ coach, heroCards }: { coach: CoachAdvice; heroCards?: Card[] | null }) {
   const [open, setOpen] = useState(false);
   const kind = coach.recommendedAction.split(" ")[0].toLowerCase();
   return (
@@ -16,7 +17,7 @@ export function MobileCoachCard({ coach }: { coach: CoachAdvice }) {
         <span className="mobile-coach-tag">ICM COACH{coach.street && STREET[coach.street] ? ` · ${STREET[coach.street]}` : ""}</span>
         <b className={`mobile-coach-action act-${kind}`} data-testid="mobile-coach-action">{coach.recommendedAction}</b>
       </div>
-      <p className="mobile-coach-why">{coach.reasoning}</p>
+      <p className="mobile-coach-why"><CoachReason text={coach.reasoning} cards={heroCards} /></p>
       <button type="button" className="mobile-coach-more" aria-expanded={open}
         data-testid="mobile-coach-details" onClick={() => setOpen((v) => !v)}>
         {open ? "Hide details ▴" : "Details ▾"}
