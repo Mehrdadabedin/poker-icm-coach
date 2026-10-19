@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { CoachAdvice, HandReview as ReviewData, formatChips, reviewResultMeta } from "../models/game";
+import { CoachAdvice, HandReview as ReviewData, formatChips } from "../models/game";
+import { reviewResultMeta } from "../models/handResult";
 import { ActionHistory } from "./ActionHistory";
 import { BotExplanations } from "./BotExplanations";
 import { CardView } from "./CardView";
