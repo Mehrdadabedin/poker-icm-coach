@@ -60,6 +60,7 @@ def build_state_view(session) -> dict:
     return {
         "tableId": session.session_id,
         "heroFinishPlace": session.hero_finish_place,
+        "standings": session.final_standings,
         "tableLabel": session.table_label,
         "status": session.status,
         "away": session.away,

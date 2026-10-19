@@ -93,12 +93,16 @@ export interface HandReview {
   pressure: string;
 }
 
+export interface StandingRow { place: number; seat: number; name: string; chips: number; isHero: boolean; out: boolean }
+
 export interface TableState {
   tableId: string;
   tableLabel?: string;
   username?: string | null;
   handNumber: number;
   heroFinishPlace?: number | null;
+  /** 1st to 9th once the busted hero ended the game by chips (plan 092). */
+  standings?: StandingRow[] | null;
   players: PlayerView[];
   actionLog?: TableAction[];
   playersRemaining?: number;

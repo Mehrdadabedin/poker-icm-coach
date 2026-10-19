@@ -150,6 +150,7 @@
 
 .reentry-actions {
   display: flex;
+  flex-wrap: wrap; /* up to four choices since plan 092 */
   gap: 10px;
   justify-content: center;
   margin-top: 14px;
