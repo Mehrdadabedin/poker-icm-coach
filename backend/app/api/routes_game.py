@@ -121,6 +121,17 @@ def reentry(table_id: str, user: str = Depends(require_user)) -> dict:
     return session.state()
 
 
+@router.post("/game/{table_id}/end", response_model=GameStateModel)
+def end_game(table_id: str, user: str = Depends(require_user)) -> dict:
+    """Plan 092: the busted hero ends the tournament; places follow the chips."""
+    session = get_session(table_id, user)
+    try:
+        session.end_by_chips()
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return session.state()
+
+
 @router.post("/game/{table_id}/next-hand", response_model=GameStateModel)
 def next_hand(table_id: str, user: str = Depends(require_user)) -> dict:
     session = get_session(table_id, user)

@@ -45,6 +45,8 @@ def apply_reentry_or_elimination(session: GameSession) -> None:
     alive = sum(1 for p in session.tournament.players if not p.is_eliminated)
     busted.sort(key=lambda item: item[1], reverse=True)
     for offset, (seat, _) in enumerate(busted):
+        # every seat's place, for the final standings when the hero ends early (plan 092)
+        session.finish_places[seat] = alive + 1 + offset
         if seat == session.hero_seat:
             session.hero_finish_place = alive + 1 + offset
 

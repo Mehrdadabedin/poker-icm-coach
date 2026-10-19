@@ -124,9 +124,19 @@ class HandReviewModel(BaseModel):
     pressure: str = "Low"
 
 
+class StandingModel(BaseModel):
+    place: int
+    seat: int
+    name: str
+    chips: int
+    isHero: bool
+    out: bool
+
+
 class GameStateModel(BaseModel):
     tableId: str
     heroFinishPlace: int | None = None
+    standings: list[StandingModel] | None = None  # the hero ended the game by chips (plan 092)
     tableLabel: str = ""
     status: str = "active"
     away: bool = False

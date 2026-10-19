@@ -10,6 +10,7 @@ from app.ai.ai_framework import AIDecisionProvider
 from app.game.actions import Action, ActionType
 from app.game.hand_engine import HandEngine
 from app.services.elimination import apply_reentry_or_elimination, is_final_hand
+from app.services.final_standings import end_by_chips
 from app.services.game_state_view import build_state_view
 from app.services.hand_history import HandDecision, HandHistoryStore, HistoryFileStore
 from app.services.session_coach import advice_dict, coach_request, grade_last_action
@@ -35,6 +36,8 @@ class GameSession:
         self.created_at = time.time()
         self.status = "active"
         self.hero_finish_place: int | None = None
+        self.finish_places: dict[int, int] = {}  # seat -> place, as players go out
+        self.final_standings: list[dict] | None = None  # set when the hero ends early
         self.last_seen = self.created_at
         self.idle_timeout = 30 * 60
         self.away = False  # hero left the table (HOME, MY MISTAKES): clock stopped
@@ -101,7 +104,7 @@ class GameSession:
         """Record the hand, apply re-entry/elimination, and finish the
         tournament when one player remains (no new hand starts)."""
         self._record_and_persist()
-        self._apply_reentry_or_eliminate()
+        apply_reentry_or_elimination(self)
         settle_status(self)
 
     def phase(self) -> str:
@@ -176,9 +179,10 @@ class GameSession:
         with self._lock:
             return grade_last_action(self.coach, self._last_hero_action, self._last_hero_request)
 
-    def _apply_reentry_or_eliminate(self) -> None:
-        """A39/A44: re-enter or eliminate busted players; note hero place."""
-        apply_reentry_or_elimination(self)
+    def end_by_chips(self) -> None:
+        """Plan 092: the busted hero ends the tournament; places follow the chips."""
+        with self._lock:
+            end_by_chips(self)
     def reentry(self) -> None:
         """A39 hero re-entry: starting stack, same level."""
         with self._lock:
