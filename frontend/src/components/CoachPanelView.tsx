@@ -1,4 +1,5 @@
-import { CoachAdvice } from "../models/game";
+import type { Card, CoachAdvice } from "../models/game";
+import { CoachReason } from "./CoachReason";
 
 /** Which street the advice is for, next to the action (plan 075). */
 const STREET_LABEL: Record<string, string> = {
@@ -11,6 +12,8 @@ interface CoachPanelViewProps {
   testId: string;
   collapsed?: boolean;
   onToggle?: () => void;
+  /** The hero's cards, shown in place of the coach's shorthand ("83o"). */
+  heroCards?: Card[] | null;
 }
 
 /** ICM COACH card: recommendation, reasoning and the factor breakdown.
@@ -19,7 +22,7 @@ interface CoachPanelViewProps {
  * table passes onToggle for a UI-only HIDE/SHOW control that folds the
  * reasoning and the factor rows away; the review omits it and is unchanged.
  * The recommendation itself is always visible, and no data is dropped. */
-export function CoachPanelView({ coach, className = "coach-panel", testId, collapsed = false, onToggle }: CoachPanelViewProps) {
+export function CoachPanelView({ coach, className = "coach-panel", testId, collapsed = false, onToggle, heroCards }: CoachPanelViewProps) {
   return (
     <div className={className} data-testid={testId}>
       <div className="panel-head">
@@ -38,7 +41,7 @@ export function CoachPanelView({ coach, className = "coach-panel", testId, colla
       </div>
       {!collapsed && (
         <>
-          <p>{coach.reasoning}</p>
+          <p><CoachReason text={coach.reasoning} cards={heroCards} /></p>
           <dl>
             {Object.entries(coach.detail).slice(0, 14).map(([k, v]) => (
               <div key={k} className="coach-row">
