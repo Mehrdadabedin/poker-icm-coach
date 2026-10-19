@@ -17,8 +17,9 @@ level 5 (the owner's choice).
 
 # Change
 
-- The bust modal offers WATCH TO THE END, END GAME and START NEW GAME, plus
-  CONTINUE TOURNAMENT while re-entry is open.
+- The bust modal offers WATCH TO THE END and END GAME, plus CONTINUE
+  TOURNAMENT while re-entry is open. START NEW GAME is on the standings list
+  END GAME opens (the owner: one of the two, then the list).
 - Every seat's place is recorded as it goes out.
 - `POST /api/game/{table_id}/end`, only once the hero is out: players still
   in by chips (chips in an unfinished pot count for whoever bet them), then

@@ -95,7 +95,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 089 | Phone Menu and Sideways Table | 7 | complete | PASS (12 FE new) | ☰ menu replaces the table header buttons on phones; sideways: table left at full height, coach card and buttons in a right column, hero cards 44px (were 24), board 42px |
 | 090 | Logo on the Table | 7 | complete | PASS (4 FE new) | empty board shows the ICMBOT logo, 25% of the table wide, opacity 0.3, from logo-felt.png (black made transparent) |
 | 091 | CHOPPED Only for a Tie | 7 | complete | PASS (3 BE + 3 FE new) | a main pot won while another player took a side pot read CHOPPED; now YOU WON with "X won the other pot"; chips were right |
-| 092 | End Game and Final Standings | 7 | complete | PASS (4 BE + 4 FE new) | after a bust: WATCH, END GAME or NEW GAME (+ CONTINUE while re-entry is open); END GAME ranks 1st-9th by chips, players out by the order they went |
+| 092 | End Game and Final Standings | 7 | complete | PASS (4 BE + 4 FE new) | after a bust: WATCH or END GAME (+ CONTINUE while re-entry is open); END GAME ranks 1st-9th by chips, NEW GAME on that list, players out by the order they went |
 
 ## Current Phase
 
