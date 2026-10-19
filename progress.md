@@ -94,6 +94,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 088 | Google Sign-in in the Android App | 7 | complete | PASS (7 BE + 5 FE new) | Chrome tab, one-time code back on com.pokericmcoach.app://auth, traded with a PKCE verifier; website flow unchanged; needs the new APK |
 | 089 | Phone Menu and Sideways Table | 7 | complete | PASS (12 FE new) | ☰ menu replaces the table header buttons on phones; sideways: table left at full height, coach card and buttons in a right column, hero cards 44px (were 24), board 42px |
 | 090 | Logo on the Table | 7 | complete | PASS (4 FE new) | empty board shows the ICMBOT logo, 25% of the table wide, opacity 0.3, from logo-felt.png (black made transparent) |
+| 091 | CHOPPED Only for a Tie | 7 | complete | PASS (3 BE + 3 FE new) | a main pot won while another player took a side pot read CHOPPED; now YOU WON with "X won the other pot"; chips were right |
 
 ## Current Phase
 
