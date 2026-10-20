@@ -87,6 +87,9 @@ export function setCurrentLang(lang: Lang): void {
  * Spanish reader takes 45,000 for forty-five). Spain leaves 4-digit numbers ungrouped. */
 export const numberLocale = (): string => NUMBER_LOCALES[current];
 
+/** A plain number in the language: English as written ("6.5"), Spanish 6,5. */
+export const localNumber = (n: number): string => (current === "en" ? String(n) : n.toLocaleString(NUMBER_LOCALES[current]));
+
 const SUFFIX: Record<number, string> = { 1: "ST", 2: "ND", 3: "RD" };
 
 /** A finishing place: 1ST, 2ND, 11TH in English; 1.º, 2.º in Spanish. */
