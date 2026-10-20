@@ -4,6 +4,9 @@ import { request } from "../services/api";
 import { Copyright } from "../components/Copyright";
 import { HistoryFiltersBar } from "../components/HistoryFiltersBar";
 import { PageHeader } from "../components/PageHeader";
+import { actionWord } from "../i18n/coach";
+import { useI18n } from "../i18n/I18n";
+import { formatChips } from "../models/game";
 import {
   NO_FILTERS, filterHands, tournamentLabel, winnerNames,
   type HandRow, type HistoryFilters, type TournamentRow,
@@ -17,6 +20,9 @@ import {
  * ?table=<id>&hand=<n>: that tournament opens with the hand marked (078). */
 export function HistoryPage() {
   const [params] = useSearchParams();
+  const words = useI18n();
+  const { t } = words;
+  const grade = (g: string | null) => (g ? t(`coach.grade.${g}` as "coach.grade.PREFERRED") : "—");
   const linked = { table: params.get("table"), hand: Number(params.get("hand")) || null };
   const [tournaments, setTournaments] = useState<TournamentRow[]>([]);
   const [liveId, setLiveId] = useState<string | null>(null);
@@ -31,7 +37,7 @@ export function HistoryPage() {
     const saved = request<{ tournaments: TournamentRow[] }>("/api/history/tournaments")
       .then((d) => d.tournaments).catch(() => [] as TournamentRow[]);
     void Promise.all([live, saved]).then(([active, list]) => {
-      const rows = active.tableId && !list.some((t) => t.tableId === active.tableId)
+      const rows = active.tableId && !list.some((row) => row.tableId === active.tableId)
         ? [{ tableId: active.tableId, tableLabel: active.tableLabel ?? "", startedAt: null, endedAt: null,
              status: "active", finishPlace: null, hands: 0 }, ...list]
         : list;
@@ -64,43 +70,45 @@ export function HistoryPage() {
   return (
     <div className="page" data-testid="history-page">
       <PageHeader />
-      <h1 className="screen-title">HAND HISTORY</h1>
-      {!loaded && <p className="note">Loading your tournaments…</p>}
+      <h1 className="screen-title">{t("hh.title")}</h1>
+      {!loaded && <p className="note">{t("hh.loading")}</p>}
       {loaded && tournaments.length === 0 && (
-        <p className="note" data-testid="history-none">No tournaments yet: start a practice session first.</p>
+        <p className="note" data-testid="history-none">{t("hh.none")}</p>
       )}
       {tournaments.length > 0 && (
         <>
           <div className="toolbar">
-            <select value={selected} onChange={(e) => choose(e.target.value)} aria-label="Tournament"
+            <select value={selected} onChange={(e) => choose(e.target.value)} aria-label={t("hh.tournament")}
               data-testid="history-tournament">
-              {tournaments.map((t) => <option key={t.tableId} value={t.tableId}>{tournamentLabel(t, liveId)}</option>)}
+              {tournaments.map((row) => <option key={row.tableId} value={row.tableId}>{tournamentLabel(row, liveId, words)}</option>)}
             </select>
           </div>
           <HistoryFiltersBar hands={hands} filters={filters} onChange={setFilters} />
           <p className="note" data-testid="history-count">
             {shown.length === hands.length
-              ? `${hands.length} completed hand${hands.length === 1 ? "" : "s"}`
-              : `${shown.length} of ${hands.length} hands match the filters`}
+              ? t(hands.length === 1 ? "hh.completed.one" : "hh.completed.other", { n: hands.length })
+              : t("hh.match", { shown: shown.length, n: hands.length })}
           </p>
         </>
       )}
       {[...groups.entries()].map(([level, rows]) => (
         <div key={level} className="history-group" data-testid={`history-level-${level}`}>
-          <h3 className="history-group-title">LEVEL {level} ({rows[0].blindLevel} blinds)</h3>
+          <h3 className="history-group-title">{t("hh.level", { n: level, blinds: rows[0].blindLevel })}</h3>
           <table className="data-table">
             <thead>
-              <tr><th>#</th><th>Pos</th><th>Pot</th><th>Winners</th><th>Net</th><th>You</th><th>Coach</th><th>Grade</th></tr>
+              <tr><th>#</th><th>{t("hh.col.pos")}</th><th>{t("hh.col.pot")}</th><th>{t("hh.col.winners")}</th>
+                <th>{t("hh.col.net")}</th><th>{t("hh.col.you")}</th><th>{t("hh.col.coach")}</th><th>{t("hh.col.grade")}</th></tr>
             </thead>
             <tbody>
               {rows.map((h) => (
                 <tr key={h.handNumber} data-testid={`history-hand-${h.handNumber}`}
                   className={h.handNumber === focus ? "history-focus" : undefined}>
-                  <td>{h.handNumber}</td><td>{h.heroPosition}</td><td>{h.pot.toLocaleString()}</td>
-                  <td>{winnerNames(h)}</td>
-                  <td className={h.net >= 0 ? "pos" : "neg"}>{h.net >= 0 ? "+" : ""}{h.net.toLocaleString()}</td>
-                  <td>{h.heroDecision ?? "—"}</td><td>{h.coachRecommendation ?? "—"}</td>
-                  <td>{h.grade ?? "—"}</td>
+                  <td>{h.handNumber}</td><td>{h.heroPosition}</td><td>{formatChips(h.pot)}</td>
+                  <td>{winnerNames(h, words)}</td>
+                  <td className={h.net >= 0 ? "pos" : "neg"}>{h.net >= 0 ? "+" : ""}{formatChips(h.net)}</td>
+                  <td>{h.heroDecision ? actionWord(h.heroDecision, t) : "—"}</td>
+                  <td>{h.coachRecommendation ? actionWord(h.coachRecommendation, t) : "—"}</td>
+                  <td>{grade(h.grade)}</td>
                 </tr>
               ))}
             </tbody>

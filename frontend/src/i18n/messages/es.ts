@@ -9,5 +9,6 @@ import { home } from "./es/home";
 import { coach } from "./es/coach";
 import { hands } from "./es/hands";
 import { mistakes } from "./es/mistakes";
+import { handHistory } from "./es/handHistory";
 
-export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes };
+export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory };

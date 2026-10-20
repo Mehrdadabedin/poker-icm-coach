@@ -7,6 +7,7 @@ import { ReportBetSizes } from "../components/ReportBetSizes";
 import { Leaks, MistakeMap, MistakeTypes, PlayerStats, SummaryCards } from "../components/ReportSections";
 import { tournamentLabel, tournamentState, type TournamentRow } from "../models/history";
 import { PERIODS, type Period, type Report } from "../models/report";
+import { useI18n } from "../i18n/I18n";
 
 const day = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short" });
 
@@ -14,6 +15,7 @@ const day = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: 
  * filters only: a tournament, or a period. The backend computes every number;
  * this page lays them out. */
 export function ReportPage() {
+  const words = useI18n();
   const [period, setPeriod] = useState<Period>("30d");
   const [tournament, setTournament] = useState("");
   const [tournaments, setTournaments] = useState<TournamentRow[]>([]);
@@ -50,7 +52,7 @@ export function ReportPage() {
         <select value={tournament} onChange={(e) => setTournament(e.target.value)} aria-label="Tournament"
           data-testid="report-tournament">
           <option value="">All tournaments</option>
-          {tournaments.map((t) => <option key={t.tableId} value={t.tableId}>{tournamentLabel(t, liveId)}</option>)}
+          {tournaments.map((t) => <option key={t.tableId} value={t.tableId}>{tournamentLabel(t, liveId, words)}</option>)}
         </select>
         <select value={period} onChange={(e) => setPeriod(e.target.value as Period)} aria-label="Period"
           disabled={tournament !== ""} title={tournament ? "A chosen tournament is shown whole" : undefined}
@@ -76,7 +78,7 @@ export function ReportPage() {
               <h2>STACK GRAPH · TABLE {stack.tableLabel}, {day(stack.startedAt).toUpperCase()}</h2>
               <p className="report-sub">
                 Your chips after each hand; shaded bands are blind levels, red dots are hands with a mistake.
-                {" "}{tournamentState(stack, liveId).replace(/^./, (c) => c.toUpperCase())}.
+                {" "}{tournamentState(stack, liveId, words).replace(/^./, (c) => c.toUpperCase())}.
               </p>
               <StackChart stack={stack} />
             </section>

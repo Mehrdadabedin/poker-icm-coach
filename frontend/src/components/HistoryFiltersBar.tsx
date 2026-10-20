@@ -1,3 +1,4 @@
+import { useT } from "../i18n/I18n";
 import type { HandRow, HistoryFilters } from "../models/history";
 
 interface Props {
@@ -11,30 +12,31 @@ interface Props {
 export function HistoryFiltersBar({ hands, filters, onChange }: Props) {
   const positions = [...new Set(hands.map((h) => h.heroPosition).filter(Boolean))];
   const levels = [...new Set(hands.map((h) => h.level))].sort((a, b) => a - b);
+  const t = useT();
   const set = (patch: Partial<HistoryFilters>) => onChange({ ...filters, ...patch });
 
   return (
-    <div className="toolbar history-filters" role="group" aria-label="Filter hands">
-      <select value={filters.result} aria-label="Result" data-testid="history-filter-result"
+    <div className="toolbar history-filters" role="group" aria-label={t("hh.filter.label")}>
+      <select value={filters.result} aria-label={t("hh.filter.result")} data-testid="history-filter-result"
         onChange={(e) => set({ result: e.target.value as HistoryFilters["result"] })}>
-        <option value="all">All results</option>
-        <option value="won">Won</option>
-        <option value="lost">Lost</option>
+        <option value="all">{t("hh.filter.allResults")}</option>
+        <option value="won">{t("hh.filter.won")}</option>
+        <option value="lost">{t("hh.filter.lost")}</option>
       </select>
-      <select value={filters.position} aria-label="Position" data-testid="history-filter-position"
+      <select value={filters.position} aria-label={t("hh.filter.position")} data-testid="history-filter-position"
         onChange={(e) => set({ position: e.target.value })}>
-        <option value="">All positions</option>
+        <option value="">{t("hh.filter.allPositions")}</option>
         {positions.map((p) => <option key={p} value={p}>{p}</option>)}
       </select>
-      <select value={filters.level} aria-label="Level" data-testid="history-filter-level"
+      <select value={filters.level} aria-label={t("hh.filter.level")} data-testid="history-filter-level"
         onChange={(e) => set({ level: e.target.value })}>
-        <option value="">All levels</option>
-        {levels.map((l) => <option key={l} value={String(l)}>Level {l}</option>)}
+        <option value="">{t("hh.filter.allLevels")}</option>
+        {levels.map((l) => <option key={l} value={String(l)}>{t("hh.filter.levelN", { n: l })}</option>)}
       </select>
       <label className="history-mistakes-only">
         <input type="checkbox" checked={filters.mistakesOnly} data-testid="history-filter-mistakes"
           onChange={(e) => set({ mistakesOnly: e.target.checked })} />
-        Mistakes only
+        {t("hh.filter.mistakes")}
       </label>
     </div>
   );
