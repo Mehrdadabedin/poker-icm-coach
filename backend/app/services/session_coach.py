@@ -60,6 +60,8 @@ def advice_dict(rec: CoachRecommendation) -> dict:
         "street": rec.street,  # the panel says "BET on the flop" (plan 075)
         "confidence": rec.confidence,
         "reasoning": rec.reasoning,
+        "reasonCode": rec.reason_code,  # the app writes the reason in Spanish from these (plan 093)
+        "reasonParams": rec.reason_params,
         "alternativeAction": rec.alternative_action,
         "detail": rec.recommendation_detail,
         "ev": rec.ev,

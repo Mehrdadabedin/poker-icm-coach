@@ -16,6 +16,7 @@ from app.strategy.coach_analysis import (
     risk_premium_for,
     win_probability_for,
 )
+from app.strategy.coach_detail import build_detail
 from app.strategy.coach_ev import (
     action_risk,
     chip_ev_for,
@@ -24,6 +25,7 @@ from app.strategy.coach_ev import (
     outs_for,
 )
 from app.strategy.push_fold import PushFoldEngine
+from app.strategy.reasons import FIRST_SENTENCE, Reason, code_of
 from app.strategy.short_stack import allin_call, sb_shove
 from app.strategy.stack_analysis import SHORT_BB
 from app.strategy.villain_range import VillainRead
@@ -72,6 +74,8 @@ class CoachRecommendation:
     outs: dict | None = None
     education: str = ""
     street: str = ""  # the street the advice is for (plan 075)
+    reason_code: str = ""  # the reasoning as a code and its details, for other languages (plan 093)
+    reason_params: dict[str, str] = field(default_factory=dict)
 
 class Coach:
     """Produces a recommendation for any hero decision point."""
@@ -81,8 +85,10 @@ class Coach:
     def recommend(self, req: CoachRequest) -> CoachRecommendation:
         analyses = analyze_request(req)
         action, alt, reason = self._decide(req, analyses)
+        code, details = code_of(reason)
         if req.mode == "beginner":
             reason = reason.split(".")[0] + "."
+            code = FIRST_SENTENCE.get(code, code)
         # One consistent decision model: EV/ICM values are computed for the
         # DECIDED action vs a FOLD baseline, so labels and recommendation
         # always refer to the same action.
@@ -91,7 +97,7 @@ class Coach:
         ev = chip_ev_for(req, analyses, action, amount)
         analyses.chip_ev = f"{ev['evClass']} ({ev['chipEv']:+,})" if ev else "n/a"
         rp_label, _ = risk_premium_for(req, analyses)
-        detail = _build_detail(req, analyses, action, alt, reason, rp_label)
+        detail = build_detail(req, analyses, action, alt, reason, rp_label)
         outs = outs_for(req)
         return CoachRecommendation(
             recommended_action=action, confidence=_confidence(analyses),
@@ -100,7 +106,7 @@ class Coach:
             risk_premium=rp_label, ev=ev,
             outs=outs,
             education=education_for(req, analyses, ev, outs, action, amount),
-            street=req.street,
+            street=req.street, reason_code=code, reason_params=details,
         )
 
     def _decide(self, req: CoachRequest, a: Analyses) -> tuple[str, str, str]:
@@ -128,71 +134,37 @@ class Coach:
             if freqs.get("OPEN RAISE", 0) >= 0.5:
                 is_late = req.position in LATE_POSITIONS
                 alt = "CHECK" if is_late else "CALL"
-                steal = " Steal spot from late position." if is_late else ""
-                return "RAISE", alt, f"{name} is in the {req.position} open range.{steal}"
-            return "FOLD", "CHECK", f"{name} is not in the {req.position} open range."
+                return "RAISE", alt, Reason("open_in_steal" if is_late else "open_in", hand=name, pos=req.position)
+            return "FOLD", "CHECK", Reason("open_out", hand=name, pos=req.position)
         # facing a raise
         if premium:
             if a.stack_bb <= 14:
-                return "RESHOVE", "ALL-IN", f"{name} is premium; stack {a.stack_bb} BB is short."
-            return "3-BET", "CALL", f"{name} is premium and can raise for value."
+                return "RESHOVE", "ALL-IN", Reason("premium_short", hand=name, bb=a.stack_bb)
+            return "3-BET", "CALL", Reason("premium_value", hand=name)
         est = a.equity  # against the raiser's range when the coach can read it (plan 073)
         if est >= a.pot_odds + 0.06:
-            return "CALL", "FOLD", f"{name} equity ~{est:.0%} clears pot odds {a.pot_odds:.0%}."
-        icm_note = f" ICM pressure {a.pressure}." if a.extra.get("icm_ev_class") == "NEGATIVE" else ""
-        return "FOLD", "CALL", f"{name} equity ~{est:.0%} below required {a.pot_odds + 0.06:.0%}.{icm_note}"
+            return "CALL", "FOLD", Reason("call_clears", hand=name, eq=f"{est:.0%}", odds=f"{a.pot_odds:.0%}")
+        below = {"hand": name, "eq": f"{est:.0%}", "req": f"{a.pot_odds + 0.06:.0%}"}
+        if a.extra.get("icm_ev_class") == "NEGATIVE":
+            return "FOLD", "CALL", Reason("call_below_icm", **below, pressure=a.pressure)
+        return "FOLD", "CALL", Reason("call_below", **below)
 
     def _postflop(self, req: CoachRequest, a: Analyses) -> tuple[str, str, str]:
         equity = win_probability_for(req)
         a.equity = equity
         if req.to_call == 0:
             if equity >= 0.62 or (equity >= 0.5 and a.spr <= 3):
-                return "BET", "CHECK", f"Strong equity {equity:.0%} on {a.hand_name}."
+                return "BET", "CHECK", Reason("bet_strong", eq=f"{equity:.0%}", hand=a.hand_name)
             if equity >= 0.45:
-                return "CHECK", "BET", f"Medium equity {equity:.0%}, keep pot small."
-            return "CHECK", "FOLD", f"Weak equity {equity:.0%}, no value to bet."
+                return "CHECK", "BET", Reason("check_medium", eq=f"{equity:.0%}")
+            return "CHECK", "FOLD", Reason("check_weak", eq=f"{equity:.0%}")
         required = a.pot_odds + 0.08
         if equity >= max(required + 0.05, RAISE_MIN_EQUITY):
-            return "RAISE", "CALL", f"Equity {equity:.0%} beats pot odds {a.pot_odds:.0%}."
+            return "RAISE", "CALL", Reason("raise_beats", eq=f"{equity:.0%}", odds=f"{a.pot_odds:.0%}")
         if equity >= required:
-            return "CALL", "FOLD", f"Equity {equity:.0%} about equal to pot odds {a.pot_odds:.0%}."
-        return "FOLD", "CALL", f"Equity {equity:.0%} below required {required:.0%}."
+            return "CALL", "FOLD", Reason("call_about", eq=f"{equity:.0%}", odds=f"{a.pot_odds:.0%}")
+        return "FOLD", "CALL", Reason("fold_below", eq=f"{equity:.0%}", req=f"{required:.0%}")
 
 def _confidence(a: Analyses) -> float:
     margin = abs(a.equity - a.pot_odds) if a.pot_odds > 0 else abs(a.equity - 0.5)
     return round(min(0.95, 0.5 + margin), 2)
-
-def _build_detail(req: CoachRequest, a: Analyses, action: str, alt: str,
-                  reason: str, rp_label: str) -> dict[str, str]:
-    detail: dict[str, str] = {
-        "ACTION": action,
-        "WHY": reason,
-        "POSITION": req.position,
-        "STACK": f"{req.stack:,} chips ({a.stack_bb} BB)",
-        "EFFECTIVE STACK": f"{a.effective} chips ({a.eff_stack_bb} BB)",
-        "POT ODDS": f"{a.pot_odds:.0%}",
-        "ICM PRESSURE": a.pressure,
-        "BUBBLE": a.stage.label if a.stage else "?",
-        "STACK BAND": a.stack_band,
-        "RISK PREMIUM": rp_label,
-        "COVERAGE": a.coverage,
-        "SPR": f"{a.spr}",
-        "ALTERNATIVE": alt,
-        "BOARD TEXTURE": _texture_label(a),
-        "EST. EQUITY": f"{a.equity:.0%}",
-        "CHIP EV": a.chip_ev,
-        "ICM EV": a.icm_ev or "n/a",
-    }
-    if a.tournament_equity is not None:
-        detail["TOURNAMENT EQUITY"] = f"{a.tournament_equity:.3f}"
-    return detail
-
-def _texture_label(a: Analyses) -> str:
-    if a.board_texture is None:
-        return "n/a"
-    t = a.board_texture
-    for label, flag in (("PAIRED", t.paired), ("MONOTONE", t.monotone),
-                        ("WET", t.wet), ("CONNECTED", t.connected)):
-        if flag:
-            return label
-    return "DRY"
