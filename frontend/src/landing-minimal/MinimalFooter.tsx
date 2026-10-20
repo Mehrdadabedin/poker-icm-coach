@@ -1,5 +1,4 @@
 import { useT } from "../i18n/I18n";
-import { LanguageMenu } from "../components/LanguageMenu";
 
 /** Footer: the copyright on the left, the practice-only note and Cookie
  * settings on the right. The consent banner shows no floating button once a
@@ -12,7 +11,6 @@ export function MinimalFooter() {
       <div className="lm-footer-inner">
         <span data-testid="minimal-copyright">© 2026 ICMBOT</span>
         <span className="lm-footer-right">
-          <LanguageMenu />
           <span>{t("landing.practiceOnly")}</span>
           <button
             type="button"

@@ -7,7 +7,7 @@ import { MemoryRouter } from "react-router-dom";
 import { LanguageMenu } from "../src/components/LanguageMenu";
 import { LoginForm } from "../src/components/LoginForm";
 import { I18nProvider } from "../src/i18n/I18n";
-import { detectLang, LANG_KEY, READY, type Lang, type LangSources } from "../src/i18n/lang";
+import { detectLang, LANG_KEY, offeredLangs, READY, type Lang, type LangSources } from "../src/i18n/lang";
 import { en } from "../src/i18n/messages/en";
 import { MESSAGES } from "../src/i18n/translate";
 
@@ -64,6 +64,19 @@ function signIn(lang: Lang) {
   render(<I18nProvider initial={lang}><MemoryRouter><LoginForm onLogin={() => undefined} /><LanguageMenu /></MemoryRouter></I18nProvider>);
 }
 
+describe("the language buttons", () => {
+  it("always offer Spanish on icmbot.es, so English is never a dead end (the owner, 20 Oct)", () => {
+    expect(offeredLangs("en", "icmbot.es")).toEqual(["en", "es"]);
+    expect(offeredLangs("es", "www.icmbot.es")).toEqual(["en", "es"]);
+  });
+
+  it("wait on icmbot.one until Spanish is ready, except while previewing it", () => {
+    expect(offeredLangs("en", "icmbot.one")).toEqual(["en"]);
+    expect(offeredLangs("es", "icmbot.one")).toEqual(["en", "es"]);
+    expect(offeredLangs("en", "icmbot.one", ["en", "es"])).toEqual(["en", "es"]);
+  });
+});
+
 describe("the landing page", () => {
   it("reads in Spanish, gold word and all, with a way back to English", async () => {
     const { App } = await import("../src/App");
@@ -78,6 +91,9 @@ describe("the landing page", () => {
     expect(screen.getByTestId("minimal-closing")).toHaveTextContent("Tu próximo torneo empieza aquí.");
     expect(screen.getByTestId("minimal-cookie-settings")).toHaveTextContent("Configuración de cookies");
     expect(screen.getByText("Tu privacidad importa")).toBeInTheDocument();
+    // at the top of the page, in the header band, as EN / ES
+    expect(screen.getByTestId("minimal-header")).toContainElement(screen.getByTestId("lang-en"));
+    expect(screen.getByTestId("lang-es")).toHaveTextContent("ES");
     fireEvent.click(screen.getByTestId("lang-en"));
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Master tournament decisions");
   });

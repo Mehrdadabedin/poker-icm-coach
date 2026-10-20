@@ -5,7 +5,7 @@
   background: transparent; color: var(--muted); font-size: 0.78rem; cursor: pointer;
 }
 .lang-menu button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
-/* in the landing footer the pills sit on the line with the other links */
-.lm-footer .lang-menu { margin: 0; }
-.lm-footer .lang-menu button { color: inherit; border-color: rgba(0, 0, 0, 0.18); }
-.lm-footer .lang-menu button[aria-pressed="true"] { color: var(--lm-accent, #8a5a00); border-color: currentColor; }
+/* at the top of the landing page, in the black band, before Log in */
+.lm-header-band .lang-menu { margin: 0; gap: 4px; }
+.lm-header-band .lang-menu button { padding: 2px 8px; color: #c9cfd8; border-color: rgba(255, 255, 255, 0.25); }
+.lm-header-band .lang-menu button[aria-pressed="true"] { color: var(--lm-gold, #f2c14e); border-color: currentColor; }

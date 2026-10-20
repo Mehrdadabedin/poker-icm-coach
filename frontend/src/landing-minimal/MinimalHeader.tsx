@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { LanguageMenu } from "../components/LanguageMenu";
 import { useT } from "../i18n/I18n";
 
 /** Top bar of the minimal landing: a full-width black band with the logo on
@@ -14,6 +15,7 @@ export function MinimalHeader() {
           <img className="lm-brand-logo" src="/Logo/logo.png" alt="ICMBOT" width={144} height={48} />
         </p>
         <nav className="lm-nav" aria-label={t("landing.nav")}>
+          <LanguageMenu short />
           <Link className="lm-login" to="/login" data-testid="minimal-login">
             {t("landing.login")}
           </Link>

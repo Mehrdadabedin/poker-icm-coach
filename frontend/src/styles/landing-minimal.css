@@ -164,3 +164,12 @@
   .lm-hero-img { border-radius: 10px; }
   .lm-btn-primary, .lm-btn-outline { width: 100%; max-width: 360px; }
 }
+
+/* narrow phones: the language buttons and the longer Spanish labels did not
+   fit 360px (446px wide). Log in and Start free open the same sign-in page,
+   so the text link gives way and the button keeps the action. */
+@media (max-width: 459px) {
+  .lm-header-band .lm-login { display: none; }
+  .lm-nav { gap: 8px; }
+  .lm-btn-quiet { padding: 7px 12px; font-size: 0.85rem; }
+}

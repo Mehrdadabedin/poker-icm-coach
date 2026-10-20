@@ -14,6 +14,15 @@ export const READY: readonly Lang[] = ["en"];
 
 export const LANG_KEY = "icmbot.lang";
 
+const SPANISH_HOST = /(^|\.)icmbot\.es$/;
+
+/** The languages the menu offers: every READY one, the one in use, and Spanish
+ * on icmbot.es, so a visitor there who picks English can always come back
+ * (the owner, 20 Oct: the buttons vanished after clicking English). */
+export function offeredLangs(lang: Lang, host: string, ready: readonly Lang[] = READY): Lang[] {
+  return LANGS.filter((l) => ready.includes(l) || l === lang || (l === "es" && SPANISH_HOST.test(host)));
+}
+
 export const isLang = (value: string | null | undefined): value is Lang =>
   !!value && (LANGS as readonly string[]).includes(value);
 
@@ -32,7 +41,7 @@ export function detectLang({ search, saved, host, browser }: LangSources, ready:
   const asked = new URLSearchParams(search).get("lang");
   if (isLang(asked)) return asked;
   if (isLang(saved)) return saved;
-  if (/(^|\.)icmbot\.es$/.test(host)) return "es";
+  if (SPANISH_HOST.test(host)) return "es";
   const fromBrowser = browser.map((tag) => tag.toLowerCase().split("-")[0]).find((tag) => isLang(tag) && ready.includes(tag));
   return isLang(fromBrowser) ? fromBrowser : "en";
 }
