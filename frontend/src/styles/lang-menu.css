@@ -1,0 +1,7 @@
+/* The language menu (plan 093): small pills, the chosen one in gold. */
+.lang-menu { display: flex; justify-content: center; gap: 6px; margin: 14px 0 0; }
+.lang-menu button {
+  padding: 3px 12px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 999px;
+  background: transparent; color: var(--muted); font-size: 0.78rem; cursor: pointer;
+}
+.lang-menu button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }

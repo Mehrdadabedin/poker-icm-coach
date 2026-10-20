@@ -2,37 +2,7 @@ import { googleSignInUrl, type AuthProviders } from "../services/api";
 import { startAppGoogle } from "../services/appGoogle";
 import { inAndroidApp } from "../services/platform";
 import { ArrowRightIcon, GoogleIcon } from "./AuthIcons";
-
-type ProviderKind = "phone" | "google" | "apple";
-
-/** Copy for a provider the backend has no flow for. Phone and Apple have no
- * pill on the sign-in screen any more, so those two branches are kept for the
- * flows rather than rendered today. The Google clause is only offered when the
- * providers endpoint reports Google as configured, so the notice never points
- * at a control that would fail. */
-function providerNotice(kind: ProviderKind, googleAvailable: boolean): string {
-  const googleClause = googleAvailable ? " or continue with Google" : "";
-  if (kind === "phone") {
-    return (
-      "Phone sign-in isn't available yet. SMS verification requires additional " +
-      "service configuration. For now, you can create an account with Sign up" +
-      googleClause +
-      "."
-    );
-  }
-  if (kind === "apple") {
-    return (
-      "Apple sign-in isn't available yet. For now, you can create an account " +
-      "with Sign up" +
-      googleClause +
-      "."
-    );
-  }
-  return (
-    "Google sign-in isn't available yet. For now, you can sign in with your " +
-    "username and password."
-  );
-}
+import { useT } from "../i18n/I18n";
 
 interface ProviderButtonsProps {
   providers: AuthProviders | null;
@@ -45,6 +15,7 @@ interface ProviderButtonsProps {
  * shows the notice. */
 export function ProviderButtons({ providers, onNotice }: ProviderButtonsProps) {
   const googleAvailable = providers?.google === true;
+  const t = useT();
 
   const chooseGoogle = () => {
     if (googleAvailable) {
@@ -60,7 +31,7 @@ export function ProviderButtons({ providers, onNotice }: ProviderButtonsProps) {
     }
     // Google is advertised but cannot sign anyone in, so the notice goes
     // through the same red status line as a rejected password.
-    onNotice(providerNotice("google", googleAvailable));
+    onNotice(t("auth.googleUnavailable"));
   };
 
   return (
@@ -75,13 +46,13 @@ export function ProviderButtons({ providers, onNotice }: ProviderButtonsProps) {
           <span className="auth-provider-mark">
             <GoogleIcon />
           </span>
-          <span className="auth-provider-label">Continue with Google</span>
+          <span className="auth-provider-label">{t("auth.google")}</span>
           <span className="auth-provider-end">
             <ArrowRightIcon />
           </span>
         </button>
       </div>
-      <div className="auth-or">or</div>
+      <div className="auth-or">{t("auth.or")}</div>
     </>
   );
 }

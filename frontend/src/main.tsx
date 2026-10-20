@@ -45,6 +45,7 @@ import "./styles/icm-calculator.css";
 import "./styles/page-header.css";
 import "./styles/home-menu.css";
 import "./styles/report.css";
+import "./styles/lang-menu.css";
 
 initializeGoogleAnalytics();
 

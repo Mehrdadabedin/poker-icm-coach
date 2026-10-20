@@ -4,6 +4,7 @@ import { adminSummary, clearAuth, getToken, getUsername, logout, me } from "../s
 import { Copyright } from "../components/Copyright";
 import { BrandLogo } from "../components/BrandLogo";
 import { HomeMenu } from "../components/HomeMenu";
+import { LanguageMenu } from "../components/LanguageMenu";
 import { LoginForm } from "../components/LoginForm";
 
 /** HOME screen: username login (A03) then start a practice tournament or
@@ -73,6 +74,7 @@ export function HomePage() {
             </p>
           )}
           <LoginForm onLogin={setUser} />
+          <LanguageMenu />
           <Copyright />
         </div>
       </div>

@@ -13,6 +13,7 @@ import { AuthField } from "./AuthField";
 import { AuthSwitch, SignedInNote, type AuthMode } from "./AuthFooter";
 import { AuthMessages } from "./AuthMessages";
 import { ProviderButtons } from "./ProviderButtons";
+import { useT } from "../i18n/I18n";
 
 interface LoginFormProps {
   onLogin: (username: string) => void;
@@ -24,6 +25,7 @@ const MIN_PASSWORD_LENGTH = 8;
  * "Don't have an account? Sign up". */
 export function LoginForm({ onLogin }: LoginFormProps) {
   const navigate = useNavigate();
+  const t = useT();
   const [mode, setMode] = useState<AuthMode>("signin");
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
@@ -58,19 +60,19 @@ export function LoginForm({ onLogin }: LoginFormProps) {
 
   const validate = (): boolean => {
     if (!name.trim()) {
-      setError("Username is required.");
+      setError(t("auth.usernameRequired"));
       return false;
     }
     if (!password) {
-      setError("Password is required.");
+      setError(t("auth.passwordRequired"));
       return false;
     }
     if (mode === "signup" && !validPassword) {
-      setError(`Password must be at least ${MIN_PASSWORD_LENGTH} characters.`);
+      setError(t("auth.passwordShort", { min: MIN_PASSWORD_LENGTH }));
       return false;
     }
     if (mode === "signup" && password !== confirm) {
-      setError("Passwords do not match.");
+      setError(t("auth.passwordMismatch"));
       return false;
     }
     return true;
@@ -86,7 +88,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         // a session token), so no second sign-in is needed.
         const normalized = created.username.length ? created.username : name.trim();
         saveAuth(created.token, normalized);
-        setSuccess(`Account "${normalized}" created. You are now signed in.`);
+        setSuccess(t("auth.created", { name: normalized }));
         onLogin(normalized);
       } else {
         const auth = await login(name, password);
@@ -132,8 +134,8 @@ export function LoginForm({ onLogin }: LoginFormProps) {
           kind="mail"
           type="text"
           value={name}
-          placeholder="Email or username"
-          label="Email or username"
+          placeholder={t("auth.username")}
+          label={t("auth.username")}
           testId="username-input"
           autoComplete="username"
           maxLength={64}
@@ -144,8 +146,8 @@ export function LoginForm({ onLogin }: LoginFormProps) {
           kind="lock"
           type={reveal ? "text" : "password"}
           value={password}
-          placeholder="Password"
-          label="Password"
+          placeholder={t("auth.password")}
+          label={t("auth.password")}
           testId="password-input"
           autoComplete={mode === "signin" ? "current-password" : "new-password"}
           onChange={setPassword}
@@ -155,7 +157,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
               type="button"
               className="auth-eye"
               onClick={() => setReveal((value) => !value)}
-              aria-label={reveal ? "Hide password" : "Show password"}
+              aria-label={t(reveal ? "auth.hidePassword" : "auth.showPassword")}
               aria-pressed={reveal}
               data-testid="password-toggle"
             >
@@ -168,8 +170,8 @@ export function LoginForm({ onLogin }: LoginFormProps) {
             kind="lock"
             type="password"
             value={confirm}
-            placeholder="Confirm password"
-            label="Confirm password"
+            placeholder={t("auth.confirm")}
+            label={t("auth.confirm")}
             testId="confirm-password-input"
             autoComplete="new-password"
             onChange={setConfirm}
@@ -178,7 +180,7 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         )}
 
         <button type="submit" className="auth-submit" disabled={busy} data-testid="auth-submit">
-          <span>{busy ? "Please wait\u2026" : mode === "signin" ? "Sign in" : "Sign up"}</span>
+          <span>{t(busy ? "auth.wait" : mode === "signin" ? "auth.signIn" : "auth.signUp")}</span>
           <ArrowRightIcon />
         </button>
       </form>
