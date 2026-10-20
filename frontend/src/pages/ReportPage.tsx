@@ -8,14 +8,18 @@ import { Leaks, MistakeMap, MistakeTypes, PlayerStats, SummaryCards } from "../c
 import { tournamentLabel, tournamentState, type TournamentRow } from "../models/history";
 import { PERIODS, type Period, type Report } from "../models/report";
 import { useI18n } from "../i18n/I18n";
+import { numberLocale } from "../i18n/lang";
+import { formatChips } from "../models/game";
 
-const day = (iso: string) => new Date(iso).toLocaleDateString(undefined, { day: "numeric", month: "short" });
+const day = (iso: string, lang: string) => new Date(iso)
+  .toLocaleDateString(lang === "en" ? undefined : numberLocale(), { day: "numeric", month: "short" });
 
 /** REPORT (plan 078): one ready-made report from the saved history. Two
  * filters only: a tournament, or a period. The backend computes every number;
  * this page lays them out. */
 export function ReportPage() {
   const words = useI18n();
+  const { t } = words;
   const [period, setPeriod] = useState<Period>("30d");
   const [tournament, setTournament] = useState("");
   const [tournaments, setTournaments] = useState<TournamentRow[]>([]);
@@ -27,7 +31,7 @@ export function ReportPage() {
     request<{ tableId: string | null }>("/api/active-table")
       .then((d) => setLiveId(d.tableId)).catch(() => undefined);
     request<{ tournaments: TournamentRow[] }>("/api/history/tournaments")
-      .then((d) => setTournaments(d.tournaments.filter((t) => t.hands > 0))).catch(() => undefined);
+      .then((d) => setTournaments(d.tournaments.filter((row) => row.hands > 0))).catch(() => undefined);
   }, []);
 
   useEffect(() => {
@@ -40,44 +44,44 @@ export function ReportPage() {
     return () => { current = false; };
   }, [period, tournament]);
 
-  const labels = new Map(tournaments.map((t) => [t.tableId, t.tableLabel]));
+  const labels = new Map(tournaments.map((row) => [row.tableId, row.tableLabel]));
   const shown = status === "ready" ? report : null;
   const stack = shown?.stack;
 
   return (
     <div className="page report-page" data-testid="report-page">
       <PageHeader />
-      <h1 className="screen-title">REPORT</h1>
+      <h1 className="screen-title">{t("report.title")}</h1>
       <div className="toolbar">
-        <select value={tournament} onChange={(e) => setTournament(e.target.value)} aria-label="Tournament"
+        <select value={tournament} onChange={(e) => setTournament(e.target.value)} aria-label={t("hh.tournament")}
           data-testid="report-tournament">
-          <option value="">All tournaments</option>
-          {tournaments.map((t) => <option key={t.tableId} value={t.tableId}>{tournamentLabel(t, liveId, words)}</option>)}
+          <option value="">{t("report.allTournaments")}</option>
+          {tournaments.map((row) => <option key={row.tableId} value={row.tableId}>{tournamentLabel(row, liveId, words)}</option>)}
         </select>
-        <select value={period} onChange={(e) => setPeriod(e.target.value as Period)} aria-label="Period"
-          disabled={tournament !== ""} title={tournament ? "A chosen tournament is shown whole" : undefined}
+        <select value={period} onChange={(e) => setPeriod(e.target.value as Period)} aria-label={t("report.period")}
+          disabled={tournament !== ""} title={tournament ? t("report.wholeTournament") : undefined}
           data-testid="report-period">
-          {PERIODS.map((p) => <option key={p.value} value={p.value}>{p.label}</option>)}
+          {PERIODS.map((p) => <option key={p.value} value={p.value}>{t(`report.period.${p.value}`)}</option>)}
         </select>
       </div>
-      {status === "loading" && <p className="note">Loading your report…</p>}
-      {status === "error" && <p className="note" data-testid="report-error">Could not load your report. Please try again.</p>}
+      {status === "loading" && <p className="note">{t("report.loading")}</p>}
+      {status === "error" && <p className="note" data-testid="report-error">{t("report.error")}</p>}
       {shown && shown.summary.tournaments === 0 && (
         <p className="note" data-testid="report-empty">
-          No saved tournaments in this period. Play a practice tournament, or choose All time.
+          {t("report.empty")}
         </p>
       )}
       {shown && shown.summary.tournaments > 0 && (
         <>
           <p className="note" data-testid="report-count">
-            {shown.summary.hands.toLocaleString()} hands, {shown.summary.decisions.toLocaleString()} decisions graded by the coach
+            {t("report.count", { hands: formatChips(shown.summary.hands), decisions: formatChips(shown.summary.decisions) })}
           </p>
           <SummaryCards summary={shown.summary} period={shown.period} />
           {stack && (
             <section className="report-card">
-              <h2>STACK GRAPH · TABLE {stack.tableLabel}, {day(stack.startedAt).toUpperCase()}</h2>
+              <h2>{t("report.stackTitle", { label: stack.tableLabel, day: day(stack.startedAt, words.lang).toUpperCase() })}</h2>
               <p className="report-sub">
-                Your chips after each hand; shaded bands are blind levels, red dots are hands with a mistake.
+                {t("report.stackSub")}
                 {" "}{tournamentState(stack, liveId, words).replace(/^./, (c) => c.toUpperCase())}.
               </p>
               <StackChart stack={stack} />
@@ -85,43 +89,42 @@ export function ReportPage() {
           )}
           <div className="report-two">
             <section className="report-card">
-              <h2>WHERE YOU MAKE MISTAKES</h2>
-              <p className="report-sub">Share of your decisions the coach graded a mistake, by position and street.</p>
+              <h2>{t("report.mapTitle")}</h2>
+              <p className="report-sub">{t("report.mapSub")}</p>
               <MistakeMap heatmap={shown.heatmap} />
             </section>
             <section className="report-card">
-              <h2>TOP 3 LEAKS</h2>
-              <p className="report-sub">The mistakes you repeat most. Each hand opens in Hand History.</p>
+              <h2>{t("report.leaksTitle")}</h2>
+              <p className="report-sub">{t("report.leaksSub")}</p>
               <Leaks leaks={shown.leaks} labels={labels} />
-              <h2 className="report-h2-gap">MISTAKES BY TYPE</h2>
+              <h2 className="report-h2-gap">{t("report.typesTitle")}</h2>
               <MistakeTypes types={shown.mistakeTypes} />
             </section>
           </div>
           <div className="report-two">
             <section className="report-card">
-              <h2>PLAYER STATS</h2>
-              <p className="report-sub">Your numbers next to a usual range for a 9-player tournament table.</p>
+              <h2>{t("report.statsTitle")}</h2>
+              <p className="report-sub">{t("report.statsSub")}</p>
               <PlayerStats stats={shown.stats} />
             </section>
             <section className="report-card">
-              <h2>PROGRESS</h2>
+              <h2>{t("report.progressTitle")}</h2>
               <p className="report-sub">
-                One point per tournament, last 12.{" "}
-                <span className="legend-agree">Gold: coach agreement %.</span>{" "}
-                <span className="legend-miss">Red: mistakes per 100 hands.</span>
+                {t("report.progressSub")}{" "}
+                <span className="legend-agree">{t("report.legendAgree")}</span>{" "}
+                <span className="legend-miss">{t("report.legendMiss")}</span>
               </p>
               {shown.progress.length > 1
                 ? <ProgressChart points={shown.progress} />
                 : <p className="note" data-testid="report-progress-one">
-                  {tournament ? "Choose All tournaments to see progress over time."
-                    : "Progress shows once this period has two tournaments or more."}
+                  {t(tournament ? "report.progressPickAll" : "report.progressTwo")}
                 </p>}
             </section>
           </div>
           {shown.betSizes && shown.betSizes.length > 0 && (
             <section className="report-card">
-              <h2>BET SIZES</h2>
-              <p className="report-sub">How big your first bet on each street is, as a share of the pot. Raises are not counted.</p>
+              <h2>{t("report.betTitle")}</h2>
+              <p className="report-sub">{t("report.betSub")}</p>
               <ReportBetSizes key={`${shown.period}-${shown.tournament ?? ""}`} sizes={shown.betSizes} />
             </section>
           )}

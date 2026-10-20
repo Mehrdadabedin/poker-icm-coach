@@ -1,13 +1,18 @@
 /* The Report page (plan 078): the shape of GET /api/history/report and the
- * wording and colours drawn from it. The backend computes every number. */
+ * wording and colours drawn from it. The backend computes every number. The
+ * wording takes the site's language (plan 093); without one it is English. */
+import { actionWord } from "../i18n/coach";
+import { localNumber } from "../i18n/lang";
+import type { MessageKey } from "../i18n/messages/en";
+import { translate, type Params } from "../i18n/translate";
+
+export type T = (key: MessageKey, params?: Params) => string;
+const EN: T = (key, params) => translate("en", key, params);
 
 export type Period = "7d" | "30d" | "90d" | "all";
 
-export const PERIODS: { value: Period; label: string; days: number | null }[] = [
-  { value: "7d", label: "Last 7 days", days: 7 },
-  { value: "30d", label: "Last 30 days", days: 30 },
-  { value: "90d", label: "Last 90 days", days: 90 },
-  { value: "all", label: "All time", days: null },
+export const PERIODS: { value: Period; days: number | null }[] = [
+  { value: "7d", days: 7 }, { value: "30d", days: 30 }, { value: "90d", days: 90 }, { value: "all", days: null },
 ];
 
 type Rates = { agreement: number | null; mistakesPer100: number | null };
@@ -47,31 +52,20 @@ export type Report = {
 export type SizeKey = "under25" | "third" | "half" | "twoThirds" | "pot" | "over";
 export type StreetSizes = { street: "flop" | "turn" | "river"; bets: number; buckets: { size: SizeKey; count: number }[] };
 
-export const TYPE_LABELS = { call: "Wrong call", fold: "Wrong fold", allin: "Wrong all-in", other: "Other" };
-
-export const STAT_LABELS: Record<string, string> = {
-  vpip: "VPIP (play a hand)",
-  pfr: "PFR (raise preflop)",
-  threeBet: "3-bet (re-raise preflop)",
-  steal: "Steal from CO, BTN or SB",
-  cbet: "Continuation bet on the flop",
-  wtsd: "Went to showdown",
-};
-
 /** Fewer chances than this and a percentage says little. */
 export const FEW_CHANCES = 10;
 
-export function statVerdict(s: PlayerStat): { text: string; tone: "ok" | "warn" | "muted" } {
+export function statVerdict(s: PlayerStat, t: T = EN): { text: string; tone: "ok" | "warn" | "muted" } {
   if (s.value === null || s.chances < FEW_CHANCES) {
-    return { text: `few hands (${s.chances})`, tone: "muted" };
+    return { text: t("report.verdict.few", { n: s.chances }), tone: "muted" };
   }
-  if (s.value < s.low) return { text: "below range", tone: "warn" };
-  if (s.value > s.high) return { text: "above range", tone: "warn" };
-  return { text: "in range", tone: "ok" };
+  if (s.value < s.low) return { text: t("report.verdict.below"), tone: "warn" };
+  if (s.value > s.high) return { text: t("report.verdict.above"), tone: "warn" };
+  return { text: t("report.verdict.in"), tone: "ok" };
 }
 
-export const leakText = (l: Leak): string =>
-  `${l.position}, ${l.street}: ${l.heroAction} where the coach says ${l.coachAction}`;
+export const leakText = (l: Leak, t: T = EN): string => t("report.leak", {
+  pos: l.position, street: l.street, hero: actionWord(l.heroAction, t), coach: actionWord(l.coachAction, t) });
 
 /** Green at no mistakes, red from one decision in four. */
 export function heatColour(rate: number): string {
@@ -84,36 +78,26 @@ export const chips = (n: number): string =>
 
 /** "▲ 6 vs previous 30 days": up is good for agreement, down for mistakes. */
 export function change(now: number | null, before: number | null | undefined, period: Period,
-  higherIsBetter: boolean): { text: string; good: boolean } | null {
+  higherIsBetter: boolean, t: T = EN): { text: string; good: boolean } | null {
   const days = PERIODS.find((p) => p.value === period)?.days;
   if (now === null || before === null || before === undefined || !days) return null;
   const diff = Math.round((now - before) * 10) / 10;
-  if (diff === 0) return { text: `same as previous ${days} days`, good: true };
-  return { text: `${diff > 0 ? "▲" : "▼"} ${Math.abs(diff)} vs previous ${days} days`, good: (diff > 0) === higherIsBetter };
+  if (diff === 0) return { text: t("report.same", { days }), good: true };
+  return { text: t("report.change", { arrow: diff > 0 ? "▲" : "▼", diff: localNumber(Math.abs(diff)), days }),
+    good: (diff > 0) === higherIsBetter };
 }
 
 export const historyLink = (tableId: string, hand: number): string =>
   `/history?table=${encodeURIComponent(tableId)}&hand=${hand}`;
 
-export const SIZE_LABELS: Record<SizeKey, string> = {
-  under25: "Under 25%", third: "About 1/3", half: "About 1/2", twoThirds: "2/3 to 3/4", pot: "Pot", over: "Over pot",
-};
-
-const SIZE_PHRASES: Record<SizeKey, string> = {
-  under25: "under a quarter of the pot", third: "about a third of the pot", half: "about half the pot",
-  twoThirds: "two thirds to three quarters of the pot", pot: "about the size of the pot", over: "bigger than the pot",
-};
-
 /** One line about the sizes on a street, or a note when there are too few. */
-export function sizingInsight(s: StreetSizes): string {
-  if (s.bets < FEW_CHANCES) return `Only ${s.bets} ${s.street} bet${s.bets === 1 ? "" : "s"} so far: play more hands for a pattern.`;
+export function sizingInsight(s: StreetSizes, t: T = EN): string {
+  const street = s.street;
+  if (s.bets < FEW_CHANCES) return t(s.bets === 1 ? "report.insight.few.one" : "report.insight.few.other", { n: s.bets, street });
   const share = (k: SizeKey) => (s.buckets.find((b) => b.size === k)?.count ?? 0) / s.bets;
-  if (share("under25") >= 0.4) {
-    return `Most of your ${s.street} bets are under a quarter of the pot. A tiny bet gives opponents a cheap call; 1/3 to 2/3 of the pot usually works better.`;
-  }
-  if (share("over") >= 0.4) {
-    return `Most of your ${s.street} bets are bigger than the pot. Overbets risk a lot of chips; keep them for your strongest hands.`;
-  }
+  if (share("under25") >= 0.4) return t("report.insight.small", { street });
+  if (share("over") >= 0.4) return t("report.insight.over", { street });
   const top = s.buckets.reduce((a, b) => (b.count > a.count ? b : a));
-  return `Your most common ${s.street} bet is ${SIZE_PHRASES[top.size]} (${Math.round((100 * top.count) / s.bets)}% of your bets).`;
+  return t("report.insight.common", { street, phrase: t(`report.phrase.${top.size}`),
+    pct: Math.round((100 * top.count) / s.bets) });
 }

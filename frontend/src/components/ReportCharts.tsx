@@ -1,4 +1,7 @@
 import type { ReactNode } from "react";
+import { useT } from "../i18n/I18n";
+import { localNumber } from "../i18n/lang";
+import { formatChips } from "../models/game";
 import { chips, type Report } from "../models/report";
 
 /* The Report's two line charts (plan 078). Lines are SVG stretched to the box;
@@ -53,6 +56,7 @@ function levelBands(levels: number[], xs: number[]): { level: number; from: numb
 }
 
 export function StackChart({ stack }: { stack: NonNullable<Report["stack"]> }) {
+  const t = useT();
   const pts = stack.points;
   const top = Math.max(...pts.map((p) => p.stack), 1);
   const start = pts[0].stack;
@@ -61,21 +65,23 @@ export function StackChart({ stack }: { stack: NonNullable<Report["stack"]> }) {
   const ticks = [{ value: top, text: chips(top) }];
   if (chips(start) !== chips(top)) ticks.push({ value: start, text: chips(start) });
   return (
-    <Plot max={top * 1.1} ticks={ticks} label={`Your stack after each hand at table ${stack.tableLabel}`}
-      testId="report-stack-chart" xLabels={["start", `hand ${pts[pts.length - 1].hand}`]}
+    <Plot max={top * 1.1} ticks={ticks} label={t("report.chart.stack", { label: stack.tableLabel })} testId="report-stack-chart"
+      xLabels={[t("report.chart.start"), t("report.chart.hand", { n: pts[pts.length - 1].hand })]}
       bands={bands.map((b, i) => (
         <rect key={b.level} x={b.from} y="0" width={b.to - b.from} height="100" className={i % 2 ? "band-b" : "band-a"} />
       ))}
-      overlay={bands.map((b) => <span key={b.level} className="chart-band" style={{ left: `${b.from}%` }}>L{b.level}</span>)}
+      overlay={bands.map((b) => <span key={b.level} className="chart-band" style={{ left: `${b.from}%` }}>{t("report.chart.band", { n: b.level })}</span>)}
       lines={[{ className: "line-stack", points: pts.map((p, i) => [xs[i], p.stack]) }]}
       dots={pts.flatMap((p, i) => (p.mistakes > 0 ? [{
         x: xs[i], y: p.stack, className: "dot-mistake", testId: "report-stack-mistake",
-        title: `Hand ${p.hand}: ${p.mistakes} mistake${p.mistakes === 1 ? "" : "s"}, ${p.stack.toLocaleString()} chips after`,
+        title: t(p.mistakes === 1 ? "report.chart.dot.one" : "report.chart.dot.other",
+          { n: p.hand, m: p.mistakes, chips: formatChips(p.stack) }),
       }] : []))} />
   );
 }
 
 export function ProgressChart({ points }: { points: Report["progress"] }) {
+  const t = useT();
   const values = points.flatMap((p) => [p.agreement ?? 0, p.mistakesPer100 ?? 0]);
   const max = Math.max(100, ...values);
   const xs = points.map((_, i) => xPct(i, points.length));
@@ -83,14 +89,15 @@ export function ProgressChart({ points }: { points: Report["progress"] }) {
     const kept = points.flatMap((p, i) => (p[key] === null ? [] : [{ p, x: xs[i], v: p[key] ?? 0 }]));
     return [{ className: `line-${className}`, points: kept.map((k) => [k.x, k.v]) },
       kept.map((k) => ({ x: k.x, y: k.v, className: `dot-${className}`, testId: `report-progress-${className}`,
-        title: `Table ${k.p.tableLabel}: ${key === "agreement" ? `${k.v}% coach agreement` : `${k.v} mistakes per 100 hands`}` }))];
+        title: t(key === "agreement" ? "report.chart.agree" : "report.chart.miss",
+          { label: k.p.tableLabel, v: localNumber(k.v) }) }))];
   };
   const [agreeLine, agreeDots] = series("agreement", "agree");
   const [missLine, missDots] = series("mistakesPer100", "miss");
   return (
     <Plot max={max} ticks={[{ value: 100, text: "100" }, { value: 0, text: "0" }]}
-      label="Coach agreement and mistakes per 100 hands, one point per tournament"
-      testId="report-progress-chart" xLabels={["oldest", "newest"]}
+      label={t("report.chart.progress")}
+      testId="report-progress-chart" xLabels={[t("report.chart.oldest"), t("report.chart.newest")]}
       lines={[agreeLine, missLine]} dots={[...agreeDots, ...missDots]} />
   );
 }
