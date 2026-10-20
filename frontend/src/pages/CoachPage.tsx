@@ -4,24 +4,19 @@ import { Copyright } from "../components/Copyright";
 import { PageHeader } from "../components/PageHeader";
 import { Card, POSITIONS_9MAX } from "../models/game";
 import { CardPicker, SUIT_SYMBOL, cardKey } from "../components/CoachCardPicker";
+import { CoachAdvicePanel, type Advice } from "../components/CoachAdvicePanel";
+import { useT } from "../i18n/I18n";
+import type { MessageKey } from "../i18n/messages/en";
 
 interface HandClass {
   name: string;
   cards: Card[];
 }
 
-type Advice = {
-  recommendedAction: string;
-  confidence: number;
-  reasoning: string;
-  detail: Record<string, string>;
-  ev: { winProb: number; loseProb: number; pot: number; toCall: number; chipEv: number; evClass: string; chipRecommendation: string } | null;
-  outs: { outs: number; unknown: number; improveTurn: number; improveRiver: number; winProb: number; method: string } | null;
-  education: string;
-};
 
 /** ICM COACH: full 169-class + exact-card analysis with EV/outs/education. */
 export function CoachPage() {
+  const t = useT();
   const [mode, setMode] = useState<"hand" | "exact">("hand");
   const [hands169, setHands169] = useState<HandClass[]>([]);
   const [handName, setHandName] = useState("AA");
@@ -97,28 +92,29 @@ export function CoachPage() {
   return (
     <div className="page" data-testid="coach-page">
       <PageHeader />
-      <h1 className="screen-title">ICM COACH</h1>
+      <h1 className="screen-title">{t("coachPage.title")}</h1>
       <div className="coach-mode-toggle">
-        <button className={mode === "hand" ? "active" : ""} onClick={() => { setMode("hand"); setAdvice(null); }}>STARTING HAND</button>
-        <button className={mode === "exact" ? "active" : ""} onClick={() => { setMode("exact"); setAdvice(null); }}>EXACT CARDS</button>
+        <button className={mode === "hand" ? "active" : ""} onClick={() => { setMode("hand"); setAdvice(null); }}>{t("coachPage.mode.hand")}</button>
+        <button className={mode === "exact" ? "active" : ""} onClick={() => { setMode("exact"); setAdvice(null); }}>{t("coachPage.mode.exact")}</button>
       </div>
 
       {mode === "hand" ? (
         <div className="toolbar">
           <label>
-            STARTING HAND (169 CLASSES)
+            {t("coachPage.handClass")}
             <select value={handName} onChange={(e) => selectHand(e.target.value)} data-testid="hand-select">
               {hands169.map((h) => <option key={h.name} value={h.name}>{h.name}</option>)}
             </select>
           </label>
-          <span className="note">Representative combo for {handName}: {hero.map((c) => `${c.rank}${SUIT_SYMBOL[c.suit]}`).join(" ")}</span>
+          <span className="note">{t("coachPage.combo", { hand: handName, cards: hero.map((c) => `${c.rank}${SUIT_SYMBOL[c.suit]}`).join(" ") })}</span>
         </div>
       ) : (
         <div className="toolbar exact-cards">
           {[0, 1].map((i) => (
             <CardPicker
               key={i}
-              label={`CARD ${i + 1}`}
+              label={t("coachPage.card", { n: i + 1 })}
+              id={`card-${i + 1}`}
               value={hero[i]?.rank ? hero[i] : null}
               used={hero.filter((_, j) => j !== i)}
               onChange={setHeroCard(i as 0 | 1)}
@@ -129,22 +125,22 @@ export function CoachPage() {
 
       <div className="train-grid">
         <div className="toolbar">
-          <label>POSITION<select value={position} onChange={(e) => setPosition(e.target.value)}>{POSITIONS_9MAX.map((p) => <option key={p}>{p}</option>)}</select></label>
-          <label>OPPONENTS<input type="number" min={1} max={8} value={opponents} onChange={(e) => setOpponents(Number(e.target.value))} /></label>
-          <label>STACK<input type="number" min={0} value={stack} onChange={(e) => setStack(Number(e.target.value))} /></label>
-          <label>POT<input type="number" min={0} value={pot} onChange={(e) => setPot(Number(e.target.value))} /></label>
-          <label>TO CALL<input type="number" min={0} value={toCall} onChange={(e) => setToCall(Number(e.target.value))} /></label>
+          <label>{t("coachPage.position")}<select value={position} onChange={(e) => setPosition(e.target.value)}>{POSITIONS_9MAX.map((p) => <option key={p}>{p}</option>)}</select></label>
+          <label>{t("coachPage.opponents")}<input type="number" min={1} max={8} value={opponents} onChange={(e) => setOpponents(Number(e.target.value))} /></label>
+          <label>{t("coachPage.stack")}<input type="number" min={0} value={stack} onChange={(e) => setStack(Number(e.target.value))} /></label>
+          <label>{t("coachPage.pot")}<input type="number" min={0} value={pot} onChange={(e) => setPot(Number(e.target.value))} /></label>
+          <label>{t("coachPage.toCall")}<input type="number" min={0} value={toCall} onChange={(e) => setToCall(Number(e.target.value))} /></label>
         </div>
         <div className="toolbar">
-          <label>SMALL BLIND<input type="number" min={0} value={smallBlind} onChange={(e) => setSmallBlind(Number(e.target.value))} /></label>
-          <label>BIG BLIND<input type="number" min={1} value={bigBlind} onChange={(e) => setBigBlind(Number(e.target.value))} /></label>
-          <button className="btn" onClick={run} disabled={running || !boardReady} data-testid="analyze-btn">ANALYZE</button>
+          <label>{t("coachPage.smallBlind")}<input type="number" min={0} value={smallBlind} onChange={(e) => setSmallBlind(Number(e.target.value))} /></label>
+          <label>{t("coachPage.bigBlind")}<input type="number" min={1} value={bigBlind} onChange={(e) => setBigBlind(Number(e.target.value))} /></label>
+          <button className="btn" onClick={run} disabled={running || !boardReady} data-testid="analyze-btn">{t("coachPage.analyze")}</button>
         </div>
       </div>
 
       <div className="board-picker">
-        <span className="board-street">BOARD — {street.toUpperCase()}</span>
-        {!boardReady && <span className="note">Add 0/3/4/5 board cards before analyzing.</span>}
+        <span className="board-street">{t("coachPage.board", { street: t(`coachPage.street.${street}` as MessageKey) })}</span>
+        {!boardReady && <span className="note">{t("coachPage.boardHint")}</span>}
         <div className="board-cards">
           {board.map((c, i) => (
             <span key={i} className="board-chip">{c.rank}{SUIT_SYMBOL[c.suit]}
@@ -152,45 +148,12 @@ export function CoachPage() {
             </span>
           ))}
           {board.length < 5 && (
-            <CardPicker label="ADD CARD" value={null} used={[...hero, ...board]} onChange={addBoardCard} resetAfterPick />
+            <CardPicker label={t("coachPage.addCard")} id="add-card" value={null} used={[...hero, ...board]} onChange={addBoardCard} resetAfterPick />
           )}
         </div>
       </div>
 
-      {advice && (
-        <div className="coach-panel" data-testid="advice-panel">
-          <h3>RECOMMENDATION: {advice.recommendedAction}</h3>
-          <p className="confidence">Confidence {Math.round(advice.confidence * 100)}%</p>
-
-          {advice.ev && (
-            <div className={`ev-panel ${advice.ev.evClass === "POSITIVE EV" ? "ev-pos" : "ev-neg"}`} data-testid="ev-panel">
-              <div className="ev-row"><b>CHIP EV:</b> <span>{advice.ev.chipEv >= 0 ? `+${advice.ev.chipEv.toLocaleString()}` : advice.ev.chipEv.toLocaleString()}</span></div>
-              <div className="ev-row"><b>CLASS:</b> <span>{advice.ev.evClass}</span></div>
-              <div className="ev-row"><b>WIN PROB:</b> <span>{(advice.ev.winProb * 100).toFixed(1)}%</span> <b>LOSE PROB:</b> <span>{(advice.ev.loseProb * 100).toFixed(1)}%</span></div>
-              <div className="ev-row"><b>POT:</b> <span>{advice.ev.pot.toLocaleString()}</span> <b>TO CALL:</b> <span>{advice.ev.toCall.toLocaleString()}</span></div>
-              <div className="ev-row"><b>CHIP RECOMMENDATION:</b> <span>{advice.ev.chipRecommendation}</span></div>
-              <div className="ev-row ev-note">TOURNAMENT/ICM: {advice.recommendedAction} (ICM-aware decision may differ from raw chip EV)</div>
-            </div>
-          )}
-
-          {advice.outs && (
-            <div className="outs-grid" data-testid="outs-panel">
-              <span>OUTS: <b>{advice.outs.outs}</b> / {advice.outs.unknown} unknown</span>
-              <span>IMPROVE TURN: <b>{(advice.outs.improveTurn * 100).toFixed(1)}%</b></span>
-              <span>IMPROVE BY RIVER: <b>{(advice.outs.improveRiver * 100).toFixed(1)}%</b></span>
-              <span>WIN PROBABILITY: <b>{(advice.outs.winProb * 100).toFixed(1)}%</b> ({advice.outs.method})</span>
-            </div>
-          )}
-
-          {advice.education && <p className="coach-education" data-testid="coach-education">{advice.education}</p>}
-          <p>{advice.reasoning}</p>
-          <dl>
-            {Object.entries(advice.detail).map(([k, v]) => (
-              <div key={k} className="coach-row"><dt>{k}</dt><dd>{v}</dd></div>
-            ))}
-          </dl>
-        </div>
-      )}
+      {advice && <CoachAdvicePanel advice={advice} />}
       <Copyright />
     </div>
   );

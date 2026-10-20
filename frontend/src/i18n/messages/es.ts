@@ -12,5 +12,6 @@ import { mistakes } from "./es/mistakes";
 import { handHistory } from "./es/handHistory";
 import { report } from "./es/report";
 import { tools } from "./es/tools";
+import { practice } from "./es/practice";
 
-export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools };
+export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools, ...practice };
