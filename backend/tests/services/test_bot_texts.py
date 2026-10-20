@@ -27,6 +27,12 @@ def test_the_bots_reasons_read_as_before() -> None:
     assert _decision("raise", *args)["code"] == "bet"
 
 
+def test_a_check_is_explained_as_a_check() -> None:
+    why = _decision("check", "A♠ K♦", 12.5, 0.45, 0.0, "very high", "BB")
+    assert why["code"] == "check", f"a check got the {why['code']} sentence: {why['text']}"
+    assert why["text"] == "Checking A♠ K♦ from BB - 45% equity, 12.5 BB behind."
+
+
 def test_what_the_bot_faced_reads_as_before() -> None:
     level = BlindLevel(small=50, big=100)
     assert [_faced(*a, level)["text"] for a in (("preflop", 100, 0), ("flop", 0, 0), ("preflop", 250, 250),

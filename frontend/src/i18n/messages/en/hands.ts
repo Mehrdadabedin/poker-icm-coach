@@ -16,6 +16,7 @@ export const hands = {
   "bots.reason.call_profitable": "Calling with {hand} - {eq} equity vs {odds} pot odds from {pos}; ICM pressure {pressure} (profitable).",
   "bots.reason.call_marginal": "Calling with {hand} - {eq} equity vs {odds} pot odds from {pos}; ICM pressure {pressure} (marginal).",
   "bots.reason.bet": "Betting {hand} from {pos} - {eq} equity, {bb} BB behind, pot odds {odds}.",
+  "bots.reason.check": "Checking {hand} from {pos} - {eq} equity, {bb} BB behind.",
   "bots.reason.all_in": "All-in with {hand} for {bb} BB - {eq} equity at {pressure} ICM pressure.",
   "bots.faced.unopened": "Unopened",
   "bots.faced.no_bet": "No bet",

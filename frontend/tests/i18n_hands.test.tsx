@@ -51,7 +51,7 @@ afterEach(() => {
 
 describe("the bots' reasons", () => {
   it("has Spanish for every server code, and the server's English word for word", () => {
-    for (const [prefix, name, size] of [["bots.reason", "DECISION", 5], ["bots.faced", "FACED", 5]] as const) {
+    for (const [prefix, name, size] of [["bots.reason", "DECISION", 6], ["bots.faced", "FACED", 5]] as const) {
       const server = table(name);
       expect(Object.keys(server)).toHaveLength(size);
       for (const [code, text] of Object.entries(server)) {
