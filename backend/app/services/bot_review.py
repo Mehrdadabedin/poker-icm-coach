@@ -74,6 +74,8 @@ def _decision(action: str, hand: str, stack_bb: float, equity: float,
         return coded(DECISION, code, hand=hand, eq=eq, odds=odds, pos=position, pressure=p)
     if action in ("bet", "raise"):
         return coded(DECISION, "bet", hand=hand, pos=position, eq=eq, bb=stack_bb, odds=odds)
+    if action == "check":
+        return coded(DECISION, "check", hand=hand, pos=position, eq=eq, bb=stack_bb)
     return coded(DECISION, "all_in", hand=hand, bb=stack_bb, eq=eq, pressure=p)
 
 

@@ -14,6 +14,7 @@ DECISION: dict[str, str] = {
     "call_marginal": "Calling with {hand} - {eq} equity vs {odds} pot odds "
                      "from {pos}; ICM pressure {pressure} (marginal).",
     "bet": "Betting {hand} from {pos} - {eq} equity, {bb} BB behind, pot odds {odds}.",
+    "check": "Checking {hand} from {pos} - {eq} equity, {bb} BB behind.",
     "all_in": "All-in with {hand} for {bb} BB - {eq} equity at {pressure} ICM pressure.",
 }
 

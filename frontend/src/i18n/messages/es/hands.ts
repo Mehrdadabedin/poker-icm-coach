@@ -17,6 +17,7 @@ export const hands: Record<keyof typeof en, string> = {
   "bots.reason.call_profitable": "Iguala con {hand}: equity del {eq} frente a pot odds del {odds} desde {pos}; presión ICM {pressure} (rentable).",
   "bots.reason.call_marginal": "Iguala con {hand}: equity del {eq} frente a pot odds del {odds} desde {pos}; presión ICM {pressure} (marginal).",
   "bots.reason.bet": "Apuesta con {hand} desde {pos}: equity del {eq}, {bb} BB detrás, pot odds del {odds}.",
+  "bots.reason.check": "Pasa con {hand} desde {pos}: equity del {eq}, {bb} BB detrás.",
   "bots.reason.all_in": "All-in con {hand} por {bb} BB: equity del {eq} con presión ICM {pressure}.",
   "bots.faced.unopened": "Sin apertura",
   "bots.faced.no_bet": "Sin apuesta",
