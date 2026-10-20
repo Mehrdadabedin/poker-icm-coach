@@ -41,7 +41,10 @@ sentences from the server.
    4b (done): hand names, the bots' reasons and the action they faced.
 5. 5a (done): the page header and My Mistakes, the coach's reason from a code
    the hand history now keeps with each decision. 5b (done): Hand History. 5c
-   (done): Report. 5d (done): statistics, ICM calculator.
+   (done): Report. 5d (done): statistics, ICM calculator. 5e (done): the
+   ICM Coach tool and tournament settings, missed in 5 (the owner, 20 Oct:
+   "not in spanish"). The coach tool's teaching paragraph is still English
+   from the server; it needs a code like step 4.
 6. Spanish review by a native speaker who plays poker; Spanish READY.
 7. icmbot.es on Render (custom domain, DNS at one.com, CORS_ORIGINS) (done).
 
@@ -125,3 +128,10 @@ gets 400), and Google sign-in starts from icmbot.es (302 to Google; another
 site gets 400). The live bundle has the step 5 Spanish. Not done: the page
 still says lang="en" and og:url https://icmbot.one before the app starts,
 so a shared icmbot.es link previews in English.
+
+Step 5e, tests only (I did not check it in the browser): COACH ICM, MANO
+INICIAL (169 CLASES), POSICIÓN, RIVALES, PARA IGUALAR, ANALIZAR, MESA ·
+PREFLOP, Valor / Palo in the card picker; after ANALIZAR: RECOMENDACIÓN:
+IGUALAR, EV EN FICHAS: +12.500, PROB. DE GANAR: 55,2%, the reason from its
+code and the factor rows. AJUSTES DEL TORNEO, STACK INICIAL, MODO RÁPIDO,
+REVERSO DE LAS CARTAS (Azul, Rojo), GUARDAR AJUSTES and both save notes.
