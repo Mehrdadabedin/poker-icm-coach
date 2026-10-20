@@ -1,3 +1,5 @@
+import { useT } from "../i18n/I18n";
+
 export type AuthMode = "signin" | "signup";
 
 interface AuthSwitchProps {
@@ -7,31 +9,32 @@ interface AuthSwitchProps {
 
 /** The prompt that moves between the sign-in view and the sign-up flow. */
 export function AuthSwitch({ mode, onSwitch }: AuthSwitchProps) {
+  const t = useT();
   if (mode === "signup") {
     return (
       <p className="auth-switch">
-        Already have an account?{" "}
+        {t("auth.haveAccount")}{" "}
         <button
           type="button"
           className="auth-link"
           onClick={() => onSwitch("signin")}
           data-testid="go-signin"
         >
-          Sign in
+          {t("auth.signIn")}
         </button>
       </p>
     );
   }
   return (
     <p className="auth-switch">
-      Don&apos;t have an account?{" "}
+      {t("auth.noAccount")}{" "}
       <button
         type="button"
         className="auth-link"
         onClick={() => onSwitch("signup")}
         data-testid="go-signup"
       >
-        Sign up
+        {t("auth.signUp")}
       </button>
     </p>
   );
@@ -53,10 +56,11 @@ interface SignedInNoteProps {
 
 /** Shows which account a stored token belongs to, if any. */
 export function SignedInNote({ username }: SignedInNoteProps) {
+  const t = useT();
   if (!username) return null;
   return (
     <p className="auth-signed-in">
-      Signed in as <b>{username}</b>
+      {t("auth.signedInAs")} <b>{username}</b>
     </p>
   );
 }

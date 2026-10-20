@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { AdminChangePasswordPage } from "./pages/AdminChangePasswordPage";
 import { AdminPage } from "./pages/AdminPage";
 import { AppLinkListener } from "./components/AppLinkListener";
+import { I18nProvider } from "./i18n/I18n";
 import { HomePage } from "./pages/HomePage";
 import { LandingPage } from "./pages/LandingPage";
 import { MinimalLandingPage } from "./pages/MinimalLandingPage";
@@ -46,34 +47,36 @@ function AnalyticsPageView() {
 /** Root router for the ICM Master application. */
 export function App() {
   return (
-    <HashRouter>
-      <AnalyticsPageView />
-      <AnalyticsConsentBanner />
-      <AppLinkListener />
-      <Routes>
-        <Route path="/" element={<EntryPage />} />
-        {/* plan 069: the old landing page stays at /classic for a while to
-            compare; links shared to /minimal open the landing page at / */}
-        <Route path="/classic" element={<LandingPage />} />
-        <Route path="/minimal" element={<Navigate to="/" replace />} />
-        <Route path="/login" element={<HomePage />} />
-        <Route path="/change-password" element={<AdminChangePasswordPage />} />
-        <Route path="/admin/:section?" element={<AdminPage />} />
-        <Route path="/table/:tableId" element={<TablePage />} />
-        <Route path="/auth/callback" element={<AuthCallbackPage />} />
-        <Route path="/training" element={<TrainingPage />} />
-        <Route path="/bot-profiles" element={<BotProfilesPage />} />
-        {/* the random-opponents step is gone: old /start links pick the 8 bots */}
-        <Route path="/start" element={<Navigate to="/bot-profiles" replace />} />
-        <Route path="/ranges" element={<RangesPage />} />
-        <Route path="/coach" element={<CoachPage />} />
-        <Route path="/settings" element={<SettingsPage />} />
-        <Route path="/history" element={<HistoryPage />} />
-        <Route path="/report" element={<ReportPage />} />
-        <Route path="/statistics" element={<StatisticsPage />} />
-        <Route path="/mistakes" element={<MistakesPage />} />
-        <Route path="/icm-calculator" element={<IcmCalculatorPage />} />
-      </Routes>
-    </HashRouter>
+    <I18nProvider>
+      <HashRouter>
+        <AnalyticsPageView />
+        <AnalyticsConsentBanner />
+        <AppLinkListener />
+        <Routes>
+          <Route path="/" element={<EntryPage />} />
+          {/* plan 069: the old landing page stays at /classic for a while to
+              compare; links shared to /minimal open the landing page at / */}
+          <Route path="/classic" element={<LandingPage />} />
+          <Route path="/minimal" element={<Navigate to="/" replace />} />
+          <Route path="/login" element={<HomePage />} />
+          <Route path="/change-password" element={<AdminChangePasswordPage />} />
+          <Route path="/admin/:section?" element={<AdminPage />} />
+          <Route path="/table/:tableId" element={<TablePage />} />
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
+          <Route path="/training" element={<TrainingPage />} />
+          <Route path="/bot-profiles" element={<BotProfilesPage />} />
+          {/* the random-opponents step is gone: old /start links pick the 8 bots */}
+          <Route path="/start" element={<Navigate to="/bot-profiles" replace />} />
+          <Route path="/ranges" element={<RangesPage />} />
+          <Route path="/coach" element={<CoachPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
+          <Route path="/history" element={<HistoryPage />} />
+          <Route path="/report" element={<ReportPage />} />
+          <Route path="/statistics" element={<StatisticsPage />} />
+          <Route path="/mistakes" element={<MistakesPage />} />
+          <Route path="/icm-calculator" element={<IcmCalculatorPage />} />
+        </Routes>
+      </HashRouter>
+    </I18nProvider>
   );
 }
