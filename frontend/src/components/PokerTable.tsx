@@ -2,6 +2,7 @@ import { Card, TableState, formatChips } from "../models/game";
 import { CardView } from "./CardView";
 import { PokerSeat } from "./PokerSeat";
 import { useT } from "../i18n/I18n";
+import { handName } from "../i18n/review";
 import type { MessageKey } from "../i18n/messages/en";
 
 interface PokerTableProps {
@@ -37,7 +38,7 @@ export function PokerTable({ state, children, overlay, cover, top }: PokerTableP
 
   const revealBySeat = new Map<number, { cards: Card[] | null; hand: string | null }>();
   for (const s of review?.showdown ?? []) {
-    revealBySeat.set(s.seat, { cards: s.cards, hand: s.handName });
+    revealBySeat.set(s.seat, { cards: s.cards, hand: s.handName && handName(s.handName, t) });
   }
   const winners = new Set(review?.winners ?? []);
   const allIn = new Set(review?.allInSeats ?? []);

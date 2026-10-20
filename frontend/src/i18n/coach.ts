@@ -44,8 +44,8 @@ const ICM_FOLD = /^FOLD \(fold equity ([\d.]+)\)$/;
 const DECIMAL = /^\d+\.\d+$/;
 
 // English keeps the server's digits: the effective stack comes ungrouped ("4490 chips")
-const chips = (text: string) => (numberLocale() === "en-US" ? text : formatChips(Number(text.replace(/,/g, ""))));
-const decimal = (text: string) => Number(text).toLocaleString(numberLocale(),
+export const chips = (text: string) => (numberLocale() === "en-US" ? text : formatChips(Number(text.replace(/,/g, ""))));
+export const decimal = (text: string) => Number(text).toLocaleString(numberLocale(),
   { minimumFractionDigits: text.split(".")[1]?.length ?? 0 });
 
 function rowValue(label: string, value: string, coach: Advice, t: T): string {

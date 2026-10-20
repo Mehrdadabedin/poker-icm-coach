@@ -2,6 +2,8 @@ import { useState } from "react";
 import { BotExplanation, formatChips } from "../models/game";
 import { useT } from "../i18n/I18n";
 import { ACTION_KEY, PRESSURE_KEY } from "../i18n/poker";
+import { botFaced, botReason } from "../i18n/review";
+import { numberLocale } from "../i18n/lang";
 
 interface BotExplanationsProps {
   explanations: BotExplanation[];
@@ -41,14 +43,14 @@ export function BotExplanations({ explanations }: BotExplanationsProps) {
               <dl className="expl-factors">
                 <div><dt>{t("bots.position")}</dt><dd>{e.position}</dd></div>
                 <div><dt>{t("bots.hand")}</dt><dd className="expl-hand">{e.hand}</dd></div>
-                <div><dt>{t("bots.stack")}</dt><dd>{e.stackBB} BB</dd></div>
+                <div><dt>{t("bots.stack")}</dt><dd>{e.stackBB.toLocaleString(numberLocale())} BB</dd></div>
                 <div><dt>{t("bots.potOdds")}</dt><dd>{e.potOdds}</dd></div>
                 <div><dt>{t("bots.equity")}</dt><dd>{e.equity}</dd></div>
                 <div><dt>{t("bots.icm")}</dt>
                   <dd>{PRESSURE_KEY[e.icmPressure?.toUpperCase()] ? t(PRESSURE_KEY[e.icmPressure.toUpperCase()]) : e.icmPressure}</dd></div>
-                <div><dt>{t("bots.faced")}</dt><dd>{e.faced}</dd></div>
+                <div><dt>{t("bots.faced")}</dt><dd>{botFaced(e, t)}</dd></div>
               </dl>
-              <p className="expl-decision">{e.reason}</p>
+              <p className="expl-decision">{botReason(e, t)}</p>
             </div>
           )}
         </div>

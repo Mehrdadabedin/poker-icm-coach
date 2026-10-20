@@ -1,0 +1,30 @@
+/* Spanish: hand names and the bots' reasons (plan 093 step 4b). */
+import type { hands as en } from "../en/hands";
+
+export const hands: Record<keyof typeof en, string> = {
+  "hand.ten": "10",
+  "hand.highCard": "Carta alta {r}",
+  "hand.pair": "Pareja de {r}",
+  "hand.twoPair": "Doble pareja, {r} y {s}",
+  "hand.trips": "Trío de {r}",
+  "hand.straight": "Escalera al {r}",
+  "hand.flush": "Color al {r}",
+  "hand.fullHouse": "Full de {r} con {s}",
+  "hand.quads": "Póquer de {r}",
+  "hand.straightFlush": "Escalera de color al {r}",
+  "hand.uncontested": "Sin disputa (los demás no fueron)",
+  "bots.reason.fold": "No va con {hand}: su equity del {eq} no llega a las pot odds del {odds} que necesita desde {pos} con presión ICM {pressure}.",
+  "bots.reason.call_profitable": "Iguala con {hand}: equity del {eq} frente a pot odds del {odds} desde {pos}; presión ICM {pressure} (rentable).",
+  "bots.reason.call_marginal": "Iguala con {hand}: equity del {eq} frente a pot odds del {odds} desde {pos}; presión ICM {pressure} (marginal).",
+  "bots.reason.bet": "Apuesta con {hand} desde {pos}: equity del {eq}, {bb} BB detrás, pot odds del {odds}.",
+  "bots.reason.all_in": "All-in con {hand} por {bb} BB: equity del {eq} con presión ICM {pressure}.",
+  "bots.faced.unopened": "Sin apertura",
+  "bots.faced.no_bet": "Sin apuesta",
+  "bots.faced.raise_to": "Subida a {amount}",
+  "bots.faced.big_blind": "Ciega grande {amount}",
+  "bots.faced.bet": "Apuesta de {amount}",
+  "bots.pressure.LOW": "baja",
+  "bots.pressure.MEDIUM": "media",
+  "bots.pressure.HIGH": "alta",
+  "bots.pressure.VERY HIGH": "muy alta",
+};

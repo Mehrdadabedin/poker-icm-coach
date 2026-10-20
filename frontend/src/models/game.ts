@@ -66,6 +66,9 @@ export interface BotExplanation {
   icmPressure: string;
   faced: string;
   reason: string;
+  // faced and reason by code, for other languages (plan 093)
+  facedCode?: string; facedParams?: Record<string, string>;
+  reasonCode?: string; reasonParams?: Record<string, string>;
 }
 
 export interface HandReview {
