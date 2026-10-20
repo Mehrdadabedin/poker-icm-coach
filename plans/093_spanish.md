@@ -43,7 +43,7 @@ sentences from the server.
    the hand history now keeps with each decision. 5b (done): Hand History. 5c
    (done): Report. 5d (done): statistics, ICM calculator.
 6. Spanish review by a native speaker who plays poker; Spanish READY.
-7. icmbot.es on Render (custom domain, DNS at one.com, CORS_ORIGINS).
+7. icmbot.es on Render (custom domain, DNS at one.com, CORS_ORIGINS) (done).
 
 Later, Chinese: `zh.ts`, "zh" in LANGS, fonts served by us (Google Fonts is
 blocked in mainland China and blocks the first paint).
@@ -114,3 +114,14 @@ EUR / -9,71%, the form errors in Spanish; ESTADÍSTICAS DE LA SESIÓN with
 25,5%, 12.500, 1,50, +45.000. Step 5 is done: every screen a player sees
 is now in Spanish on icmbot.es. Left for Spanish: the native review (6) and
 the domain (7). The admin pages stay English (only the owner uses them).
+
+Step 7, checked from outside on 20 Oct (the owner set it up the same day):
+icmbot.es A 216.24.57.1 and www.icmbot.es CNAME to the Render static site,
+as for icmbot.one; https://icmbot.es serves 200 with a Let's Encrypt
+certificate for icmbot.es (to 18 Jan 2027), http and www redirect to
+https://icmbot.es. The backend's CORS_ORIGINS on Render allows
+https://icmbot.es and https://www.icmbot.es (a preflight from another site
+gets 400), and Google sign-in starts from icmbot.es (302 to Google; another
+site gets 400). The live bundle has the step 5 Spanish. Not done: the page
+still says lang="en" and og:url https://icmbot.one before the app starts,
+so a shared icmbot.es link previews in English.
