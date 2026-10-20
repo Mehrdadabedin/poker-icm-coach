@@ -6,5 +6,6 @@ import { landing } from "./es/landing";
 import { table } from "./es/table";
 import { review } from "./es/review";
 import { home } from "./es/home";
+import { coach } from "./es/coach";
 
-export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home };
+export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home, ...coach };

@@ -6,8 +6,9 @@ import { landing } from "./en/landing";
 import { table } from "./en/table";
 import { review } from "./en/review";
 import { home } from "./en/home";
+import { coach } from "./en/coach";
 
-export const en = { ...auth, ...landing, ...table, ...review, ...home };
+export const en = { ...auth, ...landing, ...table, ...review, ...home, ...coach };
 
 export type MessageKey = keyof typeof en;
 export type Messages = Record<MessageKey, string>;

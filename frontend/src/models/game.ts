@@ -170,6 +170,7 @@ export function tournamentChampion(
 export interface CoachAdvice {
   recommendedAction: string; street?: string; // the street the advice is for (plan 075)
   reasoning: string;
+  reasonCode?: string; reasonParams?: Record<string, string>; // the reasoning by code (plan 093)
   detail: Record<string, string>;
 }
 

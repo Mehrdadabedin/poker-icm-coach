@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Card, CoachAdvice } from "../models/game";
 import { CoachReason } from "./CoachReason";
 import { useT } from "../i18n/I18n";
+import { actionWord, coachReason, factorRow } from "../i18n/coach";
 
 // street names stay in English in Spanish too: preflop, flop, turn and river are the words players use
 const STREET: Record<string, string> = { preflop: "PREFLOP", flop: "FLOP", turn: "TURN", river: "RIVER" };
@@ -18,18 +19,19 @@ export function MobileCoachCard({ coach, heroCards }: { coach: CoachAdvice; hero
     <div className="mobile-coach" data-testid="mobile-coach" role="status">
       <div className="mobile-coach-head">
         <span className="mobile-coach-tag">{t("coach.title")}{coach.street && STREET[coach.street] ? ` · ${STREET[coach.street]}` : ""}</span>
-        <b className={`mobile-coach-action act-${kind}`} data-testid="mobile-coach-action">{coach.recommendedAction}</b>
+        <b className={`mobile-coach-action act-${kind}`} data-testid="mobile-coach-action">{actionWord(coach.recommendedAction, t)}</b>
       </div>
-      <p className="mobile-coach-why"><CoachReason text={coach.reasoning} cards={heroCards} /></p>
+      <p className="mobile-coach-why"><CoachReason text={coachReason(coach, t)} cards={heroCards} /></p>
       <button type="button" className="mobile-coach-more" aria-expanded={open}
         data-testid="mobile-coach-details" onClick={() => setOpen((v) => !v)}>
         {t(open ? "coach.hideDetails" : "coach.details")}
       </button>
       {open && (
         <dl className="mobile-coach-rows">
-          {Object.entries(coach.detail).slice(0, 14).map(([k, v]) => (
-            <div key={k}><dt>{k}</dt><dd>{v}</dd></div>
-          ))}
+          {Object.entries(coach.detail).slice(0, 14).map(([k, v]) => {
+            const [label, value] = factorRow(k, v, coach, t);
+            return <div key={k}><dt>{label}</dt><dd>{value}</dd></div>;
+          })}
         </dl>
       )}
     </div>

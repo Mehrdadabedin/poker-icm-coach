@@ -2,6 +2,7 @@ import type { Card, CoachAdvice } from "../models/game";
 import { CoachReason } from "./CoachReason";
 import { useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/messages/en";
+import { actionWord, coachReason, factorRow } from "../i18n/coach";
 
 /** Which street the advice is for, next to the action (plan 075). */
 const STREET_LABEL: Record<string, MessageKey> = {
@@ -37,21 +38,24 @@ export function CoachPanelView({ coach, className = "coach-panel", testId, colla
         )}
       </div>
       <div className="coach-recommendation-row">
-        <div className="coach-recommendation">{coach.recommendedAction}</div>
+        <div className="coach-recommendation">{actionWord(coach.recommendedAction, t)}</div>
         {coach.street && STREET_LABEL[coach.street] && (
           <span className="coach-street" data-testid="coach-street">{t(STREET_LABEL[coach.street])}</span>
         )}
       </div>
       {!collapsed && (
         <>
-          <p><CoachReason text={coach.reasoning} cards={heroCards} /></p>
+          <p><CoachReason text={coachReason(coach, t)} cards={heroCards} /></p>
           <dl>
-            {Object.entries(coach.detail).slice(0, 14).map(([k, v]) => (
-              <div key={k} className="coach-row">
-                <dt>{k}</dt>
-                <dd>{v}</dd>
-              </div>
-            ))}
+            {Object.entries(coach.detail).slice(0, 14).map(([k, v]) => {
+              const [label, value] = factorRow(k, v, coach, t);
+              return (
+                <div key={k} className="coach-row">
+                  <dt>{label}</dt>
+                  <dd>{value}</dd>
+                </div>
+              );
+            })}
           </dl>
         </>
       )}

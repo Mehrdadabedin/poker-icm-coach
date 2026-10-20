@@ -7,6 +7,8 @@ import { PokerTable } from "./PokerTable";
 import { TableHeader } from "./TableHeader";
 import { TableSidebar } from "./TableSidebar";
 import type { ReactNode } from "react";
+import { useT } from "../i18n/I18n";
+import { gradeLine } from "../i18n/coach";
 
 export interface LiveTableViewProps {
   state: TableState;
@@ -39,6 +41,7 @@ export interface LiveTableViewProps {
 
 /** The live table scene: header, felt (or review), and side panels. */
 export function LiveTableView(props: LiveTableViewProps) {
+  const t = useT();
   const {
     state, overlay, cover, coach, comparison, countdown, paused, acting, showLabels,
     showResultLabels, nameBySeat, coachCollapsed, historyCollapsed, reviewOpen,
@@ -105,7 +108,7 @@ export function LiveTableView(props: LiveTableViewProps) {
             )}
             {comparison && !handOver && (
               <div className="comparison-box" data-testid="comparison">
-                <b>{comparison.grade}</b> — {comparison.explanation}
+                <b>{gradeLine(comparison, t).grade}</b> — {gradeLine(comparison, t).text}
               </div>
             )}
           </PokerTable>

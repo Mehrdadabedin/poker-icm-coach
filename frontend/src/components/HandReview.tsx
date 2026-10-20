@@ -8,6 +8,7 @@ import { CoachPanelView } from "./CoachPanelView";
 import { ShowdownHands } from "./ShowdownHands";
 import { useT } from "../i18n/I18n";
 import { PRESSURE_KEY } from "../i18n/poker";
+import { gradeLine } from "../i18n/coach";
 
 interface HandReviewProps {
   review: ReviewData;
@@ -125,7 +126,7 @@ export function HandReview({ review, coach, comparison, totalPlayers, nameBySeat
             <>
               {comparison && (
                 <div className="comparison-box" data-testid="comparison">
-                  <b>{comparison.grade}</b> — {comparison.explanation}
+                  <b>{gradeLine(comparison, t).grade}</b> — {gradeLine(comparison, t).text}
                 </div>
               )}
               {coach && <CoachPanelView coach={coach} testId="review-coach-panel" heroCards={review.heroCards} />}
