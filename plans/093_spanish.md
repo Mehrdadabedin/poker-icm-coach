@@ -34,7 +34,8 @@ sentences from the server.
 2. Landing page, footer, cookie banner (done).
 3. The table (done in 3a: buttons, sizes, header and ☰ menu, info rows, seats,
    result, bust and standings screens, coach labels; numbers as 45.000 and
-   2,5 BB). 3b: hand review and hand history. 3c: home menu and bot choice.
+   2,5 BB). 3b: hand review and hand history (done). 3c: home menu and bot
+   choice.
 4. Coach texts: the server sends codes and details instead of sentences.
 5. My Mistakes, Hand History, Report, statistics, ICM calculator.
 6. Spanish review by a native speaker who plays poker; Spanish READY.
@@ -56,3 +57,8 @@ Step 3a, browser with ?lang=es on a local table: NO IR, IGUALAR 100, SUBIR A
 250, 2,5x, STACK 45.000, NIVEL, MANO, COACH ICM, Detalles, TÚ. Poker words
 follow the big Spanish poker sites: no ir, pasar, igualar, apostar, subir,
 all-in, bote, ciegas. Street names stay preflop, flop, turn, river.
+
+Step 3b, browser with ?lang=es after a hand: HISTORIAL DE LA MANO, HAS
+PERDIDO, MANO GANADORA, PRESIÓN ICM BAJA, MANOS EN EL SHOWDOWN, pone la ciega
+grande. Hand names ("Pair of Js") and the bots' reasons come from the server:
+step 4.
