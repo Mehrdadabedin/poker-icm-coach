@@ -11,9 +11,15 @@ import random
 from app.game.hand_result import HandAction
 from app.poker.card import card_from_str
 from app.services.game_session import GameSession
-from app.services.hand_history import HandDecision, HandHistoryRecord
+from app.services.hand_history import (
+    HandDecision,
+    HandHistoryRecord,
+    record_from_dict,
+    record_to_dict,
+)
 from app.services.session_record import build_record
 from app.services.statistics import aggregate
+from app.strategy.reasons import TEXT
 from tests.api_helpers import login_client
 
 
@@ -109,4 +115,22 @@ def test_the_hands_api_returns_cards_and_decisions() -> None:
     assert len(decided[0]["heroCards"]) == 2
     assert set(decided[0]["decisions"][0]) == {
         "street", "heroAction", "coachAction", "grade", "icmPressure",
-        "explanation", "stackBb", "toCall", "board"}
+        "explanation", "stackBb", "toCall", "board", "reasonCode", "reasonParams"}
+
+
+def test_a_decision_keeps_the_coach_reason_as_a_code() -> None:
+    """My Mistakes writes the coach's reason in Spanish from the code (plan 093 step 5a)."""
+    session = _session()
+    _play_out(session)
+    session.next_hand()
+    record = session.history.all()[-1]
+    coded = [d for d in record.decisions if d.reason_code]
+    assert coded, "the seeded hand's decisions should carry the coach's code"
+    for d in coded:
+        assert TEXT[d.reason_code].format(**d.reason_params) == d.explanation
+
+    saved = record_to_dict(record)
+    assert record_from_dict(saved).decisions == record.decisions
+    for d in saved["decisions"]:
+        del d["reason_code"], d["reason_params"]  # a hand saved before the codes
+    assert record_from_dict(saved).decisions[0].reason_code == ""

@@ -1,10 +1,16 @@
 /* One graded mistake: the hand, the decision point, and the coach's line.
  * A mistake in a hand the hero won is marked WON with a softer edge: the
  * decision was still worse than the coach's line (plan 070). */
+import { actionWord, coachReason } from "../i18n/coach";
+import { useT } from "../i18n/I18n";
+import { numberLocale } from "../i18n/lang";
+import { PRESSURE_KEY } from "../i18n/poker";
+import { formatChips } from "../models/game";
 
 export type Decision = {
   street: string; heroAction: string; coachAction: string; grade: string;
   icmPressure: string; explanation: string; stackBb: number; toCall: number; board: string[];
+  reasonCode?: string; reasonParams?: Record<string, string>; // the explanation by code (plan 093)
 };
 
 export type Mistake = {
@@ -23,32 +29,35 @@ function CardFace({ card }: { card: string }) {
 
 export function MistakeCard({ mistake }: { mistake: Mistake }) {
   const d = mistake.decision;
+  const t = useT();
+  const pressure = PRESSURE_KEY[d.icmPressure] ? t(PRESSURE_KEY[d.icmPressure]) : d.icmPressure;
   return (
     <article className={mistake.won ? "mistake mistake-won" : "mistake"} data-testid={`mistake-${mistake.handNumber}-${d.street}`}>
       <header className="mistake-head">
-        {mistake.won && <span className="mistake-won-tag">WON</span>}
-        <span>Hand #{mistake.handNumber}</span>
-        <span>Level {mistake.level} ({mistake.blindLevel})</span>
+        {mistake.won && <span className="mistake-won-tag">{t("mistake.won")}</span>}
+        <span>{t("mistake.hand", { n: mistake.handNumber })}</span>
+        <span>{t("mistake.level", { n: mistake.level, blinds: mistake.blindLevel })}</span>
         <span>{mistake.heroPosition}</span>
         <span className="mistake-street">{d.street}</span>
         <span className={`mistake-pressure mistake-pressure-${d.icmPressure.toLowerCase().replace(" ", "-")}`}>
-          ICM {d.icmPressure}
+          {t("mistake.icm", { pressure })}
         </span>
       </header>
       <div className="mistake-cards">
         {mistake.heroCards.map((c) => <CardFace key={c} card={c} />)}
-        {d.board.length > 0 && <span className="mistake-board-label">Board</span>}
+        {d.board.length > 0 && <span className="mistake-board-label">{t("mistake.board")}</span>}
         {d.board.map((c) => <CardFace key={c} card={c} />)}
       </div>
       <p className="mistake-spot">
-        Stack {d.stackBb} BB{d.toCall > 0 ? ` · ${d.toCall.toLocaleString()} to call` : ""}
+        {t("mistake.stack", { bb: d.stackBb.toLocaleString(numberLocale()) })}
+        {d.toCall > 0 ? t("mistake.toCall", { n: formatChips(d.toCall) }) : ""}
       </p>
       <p className="mistake-line">
-        You: <b className="mistake-you">{d.heroAction}</b>
+        {t("mistake.you")} <b className="mistake-you">{actionWord(d.heroAction, t)}</b>
         <span aria-hidden="true">{" → "}</span>
-        Coach: <b className="mistake-coach">{d.coachAction}</b>
+        {t("mistake.coach")} <b className="mistake-coach">{actionWord(d.coachAction, t)}</b>
       </p>
-      <p className="mistake-why">{d.explanation}</p>
+      <p className="mistake-why">{coachReason({ reasoning: d.explanation, ...d }, t)}</p>
     </article>
   );
 }

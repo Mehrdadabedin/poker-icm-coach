@@ -39,7 +39,9 @@ sentences from the server.
 4. Coach texts: the server sends codes and details next to its sentences.
    4a (done): the coach's reason, action words, factor rows and the grade.
    4b (done): hand names, the bots' reasons and the action they faced.
-5. My Mistakes, Hand History, Report, statistics, ICM calculator.
+5. 5a (done): the page header and My Mistakes, the coach's reason from a code
+   the hand history now keeps with each decision. 5b: Hand History. 5c:
+   Report. 5d: statistics, ICM calculator.
 6. Spanish review by a native speaker who plays poker; Spanish READY.
 7. icmbot.es on Render (custom domain, DNS at one.com, CORS_ORIGINS).
 
@@ -84,3 +86,10 @@ faced from codes ("Iguala con Q♣ J♣: equity del 38% ... presión ICM muy alt
 (rentable).", "Apuesta de 45.000", "12,5 BB"). A test reads
 backend/app/services/bot_texts.py: every code has Spanish and the English
 matches the server word for word.
+
+Step 5a, tests only (I did not check it in the browser): MIS ERRORES, "2
+errores en 3 decisiones a lo largo de 2 manos", Igualada errónea, Nivel 2,
+ICM MUY ALTA, Stack 12,5 BB · 45.000 para igualar, Tú: IGUALAR → Coach: NO
+IR, and the coach's reason in Spanish from the saved code; a hand saved
+before the codes shows its English reason. Header: VOLVER A LA MESA, INICIO,
+CERRAR SESIÓN.

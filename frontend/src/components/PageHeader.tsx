@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { BrandLogo } from "./BrandLogo";
 import { clearAuth, getUsername, logout } from "../services/api";
 import { useAwayTable } from "../hooks/useAwayTable";
+import { useT } from "../i18n/I18n";
 
 /** Top bar for every page except the table and the home menu (plan 063): logo
  * on the left; the user, BACK TO TABLE (after stepping away from one), HOME and
@@ -11,6 +12,7 @@ export function PageHeader() {
   const navigate = useNavigate();
   const username = getUsername();
   const away = useAwayTable();
+  const t = useT();
 
   const signOut = async () => {
     try {
@@ -33,15 +35,15 @@ export function PageHeader() {
             onClick={() => navigate(`/table/${away.tableId}`)}
             data-testid="back-to-table"
           >
-            BACK TO TABLE{away.label ? ` ${away.label}` : ""}
+            {t("page.backToTable", { label: away.label ? ` ${away.label}` : "" })}
           </button>
         )}
         <button className="btn btn-small header-btn" onClick={() => navigate("/")} data-testid="home-btn">
-          HOME
+          {t("table.home")}
         </button>
         {username && (
           <button className="btn btn-logout" onClick={() => void signOut()} data-testid="logout-btn">
-            LOG OUT
+            {t("table.logout")}
           </button>
         )}
       </div>

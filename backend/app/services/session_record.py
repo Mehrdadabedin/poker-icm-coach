@@ -39,6 +39,8 @@ def decision_verdict(coach: Coach, action: str, request: CoachRequest) -> HandDe
         stack_bb=round(request.stack / max(1, request.big_blind), 1),
         to_call=request.to_call,
         board=[card.ascii() for card in request.board],
+        reason_code=advice.reason_code if advice.reasoning else "",
+        reason_params=dict(advice.reason_params) if advice.reasoning else {},
     )
 
 

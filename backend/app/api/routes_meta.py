@@ -41,6 +41,7 @@ def hand_view(r: HandHistoryRecord) -> dict:
                 "coachAction": d.coach_action, "grade": d.grade,
                 "icmPressure": d.icm_pressure, "explanation": d.explanation,
                 "stackBb": d.stack_bb, "toCall": d.to_call, "board": d.board,
+                "reasonCode": d.reason_code, "reasonParams": d.reason_params,
             } for d in r.decisions
         ],
     }

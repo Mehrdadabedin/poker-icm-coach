@@ -25,6 +25,10 @@ class HandDecision:
     stack_bb: float
     to_call: int
     board: list[str]
+    # the explanation as the coach's code and details, for other languages (plan 093);
+    # hands saved before have none and show the English
+    reason_code: str = ""
+    reason_params: dict[str, str] = field(default_factory=dict)
 
 
 @dataclass(slots=True)
