@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import { currentSources, detectLang, htmlLang, isLang, saveLang, type Lang } from "./lang";
+import { currentSources, detectLang, htmlLang, isLang, saveLang, setCurrentLang, type Lang } from "./lang";
 import type { MessageKey } from "./messages/en";
 import { translate, type Params } from "./translate";
 
@@ -25,6 +25,7 @@ export function I18nProvider({ children, initial }: { children: ReactNode; initi
     if (!initial && isLang(asked)) saveLang(asked);
     return initial ?? detectLang(sources);
   });
+  setCurrentLang(lang); // during render, so formatChips below already follows it
   useEffect(() => {
     document.documentElement.lang = htmlLang(lang);
   }, [lang]);

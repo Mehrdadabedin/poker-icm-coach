@@ -63,10 +63,21 @@ export function stepSize(i: SizingInput): number {
   return i.street === "preflop" ? i.bigBlind : Math.max(i.bigBlind / 2, Math.round(i.pot * 0.05));
 }
 
-/** "7.5 BB" preflop, "1/2 pot" or "45% pot" after the flop. */
-export function sizeNote(amount: number, i: SizingInput, list: Preset[]): string {
-  if (i.street === "preflop") return `${Number((amount / i.bigBlind).toFixed(1))} BB`;
+/** The words of a size note, so another language can order them its own way. */
+export interface NoteWords {
+  bb: (n: string) => string;
+  pot: string;
+  share: (share: string) => string;
+  percent: (n: number) => string;
+}
+
+const ENGLISH: NoteWords = { bb: (n) => `${n} BB`, pot: "pot", share: (s) => `${s} pot`, percent: (n) => `${n}% pot` };
+
+/** "7.5 BB" preflop, "1/2 pot" or "45% pot" after the flop (in Spanish "1/2 del bote"). */
+export function sizeNote(amount: number, i: SizingInput, list: Preset[], words: NoteWords = ENGLISH,
+  locale = "en-US"): string {
+  if (i.street === "preflop") return words.bb(Number((amount / i.bigBlind).toFixed(1)).toLocaleString(locale));
   const named = list.find((p) => p.amount === amount);
-  if (named) return named.key === "Pot" ? "pot" : `${named.label} pot`;
-  return `${Math.round((100 * amount) / Math.max(1, i.pot))}% pot`;
+  if (named) return named.key === "Pot" ? words.pot : words.share(named.label);
+  return words.percent(Math.round((100 * amount) / Math.max(1, i.pot)));
 }

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useT } from "../i18n/I18n";
 
 export function MenuIcon() {
   return (
@@ -27,6 +28,7 @@ export function TableMenu({ username, paused, canPause, onHome, onMistakes, onLo
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
+  const t = useT();
   const pick = (action: () => void) => () => {
     onClose();
     action();
@@ -34,15 +36,15 @@ export function TableMenu({ username, paused, canPause, onHome, onMistakes, onLo
   return (
     <>
       <div className="table-menu-backdrop" onClick={onClose} data-testid="table-menu-backdrop" />
-      <nav className="table-menu" id="table-menu" aria-label="Table menu" data-testid="table-menu">
-        {username && <p className="table-menu-user">Playing as <b>{username}</b></p>}
-        <button type="button" onClick={pick(onHome)} data-testid="menu-home">HOME</button>
-        <button type="button" onClick={pick(onMistakes)} data-testid="menu-mistakes">MY MISTAKES</button>
+      <nav className="table-menu" id="table-menu" aria-label={t("menu.table")} data-testid="table-menu">
+        {username && <p className="table-menu-user">{t("menu.playingAs")} <b>{username}</b></p>}
+        <button type="button" onClick={pick(onHome)} data-testid="menu-home">{t("table.home")}</button>
+        <button type="button" onClick={pick(onMistakes)} data-testid="menu-mistakes">{t("table.mistakes")}</button>
         <button type="button" onClick={pick(onTogglePause)} disabled={!canPause} data-testid="menu-pause">
-          {paused ? "RESUME NEXT HAND" : "PAUSE NEXT HAND"}
+          {t(paused ? "menu.resumeNext" : "menu.pauseNext")}
         </button>
         <button type="button" className="table-menu-logout" onClick={pick(onLogout)} data-testid="menu-logout">
-          LOG OUT
+          {t("table.logout")}
         </button>
       </nav>
     </>

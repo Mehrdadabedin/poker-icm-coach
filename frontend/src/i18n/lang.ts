@@ -64,3 +64,25 @@ export function currentSources(): LangSources {
 
 /** The value for <html lang>. */
 export const htmlLang = (lang: Lang): string => lang;
+
+const NUMBER_LOCALES: Record<Lang, string> = { en: "en-US", es: "es-ES" };
+let current: Lang = "en";
+
+/** The language the I18nProvider is rendering in, for plain functions such as
+ * formatChips that cannot read React context. */
+export function setCurrentLang(lang: Lang): void {
+  current = lang;
+}
+
+/** formatChips follows the language: 45,000 in English, 45.000 in Spanish (a
+ * Spanish reader takes 45,000 for forty-five). Spain leaves 4-digit numbers ungrouped. */
+export const numberLocale = (): string => NUMBER_LOCALES[current];
+
+const SUFFIX: Record<number, string> = { 1: "ST", 2: "ND", 3: "RD" };
+
+/** A finishing place: 1ST, 2ND, 11TH in English; 1.º, 2.º in Spanish. */
+export function placeOrdinal(lang: Lang, n: number): string {
+  if (lang === "es") return `${n}.º`;
+  const teen = n % 100 >= 11 && n % 100 <= 13;
+  return `${n}${teen ? "TH" : (SUFFIX[n % 10] ?? "TH")}`;
+}

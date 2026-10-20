@@ -1,9 +1,11 @@
 import type { Card, CoachAdvice } from "../models/game";
 import { CoachReason } from "./CoachReason";
+import { useT } from "../i18n/I18n";
+import type { MessageKey } from "../i18n/messages/en";
 
 /** Which street the advice is for, next to the action (plan 075). */
-const STREET_LABEL: Record<string, string> = {
-  preflop: "preflop", flop: "on the flop", turn: "on the turn", river: "on the river",
+const STREET_LABEL: Record<string, MessageKey> = {
+  preflop: "coach.street.preflop", flop: "coach.street.flop", turn: "coach.street.turn", river: "coach.street.river",
 };
 
 interface CoachPanelViewProps {
@@ -23,20 +25,21 @@ interface CoachPanelViewProps {
  * reasoning and the factor rows away; the review omits it and is unchanged.
  * The recommendation itself is always visible, and no data is dropped. */
 export function CoachPanelView({ coach, className = "coach-panel", testId, collapsed = false, onToggle, heroCards }: CoachPanelViewProps) {
+  const t = useT();
   return (
     <div className={className} data-testid={testId}>
       <div className="panel-head">
-        <h3>ICM COACH</h3>
+        <h3>{t("coach.title")}</h3>
         {onToggle && (
           <button className="coach-toggle" onClick={onToggle} data-testid="coach-toggle">
-            {collapsed ? "SHOW ▼" : "HIDE ▲"}
+            {t(collapsed ? "coach.show" : "coach.hide")}
           </button>
         )}
       </div>
       <div className="coach-recommendation-row">
         <div className="coach-recommendation">{coach.recommendedAction}</div>
         {coach.street && STREET_LABEL[coach.street] && (
-          <span className="coach-street" data-testid="coach-street">{STREET_LABEL[coach.street]}</span>
+          <span className="coach-street" data-testid="coach-street">{t(STREET_LABEL[coach.street])}</span>
         )}
       </div>
       {!collapsed && (

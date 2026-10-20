@@ -1,4 +1,5 @@
 // Typed game state mirrored from the backend API (part 034 keeps them in sync).
+import { numberLocale } from "../i18n/lang";
 
 type Suit = "c" | "d" | "h" | "s";
 
@@ -152,7 +153,7 @@ export const cardAlt = (card: Card): string =>
   `${RANK_WORD[card.rank] ?? card.rank} of ${SUIT_WORD[card.suit]}`;
 
 export function formatChips(value: number): string {
-  return value.toLocaleString("en-US");
+  return value.toLocaleString(numberLocale());
 }
 
 /** Sole survivor is the tournament champion (hero or BOT); null otherwise. */
