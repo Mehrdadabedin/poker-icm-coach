@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING
 
 from app.icm.icm_engine import icm_equities
 from app.strategy import allin_preflop as nash
+from app.strategy.reasons import Reason
 from app.strategy.stack_analysis import SHORT_BB
 from app.strategy.villain_range import preflop_cells
 
@@ -36,22 +37,22 @@ def sb_shove(req: CoachRequest, a: Analyses) -> Decision | None:
     if stack > SHORT_BB:
         return None
     shoves = nash.shove_range(stack)
-    where = f"the SB shove range at {nash.depth(stack)} BB (Nash push/fold, {nash.share(shoves):.0%} of hands)"
+    where = {"hand": a.hand_name, "depth": nash.depth(stack), "share": f"{nash.share(shoves):.0%}"}
     if a.hand_name in shoves:
-        return "OPEN JAM", "FOLD", f"{a.hand_name} is in {where}."
-    return "FOLD", "OPEN JAM", f"{a.hand_name} is not in {where}."
+        return "OPEN JAM", "FOLD", Reason("sb_shove_in", **where)
+    return "FOLD", "OPEN JAM", Reason("sb_shove_out", **where)
 
 
-def _shover_range(req: CoachRequest) -> tuple[frozenset[str], str]:
-    """The hands the all-in player shoves, and how to name them."""
+def _shover_range(req: CoachRequest) -> tuple[frozenset[str], dict[str, object]]:
+    """The hands the all-in player shoves, and how to name them (sb or pos)."""
     read = req.villain
     assert read is not None
     if read.position == "SB" and req.position == "BB":
         stack = min(req.to_call, req.stack) / max(req.big_blind, 1) + 1
         if stack <= nash.MAX_BB:
-            return nash.shove_range(stack), f"the SB shove range at {nash.depth(stack)} BB"
+            return nash.shove_range(stack), {"kind": "sb", "depth": nash.depth(stack)}
     cells = preflop_cells(read, int(req.stack / max(req.big_blind, 1)))
-    return frozenset(c.name() for c in cells), f"the {read.position} range"
+    return frozenset(c.name() for c in cells), {"kind": "pos", "pos": read.position}
 
 
 def allin_call(req: CoachRequest, a: Analyses) -> Decision | None:
@@ -59,6 +60,7 @@ def allin_call(req: CoachRequest, a: Analyses) -> Decision | None:
     if _lone_opponent(req) != 0 or req.villain is None or not req.facing_raise or req.board:
         return None
     shoves, who = _shover_range(req)
+    kind = who.pop("kind")
     equity = nash.equity_vs(a.hand_name, shoves)
     if equity is None:
         return None
@@ -70,16 +72,17 @@ def allin_call(req: CoachRequest, a: Analyses) -> Decision | None:
     priced = _icm(req, equity, excess, risk)
     if priced is None:
         if equity >= a.pot_odds:
-            return call, "FOLD", f"Equity {equity:.0%} against {who} beats the pot odds {a.pot_odds:.0%}."
-        return "FOLD", call, f"Equity {equity:.0%} against {who} is below the pot odds {a.pot_odds:.0%}."
+            return call, "FOLD", Reason(f"allin_beats_{kind}", **who, eq=f"{equity:.0%}", odds=f"{a.pot_odds:.0%}")
+        return "FOLD", call, Reason(f"allin_below_{kind}", **who, eq=f"{equity:.0%}", odds=f"{a.pot_odds:.0%}")
     fold_eq, call_eq = priced
     a.extra.update(allin_icm=priced, fold_equity=fold_eq)
     a.tournament_equity = round(fold_eq, 4)
     total = sum(p for p in req.payout or [] if p > 0)
-    icm = f"ICM: calling is worth {call_eq / total:.1%} of the prize pool, folding {fold_eq / total:.1%}."
+    icm = Reason(f"allin_icm_{kind}", **who, eq=f"{equity:.0%}", call=f"{call_eq / total:.1%}",
+                 fold=f"{fold_eq / total:.1%}")
     if call_eq > fold_eq:
-        return call, "FOLD", f"Equity {equity:.0%} against {who}. {icm}"
-    return "FOLD", call, f"Equity {equity:.0%} against {who}. {icm}"
+        return call, "FOLD", icm
+    return "FOLD", call, icm
 
 
 def _icm(req: CoachRequest, equity: float, excess: int, risk: int) -> tuple[float, float] | None:

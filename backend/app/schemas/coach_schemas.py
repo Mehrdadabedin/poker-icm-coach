@@ -57,6 +57,8 @@ class CoachResponseModel(BaseModel):
     outs: dict | None = None
     education: str = ""
     street: str = ""  # the street the advice is for, shown next to the action (plan 075)
+    reasonCode: str = ""  # the reasoning as a code and its details, for other languages (plan 093)
+    reasonParams: dict[str, str] = {}
 
 
 class RangeGridResponse(BaseModel):

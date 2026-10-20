@@ -13,6 +13,7 @@ from app.equity.equity_engine import hero_vs_range
 from app.poker.card import Card
 from app.strategy.baseline_ranges import matrix_for_position
 from app.strategy.hand_codec import HandCell, parse_hand
+from app.strategy.reasons import Reason
 
 
 def _jam_frequency_cells(position: str, stack_bb: int, action: str,
@@ -91,5 +92,5 @@ class PushFoldEngine:
         cell = HandCell(hi, lo,
                         None if hero[0].rank == hero[1].rank else hero[0].suit == hero[1].suit)
         if cell in jam:
-            return PushFoldDecision("OPEN JAM", f"{cell.name()} is in the {position} jam range")
-        return PushFoldDecision("FOLD", f"{cell.name()} is not in the {position} jam range")
+            return PushFoldDecision("OPEN JAM", Reason("jam_in", hand=cell.name(), pos=position))
+        return PushFoldDecision("FOLD", Reason("jam_out", hand=cell.name(), pos=position))
