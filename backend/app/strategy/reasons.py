@@ -7,6 +7,8 @@ write the same sentence in another language from its own message files.
 """
 from __future__ import annotations
 
+from typing import ClassVar
+
 TEXT: dict[str, str] = {
     "open_in": "{hand} is in the {pos} open range.",
     "open_in_steal": "{hand} is in the {pos} open range. Steal spot from late position.",
@@ -48,12 +50,13 @@ FIRST_SENTENCE = {
 class Reason(str):
     """An English sentence of the coach with its code and details."""
 
+    texts: ClassVar[dict[str, str]] = TEXT  # a subclass brings its own sentences
     code: str
     params: dict[str, str]
 
     def __new__(cls, code: str, **params: object) -> Reason:
         details = {name: str(value) for name, value in params.items()}
-        sentence = super().__new__(cls, TEXT[code].format(**details))
+        sentence = super().__new__(cls, cls.texts[code].format(**details))
         sentence.code = code
         sentence.params = details
         return sentence

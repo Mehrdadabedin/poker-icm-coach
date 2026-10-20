@@ -43,8 +43,8 @@ sentences from the server.
    the hand history now keeps with each decision. 5b (done): Hand History. 5c
    (done): Report. 5d (done): statistics, ICM calculator. 5e (done): the
    ICM Coach tool and tournament settings, missed in 5 (the owner, 20 Oct:
-   "not in spanish"). The coach tool's teaching paragraph is still English
-   from the server; it needs a code like step 4.
+   "not in spanish"). The coach tool's teaching paragraph comes from the
+   server as a code and details too (8 codes, coach.edu.*).
 6. Spanish review by a native speaker who plays poker; Spanish READY.
 7. icmbot.es on Render (custom domain, DNS at one.com, CORS_ORIGINS) (done).
 
@@ -135,3 +135,5 @@ PREFLOP, Valor / Palo in the card picker; after ANALIZAR: RECOMENDACIÓN:
 IGUALAR, EV EN FICHAS: +12.500, PROB. DE GANAR: 55,2%, the reason from its
 code and the factor rows. AJUSTES DEL TORNEO, STACK INICIAL, MODO RÁPIDO,
 REVERSO DE LAS CARTAS (Azul, Rojo), GUARDAR AJUSTES and both save notes.
+The teaching paragraph, tests only: "Aunque hay algunos outs / proyectos
+disponibles, ... los 45.000 que cuesta igualar ...", English word for word.

@@ -67,6 +67,8 @@ def advice_dict(rec: CoachRecommendation) -> dict:
         "ev": rec.ev,
         "outs": rec.outs,
         "education": rec.education,
+        "educationCode": rec.education_code,
+        "educationParams": rec.education_params,
     }
 
 

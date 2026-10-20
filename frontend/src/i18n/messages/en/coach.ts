@@ -1,5 +1,6 @@
 /* English: what the coach writes on the server, by code (plan 093 step 4).
- * The reasons are the sentences of backend/app/strategy/reasons.py. */
+ * The reasons are the sentences of backend/app/strategy/reasons.py, the
+ * education notes those of education.py. */
 export const coach = {
   "coach.reason.open_in": "{hand} is in the {pos} open range.",
   "coach.reason.open_in_steal": "{hand} is in the {pos} open range. Steal spot from late position.",
@@ -27,6 +28,14 @@ export const coach = {
   "coach.reason.allin_icm_pos": "Equity {eq} against the {pos} range. ICM: calling is worth {call} of the prize pool, folding {fold}.",
   "coach.reason.allin_eq_sb": "Equity {eq} against the SB shove range at {depth} BB.",
   "coach.reason.allin_eq_pos": "Equity {eq} against the {pos} range.",
+  "coach.edu.no_call_exact": "With exact two-card combo from {pos} vs {opponents} opponent(s), you face no call: pot control and betting initiative matter more than pot odds right now.",
+  "coach.edu.no_call_class": "With {hand} starting-hand class from {pos} vs {opponents} opponent(s), you face no call: pot control and betting initiative matter more than pot odds right now.",
+  "coach.edu.positive_exact": "exact two-card combo has positive chip EV against {opponents} opponent(s): winning probability plus the pot you win outweigh the amount to call.",
+  "coach.edu.positive_class": "{hand} starting-hand class has positive chip EV against {opponents} opponent(s): winning probability plus the pot you win outweigh the amount to call.",
+  "coach.edu.negative_outs": "Although there are {outs} outs / draws available, drawing probability alone is not enough: the probability of actually winning and the {call} call determine that this spot is negative EV.",
+  "coach.edu.negative_some": "Although there are some outs / draws available, drawing probability alone is not enough: the probability of actually winning and the {call} call determine that this spot is negative EV.",
+  "coach.edu.pot_odds_exact": "exact two-card combo from {pos} vs {opponents} opponent(s): pot odds ({pot} pot, {call} to call) and board texture shape whether calling or folding preserves tournament equity.",
+  "coach.edu.pot_odds_class": "{hand} starting-hand class from {pos} vs {opponents} opponent(s): pot odds ({pot} pot, {call} to call) and board texture shape whether calling or folding preserves tournament equity.",
   "coach.word.FOLD": "FOLD",
   "coach.word.CHECK": "CHECK",
   "coach.word.CALL": "CALL",
