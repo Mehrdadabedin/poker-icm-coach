@@ -40,7 +40,7 @@ sentences from the server.
    4a (done): the coach's reason, action words, factor rows and the grade.
    4b (done): hand names, the bots' reasons and the action they faced.
 5. 5a (done): the page header and My Mistakes, the coach's reason from a code
-   the hand history now keeps with each decision. 5b: Hand History. 5c:
+   the hand history now keeps with each decision. 5b (done): Hand History. 5c:
    Report. 5d: statistics, ICM calculator.
 6. Spanish review by a native speaker who plays poker; Spanish READY.
 7. icmbot.es on Render (custom domain, DNS at one.com, CORS_ORIGINS).
@@ -93,3 +93,9 @@ ICM MUY ALTA, Stack 12,5 BB · 45.000 para igualar, Tú: IGUALAR → Coach: NO
 IR, and the coach's reason in Spanish from the saved code; a hand saved
 before the codes shows its English reason. Header: VOLVER A LA MESA, INICIO,
 CERRAR SESIÓN.
+
+Step 5b, tests only (I did not check it in the browser): HISTORIAL DE
+MANOS, "Mesa A · terminado 5.º · 1 mano", "2 manos terminadas", NIVEL 1
+(ciegas 100/200), Valoración, rows with 45.000, +12.000, Tú, Asiento 5,
+IGUALAR, NO IR, SUBÓPTIMA, and the filters. The Report's tournament list
+uses the same names, so it is Spanish too.

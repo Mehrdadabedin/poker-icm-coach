@@ -1,5 +1,9 @@
 /* Hand History (plan 077): the user's saved tournaments, names for winners,
  * and the filters. Kept out of the page so the page stays a layout. */
+import type { I18nValue } from "../i18n/I18n";
+import { numberLocale } from "../i18n/lang";
+
+type Words = Pick<I18nValue, "t" | "lang">;
 
 export type HandRow = {
   handNumber: number; heroPosition: string; pot: number; winnerSeats: number[];
@@ -27,25 +31,30 @@ export function ordinal(n: number): string {
 /** A tournament still marked active whose table is gone (a deploy or restart
  * ended it) is "unfinished"; the live one is "in progress". */
 export function tournamentState(t: Pick<TournamentRow, "tableId" | "status" | "finishPlace">,
-  liveId: string | null): string {
-  return t.tableId === liveId ? "in progress"
-    : t.status === "finished" ? (t.finishPlace ? `finished ${ordinal(t.finishPlace)}` : "finished")
-      : t.status === "abandoned" ? "abandoned" : "unfinished";
+  liveId: string | null, { t: tr, lang }: Words): string {
+  if (t.tableId === liveId) return tr("hh.state.live");
+  if (t.status === "finished") {
+    if (!t.finishPlace) return tr("hh.state.finished");
+    return tr("hh.state.finishedAt", { place: lang === "es" ? `${t.finishPlace}.º` : ordinal(t.finishPlace) });
+  }
+  return tr(t.status === "abandoned" ? "hh.state.abandoned" : "hh.state.unfinished");
 }
 
 /** "Table A · 13 Oct, 16:20 · finished 5th · 18 hands". */
-export function tournamentLabel(t: TournamentRow, liveId: string | null): string {
+export function tournamentLabel(t: TournamentRow, liveId: string | null, words: Words): string {
   const when = t.startedAt
-    ? new Date(t.startedAt).toLocaleString(undefined, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
+    ? new Date(t.startedAt).toLocaleString(words.lang === "en" ? undefined : numberLocale(),
+      { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })
     : "";
-  return [`Table ${t.tableLabel}`, when, tournamentState(t, liveId), `${t.hands} hand${t.hands === 1 ? "" : "s"}`]
+  const hands = words.t(t.hands === 1 ? "mistakes.hands.one" : "mistakes.hands.other", { n: t.hands });
+  return [words.t("hh.table", { label: t.tableLabel }), when, tournamentState(t, liveId, words), hands]
     .filter(Boolean).join(" · ");
 }
 
 /** Winners by name: "You" for the hero, "Seat 5" for hands saved before names were. */
-export function winnerNames(h: HandRow): string {
+export function winnerNames(h: HandRow, { t }: Words): string {
   return h.winnerSeats
-    .map((s) => (s === HERO_SEAT ? "You" : h.seatNames?.[s] || `Seat ${s}`))
+    .map((s) => (s === HERO_SEAT ? t("hh.you") : h.seatNames?.[s] || t("showdown.seat", { n: s })))
     .join(", ");
 }
 
