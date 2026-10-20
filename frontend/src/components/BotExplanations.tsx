@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { ACTION_LABEL, BotExplanation, formatChips } from "../models/game";
+import { BotExplanation, formatChips } from "../models/game";
+import { useT } from "../i18n/I18n";
+import { ACTION_KEY, PRESSURE_KEY } from "../i18n/poker";
 
 interface BotExplanationsProps {
   explanations: BotExplanation[];
@@ -7,6 +9,7 @@ interface BotExplanationsProps {
 
 /** Expandable "why did this bot act" list, one real decision per row. */
 export function BotExplanations({ explanations }: BotExplanationsProps) {
+  const t = useT();
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
 
   const toggle = (i: number) => {
@@ -22,13 +25,13 @@ export function BotExplanations({ explanations }: BotExplanationsProps) {
 
   return (
     <div className="bot-explanations" data-testid="bot-explanations">
-      <h3>WHY THE BOTS ACTED <span className="hint">(tap to expand)</span></h3>
+      <h3>{t("bots.title")} <span className="hint">{t("bots.hint")}</span></h3>
       {explanations.map((e, i) => (
         <div key={i} className={`expl-item ${expanded.has(i) ? "expl-open" : ""}`}>
           <button className="expl-head" onClick={() => toggle(i)} aria-expanded={expanded.has(i)}>
             <span className="expl-arrow">{expanded.has(i) ? "▾" : "▸"}</span>
             <span className="expl-who">
-              <b>{e.name}</b> — {ACTION_LABEL[e.action] ?? e.action}
+              <b>{e.name}</b> — {ACTION_KEY[e.action] ? t(ACTION_KEY[e.action]) : e.action}
               {e.amount != null ? ` ${formatChips(e.amount)}` : ""}
               <span className="expl-street">{e.street.toUpperCase()}</span>
             </span>
@@ -36,13 +39,14 @@ export function BotExplanations({ explanations }: BotExplanationsProps) {
           {expanded.has(i) && (
             <div className="expl-body">
               <dl className="expl-factors">
-                <div><dt>Position</dt><dd>{e.position}</dd></div>
-                <div><dt>Hand</dt><dd className="expl-hand">{e.hand}</dd></div>
-                <div><dt>Stack</dt><dd>{e.stackBB} BB</dd></div>
-                <div><dt>Pot odds</dt><dd>{e.potOdds}</dd></div>
-                <div><dt>Est. equity</dt><dd>{e.equity}</dd></div>
-                <div><dt>ICM pressure</dt><dd>{e.icmPressure}</dd></div>
-                <div><dt>Action faced</dt><dd>{e.faced}</dd></div>
+                <div><dt>{t("bots.position")}</dt><dd>{e.position}</dd></div>
+                <div><dt>{t("bots.hand")}</dt><dd className="expl-hand">{e.hand}</dd></div>
+                <div><dt>{t("bots.stack")}</dt><dd>{e.stackBB} BB</dd></div>
+                <div><dt>{t("bots.potOdds")}</dt><dd>{e.potOdds}</dd></div>
+                <div><dt>{t("bots.equity")}</dt><dd>{e.equity}</dd></div>
+                <div><dt>{t("bots.icm")}</dt>
+                  <dd>{PRESSURE_KEY[e.icmPressure?.toUpperCase()] ? t(PRESSURE_KEY[e.icmPressure.toUpperCase()]) : e.icmPressure}</dd></div>
+                <div><dt>{t("bots.faced")}</dt><dd>{e.faced}</dd></div>
               </dl>
               <p className="expl-decision">{e.reason}</p>
             </div>

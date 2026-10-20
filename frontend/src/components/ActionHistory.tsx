@@ -1,4 +1,7 @@
-import { ACTION_LABEL, formatChips, HandHistoryEntry, ReviewAction, TableAction } from "../models/game";
+import { formatChips, HandHistoryEntry, ReviewAction, TableAction } from "../models/game";
+import { useT } from "../i18n/I18n";
+import { ACTION_KEY } from "../i18n/poker";
+import type { MessageKey } from "../i18n/messages/en";
 import { OverallPerformance, WinLoseAnalysis } from "./WinLoseAnalysis";
 
 export type HistoryView = "history" | "analysis";
@@ -6,17 +9,10 @@ export type HistoryView = "history" | "analysis";
 type AnyAction = TableAction | ReviewAction;
 
 const STREET_ORDER = ["preflop", "flop", "turn", "river"];
-const STREET_TITLE: Record<string, string> = {
-  preflop: "PRE-FLOP",
-  flop: "FLOP",
-  turn: "TURN",
-  river: "RIVER",
-};
+// flop, turn and river are the words Spanish players use too
+const STREET_TITLE: Record<string, string> = { flop: "FLOP", turn: "TURN", river: "RIVER" };
 
-const BLIND_LABEL: Record<string, string> = {
-  small_blind: "posts SB",
-  big_blind: "posts BB",
-};
+const BLIND_LABEL: Record<string, MessageKey> = { small_blind: "history.postsSB", big_blind: "history.postsBB" };
 
 interface ActionHistoryProps {
   actions: AnyAction[];
@@ -42,7 +38,8 @@ interface ActionHistoryProps {
 
 export function ActionHistory({ actions, heroSeat, nameBySeat, collapsed = false, onToggle,
                              view = "history", onViewChange, hands = null, currentLevel }: ActionHistoryProps) {
-  const seatName = (a: AnyAction): string => (a as ReviewAction).name ?? nameBySeat.get(a.seat) ?? `Seat ${a.seat}`;
+  const t = useT();
+  const seatName = (a: AnyAction): string => (a as ReviewAction).name ?? nameBySeat.get(a.seat) ?? t("showdown.seat", { n: a.seat });
   const groups = STREET_ORDER.map((street) => ({
     street,
     entries: actions.filter((a) => a.street === street && a.action !== "small_blind" && a.action !== "big_blind"),
@@ -59,18 +56,18 @@ export function ActionHistory({ actions, heroSeat, nameBySeat, collapsed = false
               value={view}
               onChange={(event) => onViewChange(event.target.value === "analysis" ? "analysis" : "history")}
               data-testid="history-view-select"
-              aria-label="Side panel view"
+              aria-label={t("history.view")}
             >
-              <option value="history">HAND HISTORY</option>
-              <option value="analysis">RESULTS BY POSITION</option>
+              <option value="history">{t("history.title")}</option>
+              <option value="analysis">{t("history.byPosition")}</option>
             </select>
           </label>
         ) : (
-          <h3 className="history-title">HAND HISTORY</h3>
+          <h3 className="history-title">{t("history.title")}</h3>
         )}
         {onToggle && (
           <button className="coach-toggle" onClick={onToggle} data-testid="history-toggle">
-            {collapsed ? "SHOW ▼" : "HIDE ▲"}
+            {t(collapsed ? "coach.show" : "coach.hide")}
           </button>
         )}
       </div>
@@ -85,19 +82,19 @@ export function ActionHistory({ actions, heroSeat, nameBySeat, collapsed = false
           <span>
             {blindPosts.map((b) => (
               <span key={b.seat}>
-                <b>{seatName(b)}</b> {BLIND_LABEL[b.action] ?? b.action} {b.amount != null ? formatChips(b.amount) : ""}
+                <b>{seatName(b)}</b> {BLIND_LABEL[b.action] ? t(BLIND_LABEL[b.action]) : b.action} {b.amount != null ? formatChips(b.amount) : ""}
                 {b.seat !== blindPosts[blindPosts.length - 1].seat ? "  " : ""}
               </span>
             ))}
           </span>
         </div>
       )}
-      {!collapsed && !nonEmpty && blindPosts.length === 0 && <div className="history-empty">DEALING…</div>}
+      {!collapsed && !nonEmpty && blindPosts.length === 0 && <div className="history-empty">{t("history.dealing")}</div>}
       {!collapsed && groups.map(
         (g) =>
           g.entries.length > 0 && (
             <div key={g.street} className="history-street">
-              <div className="history-street-title">{STREET_TITLE[g.street]}</div>
+              <div className="history-street-title">{g.street === "preflop" ? t("history.preflop") : STREET_TITLE[g.street]}</div>
               {g.entries.map((a, i) => (
                 <div key={i} className="history-line" data-testid={`history-${g.street}-${i}`}>
                   <span className="history-street-dot" />
@@ -105,7 +102,7 @@ export function ActionHistory({ actions, heroSeat, nameBySeat, collapsed = false
                     {a.seat === heroSeat ? <b className="history-hero">{nameBySeat.get(heroSeat) ?? "Hero"}</b> : <b>{seatName(a)}</b>}
                     {" — "}
                     <span className={`history-action history-action-${a.action}`}>
-                      {ACTION_LABEL[a.action] ?? a.action}
+                      {ACTION_KEY[a.action] ? t(ACTION_KEY[a.action]) : a.action}
                       {a.amount != null ? ` ${formatChips(a.amount)}` : ""}
                     </span>
                   </span>

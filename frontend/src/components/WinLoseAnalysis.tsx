@@ -1,5 +1,6 @@
 import { formatChips, HandHistoryEntry } from "../models/game";
 import { blindLevelStats, percent, positionStats, winLossTotals } from "../models/winloss";
+import { useT } from "../i18n/I18n";
 
 /**
  * A18 — win / lose statistics inside the existing right-side panel.
@@ -42,42 +43,44 @@ function Ring({ pct, color, label, size, stroke, testId }: {
 }
 
 function Overall({ totals }: { totals: ReturnType<typeof winLossTotals> }) {
+  const t = useT();
   return (
     <section className="wl-section" data-testid="wl-overall">
-      <h4 className="wl-title">OVERALL PERFORMANCE</h4>
+      <h4 className="wl-title">{t("wl.overall")}</h4>
       <div className="wl-donut-row">
         <Ring pct={totals.winRate} color={GREEN} label={percent(totals.winRate)} size={76} stroke={10} testId="wl-win-donut" />
         <Ring pct={totals.lossRate} color={RED} label={percent(totals.lossRate)} size={76} stroke={10} testId="wl-loss-donut" />
       </div>
       <dl className="wl-metrics">
-        <div className="wl-metric"><dt>Total Hands</dt><dd data-testid="wl-total-hands">{totals.total}</dd></div>
-        <div className="wl-metric"><dt>Wins</dt><dd data-testid="wl-wins">{totals.wins}</dd></div>
-        <div className="wl-metric"><dt>Losses</dt><dd data-testid="wl-losses">{totals.losses}</dd></div>
-        <div className="wl-metric"><dt>Win Rate</dt><dd data-testid="wl-win-rate">{percent(totals.winRate)}</dd></div>
-        <div className="wl-metric"><dt>Loss Rate</dt><dd data-testid="wl-loss-rate">{percent(totals.lossRate)}</dd></div>
-        <div className="wl-metric"><dt>Profit / Loss</dt><dd data-testid="wl-profit">{formatProfit(totals.profit)} chips</dd></div>
+        <div className="wl-metric"><dt>{t("wl.totalHands")}</dt><dd data-testid="wl-total-hands">{totals.total}</dd></div>
+        <div className="wl-metric"><dt>{t("wl.wins")}</dt><dd data-testid="wl-wins">{totals.wins}</dd></div>
+        <div className="wl-metric"><dt>{t("wl.losses")}</dt><dd data-testid="wl-losses">{totals.losses}</dd></div>
+        <div className="wl-metric"><dt>{t("wl.winRate")}</dt><dd data-testid="wl-win-rate">{percent(totals.winRate)}</dd></div>
+        <div className="wl-metric"><dt>{t("wl.lossRate")}</dt><dd data-testid="wl-loss-rate">{percent(totals.lossRate)}</dd></div>
+        <div className="wl-metric"><dt>{t("wl.profit")}</dt><dd data-testid="wl-profit">{t("wl.chips", { n: formatProfit(totals.profit) })}</dd></div>
       </dl>
     </section>
   );
 }
 
 function ByBlindLevel({ hands, currentLevel }: { hands: readonly HandHistoryEntry[]; currentLevel?: number }) {
+  const t = useT();
   const rows = blindLevelStats(hands);
   if (rows.length === 0) return null;
   return (
     <section className="wl-section" data-testid="wl-blind-levels">
-      <h4 className="wl-title">WIN / LOSE BY BLIND LEVEL</h4>
+      <h4 className="wl-title">{t("wl.byLevel")}</h4>
       {rows.map((row) => (
         <div key={row.level} className="wl-level" data-testid={`wl-level-${row.level}`} data-current={row.level === currentLevel ? "true" : undefined}>
           <div className="wl-level-head">
             <span className="wl-level-name">
-              Level {row.level}
-              {row.blindLevel ? <span className="wl-level-blinds">({row.blindLevel} blinds)</span> : null}
-              {row.level === currentLevel ? <span className="wl-level-current">CURRENT</span> : null}
+              {t("wl.level", { n: row.level })}
+              {row.blindLevel ? <span className="wl-level-blinds">{t("wl.blinds", { b: row.blindLevel })}</span> : null}
+              {row.level === currentLevel ? <span className="wl-level-current">{t("wl.current")}</span> : null}
             </span>
             <span className="wl-level-pct">{percent(row.winRate)} / {percent(row.lossRate)}</span>
           </div>
-          <div className="wl-bar" role="img" aria-label={`Level ${row.level}: ${percent(row.winRate)} wins, ${percent(row.lossRate)} losses`}>
+          <div className="wl-bar" role="img" aria-label={t("wl.levelBar", { n: row.level, w: percent(row.winRate), l: percent(row.lossRate) })}>
             <div className="wl-bar-win" style={{ width: `${row.winRate * 100}%` }} />
             <div className="wl-bar-loss" style={{ width: `${row.lossRate * 100}%` }} />
           </div>
@@ -88,11 +91,12 @@ function ByBlindLevel({ hands, currentLevel }: { hands: readonly HandHistoryEntr
 }
 
 function ByPosition({ hands }: { hands: readonly HandHistoryEntry[] }) {
+  const t = useT();
   const rows = positionStats(hands);
   if (rows.length === 0) return null;
   return (
     <section className="wl-section" data-testid="wl-positions">
-      <h4 className="wl-title">RESULTS BY POSITION</h4>
+      <h4 className="wl-title">{t("history.byPosition")}</h4>
       {rows.map((row) => (
         <div key={row.position} className="wl-position" data-testid={`wl-position-${row.position}`}>
           <Ring pct={row.winRate} color={GREEN} label={percent(row.winRate)} size={60} stroke={8} testId={`wl-position-ring-${row.position}`} />
@@ -108,9 +112,10 @@ function ByPosition({ hands }: { hands: readonly HandHistoryEntry[] }) {
 }
 
 function Placeholder({ loading }: { loading?: boolean }) {
+  const t = useT();
   return loading
-    ? <p className="wl-empty" data-testid="wl-loading">Loading completed hands…</p>
-    : <p className="wl-empty" data-testid="wl-empty">No completed hands yet.</p>;
+    ? <p className="wl-empty" data-testid="wl-loading">{t("wl.loading")}</p>
+    : <p className="wl-empty" data-testid="wl-empty">{t("wl.empty")}</p>;
 }
 
 /** Top of the default HAND HISTORY view: rings and totals. */

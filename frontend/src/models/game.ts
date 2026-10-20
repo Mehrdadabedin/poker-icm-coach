@@ -148,7 +148,6 @@ export const POSITIONS_9MAX = ["UTG", "UTG+1", "MP", "LJ", "HJ", "CO", "BTN", "S
 
 // Shared by ActionHistory and BotExplanations; PokerTable uses its own
 // upper-case, past-tense labels for the in-seat badge and stays separate.
-export const ACTION_LABEL: Record<string, string> = { fold: "Fold", check: "Check", call: "Call", bet: "Bet", raise: "Raise", all_in: "All-in" };
 export const cardAlt = (card: Card): string =>
   `${RANK_WORD[card.rank] ?? card.rank} of ${SUIT_WORD[card.suit]}`;
 
