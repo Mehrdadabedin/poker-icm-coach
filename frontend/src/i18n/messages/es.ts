@@ -7,5 +7,6 @@ import { table } from "./es/table";
 import { review } from "./es/review";
 import { home } from "./es/home";
 import { coach } from "./es/coach";
+import { hands } from "./es/hands";
 
-export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home, ...coach };
+export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands };

@@ -9,6 +9,7 @@ import { ShowdownHands } from "./ShowdownHands";
 import { useT } from "../i18n/I18n";
 import { PRESSURE_KEY } from "../i18n/poker";
 import { gradeLine } from "../i18n/coach";
+import { handName } from "../i18n/review";
 
 interface HandReviewProps {
   review: ReviewData;
@@ -45,11 +46,11 @@ export function HandReview({ review, coach, comparison, totalPlayers, nameBySeat
       <div className="result-grid" data-testid="result-grid">
         <div className="result-cell">
           <dt>{t("review.winningHand")}</dt>
-          <dd>{review.winningHandName ?? t("review.uncontested")}</dd>
+          <dd>{review.winningHandName ? handName(review.winningHandName, t) : t("review.uncontested")}</dd>
         </div>
         <div className="result-cell">
           <dt>{t("review.yourHand")}</dt>
-          <dd>{review.heroHandName ?? t("review.foldedHidden")}</dd>
+          <dd>{review.heroHandName ? handName(review.heroHandName, t) : t("review.foldedHidden")}</dd>
         </div>
         <div className="result-cell result-cards-cell">
           <dt>{t("review.heroCards")}</dt>

@@ -38,7 +38,7 @@ sentences from the server.
    choice and the Google sign-in return page (done).
 4. Coach texts: the server sends codes and details next to its sentences.
    4a (done): the coach's reason, action words, factor rows and the grade.
-   4b: hand names, the bots' reasons.
+   4b (done): hand names, the bots' reasons and the action they faced.
 5. My Mistakes, Hand History, Report, statistics, ICM calculator.
 6. Spanish review by a native speaker who plays poker; Spanish READY.
 7. icmbot.es on Render (custom domain, DNS at one.com, CORS_ORIGINS).
@@ -76,3 +76,11 @@ Step 4a, browser with ?lang=es on a local table (backend restarted): NO IR,
 and after calling: "SUBÓPTIMA — IGUALAR se aparta de la jugada recomendada:
 NO IR." A test reads backend/app/strategy/reasons.py: every code has Spanish,
 and the English matches the server word for word.
+
+Step 4b, tests only (I did not check it in the browser): hand names read back
+from the server's one English form ("Pair of Ts" -> "Pareja de 10", "Full
+House, Ks full of 2s" -> "Full de K con 2"); the bots' reasons and the action
+faced from codes ("Iguala con Q♣ J♣: equity del 38% ... presión ICM muy alta
+(rentable).", "Apuesta de 45.000", "12,5 BB"). A test reads
+backend/app/services/bot_texts.py: every code has Spanish and the English
+matches the server word for word.

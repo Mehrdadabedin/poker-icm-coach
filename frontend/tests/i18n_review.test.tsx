@@ -1,6 +1,5 @@
 /* The hand review and the hand history in Spanish (plan 093 step 3b). Hand
- * names, the bots' reasons and the coach's words come from the server and stay
- * English until step 4. */
+ * names and the bots' reasons are in i18n_hands.test.tsx (step 4b). */
 import { afterEach, describe, expect, it } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";

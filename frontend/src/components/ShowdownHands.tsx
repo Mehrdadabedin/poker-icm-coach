@@ -2,6 +2,7 @@ import { ReviewShowdown } from "../models/game";
 import { CardView } from "./CardView";
 import { PlayingCard } from "./PlayingCard";
 import { useT } from "../i18n/I18n";
+import { handName } from "../i18n/review";
 
 interface ShowdownHandsProps {
   showdown: ReviewShowdown[];
@@ -45,7 +46,7 @@ export function ShowdownHands({ showdown, foldedSeats, nameBySeat, heroSeat }: S
             ) : (
               <MuckedCards label={t("showdown.walk")} />
             )}
-            <div className="reveal-hand">{s.handName ?? t("showdown.noShowdown")}</div>
+            <div className="reveal-hand">{s.handName ? handName(s.handName, t) : t("showdown.noShowdown")}</div>
             <div className={`reveal-result ${s.won ? "reveal-won-label" : "reveal-lost-label"}`}>
               {t(s.won ? "seat.won" : "seat.lost")}
             </div>
