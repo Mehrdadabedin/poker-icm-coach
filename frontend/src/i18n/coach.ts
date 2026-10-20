@@ -1,7 +1,8 @@
 /* What the coach writes on the server, in the site's language (plan 093 step 4).
  * The server sends English plus codes: a reason code and its details, the
  * action words, and factor rows whose values come from small fixed sets.
- * Anything unknown (an older server, a new sentence) shows as sent. */
+ * Anything unknown (an older server, a new sentence) shows as sent. The ICM
+ * Coach tool's teaching note comes the same way, as a code and details. */
 import { formatChips, type CoachAdvice } from "../models/game";
 import { numberLocale } from "./lang";
 import { en, type MessageKey } from "./messages/en";
@@ -71,4 +72,13 @@ function rowValue(label: string, value: string, coach: Advice, t: T): string {
 /** One factor row of the coach panel: its label and its value. */
 export function factorRow(label: string, value: string, coach: Advice, t: T): [string, string] {
   return [tr(t, `coach.row.${label}`, label), rowValue(label, value, coach, t)];
+}
+
+export type Taught = { education: string; educationCode?: string; educationParams?: Record<string, string> };
+
+/** The ICM Coach tool's teaching note; its chip amounts come grouped the English way. */
+export function coachEducation(note: Taught, t: T): string {
+  const params: Params = { ...note.educationParams };
+  for (const name of ["pot", "call"]) if (params[name] !== undefined) params[name] = chips(String(params[name]));
+  return tr(t, `coach.edu.${note.educationCode ?? ""}`, note.education, params);
 }

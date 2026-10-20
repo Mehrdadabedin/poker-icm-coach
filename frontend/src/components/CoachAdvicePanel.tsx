@@ -1,13 +1,12 @@
 import { useT } from "../i18n/I18n";
-import { actionWord, coachReason, factorRow, tr } from "../i18n/coach";
+import { actionWord, coachEducation, coachReason, factorRow, tr, type Taught } from "../i18n/coach";
 import { localFixed } from "../i18n/lang";
 import { formatChips, type CoachAdvice } from "../models/game";
 
-export type Advice = CoachAdvice & {
+export type Advice = CoachAdvice & Taught & {
   confidence: number;
   ev: { winProb: number; loseProb: number; pot: number; toCall: number; chipEv: number; evClass: string; chipRecommendation: string } | null;
   outs: { outs: number; unknown: number; improveTurn: number; improveRiver: number; winProb: number; method: string } | null;
-  education: string;
 };
 
 const pct = (p: number) => `${localFixed(p * 100, 1)}%`;
@@ -42,7 +41,7 @@ export function CoachAdvicePanel({ advice }: { advice: Advice }) {
         </div>
       )}
 
-      {advice.education && <p className="coach-education" data-testid="coach-education">{advice.education}</p>}
+      {advice.education && <p className="coach-education" data-testid="coach-education">{coachEducation(advice, t)}</p>}
       <p>{coachReason(advice, t)}</p>
       <dl>
         {Object.entries(advice.detail).map(([k, v]) => {

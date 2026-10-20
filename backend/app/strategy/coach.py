@@ -76,6 +76,8 @@ class CoachRecommendation:
     street: str = ""  # the street the advice is for (plan 075)
     reason_code: str = ""  # the reasoning as a code and its details, for other languages (plan 093)
     reason_params: dict[str, str] = field(default_factory=dict)
+    education_code: str = ""  # the education note likewise
+    education_params: dict[str, str] = field(default_factory=dict)
 
 class Coach:
     """Produces a recommendation for any hero decision point."""
@@ -99,14 +101,16 @@ class Coach:
         rp_label, _ = risk_premium_for(req, analyses)
         detail = build_detail(req, analyses, action, alt, reason, rp_label)
         outs = outs_for(req)
+        education = education_for(req, analyses, ev, outs, action, amount)
+        edu_code, edu_details = code_of(education)
         return CoachRecommendation(
             recommended_action=action, confidence=_confidence(analyses),
             reasoning=reason, alternative_action=alt,
             recommendation_detail=detail, icm_pressure=analyses.pressure,
             risk_premium=rp_label, ev=ev,
             outs=outs,
-            education=education_for(req, analyses, ev, outs, action, amount),
-            street=req.street, reason_code=code, reason_params=details,
+            education=education, street=req.street, reason_code=code, reason_params=details,
+            education_code=edu_code, education_params=edu_details,
         )
 
     def _decide(self, req: CoachRequest, a: Analyses) -> tuple[str, str, str]:
