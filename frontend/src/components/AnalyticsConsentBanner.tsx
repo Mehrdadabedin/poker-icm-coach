@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useT } from "../i18n/I18n";
 import {
   getAnalyticsConsent,
   isGoogleAnalyticsConfigured,
@@ -8,6 +9,7 @@ import {
 
 export function AnalyticsConsentBanner() {
   const { pathname } = useLocation();
+  const t = useT();
   const [consent, setConsent] = useState(getAnalyticsConsent);
   const [isEditing, setIsEditing] = useState(consent === null);
 
@@ -29,14 +31,10 @@ export function AnalyticsConsentBanner() {
   }
 
   return (
-    <aside className="analytics-consent" aria-label="Analytics consent">
+    <aside className="analytics-consent" aria-label={t("consent.label")}>
       <div className="analytics-consent__copy">
-        <h2 className="analytics-consent__title">Your privacy matters</h2>
-        <p>
-          We use Google Analytics cookies to understand how visitors use
-          ICMBOT. Analytics stays off unless you accept. You can change your
-          choice any time with Cookie settings at the bottom of the home page.
-        </p>
+        <h2 className="analytics-consent__title">{t("consent.title")}</h2>
+        <p>{t("consent.text")}</p>
       </div>
       <div className="analytics-consent__actions">
         <button
@@ -44,14 +42,14 @@ export function AnalyticsConsentBanner() {
           type="button"
           onClick={() => chooseConsent("denied")}
         >
-          Reject analytics
+          {t("consent.reject")}
         </button>
         <button
           className="analytics-consent__button analytics-consent__button--accept"
           type="button"
           onClick={() => chooseConsent("granted")}
         >
-          Accept analytics
+          {t("consent.accept")}
         </button>
       </div>
     </aside>

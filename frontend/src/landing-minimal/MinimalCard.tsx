@@ -1,9 +1,11 @@
 import type { ReactNode } from "react";
+import { useT } from "../i18n/I18n";
+import type { MessageKey } from "../i18n/messages/en";
 
 export interface CardContent {
   id: string;
-  title: string;
-  text: string;
+  title: MessageKey;
+  text: MessageKey;
   icon: ReactNode;
 }
 
@@ -17,6 +19,7 @@ interface MinimalCardProps {
  * the features. The icon is an inline SVG line drawing that takes its amber
  * from CSS (currentColor) and adds no image request. */
 export function MinimalCard({ card, heading: Title, testId }: MinimalCardProps) {
+  const t = useT();
   return (
     <li className="lm-card" data-testid={testId}>
       <svg
@@ -35,8 +38,8 @@ export function MinimalCard({ card, heading: Title, testId }: MinimalCardProps) 
         {card.icon}
       </svg>
       <div className="lm-card-body">
-        <Title className="lm-card-title">{card.title}</Title>
-        <p className="lm-card-text">{card.text}</p>
+        <Title className="lm-card-title">{t(card.title)}</Title>
+        <p className="lm-card-text">{t(card.text)}</p>
       </div>
     </li>
   );

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useT } from "../i18n/I18n";
 
 const DEMO_ID = "lm-demo";
 
@@ -17,12 +18,13 @@ export function scrollToDemo(): void {
  * the video file is not requested before that, and it never autoplays: the
  * visitor starts it with the player's own controls. */
 export function MinimalDemo() {
+  const t = useT();
   useEffect(() => {
     scrollToDemo();
   }, []);
 
   return (
-    <section className="lm-demo" id={DEMO_ID} aria-label="Demo video" data-testid="minimal-demo">
+    <section className="lm-demo" id={DEMO_ID} aria-label={t("landing.demo")} data-testid="minimal-demo">
       <video
         className="lm-video"
         data-testid="minimal-video"

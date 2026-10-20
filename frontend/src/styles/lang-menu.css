@@ -5,3 +5,7 @@
   background: transparent; color: var(--muted); font-size: 0.78rem; cursor: pointer;
 }
 .lang-menu button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+/* in the landing footer the pills sit on the line with the other links */
+.lm-footer .lang-menu { margin: 0; }
+.lm-footer .lang-menu button { color: inherit; border-color: rgba(0, 0, 0, 0.18); }
+.lm-footer .lang-menu button[aria-pressed="true"] { color: var(--lm-accent, #8a5a00); border-color: currentColor; }

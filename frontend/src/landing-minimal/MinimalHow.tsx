@@ -1,3 +1,4 @@
+import { useT } from "../i18n/I18n";
 import { MinimalCard, type CardContent } from "./MinimalCard";
 
 /** How it works: the current landing page's three steps, as cards with an
@@ -6,8 +7,8 @@ import { MinimalCard, type CardContent } from "./MinimalCard";
 const STEPS: CardContent[] = [
   {
     id: "signup",
-    title: "Sign up",
-    text: "Create an account in seconds (or continue with Google).",
+    title: "landing.how.signup.title",
+    text: "landing.how.signup.text",
     icon: (
       <>
         <circle cx="9" cy="8" r="4" />
@@ -18,8 +19,8 @@ const STEPS: CardContent[] = [
   },
   {
     id: "opponents",
-    title: "Choose your opponents",
-    text: "Pick the bot lineup you want to face.",
+    title: "landing.how.choose.title",
+    text: "landing.how.choose.text",
     icon: (
       <>
         <rect x="4" y="8" width="16" height="12" rx="3" />
@@ -33,8 +34,8 @@ const STEPS: CardContent[] = [
   },
   {
     id: "graded",
-    title: "Play and get graded",
-    text: "Every decision is graded Preferred, Acceptable or Suboptimal.",
+    title: "landing.how.play.title",
+    text: "landing.how.play.text",
     icon: (
       <>
         <rect x="5" y="4" width="14" height="17" rx="2" />
@@ -46,9 +47,10 @@ const STEPS: CardContent[] = [
 ];
 
 export function MinimalHow() {
+  const t = useT();
   return (
     <section className="lm-how" aria-labelledby="lm-how-title" data-testid="minimal-how">
-      <h2 className="lm-how-title" id="lm-how-title">How it works</h2>
+      <h2 className="lm-how-title" id="lm-how-title">{t("landing.how")}</h2>
       <ol className="lm-cards">
         {STEPS.map((step) => (
           <MinimalCard key={step.id} card={step} heading="h3" testId={`minimal-step-${step.id}`} />
