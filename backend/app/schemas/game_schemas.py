@@ -96,6 +96,11 @@ class BotExplanationModel(BaseModel):
     icmPressure: str
     faced: str
     reason: str
+    # faced and reason as a code and its details, for other languages (plan 093)
+    facedCode: str = ""
+    facedParams: dict[str, str] = {}
+    reasonCode: str = ""
+    reasonParams: dict[str, str] = {}
 
 
 class HandReviewModel(BaseModel):

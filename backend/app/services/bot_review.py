@@ -12,6 +12,7 @@ from app.ai.postflop_ai import equity_estimate
 from app.game.hand_setup import blind_seats
 from app.game.positions import position_labels
 from app.poker.card import Card
+from app.services.bot_texts import DECISION, FACED, coded
 from app.strategy.bubble import bubble_pressure, detect_stage
 from app.strategy.coach_analysis import _preflop_equity
 from app.strategy.hand_codec import RANK_CHAR
@@ -55,28 +56,25 @@ def hand_pressure(session, result, level) -> str:
     return bubble_pressure(info).label
 
 
-def _faced(street: str, bet: int, to_call: int, level) -> str:
+def _faced(street: str, bet: int, to_call: int, level) -> dict[str, object]:
     if to_call == 0:
-        return "Unopened" if street == "preflop" else "No bet"
+        return coded(FACED, "unopened" if street == "preflop" else "no_bet")
     if street == "preflop":
-        return f"Raise to {bet}" if bet > level.big else f"Big blind {bet}"
-    return f"Bet {bet}"
+        return coded(FACED, "raise_to" if bet > level.big else "big_blind", amount=bet)
+    return coded(FACED, "bet", amount=bet)
 
 
 def _decision(action: str, hand: str, stack_bb: float, equity: float,
-              pot_odds: float, pressure: str, position: str) -> str:
-    p = pressure.title()
+              pot_odds: float, pressure: str, position: str) -> dict[str, object]:
+    p, eq, odds = pressure.title(), f"{equity:.0%}", f"{pot_odds:.0%}"
     if action == "fold":
-        return (f"Folding {hand} - {equity:.0%} equity is below the {pot_odds:.0%} pot "
-                f"odds needed from {position} under {p} ICM pressure.")
+        return coded(DECISION, "fold", hand=hand, eq=eq, odds=odds, pos=position, pressure=p)
     if action == "call":
-        v = "profitable" if equity >= pot_odds else "marginal"
-        return (f"Calling with {hand} - {equity:.0%} equity vs {pot_odds:.0%} pot odds "
-                f"from {position}; ICM pressure {p} ({v}).")
+        code = "call_profitable" if equity >= pot_odds else "call_marginal"
+        return coded(DECISION, code, hand=hand, eq=eq, odds=odds, pos=position, pressure=p)
     if action in ("bet", "raise"):
-        return (f"Betting {hand} from {position} - {equity:.0%} equity, {stack_bb} BB "
-                f"behind, pot odds {pot_odds:.0%}.")
-    return f"All-in with {hand} for {stack_bb} BB - {equity:.0%} equity at {p} ICM pressure."
+        return coded(DECISION, "bet", hand=hand, pos=position, eq=eq, bb=stack_bb, odds=odds)
+    return coded(DECISION, "all_in", hand=hand, bb=stack_bb, eq=eq, pressure=p)
 
 
 def build_explanations(session, result, level, pressure: str) -> list[dict]:
@@ -108,15 +106,19 @@ def build_explanations(session, result, level, pressure: str) -> list[dict]:
         equity = _equity(hole, street, board) if len(hole) == 2 else 0.0
         stack_bb = round(max(0, start.get(a.seat, 0) - cum.get(a.seat, 0)) / max(1, level.big), 1)
         pos = position_labels(result.button, set(hand), len(players)).get(a.seat, "")
+        faced = _faced(street, bet, to_call, level)
+        why = _decision(a.action, _hand_text(hole) if len(hole) == 2 else "?",
+                        stack_bb, equity, odds, pressure, pos)
         out.append({
             "seat": a.seat, "name": players[a.seat].name, "action": a.action,
             "amount": a.amount, "street": street, "position": pos,
             "hand": _hand_text(hole) if len(hole) == 2 else "",
             "handCode": _code(hole) if len(hole) == 2 else "",
             "stackBB": stack_bb, "potOdds": f"{odds:.0%}", "equity": f"{equity:.0%}",
-            "icmPressure": pressure.title(), "faced": _faced(street, bet, to_call, level),
-            "reason": _decision(a.action, _hand_text(hole) if len(hole) == 2 else "?",
-                                stack_bb, equity, odds, pressure, pos),
+            "icmPressure": pressure.title(),
+            # the English text, and its code and details for other languages (plan 093)
+            "faced": faced["text"], "facedCode": faced["code"], "facedParams": faced["params"],
+            "reason": why["text"], "reasonCode": why["code"], "reasonParams": why["params"],
         })
         if a.action in ("bet", "raise", "all_in") and a.amount is not None:
             add = max(0, a.amount - sc)
