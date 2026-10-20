@@ -27,7 +27,7 @@ describe("ReentryModal (A39)", () => {
   it("shows YOU FINISHED N OF 9 with WATCH and END GAME after Level 5 (A44, plan 092)", () => {
     const onWatch = vi.fn();
     render(<ReentryModal available={false} finishPlace={7} onWatch={onWatch} />);
-    expect(screen.getByText("YOU FINISHED 7 OF 9")).toBeInTheDocument();
+    expect(screen.getByText("YOU FINISHED 7TH OF 9")).toBeInTheDocument(); // the champion screen's wording (plan 093)
     expect(screen.getAllByRole("button").map((b) => b.textContent)).toEqual(["WATCH TO THE END", "END GAME"]);
     expect(screen.queryByTestId("reentry-new-game")).toBeNull();
     fireEvent.click(screen.getByTestId("reentry-watch"));

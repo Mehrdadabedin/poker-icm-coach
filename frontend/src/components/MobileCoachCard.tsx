@@ -1,7 +1,9 @@
 import { useState } from "react";
 import type { Card, CoachAdvice } from "../models/game";
 import { CoachReason } from "./CoachReason";
+import { useT } from "../i18n/I18n";
 
+// street names stay in English in Spanish too: preflop, flop, turn and river are the words players use
 const STREET: Record<string, string> = { preflop: "PREFLOP", flop: "FLOP", turn: "TURN", river: "RIVER" };
 
 /** The coach's advice at the top of the table on a phone (plan 087), where
@@ -9,18 +11,19 @@ const STREET: Record<string, string> = { preflop: "PREFLOP", flop: "FLOP", turn:
  * turn and goes when the hero acts; Details opens the factor rows. The
  * desktop hides it and keeps the side panel. */
 export function MobileCoachCard({ coach, heroCards }: { coach: CoachAdvice; heroCards?: Card[] | null }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
   const kind = coach.recommendedAction.split(" ")[0].toLowerCase();
   return (
     <div className="mobile-coach" data-testid="mobile-coach" role="status">
       <div className="mobile-coach-head">
-        <span className="mobile-coach-tag">ICM COACH{coach.street && STREET[coach.street] ? ` · ${STREET[coach.street]}` : ""}</span>
+        <span className="mobile-coach-tag">{t("coach.title")}{coach.street && STREET[coach.street] ? ` · ${STREET[coach.street]}` : ""}</span>
         <b className={`mobile-coach-action act-${kind}`} data-testid="mobile-coach-action">{coach.recommendedAction}</b>
       </div>
       <p className="mobile-coach-why"><CoachReason text={coach.reasoning} cards={heroCards} /></p>
       <button type="button" className="mobile-coach-more" aria-expanded={open}
         data-testid="mobile-coach-details" onClick={() => setOpen((v) => !v)}>
-        {open ? "Hide details ▴" : "Details ▾"}
+        {t(open ? "coach.hideDetails" : "coach.details")}
       </button>
       {open && (
         <dl className="mobile-coach-rows">

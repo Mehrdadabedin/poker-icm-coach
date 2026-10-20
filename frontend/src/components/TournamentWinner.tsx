@@ -1,6 +1,9 @@
 /* Tournament champion screen (A45): covers the whole table area once the
  * tournament ends. The plaque text and the finish strip are positioned in
  * percentages of the artwork (1671 x 941), see winner.css. */
+import { useI18n } from "../i18n/I18n";
+import { placeOrdinal } from "../i18n/lang";
+
 
 const ORDINAL_SUFFIX: Record<number, string> = { 1: "ST", 2: "ND", 3: "RD" };
 
@@ -16,9 +19,10 @@ export function TournamentWinner({ username, place, heroIsChampion, onNewSession
   heroIsChampion: boolean;
   onNewSession?: () => void;
 }) {
+  const { lang, t } = useI18n();
   const display = username?.trim() || "Champion";
   return (
-    <div className="tournament-winner" data-testid="tournament-winner" role="dialog" aria-label="Tournament finished">
+    <div className="tournament-winner" data-testid="tournament-winner" role="dialog" aria-label={t("winner.label")}>
       <div className="tournament-winner-panel">
         <div className="tournament-winner-art" data-testid="tournament-winner-art">
           <img
@@ -30,7 +34,7 @@ export function TournamentWinner({ username, place, heroIsChampion, onNewSession
           />
           <div className="tournament-winner-plaque" data-testid="tournament-winner-plaque">
             <div className="tournament-winner-title" data-testid="tournament-winner-title">
-              CONGRATULATIONS
+              {t("winner.congrats")}
             </div>
             <span className="tournament-winner-divider" aria-hidden="true" />
             <div
@@ -43,7 +47,7 @@ export function TournamentWinner({ username, place, heroIsChampion, onNewSession
           </div>
           {!heroIsChampion && (
             <div className="tournament-winner-place" data-testid="tournament-winner-place">
-              YOU FINISHED {place ? ordinal(place) : "?"} OF 9
+              {t("bust.finished", { place: place ? placeOrdinal(lang, place) : "?" })}
             </div>
           )}
         </div>
@@ -54,7 +58,7 @@ export function TournamentWinner({ username, place, heroIsChampion, onNewSession
             data-testid="tournament-new-session"
             onClick={onNewSession}
           >
-            START NEW SESSION
+            {t("winner.newSession")}
           </button>
         )}
       </div>

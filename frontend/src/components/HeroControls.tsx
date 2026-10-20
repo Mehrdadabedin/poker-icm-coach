@@ -5,6 +5,8 @@ import {
 } from "../models/betSizing";
 import { useHeroKeys } from "../hooks/useHeroKeys";
 import { BetSizer } from "./BetSizer";
+import { useT } from "../i18n/I18n";
+import { numberLocale } from "../i18n/lang";
 
 // Phase 7: single reusable label mechanism — glyphs with accessible text.
 const GLYPH: Record<string, string> = {
@@ -38,6 +40,7 @@ export function HeroControls({
   legalActions, toCall, pot, stack, bigBlind, disabled, submitting = false, showLabels = true,
   street = "flop", heroBet = 0, actionLog, onAction,
 }: HeroControlsProps) {
+  const t = useT();
   const has = (kind: ActionKind) => legalActions.some((a) => a.kind === kind);
   const meta = (kind: ActionKind) => legalActions.find((a) => a.kind === kind);
   // Blocks double-submits (a second click arrives after the polled state
@@ -45,7 +48,7 @@ export function HeroControls({
   const acting = disabled || legalActions.length === 0 || submitting;
 
   const callKind: ActionKind = toCall > 0 ? "call" : "check";
-  const callLabel = callKind === "call" ? `CALL ${formatChips(toCall)}` : "CHECK";
+  const callLabel = callKind === "call" ? t("controls.call", { n: formatChips(toCall) }) : t("controls.check");
   // The engine sizes an all-in as a street total, so it already counts what the
   // hero has in front of them. Falling back to the bare stack understates it.
   const allInTo = meta("all_in")?.amount ?? stack;
@@ -85,27 +88,31 @@ export function HeroControls({
     smaller: () => step(-1), bigger: () => step(1),
   });
 
-  const sizeLabel = allIn ? `ALL-IN ${formatChips(allInTo)}` : `${sizeKind === "bet" ? "BET" : "RAISE TO"} ${formatChips(amount)}`;
-  const note = input ? sizeNote(amount, input, list) : "";
+  const sizeLabel = allIn ? t("controls.allIn", { n: formatChips(allInTo) })
+    : t(sizeKind === "bet" ? "controls.bet" : "controls.raiseTo", { n: formatChips(amount) });
+  const note = input ? sizeNote(amount, input, list, {
+    bb: (n) => t("size.bb", { n }), pot: t("size.pot"),
+    share: (share) => t("size.share", { share }), percent: (n) => t("size.percent", { n }),
+  }, numberLocale()) : "";
 
   return (
     <div className="hero-controls" data-testid="hero-controls">
       <div className="hero-info">
-        <span>TO CALL {formatChips(toCall)}</span>
-        <span>POT {formatChips(pot)}</span>
-        <span>STACK {formatChips(stack)}</span>
+        <span>{t("controls.toCall", { n: formatChips(toCall) })}</span>
+        <span>{t("controls.pot", { n: formatChips(pot) })}</span>
+        <span>{t("controls.stack", { n: formatChips(stack) })}</span>
         {has("raise") && (
-          <span className="raise-hint">MIN RAISE {formatChips(meta("raise")?.minAmount ?? 0)}</span>
+          <span className="raise-hint">{t("controls.minRaise", { n: formatChips(meta("raise")?.minAmount ?? 0) })}</span>
         )}
       </div>
       <div className="controls-row">
-        <button className="btn btn-fold" disabled={acting || toCall === 0} aria-label="Fold"
-          title={toCall === 0 ? "Checking is free" : "Fold"} onClick={fold}>
-          {showLabels ? "FOLD" : GLYPH.fold}
+        <button className="btn btn-fold" disabled={acting || toCall === 0} aria-label={t("controls.foldTitle")}
+          title={toCall === 0 ? t("controls.checkFree") : t("controls.foldTitle")} onClick={fold}>
+          {showLabels ? t("controls.fold") : GLYPH.fold}
         </button>
         <button className="btn btn-call" disabled={acting || !has(callKind)}
-          aria-label={callKind === "call" ? `Call ${formatChips(toCall)}` : "Check"}
-          title={callKind === "call" ? `Call ${formatChips(toCall)}` : "Check"}
+          aria-label={callKind === "call" ? t("controls.callTitle", { n: formatChips(toCall) }) : t("controls.checkTitle")}
+          title={callKind === "call" ? t("controls.callTitle", { n: formatChips(toCall) }) : t("controls.checkTitle")}
           onClick={() => callOrCheck(callKind)}>
           {showLabels ? callLabel : GLYPH[callKind]}
         </button>
@@ -116,9 +123,9 @@ export function HeroControls({
           </button>
         )}
         {has("all_in") && (
-          <button className="btn btn-allin" disabled={acting} aria-label={`All-in ${formatChips(allInTo)}`}
-            title={`All-in ${formatChips(allInTo)}`} onClick={() => onAction("all_in", allInTo)}>
-            {showLabels ? `ALL-IN ${formatChips(allInTo)}` : GLYPH.all_in}
+          <button className="btn btn-allin" disabled={acting} aria-label={t("controls.allInTitle", { n: formatChips(allInTo) })}
+            title={t("controls.allInTitle", { n: formatChips(allInTo) })} onClick={() => onAction("all_in", allInTo)}>
+            {showLabels ? t("controls.allIn", { n: formatChips(allInTo) }) : GLYPH.all_in}
           </button>
         )}
       </div>

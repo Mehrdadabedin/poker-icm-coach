@@ -3,6 +3,9 @@
  * shows the finishing place. Either way the hero can WATCH TO THE END (BOT
  * auto-finish) or END GAME, which shows the final standings by chips; START
  * NEW GAME is on that list, not here (the owner: one of the two, plan 092). */
+import { useI18n } from "../i18n/I18n";
+import { placeOrdinal } from "../i18n/lang";
+
 export function ReentryModal({
   available,
   finishPlace,
@@ -16,35 +19,36 @@ export function ReentryModal({
   onWatch?: () => void;
   onEnd?: () => void;
 }) {
+  const { lang, t } = useI18n();
   return (
     <div className="reentry-modal" data-testid="reentry-modal" role="alert">
       {available ? (
         <>
-          <b className="reentry-title">YOU LOST THE ALL-IN</b>
-          <p>Your tournament stack is 0.</p>
-          <p>Re-entry is still available.</p>
+          <b className="reentry-title">{t("bust.title")}</b>
+          <p>{t("bust.stack")}</p>
+          <p>{t("bust.reentry")}</p>
         </>
       ) : (
         <>
           <b className="reentry-title" data-testid="reentry-finished-title">
-            YOU FINISHED {finishPlace ?? "?"} OF 9
+            {t("bust.finished", { place: finishPlace ? placeOrdinal(lang, finishPlace) : "?" })}
           </b>
-          <p>Level 5 has passed. Re-entry is no longer available.</p>
+          <p>{t("bust.closed")}</p>
         </>
       )}
-      <p>END GAME shows the final standings by chips.</p>
+      <p>{t("bust.endHint", { end: t("bust.end") })}</p>
       <div className="reentry-actions">
         {available && (
           <button type="button" className="btn btn-small btn-primary" onClick={onContinue} data-testid="reentry-continue">
-            CONTINUE TOURNAMENT
+            {t("bust.continue")}
           </button>
         )}
         <button type="button" className="btn btn-small" onClick={onWatch} data-testid="reentry-watch">
-          WATCH TO THE END
+          {t("bust.watch")}
         </button>
         <button type="button" className={available ? "btn btn-small" : "btn btn-small btn-primary"} onClick={onEnd}
           data-testid="reentry-end">
-          END GAME
+          {t("bust.end")}
         </button>
       </div>
     </div>

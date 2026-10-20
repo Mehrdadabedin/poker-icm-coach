@@ -2,6 +2,7 @@ import { Card, PlayerView, formatChips } from "../models/game";
 import { botProfilePortrait } from "../models/botProfiles";
 import { CardView } from "./CardView";
 import { PlayingCard } from "./PlayingCard";
+import { useT } from "../i18n/I18n";
 
 interface PokerSeatProps {
   player: PlayerView;
@@ -14,6 +15,7 @@ interface PokerSeatProps {
 
 /** One seat on the poker table: stack, position, bet, cards, indicators. */
 export function PokerSeat({ player, active, lastAction, status, revealCards, revealHand }: PokerSeatProps) {
+  const t = useT();
   const portrait = player.isHero ? null : (player.profile ? botProfilePortrait(player.profile) : null);
   // Real cards when known (hero, showdown); a BOT still in the hand shows two
   // backs; folded seats show none. Busted seats take the OUT branch below.
@@ -42,7 +44,7 @@ export function PokerSeat({ player, active, lastAction, status, revealCards, rev
         <img
           className="seat-bot-portrait"
           src={portrait.src}
-          alt={`${portrait.alt} bot profile`}
+          alt={t("seat.botProfile", { name: portrait.alt })}
           style={{ borderColor: portrait.color }}
           draggable={false}
         />
@@ -52,7 +54,7 @@ export function PokerSeat({ player, active, lastAction, status, revealCards, rev
       </div>
       <div className="seat-name">{player.name}</div>
       {player.sitsOut ? (
-        <div className="seat-out-label">OUT</div>
+        <div className="seat-out-label">{t("seat.out")}</div>
       ) : (
         <>
           <div className="seat-stack">
@@ -76,11 +78,11 @@ export function PokerSeat({ player, active, lastAction, status, revealCards, rev
           {formatChips(player.bet)}
         </div>
       )}
-      {status === "won" && <div className="seat-status seat-status-won">WON</div>}
-      {status === "lost" && <div className="seat-status seat-status-lost">LOST</div>}
-      {status === "allIn" && <div className="seat-status seat-status-allin">ALL-IN</div>}
+      {status === "won" && <div className="seat-status seat-status-won">{t("seat.won")}</div>}
+      {status === "lost" && <div className="seat-status seat-status-lost">{t("seat.lost")}</div>}
+      {status === "allIn" && <div className="seat-status seat-status-allin">{t("seat.allIn")}</div>}
       {lastAction && !status && <div className="seat-status seat-status-action">{lastAction}</div>}
-      {player.folded && <div className="seat-fold-label">FOLDED</div>}
+      {player.folded && <div className="seat-fold-label">{t("seat.folded")}</div>}
     </div>
   );
 }

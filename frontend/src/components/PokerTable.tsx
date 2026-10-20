@@ -1,6 +1,8 @@
 import { Card, TableState, formatChips } from "../models/game";
 import { CardView } from "./CardView";
 import { PokerSeat } from "./PokerSeat";
+import { useT } from "../i18n/I18n";
+import type { MessageKey } from "../i18n/messages/en";
 
 interface PokerTableProps {
   state: TableState;
@@ -13,17 +15,13 @@ interface PokerTableProps {
   top?: React.ReactNode;
 }
 
-const ACT_LABEL: Record<string, string> = {
-  fold: "FOLDED",
-  check: "CHECK",
-  call: "CALL",
-  bet: "BET",
-  raise: "RAISE",
-  all_in: "ALL-IN",
+const TAGS: Record<string, MessageKey> = {
+  fold: "tag.fold", check: "tag.check", call: "tag.call", bet: "tag.bet", raise: "tag.raise", all_in: "tag.all_in",
 };
 
 /** The 9-seat poker table: seats, community board, pot, header info. */
 export function PokerTable({ state, children, overlay, cover, top }: PokerTableProps) {
+  const t = useT();
   // A43: an eliminated BOT leaves the felt entirely; the hero seat stays.
   const sorted = [...state.players]
     .filter((pl) => !pl.sitsOut || pl.isHero)
@@ -34,7 +32,7 @@ export function PokerTable({ state, children, overlay, cover, top }: PokerTableP
   // last action per seat from the live action log
   const lastActionBySeat = new Map<number, string>();
   for (const a of state.actionLog ?? []) {
-    lastActionBySeat.set(a.seat, ACT_LABEL[a.action] ?? a.action.toUpperCase());
+    lastActionBySeat.set(a.seat, TAGS[a.action] ? t(TAGS[a.action]) : a.action.toUpperCase());
   }
 
   const revealBySeat = new Map<number, { cards: Card[] | null; hand: string | null }>();
@@ -57,34 +55,36 @@ export function PokerTable({ state, children, overlay, cover, top }: PokerTableP
     <div className="table-wrap" data-testid="poker-table">
       <div className="table-header">
         <span className="tbl-info">
-          LEVEL {state.level} — {state.smallBlind}/{state.bigBlind}
+          {t("status.level", { level: state.level, sb: state.smallBlind, bb: state.bigBlind })}
         </span>
         <span className="tbl-info">
-          {state.inBreak ? "BREAK · " : ""}
-          {state.ante > 0 ? `ANTE ${formatChips(state.ante)} · ` : ""}TIME {formatClock(state.secondsLeft)}
+          {state.inBreak ? t("status.break") : ""}
+          {state.ante > 0 ? t("status.ante", { n: formatChips(state.ante) }) : ""}
+          {t("status.time", { clock: formatClock(state.secondsLeft) })}
         </span>
         <span className="tbl-info" data-testid="pot-amount">
-          POT {formatChips(state.pot)}
+          {t("status.pot", { n: formatChips(state.pot) })}
         </span>
       </div>
       <div className="table-status" data-testid="table-status">
-        <span className="tbl-info">HAND #{state.handNumber}</span>
+        <span className="tbl-info">{t("status.hand", { n: state.handNumber })}</span>
         {state.playersRemaining !== undefined && (
           <span className="tbl-info" data-testid="players-remaining">
-            {state.playersRemaining}/9 IN TOURNAMENT{state.inHand !== undefined ? ` · ${state.inHand} IN HAND` : ""}
+            {t("status.inTournament", { n: state.playersRemaining })}
+            {state.inHand !== undefined ? t("status.inHand", { n: state.inHand }) : ""}
           </span>
         )}
         {state.totalChips !== undefined && (
           <span className="tbl-info" data-testid="total-chips">
-            TOTAL CHIPS {formatChips(state.totalChips)}
+            {t("status.totalChips", { n: formatChips(state.totalChips) })}
           </span>
         )}
         {state.averageStack !== undefined && (
           <span className="tbl-info" data-testid="average-stack">
-            AVERAGE STACK {formatChips(state.averageStack)}
+            {t("status.averageStack", { n: formatChips(state.averageStack) })}
           </span>
         )}
-        <span className="tbl-info">{isReview ? "HAND COMPLETE" : "LIVE HAND"}</span>
+        <span className="tbl-info">{t(isReview ? "status.handComplete" : "status.liveHand")}</span>
       </div>
       {top}
       <div className="table-felt">
@@ -98,7 +98,7 @@ export function PokerTable({ state, children, overlay, cover, top }: PokerTableP
               lastAction={isReview ? undefined : lastActionBySeat.get(p.seat)}
               status={seatStatus(p.seat, p.folded, p.sitsOut)}
               revealCards={isReview ? (reveal?.cards ?? null) : null}
-              revealHand={isReview ? (reveal?.hand ?? null) : (p.isHero ? "YOU" : null)}
+              revealHand={isReview ? (reveal?.hand ?? null) : (p.isHero ? t("seat.you") : null)}
             />
           );
         })}

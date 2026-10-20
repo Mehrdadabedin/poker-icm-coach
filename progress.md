@@ -96,7 +96,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 090 | Logo on the Table | 7 | complete | PASS (4 FE new) | empty board shows the ICMBOT logo, 25% of the table wide, opacity 0.3, from logo-felt.png (black made transparent) |
 | 091 | CHOPPED Only for a Tie | 7 | complete | PASS (3 BE + 3 FE new) | a main pot won while another player took a side pot read CHOPPED; now YOU WON with "X won the other pot"; chips were right |
 | 092 | End Game and Final Standings | 7 | complete | PASS (4 BE + 4 FE new) | after a bust: WATCH or END GAME (+ CONTINUE while re-entry is open); END GAME ranks 1st-9th by chips, NEW GAME on that list, players out by the order they went |
-| 093 | Spanish Site (icmbot.es) | 7 | in-progress | PASS (8 FE new) | step 1: language system (useT, en/es files, ?lang, icmbot.es Spanish from the start), sign-in screen in Spanish; step 2: landing page, footer, cookie banner; next: table |
+| 093 | Spanish Site (icmbot.es) | 7 | in-progress | PASS (15 FE new) | step 1: language system (useT, en/es files, ?lang, icmbot.es Spanish from the start), sign-in screen in Spanish; step 2: landing page, footer, cookie banner; step 3a: table (buttons, sizes, menu, seats, result, end screens, Spanish numbers); next: hand review |
 
 ## Current Phase
 
