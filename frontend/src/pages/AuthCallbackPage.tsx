@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { saveAuth } from "../services/api";
+import { useT } from "../i18n/I18n";
 
 /** Landing route for the server-side OAuth redirect: /#/auth/callback?token=..
  *
@@ -10,7 +11,8 @@ import { saveAuth } from "../services/api";
 export function AuthCallbackPage() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const [message, setMessage] = useState("Signing you in\u2026");
+  const t = useT();
+  const [message, setMessage] = useState(t("callback.signingIn"));
 
   useEffect(() => {
     const token = params.get("token");
@@ -18,19 +20,17 @@ export function AuthCallbackPage() {
     const error = params.get("error");
     if (error) {
       setMessage(
-        error === "account_suspended"
-          ? "This account is suspended."
-          : "Sign-in could not be completed. Please try again.",
+        t(error === "account_suspended" ? "callback.suspended" : "callback.failed"),
       );
       return;
     }
     if (!token || !username) {
-      setMessage("Sign-in could not be completed. Please try again.");
+      setMessage(t("callback.failed"));
       return;
     }
     saveAuth(token, username);
     navigate("/", { replace: true });
-  }, [params, navigate]);
+  }, [params, navigate, t]);
 
   return (
     <div className="page auth-callback-page" data-testid="auth-callback">

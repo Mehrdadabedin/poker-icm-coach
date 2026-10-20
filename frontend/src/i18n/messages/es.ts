@@ -5,5 +5,6 @@ import { auth } from "./es/auth";
 import { landing } from "./es/landing";
 import { table } from "./es/table";
 import { review } from "./es/review";
+import { home } from "./es/home";
 
-export const es: Messages = { ...auth, ...landing, ...table, ...review };
+export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home };

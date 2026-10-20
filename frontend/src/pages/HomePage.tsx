@@ -6,11 +6,13 @@ import { BrandLogo } from "../components/BrandLogo";
 import { HomeMenu } from "../components/HomeMenu";
 import { LanguageMenu } from "../components/LanguageMenu";
 import { LoginForm } from "../components/LoginForm";
+import { useT } from "../i18n/I18n";
 
 /** HOME screen: username login (A03) then start a practice tournament or
  * visit the tools. The authenticated username replaces "Hero" everywhere. */
 export function HomePage() {
   const location = useLocation();
+  const t = useT();
   const authNotice = (location.state as { authNotice?: string } | null)?.authNotice ?? null;
   const [user, setUser] = useState<string | null>(() => (getToken() ? getUsername() : null));
   const [isAdmin, setIsAdmin] = useState(false);
@@ -89,15 +91,16 @@ export function HomePage() {
         <div className="top-bar app-header" data-testid="session-bar">
           <h1 className="screen-title header-title" data-testid="app-title"><BrandLogo /></h1>
           <div className="header-right">
-            <span className="header-user">Playing as <b data-testid="session-username">{user}</b></span>
+            <LanguageMenu short />
+            <span className="header-user">{t("menu.playingAs")} <b data-testid="session-username">{user}</b></span>
             <button className="btn btn-logout" onClick={() => void signOut()} data-testid="logout-btn">
-              LOG OUT
+              {t("table.logout")}
             </button>
           </div>
         </div>
       </div>
       <main className="home-body">
-        <p className="home-tagline">9-player tournament practice with an ICM coach</p>
+        <p className="home-tagline">{t("home.tagline")}</p>
         <HomeMenu isAdmin={isAdmin} />
         <Copyright />
       </main>

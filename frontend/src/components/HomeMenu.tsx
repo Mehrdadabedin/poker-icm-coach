@@ -1,52 +1,57 @@
 import { useNavigate } from "react-router-dom";
 import { useAwayTable } from "../hooks/useAwayTable";
 import { MENU_ICONS, type MenuIcon } from "./homeMenuIcons";
+import { useT } from "../i18n/I18n";
+import type { MessageKey } from "../i18n/messages/en";
 
 interface Entry {
   to: string;
   icon: MenuIcon;
-  title: string;
-  text: string;
+  title: MessageKey;
+  text: MessageKey;
   testId: string;
+  /** filled into the title, as the table label in "Continue table D" */
+  label?: string;
 }
 
-const GROUPS: { label: string; entries: Entry[] }[] = [
+const GROUPS: { label: MessageKey; entries: Entry[] }[] = [
   {
-    label: "STUDY",
+    label: "home.study",
     entries: [
-      { to: "/coach", icon: "coach", title: "ICM coach", text: "Ask the coach about any hand and stack", testId: "menu-coach" },
-      { to: "/ranges", icon: "ranges", title: "Ranges", text: "Baseline ranges by position and stack", testId: "menu-ranges" },
-      { to: "/icm-calculator", icon: "calculator", title: "ICM calculator", text: "What each stack is worth", testId: "menu-icm-calculator" },
+      { to: "/coach", icon: "coach", title: "home.coach.title", text: "home.coach.text", testId: "menu-coach" },
+      { to: "/ranges", icon: "ranges", title: "home.ranges.title", text: "home.ranges.text", testId: "menu-ranges" },
+      { to: "/icm-calculator", icon: "calculator", title: "home.calculator.title", text: "home.calculator.text", testId: "menu-icm-calculator" },
     ],
   },
   {
-    label: "REVIEW",
+    label: "home.review",
     entries: [
-      { to: "/mistakes", icon: "mistakes", title: "My mistakes", text: "Decisions the coach played differently", testId: "menu-mistakes" },
-      { to: "/history", icon: "history", title: "Hand history", text: "Every tournament you played, hand by hand", testId: "menu-history" },
-      { to: "/report", icon: "report", title: "Report", text: "Results, leaks and progress across tournaments", testId: "menu-report" },
+      { to: "/mistakes", icon: "mistakes", title: "home.mistakes.title", text: "home.mistakes.text", testId: "menu-mistakes" },
+      { to: "/history", icon: "history", title: "home.history.title", text: "home.history.text", testId: "menu-history" },
+      { to: "/report", icon: "report", title: "home.report.title", text: "home.report.text", testId: "menu-report" },
     ],
   },
   {
-    label: "SETUP",
+    label: "home.setup",
     entries: [
-      { to: "/settings", icon: "settings", title: "Tournament settings", text: "Stacks, blinds and speed for new tournaments", testId: "menu-settings" },
+      { to: "/settings", icon: "settings", title: "home.settings.title", text: "home.settings.text", testId: "menu-settings" },
     ],
   },
 ];
 
-const ADMIN: Entry = { to: "/admin", icon: "admin", title: "Admin", text: "Users and moderation", testId: "menu-admin" };
+const ADMIN: Entry = { to: "/admin", icon: "admin", title: "home.admin.title", text: "home.admin.text", testId: "menu-admin" };
 
 function MenuCard({ entry, big = false }: { entry: Entry; big?: boolean }) {
   const navigate = useNavigate();
+  const t = useT();
   return (
     <button type="button" className={big ? "hm-card hm-card-big" : "hm-card"} onClick={() => navigate(entry.to)} data-testid={entry.testId}>
       <svg className="hm-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
         {MENU_ICONS[entry.icon]}
       </svg>
       <span className="hm-text">
-        <b className="hm-title">{entry.title}</b>
-        <span className="hm-desc">{entry.text}</span>
+        <b className="hm-title">{t(entry.title, { label: entry.label ?? "" }).trim()}</b>
+        <span className="hm-desc">{t(entry.text)}</span>
       </span>
     </button>
   );
@@ -58,12 +63,13 @@ function MenuCard({ entry, big = false }: { entry: Entry; big?: boolean }) {
  * practice opens the 8-bot lineup builder, so BOT PROFILES has no card. */
 export function HomeMenu({ isAdmin }: { isAdmin: boolean }) {
   const away = useAwayTable();
+  const t = useT();
   const groups = isAdmin
-    ? GROUPS.map((g) => (g.label === "SETUP" ? { ...g, entries: [...g.entries, ADMIN] } : g))
+    ? GROUPS.map((g) => (g.label === "home.setup" ? { ...g, entries: [...g.entries, ADMIN] } : g))
     : GROUPS;
 
   return (
-    <nav className="home-menu" aria-label="Main menu">
+    <nav className="home-menu" aria-label={t("home.menu")}>
       <div className="hm-play">
         {away && (
           <MenuCard
@@ -71,20 +77,21 @@ export function HomeMenu({ isAdmin }: { isAdmin: boolean }) {
             entry={{
               to: `/table/${away.tableId}`,
               icon: "continue",
-              title: `Continue table${away.label ? ` ${away.label}` : ""}`,
-              text: "Pick up where you left off",
+              title: "home.continue.title",
+              label: away.label ?? "",
+              text: "home.continue.text",
               testId: "continue-table",
             }}
           />
         )}
         <MenuCard
           big
-          entry={{ to: "/bot-profiles", icon: "start", title: "Start practice", text: "Choose 8 bots and play a tournament", testId: "start-practice" }}
+          entry={{ to: "/bot-profiles", icon: "start", title: "home.start.title", text: "home.start.text", testId: "start-practice" }}
         />
       </div>
       {groups.map((group) => (
-        <section key={group.label} aria-label={group.label}>
-          <p className="hm-label">{group.label}</p>
+        <section key={group.label} aria-label={t(group.label)}>
+          <p className="hm-label">{t(group.label)}</p>
           <div className="hm-grid">
             {group.entries.map((entry) => <MenuCard key={entry.to} entry={entry} />)}
           </div>

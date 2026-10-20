@@ -9,3 +9,6 @@
 .lm-header-band .lang-menu { margin: 0; gap: 4px; }
 .lm-header-band .lang-menu button { padding: 2px 8px; color: #c9cfd8; border-color: rgba(255, 255, 255, 0.25); }
 .lm-header-band .lang-menu button[aria-pressed="true"] { color: var(--lm-gold, #f2c14e); border-color: currentColor; }
+/* in the signed-in home header, beside "Playing as" */
+.app-header .lang-menu { margin: 0; gap: 4px; }
+.app-header .lang-menu button { padding: 2px 8px; }

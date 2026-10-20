@@ -34,8 +34,8 @@ sentences from the server.
 2. Landing page, footer, cookie banner (done).
 3. The table (done in 3a: buttons, sizes, header and ☰ menu, info rows, seats,
    result, bust and standings screens, coach labels; numbers as 45.000 and
-   2,5 BB). 3b: hand review and hand history (done). 3c: home menu and bot
-   choice.
+   2,5 BB). 3b: hand review and hand history (done). 3c: home menu, bot
+   choice and the Google sign-in return page (done).
 4. Coach texts: the server sends codes and details instead of sentences.
 5. My Mistakes, Hand History, Report, statistics, ICM calculator.
 6. Spanish review by a native speaker who plays poker; Spanish READY.
@@ -62,3 +62,8 @@ Step 3b, browser with ?lang=es after a hand: HISTORIAL DE LA MANO, HAS
 PERDIDO, MANO GANADORA, PRESIÓN ICM BAJA, MANOS EN EL SHOWDOWN, pone la ciega
 grande. Hand names ("Pair of Js") and the bots' reasons come from the server:
 step 4.
+
+Step 3c, browser with ?lang=es at 574 and 360 wide: the home menu (Empezar a
+practicar, ESTUDIAR, Coach ICM, Seguir en la mesa D), EN / ES in its header,
+the bot page (PERFILES DE BOTS, Tight agresivo, RIVALES 8 / 8), no sideways
+scroll.
