@@ -1,6 +1,6 @@
 /* The minimal landing page, the landing page at / since plan 069. The old
  * page stays at /classic (see landing.test.tsx); /minimal links still work. */
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { describe, expect, it, vi, beforeAll, beforeEach, afterEach } from "vitest";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 
 vi.mock("../src/services/api", async (importOriginal) => ({
@@ -10,6 +10,14 @@ vi.mock("../src/services/api", async (importOriginal) => ({
 }));
 
 const scrolledIds: string[] = [];
+
+// Loading the whole app takes seconds on a busy machine (the pre-push hook runs
+// everything at once). Once here, not in the first test: that test passed the
+// 5 s limit, and the tests after it failed on its leftovers.
+beforeAll(async () => {
+  await import("../src/App");
+}, 30_000);
+
 // HashRouter renders the /login route as the #/login href.
 
 async function openAt(hash: string) {
@@ -25,7 +33,10 @@ describe("minimal landing page (/minimal)", () => {
     scrolledIds.length = 0;
     Element.prototype.scrollIntoView = function (this: Element) { scrolledIds.push(this.id); };
   });
-  afterEach(() => vi.restoreAllMocks());
+  afterEach(() => {
+    cleanup();
+    vi.restoreAllMocks();
+  });
 
   it("is the landing page at / for a visitor without a session (plan 069)", async () => {
     await openAt("#/");
