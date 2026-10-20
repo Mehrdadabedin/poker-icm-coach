@@ -13,6 +13,8 @@ import {
   saveLineup,
 } from "../models/botProfiles";
 import { AuthError, clearAuth, createTournament } from "../services/api";
+import { useT } from "../i18n/I18n";
+import type { MessageKey } from "../i18n/messages/en";
 
 function initialCounts(): Record<string, number> {
   const counts: Record<string, number> = {};
@@ -24,7 +26,15 @@ function initialCounts(): Record<string, number> {
   return counts;
 }
 
+/** Each personality's style and description, as message keys (plan 093). */
+const BOT_TEXT: Record<string, [MessageKey, MessageKey]> = {
+  alex: ["bot.tag.style", "bot.tag.desc"], sarah: ["bot.lag.style", "bot.lag.desc"],
+  david: ["bot.tp.style", "bot.tp.desc"], emma: ["bot.lp.style", "bot.lp.desc"],
+};
+
 export function BotProfilesPage() {
+  const t = useT();
+  const style = (id: string, fallback: string) => (BOT_TEXT[id] ? t(BOT_TEXT[id][0]) : fallback);
   const navigate = useNavigate();
   const [counts, setCounts] = useState<Record<string, number>>(initialCounts);
   const [error, setError] = useState<string | null>(null);
@@ -49,7 +59,7 @@ export function BotProfilesPage() {
 
   const addBots = async () => {
     if (total !== MAX_BOTS) {
-      setError("Please select 8 opponents to fill the tournament.");
+      setError(t("botsPage.select8"));
       return;
     }
     setStarting(true);
@@ -63,7 +73,7 @@ export function BotProfilesPage() {
       // send the user back to login instead of failing silently.
       if (err instanceof AuthError) {
         clearAuth();
-        navigate("/login", { state: { authNotice: "Session expired — please log in again." } });
+        navigate("/login", { state: { authNotice: t("botsPage.expired") } });
         return;
       }
       setStarting(false);
@@ -73,13 +83,13 @@ export function BotProfilesPage() {
   return (
     <div className="page bot-profiles-page" data-testid="bot-profiles-page">
       <div className="bot-profiles-bar">
-        <h1 className="screen-title">BOT PROFILES</h1>
+        <h1 className="screen-title">{t("botsPage.title")}</h1>
         <button type="button" className="bot-profile-back" onClick={back} data-testid="bot-profiles-back">
-          BACK
+          {t("botsPage.back")}
         </button>
       </div>
       <p className="bot-profiles-intro">
-        Build your opponent lineup. Each personality can be used more than once.
+        {t("botsPage.intro")}
       </p>
       <div className="bot-profiles-grid">
         {BOT_PROFILES.map((profile) => {
@@ -99,12 +109,12 @@ export function BotProfilesPage() {
                 />
               </span>
               <b className="bot-profile-name">{profile.name}</b>
-              <span className="bot-profile-style">{profile.style}</span>
-              <span className="bot-profile-desc">{profile.description}</span>
+              <span className="bot-profile-style">{style(profile.id, profile.style)}</span>
+              <span className="bot-profile-desc">{BOT_TEXT[profile.id] ? t(BOT_TEXT[profile.id][1]) : profile.description}</span>
               <div className="bot-profile-counter">
                 <button
                   type="button"
-                  aria-label={`Remove ${profile.name}`}
+                  aria-label={t("botsPage.remove", { name: profile.name })}
                   disabled={count === 0}
                   onClick={() => remove(profile.id)}
                   data-testid={`bot-profile-remove-${profile.id}`}
@@ -116,7 +126,7 @@ export function BotProfilesPage() {
                 </span>
                 <button
                   type="button"
-                  aria-label={`Add ${profile.name}`}
+                  aria-label={t("botsPage.add", { name: profile.name })}
                   disabled={full}
                   onClick={() => add(profile.id)}
                   data-testid={`bot-profile-add-${profile.id}`}
@@ -130,17 +140,17 @@ export function BotProfilesPage() {
       </div>
 
       <p className="bot-profiles-total" data-testid="bot-profiles-total">
-        OPPONENTS {total} / {MAX_BOTS}
+        {t("botsPage.total", { n: total, max: MAX_BOTS })}
       </p>
 
       <div className="bot-profiles-summary" data-testid="bot-profiles-summary">
-        <b>YOUR OPPONENTS</b>
+        <b>{t("botsPage.yours")}</b>
         {BOT_PROFILES.filter((p) => (counts[p.id] ?? 0) > 0).map((p) => (
           <span key={p.id}>
-            {p.name} — {p.style} × {counts[p.id]}
+            {p.name} — {style(p.id, p.style)} × {counts[p.id]}
           </span>
         ))}
-        {total === 0 && <span>None selected yet.</span>}
+        {total === 0 && <span>{t("botsPage.none")}</span>}
       </div>
 
       {error && (
@@ -155,7 +165,7 @@ export function BotProfilesPage() {
         disabled={starting}
         data-testid="add-bots-to-table"
       >
-        {starting ? "CREATING TABLE…" : "ADD BOTS TO TABLE"}
+        {t(starting ? "botsPage.creating" : "botsPage.addBots")}
       </button>
       <Copyright />
     </div>

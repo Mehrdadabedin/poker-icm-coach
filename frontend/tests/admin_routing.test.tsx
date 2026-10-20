@@ -1,6 +1,6 @@
 /* A04 tests: App routing reaches the Admin page and the ADMIN menu entry is
  * shown only to an Admin (the summary API answers 403 for a normal user). */
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it, vi, beforeAll, beforeEach } from "vitest";
 import { act, fireEvent, render, screen } from "@testing-library/react";
 
 const { adminSummary } = vi.hoisted(() => ({
@@ -24,6 +24,13 @@ vi.mock("../src/services/api", async (importOriginal) => ({
 }));
 
 const flush = async () => act(async () => undefined);
+
+// Loading the whole app takes seconds on a busy machine (the pre-push hook runs
+// everything at once). Once here, not in the first test: that test passed the
+// 5 s limit, and the tests after it failed on its leftovers.
+beforeAll(async () => {
+  await import("../src/App");
+}, 30_000);
 
 beforeEach(() => {
   localStorage.clear();
