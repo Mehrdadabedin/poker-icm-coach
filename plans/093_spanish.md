@@ -48,7 +48,7 @@ sentences from the server.
 6. Spanish review by a native speaker who plays poker; Spanish READY.
 7. icmbot.es on Render (custom domain, DNS at one.com, CORS_ORIGINS) (done).
 8. The page head for icmbot.es: Spanish title, description and link preview,
-   og:url https://icmbot.es (code done; Render setup below is the owner's).
+   og:url https://icmbot.es (done: static site icmbot-es on Render, 20 Oct).
 
 # The page head on icmbot.es (step 8)
 
@@ -180,3 +180,24 @@ PREFLOP, Valor / Palo in the card picker; after ANALIZAR: RECOMENDACIÓN:
 IGUALAR, EV EN FICHAS: +12.500, PROB. DE GANAR: 55,2%, the reason from its
 code and the factor rows. AJUSTES DEL TORNEO, STACK INICIAL, MODO RÁPIDO,
 REVERSO DE LAS CARTAS (Azul, Rojo), GUARDAR AJUSTES and both save notes.
+
+Step 8, checked from outside on 20 Oct (the owner set up Render the same
+day): icmbot.es is the static site icmbot-es (Root Directory frontend,
+`npm ci && npm run build`, publish dist, VITE_API_URL as on
+poker-icm-coach-layout-test, VITE_SITE_LANG=es). www.icmbot.es CNAME to
+icmbot-es.onrender.com, the A record still 216.24.57.1; certificate for
+icmbot.es to 18 Jan 2027. https://icmbot.es, www and new ?v= links answer
+200 with lang="es", og:url https://icmbot.es/, og:title "ICMBOT ·
+Entrenador de póker de torneos" and og:locale es_ES, fetched with the
+WhatsApp, facebookexternalhit and Twitterbot user agents. The backend still
+allows https://icmbot.es (preflight 200). icmbot.one is unchanged, English.
+Not checked: the preview inside WhatsApp itself. WhatsApp Web still showed
+the English preview for https://icmbot.es/?v=3 the same evening; Meta
+caches by og:url, so the fix is Scrape Again on https://icmbot.es/ in the
+Facebook Sharing Debugger.
+
+Step 8b: icmbot.es previews with its own picture, og-1200x630-es.jpg: the
+icmbot.one picture with the floating coach screen replaced by a screenshot
+of the Spanish table (NO IR, IGUALAR 100, SUBIR A 250, 45.000), warped onto
+the screen's corners. A new file name, because the preview apps cache a
+picture by its URL.
