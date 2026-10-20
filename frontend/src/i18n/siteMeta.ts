@@ -15,6 +15,7 @@ export interface SiteMeta {
   twitterDescription: string;
   imageAlt: string;
   locale: string;
+  image: string;
 }
 
 export const SITE_META: Record<Lang, SiteMeta> = {
@@ -29,6 +30,7 @@ export const SITE_META: Record<Lang, SiteMeta> = {
     twitterDescription: "Play 9-handed tournaments against 8 bots. Before every decision, the ICM coach tells you what to do and why.",
     imageAlt: "ICMBOT robot with a human face holding two aces, the ICM coach screen beside it",
     locale: "en_US",
+    image: "/images/og-1200x630-v2.jpg",
   },
   es: {
     origin: "https://icmbot.es",
@@ -41,10 +43,10 @@ export const SITE_META: Record<Lang, SiteMeta> = {
     twitterDescription: "Juega torneos de 9 jugadores contra 8 bots. Antes de cada decisión, el coach ICM te dice qué hacer y por qué.",
     imageAlt: "El robot de ICMBOT con cara humana y dos ases en la mano, junto a la pantalla del coach ICM",
     locale: "es_ES",
+    // the coach screen in the picture shows the Spanish table
+    image: "/images/og-1200x630-es.jpg",
   },
 };
-
-export const OG_IMAGE_PATH = "/images/og-1200x630-v2.jpg";
 
 const escapeAttr = (s: string): string => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
 
@@ -63,7 +65,7 @@ function replaceOnce(html: string, pattern: RegExp, value: string): string {
  * stay the same on both sites, so each names the other. */
 export function siteHtml(html: string, lang: Lang): string {
   const m = SITE_META[lang];
-  const image = `${m.origin}${OG_IMAGE_PATH}`;
+  const image = `${m.origin}${m.image}`;
   const swaps: [RegExp, string][] = [
     [/(<html\s+lang=")[^"]*(")/g, lang],
     [/(<title>)[^<]*(<\/title>)/g, m.title],

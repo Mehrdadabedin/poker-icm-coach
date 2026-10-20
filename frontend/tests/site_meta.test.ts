@@ -1,4 +1,4 @@
-import { readFileSync } from "fs";
+import { existsSync, readFileSync } from "fs";
 import { resolve } from "path";
 import { SITE_META, siteHtml } from "../src/i18n/siteMeta";
 
@@ -21,12 +21,12 @@ describe("site head (plan 093)", () => {
     expect(meta(doc, "og:url")).toBe("https://icmbot.es/");
     expect(meta(doc, "og:title")).toBe(es.ogTitle);
     expect(meta(doc, "og:description")).toBe(es.ogDescription);
-    expect(meta(doc, "og:image")).toBe("https://icmbot.es/images/og-1200x630-v2.jpg");
+    expect(meta(doc, "og:image")).toBe("https://icmbot.es/images/og-1200x630-es.jpg");
     expect(meta(doc, "og:image:alt")).toBe(es.imageAlt);
     expect(meta(doc, "og:locale")).toBe("es_ES");
     expect(meta(doc, "twitter:title")).toBe(es.ogTitle);
     expect(meta(doc, "twitter:description")).toBe(es.twitterDescription);
-    expect(meta(doc, "twitter:image")).toBe("https://icmbot.es/images/og-1200x630-v2.jpg");
+    expect(meta(doc, "twitter:image")).toBe("https://icmbot.es/images/og-1200x630-es.jpg");
     expect(meta(doc, "twitter:image:alt")).toBe(es.imageAlt);
     expect(doc.querySelector('link[rel="canonical"]')?.getAttribute("href")).toBe("https://icmbot.es/");
   });
@@ -47,6 +47,10 @@ describe("site head (plan 093)", () => {
     const expected = ["en https://icmbot.one/", "es https://icmbot.es/", "x-default https://icmbot.one/"];
     expect(links(INDEX)).toEqual(expected);
     expect(links(siteHtml(INDEX, "es"))).toEqual(expected);
+  });
+
+  it("every site's preview picture is in public/", () => {
+    for (const m of Object.values(SITE_META)) expect(existsSync(resolve(__dirname, `../public${m.image}`)), m.image).toBe(true);
   });
 
   it("fails the build when index.html no longer has a tag it must rewrite", () => {
