@@ -90,6 +90,10 @@ export const numberLocale = (): string => NUMBER_LOCALES[current];
 /** A plain number in the language: English as written ("6.5"), Spanish 6,5. */
 export const localNumber = (n: number): string => (current === "en" ? String(n) : n.toLocaleString(NUMBER_LOCALES[current]));
 
+/** A number with fixed decimals in the language: 12.50 in English, 12,50 in Spanish. */
+export const localFixed = (n: number, digits: number): string => (current === "en" ? n.toFixed(digits)
+  : n.toLocaleString(NUMBER_LOCALES[current], { minimumFractionDigits: digits, maximumFractionDigits: digits }));
+
 const SUFFIX: Record<number, string> = { 1: "ST", 2: "ND", 3: "RD" };
 
 /** A finishing place: 1ST, 2ND, 11TH in English; 1.º, 2.º in Spanish. */

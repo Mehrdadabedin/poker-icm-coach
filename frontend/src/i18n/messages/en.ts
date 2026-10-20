@@ -11,8 +11,9 @@ import { hands } from "./en/hands";
 import { mistakes } from "./en/mistakes";
 import { handHistory } from "./en/handHistory";
 import { report } from "./en/report";
+import { tools } from "./en/tools";
 
-export const en = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report };
+export const en = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools };
 
 export type MessageKey = keyof typeof en;
 export type Messages = Record<MessageKey, string>;

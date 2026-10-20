@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { request } from "../services/api";
 import { Copyright } from "../components/Copyright";
 import { PageHeader } from "../components/PageHeader";
+import { useT } from "../i18n/I18n";
+import { localFixed, localNumber } from "../i18n/lang";
+import { formatChips } from "../models/game";
 
 type Stats = { handsPlayed: number; handsWon: number; vpip: number; pfr: number; aggression: number; averagePot: number; bbWonLost: number; chipProfit: number; coachAgreement: number; icmMistakes: number; positionPerformance: Record<string, number> };
 
@@ -15,6 +18,7 @@ const card = (label: string, value: string, extra?: string) => (
 
 /** STATISTICS screen: session aggregates from the API. */
 export function StatisticsPage() {
+  const t = useT();
   const [stats, setStats] = useState<Stats | null>(null);
   const [tableId, setTableId] = useState("");
 
@@ -29,35 +33,35 @@ export function StatisticsPage() {
   return (
     <div className="page" data-testid="statistics-page">
       <PageHeader />
-      <h1 className="screen-title">SESSION STATISTICS</h1>
+      <h1 className="screen-title">{t("stats.title")}</h1>
       <div className="toolbar">
-        <input placeholder="table id" value={tableId} onChange={(e) => setTableId(e.target.value)} />
+        <input placeholder={t("stats.tableId")} value={tableId} onChange={(e) => setTableId(e.target.value)} />
       </div>
       {stats && (
         <>
           <div className="stat-grid">
-            {card("HANDS", String(stats.handsPlayed))}
-            {card("WON", String(stats.handsWon))}
-            {card("VPIP", `${(stats.vpip * 100).toFixed(1)}%`)}
-            {card("PFR", `${(stats.pfr * 100).toFixed(1)}%`)}
-            {card("AGGRESSION", `${(stats.aggression * 100).toFixed(0)}%`)}
-            {card("AVG POT", stats.averagePot.toLocaleString())}
-            {card("BB WON/LOST", stats.bbWonLost.toFixed(2))}
-            {card("CHIP P/L", `${stats.chipProfit >= 0 ? "+" : ""}${stats.chipProfit.toLocaleString()}`)}
-            {card("COACH AGREEMENT", `${(stats.coachAgreement * 100).toFixed(0)}%`)}
-            {card("ICM MISTAKES", String(stats.icmMistakes))}
+            {card(t("stats.hands"), String(stats.handsPlayed))}
+            {card(t("stats.won"), String(stats.handsWon))}
+            {card("VPIP", `${localFixed(stats.vpip * 100, 1)}%`)}
+            {card("PFR", `${localFixed(stats.pfr * 100, 1)}%`)}
+            {card(t("stats.aggression"), `${localFixed(stats.aggression * 100, 0)}%`)}
+            {card(t("stats.avgPot"), formatChips(stats.averagePot))}
+            {card(t("stats.bb"), localFixed(stats.bbWonLost, 2))}
+            {card(t("stats.chips"), `${stats.chipProfit >= 0 ? "+" : ""}${formatChips(stats.chipProfit)}`)}
+            {card(t("stats.agreement"), `${localFixed(stats.coachAgreement * 100, 0)}%`)}
+            {card(t("stats.icmMistakes"), String(stats.icmMistakes))}
           </div>
-          <h3>POSITION PERFORMANCE</h3>
+          <h3>{t("stats.positions")}</h3>
           <table className="data-table">
             <tbody>
               {Object.entries(stats.positionPerformance).map(([pos, net]) => (
-                <tr key={pos}><td>{pos}</td><td className={net >= 0 ? "pos" : "neg"}>{net >= 0 ? "+" : ""}{net}</td></tr>
+                <tr key={pos}><td>{pos}</td><td className={net >= 0 ? "pos" : "neg"}>{net >= 0 ? "+" : ""}{localNumber(net)}</td></tr>
               ))}
             </tbody>
           </table>
         </>
       )}
-      {!stats && <p className="note">Enter a table id to load statistics.</p>}
+      {!stats && <p className="note">{t("stats.enterTable")}</p>}
       <Copyright />
     </div>
   );

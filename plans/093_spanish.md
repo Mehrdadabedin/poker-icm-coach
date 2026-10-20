@@ -41,7 +41,7 @@ sentences from the server.
    4b (done): hand names, the bots' reasons and the action they faced.
 5. 5a (done): the page header and My Mistakes, the coach's reason from a code
    the hand history now keeps with each decision. 5b (done): Hand History. 5c
-   (done): Report. 5d: statistics, ICM calculator.
+   (done): Report. 5d (done): statistics, ICM calculator.
 6. Spanish review by a native speaker who plays poker; Spanish READY.
 7. icmbot.es on Render (custom domain, DNS at one.com, CORS_ORIGINS).
 
@@ -107,3 +107,10 @@ STACK · MESA C, 12 OCT, N2 on the bands, the leak "BB, preflop: IGUALAR
 cuando el coach dice NO IR", VPIP (jugar la mano) por encima del rango, and
 the bet-size bars and lines. English is unchanged (the existing Report
 tests pass untouched).
+
+Step 5d, tests only (I did not check it in the browser): CALCULADORA ICM,
+Premio total (EUR), Puesto 1, Añadir jugador, results as 47,37% / 376,60
+EUR / -9,71%, the form errors in Spanish; ESTADÍSTICAS DE LA SESIÓN with
+25,5%, 12.500, 1,50, +45.000. Step 5 is done: every screen a player sees
+is now in Spanish on icmbot.es. Left for Spanish: the native review (6) and
+the domain (7). The admin pages stay English (only the owner uses them).
