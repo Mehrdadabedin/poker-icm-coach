@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { useT } from "../i18n/I18n";
 
 interface MinimalHeroProps {
   demoOpen: boolean;
@@ -9,18 +10,16 @@ interface MinimalHeroProps {
  * primary button and a rounded outline button that opens the demo video, then the
  * picture of the ICM coach screen. */
 export function MinimalHero({ demoOpen, onWatchDemo }: MinimalHeroProps) {
+  const t = useT();
   return (
     <section className="lm-hero" aria-labelledby="lm-hero-title" data-testid="minimal-hero">
       <h1 className="lm-title" id="lm-hero-title">
-        Master tournament <span className="lm-accent">decisions</span>
+        {t("landing.hero.before")}<span className="lm-accent">{t("landing.hero.accent")}</span>{t("landing.hero.after")}
       </h1>
-      <p className="lm-sub">
-        Play 9-handed tournaments against 8 bots. The ICM coach shows the right
-        move, and why.
-      </p>
+      <p className="lm-sub">{t("landing.hero.sub")}</p>
       <div className="lm-actions">
         <Link className="lm-btn lm-btn-primary" to="/login" data-testid="minimal-start">
-          Start training free
+          {t("landing.startTraining")}
         </Link>
         <button
           type="button"
@@ -29,14 +28,14 @@ export function MinimalHero({ demoOpen, onWatchDemo }: MinimalHeroProps) {
           onClick={onWatchDemo}
           data-testid="minimal-watch-demo"
         >
-          Watch the demo
+          {t("landing.watchDemo")}
         </button>
       </div>
-      <p className="lm-tagline" data-testid="minimal-tagline">PRACTICE · IMPROVE · WIN</p>
+      <p className="lm-tagline" data-testid="minimal-tagline">{t("landing.tagline")}</p>
       <img
         className="lm-hero-img"
         src="/images/hero-coach-screen.webp"
-        alt="The ICMBOT table on a floating screen, where the ICM coach recommends a raise with K8s"
+        alt={t("landing.hero.alt")}
         width={1602}
         height={982}
         data-testid="minimal-hero-visual"

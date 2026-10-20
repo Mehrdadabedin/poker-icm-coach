@@ -30,8 +30,8 @@ sentences from the server.
 
 # Steps (one pull request each)
 
-1. The language system and the sign-in screen (done here).
-2. Landing page and footer.
+1. The language system and the sign-in screen (done, #77).
+2. Landing page, footer, cookie banner (done).
 3. Home menu, bot choice, table (header, controls, coach card, results).
 4. Coach texts: the server sends codes and details instead of sentences.
 5. My Mistakes, Hand History, Report, statistics, ICM calculator.
@@ -41,7 +41,11 @@ sentences from the server.
 Later, Chinese: `zh.ts`, "zh" in LANGS, fonts served by us (Google Fonts is
 blocked in mainland China and blocks the first paint).
 
-# Checked (step 1)
+# Checked
 
-Browser with ?lang=es: the sign-in screen in Spanish, the menu (English,
-Español) switches back to English and remembers it.
+Step 1, browser with ?lang=es: the sign-in screen in Spanish, the menu
+(English, Español) switches back to English and remembers it.
+
+Step 2, browser with ?lang=es: the landing page in Spanish ("Domina tus
+decisiones de torneo", the gold word kept), language pills in the footer.
+The demo video still speaks English; a Spanish narration is a later step.

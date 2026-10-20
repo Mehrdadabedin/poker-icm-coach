@@ -1,11 +1,12 @@
+import { useT } from "../i18n/I18n";
 import { MinimalCard, type CardContent } from "./MinimalCard";
 
 /** One row of three feature cards. */
 const FEATURES: CardContent[] = [
   {
     id: "coach",
-    title: "Coach at every decision",
-    text: "The move and the reason, before you act.",
+    title: "landing.feature.coach.title",
+    text: "landing.feature.coach.text",
     icon: (
       <>
         <path d="M4 5h16v11h-9l-4 4v-4H4z" />
@@ -15,8 +16,8 @@ const FEATURES: CardContent[] = [
   },
   {
     id: "mistakes",
-    title: "Find your mistakes",
-    text: "Every suboptimal decision, with why.",
+    title: "landing.feature.mistakes.title",
+    text: "landing.feature.mistakes.text",
     icon: (
       <>
         <circle cx="10.5" cy="10.5" r="6.5" />
@@ -28,8 +29,8 @@ const FEATURES: CardContent[] = [
   },
   {
     id: "calculator",
-    title: "ICM calculator",
-    text: "What every stack is worth in prize money.",
+    title: "landing.feature.calculator.title",
+    text: "landing.feature.calculator.text",
     icon: (
       <>
         <rect x="5" y="3" width="14" height="18" rx="2" />
@@ -41,8 +42,9 @@ const FEATURES: CardContent[] = [
 ];
 
 export function MinimalFeatures() {
+  const t = useT();
   return (
-    <section className="lm-features-wrap" aria-label="Features" data-testid="minimal-features">
+    <section className="lm-features-wrap" aria-label={t("landing.features")} data-testid="minimal-features">
       <ul className="lm-cards">
         {FEATURES.map((feature) => (
           <MinimalCard key={feature.id} card={feature} heading="h2" testId={`minimal-feature-${feature.id}`} />

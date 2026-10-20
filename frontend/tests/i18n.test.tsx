@@ -1,7 +1,7 @@
 /* The language system (plan 093): English and Spanish (icmbot.es); Chinese
  * comes later. Step 1 translates the sign-in screen; a language reaches
  * visitors only once it is READY, until then it is previewed with ?lang=es. */
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { LanguageMenu } from "../src/components/LanguageMenu";
@@ -10,6 +10,12 @@ import { I18nProvider } from "../src/i18n/I18n";
 import { detectLang, LANG_KEY, READY, type Lang, type LangSources } from "../src/i18n/lang";
 import { en } from "../src/i18n/messages/en";
 import { MESSAGES } from "../src/i18n/translate";
+
+// the cookie banner only shows where Google Analytics is set up, as on icmbot.es
+vi.mock("../src/analytics", async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  isGoogleAnalyticsConfigured: () => true,
+}));
 
 const holes = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
 
@@ -47,7 +53,8 @@ describe("which language the site speaks", () => {
       expect(Object.keys(messages).sort(), lang).toEqual(Object.keys(en).sort());
       for (const key of Object.keys(en) as (keyof typeof en)[]) {
         expect(holes(messages[key]), `${lang} ${key}`).toEqual(holes(en[key]));
-        expect(messages[key].trim(), `${lang} ${key}`).not.toBe("");
+        // empty only where English is: the hero puts words after its gold word in Spanish only
+        if (en[key].trim()) expect(messages[key].trim(), `${lang} ${key}`).not.toBe("");
       }
     }
   });
@@ -56,6 +63,25 @@ describe("which language the site speaks", () => {
 function signIn(lang: Lang) {
   render(<I18nProvider initial={lang}><MemoryRouter><LoginForm onLogin={() => undefined} /><LanguageMenu /></MemoryRouter></I18nProvider>);
 }
+
+describe("the landing page", () => {
+  it("reads in Spanish, gold word and all, with a way back to English", async () => {
+    const { App } = await import("../src/App");
+    localStorage.setItem(LANG_KEY, "es");
+    window.location.hash = "#/";
+    render(<App />);
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Domina tus decisiones de torneo");
+    expect(screen.getByRole("heading", { level: 1 }).querySelector(".lm-accent")).toHaveTextContent("decisiones");
+    expect(screen.getByTestId("minimal-start")).toHaveTextContent("Empieza a entrenar gratis");
+    expect(screen.getByTestId("minimal-login")).toHaveTextContent("Iniciar sesión");
+    expect(screen.getByTestId("minimal-step-graded")).toHaveTextContent("Preferida, Aceptable o Subóptima");
+    expect(screen.getByTestId("minimal-closing")).toHaveTextContent("Tu próximo torneo empieza aquí.");
+    expect(screen.getByTestId("minimal-cookie-settings")).toHaveTextContent("Configuración de cookies");
+    expect(screen.getByText("Tu privacidad importa")).toBeInTheDocument();
+    fireEvent.click(screen.getByTestId("lang-en"));
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Master tournament decisions");
+  });
+});
 
 describe("the sign-in screen", () => {
   it("reads in Spanish", () => {
