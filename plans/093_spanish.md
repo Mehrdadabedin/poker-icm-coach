@@ -44,6 +44,51 @@ sentences from the server.
    (done): Report. 5d (done): statistics, ICM calculator.
 6. Spanish review by a native speaker who plays poker; Spanish READY.
 7. icmbot.es on Render (custom domain, DNS at one.com, CORS_ORIGINS) (done).
+8. The page head for icmbot.es: Spanish title, description and link preview,
+   og:url https://icmbot.es (code done; Render setup below is the owner's).
+
+# The page head on icmbot.es (step 8)
+
+Link-preview crawlers (WhatsApp, Facebook, X) read the HTML and run no
+JavaScript, so lang.ts cannot make a shared icmbot.es link preview in
+Spanish. Render's redirect and rewrite rules match the path only, never the
+host (render.com/docs/redirects-rewrites, read 20 Oct), so one static site
+cannot serve two heads. hreflang alone does not help either: crawlers build
+the preview from og: tags, not from hreflang.
+
+So icmbot.es becomes a second Render static site from the same repo, built
+with `VITE_SITE_LANG=es`. `src/i18n/siteMeta.ts` holds each site's head and
+the Vite plugin in `vite.config.ts` rewrites index.html with it. The bundle
+is the same on both sites; only the head differs. Both heads carry canonical
+and hreflang links naming the other site. The build fails if index.html
+loses a tag it must rewrite, or if VITE_SITE_LANG is not a language.
+
+Owner steps in the Render dashboard (I cannot do these):
+
+1. New, Static Site, repo Mehrdadabedin/poker-icm-coach, branch main.
+   Copy Root Directory, Build Command and Publish Directory from
+   poker-icm-coach-layout-test.
+2. Environment: copy every variable of poker-icm-coach-layout-test
+   (VITE_API_URL and any VITE_GA_MEASUREMENT_ID), then add
+   `VITE_SITE_LANG` = `es`. Copy any Redirects/Rewrites and Headers rules
+   too (the live site showed none on 20 Oct: unknown paths answer 404).
+3. Deploy. On the new site's onrender.com address, View Source shows
+   `<html lang="es">` and `og:url` https://icmbot.es/. The app there speaks
+   English (only the icmbot.es host turns it Spanish); that is expected.
+4. On poker-icm-coach-layout-test, Settings, Custom Domains: delete
+   icmbot.es and www.icmbot.es. Add both to the new site.
+5. DNS at one.com: the A record 216.24.57.1 stays. Point the www CNAME at
+   the new site's onrender.com address. Wait for Render to show both
+   domains verified and the certificate issued (icmbot.es is down from step
+   4 until then, usually minutes).
+6. No backend change: CORS_ORIGINS and Google sign-in already allow
+   https://icmbot.es, and the origin does not change.
+7. Refresh the previews: Facebook Sharing Debugger
+   (developers.facebook.com/tools/debug), https://icmbot.es/, Scrape Again.
+   WhatsApp keeps an old preview for a link it has seen; test with
+   https://icmbot.es/?v=2.
+
+Each push to main now builds both sites.
 
 Later, Chinese: `zh.ts`, "zh" in LANGS, fonts served by us (Google Fonts is
 blocked in mainland China and blocks the first paint).
