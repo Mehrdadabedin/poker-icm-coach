@@ -195,3 +195,9 @@ Not checked: the preview inside WhatsApp itself. WhatsApp Web still showed
 the English preview for https://icmbot.es/?v=3 the same evening; Meta
 caches by og:url, so the fix is Scrape Again on https://icmbot.es/ in the
 Facebook Sharing Debugger.
+
+Step 8b: icmbot.es previews with its own picture, og-1200x630-es.jpg: the
+icmbot.one picture with the floating coach screen replaced by a screenshot
+of the Spanish table (NO IR, IGUALAR 100, SUBIR A 250, 45.000), warped onto
+the screen's corners. A new file name, because the preview apps cache a
+picture by its URL.
