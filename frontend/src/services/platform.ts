@@ -11,3 +11,8 @@ export function inAndroidApp(): boolean {
   const bridge = (globalThis as { Capacitor?: CapacitorGlobal }).Capacitor;
   return bridge?.isNativePlatform?.() === true;
 }
+
+/** A phone or tablet browser, where a file input with `capture` opens the camera. */
+export function hasTouchScreen(): boolean {
+  return typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches === true;
+}

@@ -40,6 +40,24 @@ The APK is `frontend/android/app/build/outputs/apk/debug/app-debug.apk`
 (about 24 MB). A debug APK installs on any phone; a Play Store release
 needs a signing key (`./gradlew assembleRelease` with a keystore).
 
+## Release to Google Play
+
+Google Play takes a signed app bundle (AAB) and refuses a `versionCode` it
+has seen before.
+
+1. Raise `versionCode` (by 1) and `versionName` in
+   `frontend/android/app/build.gradle`.
+2. Build: `cd frontend && npm run cap:sync`, then
+   `cd android && ./gradlew bundleRelease` with the upload keystore. The
+   bundle is `frontend/android/app/build/outputs/bundle/release/app-release.aab`.
+3. In Play Console, create a release (internal testing first), upload the
+   AAB, and roll it out.
+
+Taking a portrait photo (plan 094) needs version 1.1 (code 2) or later: it
+lists the camera app under `<queries>` in `AndroidManifest.xml`. Without that
+entry, Android 11+ hides the camera app and "Take a photo" opens the gallery.
+The app asks for no CAMERA permission, because the camera app takes the photo.
+
 ## Install on a phone
 
 Either:

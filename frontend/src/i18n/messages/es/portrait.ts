@@ -13,6 +13,7 @@ export const portrait: Record<keyof typeof en, string> = {
   "portrait.hint.rejected": "Un administrador no aprobó esta foto. Elige otra.",
   "portrait.choose": "Elegir una foto",
   "portrait.change": "Elegir otra foto",
+  "portrait.camera": "Hacer una foto",
   "portrait.remove": "Quitar la foto",
   "portrait.uploading": "Subiendo…",
   "portrait.note": "JPG, PNG o WebP. La foto se reduce antes de subirla.",

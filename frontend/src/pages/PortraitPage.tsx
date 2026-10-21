@@ -3,6 +3,7 @@ import { Copyright } from "../components/Copyright";
 import { PageHeader } from "../components/PageHeader";
 import { useT } from "../i18n/I18n";
 import { getUsername } from "../services/api";
+import { hasTouchScreen, inAndroidApp } from "../services/platform";
 import { getMyPortrait, removePortrait, uploadPortrait, type MyPortrait } from "../services/portraitApi";
 import { ACCEPTED, resizePortrait } from "../services/resizePortrait";
 
@@ -10,6 +11,8 @@ import { ACCEPTED, resizePortrait } from "../services/resizePortrait";
 export function PortraitPage() {
   const t = useT();
   const input = useRef<HTMLInputElement>(null);
+  const camera = useRef<HTMLInputElement>(null);
+  const [canTakePhoto] = useState(() => inAndroidApp() || hasTouchScreen());
   const [portrait, setPortrait] = useState<MyPortrait | null>(null);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -66,6 +69,15 @@ export function PortraitPage() {
           onClick={() => input.current?.click()} data-testid="portrait-choose">
           {busy ? t("portrait.uploading") : t(portrait?.image ? "portrait.change" : "portrait.choose")}
         </button>
+        {canTakePhoto && <>
+          {/* "image/*" and `capture` together are what make the app's file chooser open the camera */}
+          <input ref={camera} type="file" accept="image/*" capture="user" hidden onChange={(e) => void choose(e)}
+            data-testid="portrait-camera-input" />
+          <button type="button" className="portrait-button portrait-camera" disabled={busy || !portrait}
+            onClick={() => camera.current?.click()} data-testid="portrait-camera">
+            {t("portrait.camera")}
+          </button>
+        </>}
         {portrait?.image && (
           <button type="button" className="portrait-remove" disabled={busy} onClick={() => void remove()}
             data-testid="portrait-remove">

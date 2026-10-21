@@ -50,6 +50,7 @@
 }
 .portrait-button { background: #fffdf8; color: #1f1b16; border: 1px solid #cfc6b6; }
 .portrait-button:hover:not(:disabled) { background: #f6efe3; }
+.portrait-camera { margin-top: 8px; }
 .portrait-remove { margin-top: 8px; background: transparent; color: #9b2f25; border: 1px solid transparent; }
 .portrait-remove:hover:not(:disabled) { border-color: #f0c9c4; }
 .portrait-button:disabled, .portrait-remove:disabled { opacity: 0.6; cursor: default; }
