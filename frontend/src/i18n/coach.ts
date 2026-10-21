@@ -12,7 +12,8 @@ type T = (key: MessageKey, params?: Params) => string;
 type Advice = Pick<CoachAdvice, "reasoning" | "reasonCode" | "reasonParams">;
 
 const known = (key: string): key is MessageKey => key in en;
-const tr = (t: T, key: string, fallback: string, params?: Params) => (known(key) ? t(key, params) : fallback);
+/** The text for a key built from server words, or the words as sent when no key exists. */
+export const tr = (t: T, key: string, fallback: string, params?: Params) => (known(key) ? t(key, params) : fallback);
 
 /** The coach's reason; the ICM pressure inside it is translated too. */
 export function coachReason(coach: Advice, t: T): string {

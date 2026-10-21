@@ -44,9 +44,57 @@ sentences from the server.
    4b (done): hand names, the bots' reasons and the action they faced.
 5. 5a (done): the page header and My Mistakes, the coach's reason from a code
    the hand history now keeps with each decision. 5b (done): Hand History. 5c
-   (done): Report. 5d (done): statistics, ICM calculator.
+   (done): Report. 5d (done): statistics, ICM calculator. 5e (done): the
+   ICM Coach tool and tournament settings, missed in 5 (the owner, 20 Oct:
+   "not in spanish"). The coach tool's teaching paragraph is still English
+   from the server; it needs a code like step 4.
 6. Spanish review by a native speaker who plays poker; Spanish READY.
 7. icmbot.es on Render (custom domain, DNS at one.com, CORS_ORIGINS) (done).
+8. The page head for icmbot.es: Spanish title, description and link preview,
+   og:url https://icmbot.es (done: static site icmbot-es on Render, 20 Oct).
+
+# The page head on icmbot.es (step 8)
+
+Link-preview crawlers (WhatsApp, Facebook, X) read the HTML and run no
+JavaScript, so lang.ts cannot make a shared icmbot.es link preview in
+Spanish. Render's redirect and rewrite rules match the path only, never the
+host (render.com/docs/redirects-rewrites, read 20 Oct), so one static site
+cannot serve two heads. hreflang alone does not help either: crawlers build
+the preview from og: tags, not from hreflang.
+
+So icmbot.es becomes a second Render static site from the same repo, built
+with `VITE_SITE_LANG=es`. `src/i18n/siteMeta.ts` holds each site's head and
+the Vite plugin in `vite.config.ts` rewrites index.html with it. The bundle
+is the same on both sites; only the head differs. Both heads carry canonical
+and hreflang links naming the other site. The build fails if index.html
+loses a tag it must rewrite, or if VITE_SITE_LANG is not a language.
+
+Owner steps in the Render dashboard (I cannot do these):
+
+1. New, Static Site, repo Mehrdadabedin/poker-icm-coach, branch main.
+   Copy Root Directory, Build Command and Publish Directory from
+   poker-icm-coach-layout-test.
+2. Environment: copy every variable of poker-icm-coach-layout-test
+   (VITE_API_URL and any VITE_GA_MEASUREMENT_ID), then add
+   `VITE_SITE_LANG` = `es`. Copy any Redirects/Rewrites and Headers rules
+   too (the live site showed none on 20 Oct: unknown paths answer 404).
+3. Deploy. On the new site's onrender.com address, View Source shows
+   `<html lang="es">` and `og:url` https://icmbot.es/. The app there speaks
+   English (only the icmbot.es host turns it Spanish); that is expected.
+4. On poker-icm-coach-layout-test, Settings, Custom Domains: delete
+   icmbot.es and www.icmbot.es. Add both to the new site.
+5. DNS at one.com: the A record 216.24.57.1 stays. Point the www CNAME at
+   the new site's onrender.com address. Wait for Render to show both
+   domains verified and the certificate issued (icmbot.es is down from step
+   4 until then, usually minutes).
+6. No backend change: CORS_ORIGINS and Google sign-in already allow
+   https://icmbot.es, and the origin does not change.
+7. Refresh the previews: Facebook Sharing Debugger
+   (developers.facebook.com/tools/debug), https://icmbot.es/, Scrape Again.
+   WhatsApp keeps an old preview for a link it has seen; test with
+   https://icmbot.es/?v=2.
+
+Each push to main now builds both sites.
 
 Later, Chinese: `zh.ts`, "zh" in LANGS, fonts served by us (Google Fonts is
 blocked in mainland China and blocks the first paint).
@@ -128,6 +176,34 @@ gets 400), and Google sign-in starts from icmbot.es (302 to Google; another
 site gets 400). The live bundle has the step 5 Spanish. Not done: the page
 still says lang="en" and og:url https://icmbot.one before the app starts,
 so a shared icmbot.es link previews in English.
+
+Step 5e, tests only (I did not check it in the browser): COACH ICM, MANO
+INICIAL (169 CLASES), POSICIÓN, RIVALES, PARA IGUALAR, ANALIZAR, MESA ·
+PREFLOP, Valor / Palo in the card picker; after ANALIZAR: RECOMENDACIÓN:
+IGUALAR, EV EN FICHAS: +12.500, PROB. DE GANAR: 55,2%, the reason from its
+code and the factor rows. AJUSTES DEL TORNEO, STACK INICIAL, MODO RÁPIDO,
+REVERSO DE LAS CARTAS (Azul, Rojo), GUARDAR AJUSTES and both save notes.
+
+Step 8, checked from outside on 20 Oct (the owner set up Render the same
+day): icmbot.es is the static site icmbot-es (Root Directory frontend,
+`npm ci && npm run build`, publish dist, VITE_API_URL as on
+poker-icm-coach-layout-test, VITE_SITE_LANG=es). www.icmbot.es CNAME to
+icmbot-es.onrender.com, the A record still 216.24.57.1; certificate for
+icmbot.es to 18 Jan 2027. https://icmbot.es, www and new ?v= links answer
+200 with lang="es", og:url https://icmbot.es/, og:title "ICMBOT ·
+Entrenador de póker de torneos" and og:locale es_ES, fetched with the
+WhatsApp, facebookexternalhit and Twitterbot user agents. The backend still
+allows https://icmbot.es (preflight 200). icmbot.one is unchanged, English.
+Not checked: the preview inside WhatsApp itself. WhatsApp Web still showed
+the English preview for https://icmbot.es/?v=3 the same evening; Meta
+caches by og:url, so the fix is Scrape Again on https://icmbot.es/ in the
+Facebook Sharing Debugger.
+
+Step 8b: icmbot.es previews with its own picture, og-1200x630-es.jpg: the
+icmbot.one picture with the floating coach screen replaced by a screenshot
+of the Spanish table (NO IR, IGUALAR 100, SUBIR A 250, 45.000), warped onto
+the screen's corners. A new file name, because the preview apps cache a
+picture by its URL.
 
 App Spanish, tests only (I did not check it on a phone): inside the app
 (user agent ICMBOTApp), a Spanish phone gets Spanish and the menu offers
