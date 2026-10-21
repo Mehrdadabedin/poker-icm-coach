@@ -3,6 +3,7 @@ import { botProfilePortrait } from "../models/botProfiles";
 import { CardView } from "./CardView";
 import { PlayingCard } from "./PlayingCard";
 import { useT } from "../i18n/I18n";
+import { useApprovedPortrait } from "../services/portraitApi";
 
 interface PokerSeatProps {
   player: PlayerView;
@@ -17,6 +18,7 @@ interface PokerSeatProps {
 export function PokerSeat({ player, active, lastAction, status, revealCards, revealHand }: PokerSeatProps) {
   const t = useT();
   const portrait = player.isHero ? null : (player.profile ? botProfilePortrait(player.profile) : null);
+  const heroPortrait = useApprovedPortrait(player.isHero);
   // Real cards when known (hero, showdown); a BOT still in the hand shows two
   // backs; folded seats show none. Busted seats take the OUT branch below.
   const shown = revealCards && revealCards.length === 2
@@ -48,6 +50,10 @@ export function PokerSeat({ player, active, lastAction, status, revealCards, rev
           style={{ borderColor: portrait.color }}
           draggable={false}
         />
+      )}
+      {heroPortrait && (
+        <img className="seat-bot-portrait seat-hero-portrait" src={heroPortrait} alt={t("portrait.alt")}
+          draggable={false} data-testid="seat-hero-portrait" />
       )}
       <div className="seat-position">
         {player.position} {player.position === "SB" || player.position === "BB" ? "•" : ""}

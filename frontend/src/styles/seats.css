@@ -162,7 +162,7 @@
 
 /* A35: small circular BOT profile portrait inside existing BOT seats.
    Absolute positioning keeps the seat box, placement and content untouched.
-   The hero seat never gets one (renderer only emits it for non-hero seats). */
+   The hero seat shows the player's own photo here once an Admin approved it (plan 094). */
 .seat-bot-portrait {
   position: absolute;
   top: 2px; right: 3px;

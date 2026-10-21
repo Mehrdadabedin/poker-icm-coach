@@ -8,6 +8,7 @@ stay as structural placeholders; no business logic lives here.
 */
 import type { ReactNode } from "react";
 import type { AdminSummary } from "../services/api";
+import { AdminPortraitsView } from "./AdminPortraitsView";
 import { AdminUsersView } from "./AdminUsersView";
 
 /** Data the Admin shell hands to every section renderer. */
@@ -59,6 +60,12 @@ export const ADMIN_SECTIONS: AdminSection[] = [
     label: "Users",
     icon: "👥",
     render: () => <AdminUsersView />,
+  },
+  {
+    id: "photos",
+    label: "Photos",
+    icon: "🖼️",
+    render: () => <AdminPortraitsView />,
   },
   {
     id: "activity",
