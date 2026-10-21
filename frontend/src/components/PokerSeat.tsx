@@ -3,6 +3,7 @@ import { botProfilePortrait } from "../models/botProfiles";
 import { CardView } from "./CardView";
 import { PlayingCard } from "./PlayingCard";
 import { useT } from "../i18n/I18n";
+import { getToken } from "../services/api";
 import { useApprovedPortrait } from "../services/portraitApi";
 
 interface PokerSeatProps {
@@ -51,9 +52,14 @@ export function PokerSeat({ player, active, lastAction, status, revealCards, rev
           draggable={false}
         />
       )}
-      {heroPortrait && (
+      {heroPortrait ? (
         <img className="seat-bot-portrait seat-hero-portrait" src={heroPortrait} alt={t("portrait.alt")}
           draggable={false} data-testid="seat-hero-portrait" />
+      ) : player.isHero && getToken() && (
+        // until a photo is approved, the initial keeps every seat alike; the letter
+        // comes from CSS so the seat's text stays the name and stack
+        <span className="seat-bot-portrait seat-hero-initial" data-initial={player.name.charAt(0).toUpperCase()}
+          aria-hidden="true" data-testid="seat-hero-initial" />
       )}
       <div className="seat-position">
         {player.position} {player.position === "SB" || player.position === "BB" ? "•" : ""}

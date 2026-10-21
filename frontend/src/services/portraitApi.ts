@@ -47,7 +47,7 @@ export function getMyPortrait({ fresh = false } = {}): Promise<MyPortrait> {
     cachedFor = getToken();
     cachedAt = Date.now();
   }
-  cached ??= request<MyPortrait>("/api/portrait").then(keep).catch((error: unknown) => {
+  cached ??= Promise.resolve().then(() => request<MyPortrait>("/api/portrait")).then(keep).catch((error: unknown) => {
     cached = null;
     throw error;
   });

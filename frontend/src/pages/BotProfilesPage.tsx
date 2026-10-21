@@ -5,6 +5,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Copyright } from "../components/Copyright";
+import { PortraitPrompt } from "../components/PortraitPrompt";
 import {
   BOT_PROFILES,
   MAX_BOTS,
@@ -91,6 +92,7 @@ export function BotProfilesPage() {
       <p className="bot-profiles-intro">
         {t("botsPage.intro")}
       </p>
+      <PortraitPrompt />
       <div className="bot-profiles-grid">
         {BOT_PROFILES.map((profile) => {
           const count = counts[profile.id] ?? 0;
