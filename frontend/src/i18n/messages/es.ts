@@ -14,5 +14,6 @@ import { report } from "./es/report";
 import { tools } from "./es/tools";
 import { practice } from "./es/practice";
 import { portrait } from "./es/portrait";
+import { portraitPrompt } from "./es/portraitPrompt";
 
-export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools, ...practice, ...portrait };
+export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools, ...practice, ...portrait, ...portraitPrompt };

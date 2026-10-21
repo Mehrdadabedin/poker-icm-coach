@@ -32,6 +32,12 @@ in the Admin page.
 - Storage: the `user_portraits` table when AUTH_STORAGE=database (Render),
   which the backend creates itself; memory otherwise (lost on restart, like
   file-mode tables). Deleting an account deletes its photo.
+- First time (the owner, 22 Oct): the bot lineup page shows a card, "Add your
+  photo", with Add photo and Not now. It never blocks AÑADIR BOTS A LA MESA.
+  Not now hides it for that account (saved in the browser). A photo waiting
+  for review, or not approved, shows its own card once (Got it). Until a
+  photo is approved the hero seat shows the player's initial where the photo
+  goes, so every seat looks alike.
 - The table polls every 350 ms, so the seat reads the photo from a cache that
   lasts a minute and belongs to one sign-in.
 
@@ -42,3 +48,7 @@ frontend portrait.test.tsx (9). Local browser, headless Chromium, 22 Oct: the
 card shows J and NO PHOTO, a 430 px JPEG becomes a 256 px WebP of about 10 KB,
 WAITING FOR REVIEW, the photo in Admin, Photos, Approve, and the photo on the
 hero's seat at the next table. Not checked on Render.
+
+First-time prompt, local browser (headless Chromium, Spanish), 22 Oct: "Añade
+tu foto" with Añadir foto and Ahora no above the bot cards; the hero seat shows
+the initial J in the photo's place. Tests: portrait_prompt.test.tsx (9).

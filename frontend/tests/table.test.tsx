@@ -58,8 +58,8 @@ describe("PokerTable", () => {
     state.players = state.players.map((p, i) =>
       i === 0 ? p : { ...p, profile: profiles[i - 1] });
     render(<PokerTable state={state} />);
-    // human seat has no portrait
-    expect(screen.getByTestId("seat-0").querySelector(".seat-bot-portrait")).toBeNull();
+    // the human seat has no BOT portrait: no photo, only the initial when signed in (plan 094)
+    expect(screen.getByTestId("seat-0").querySelector("img.seat-bot-portrait")).toBeNull();
     // each BOT seat shows its profile portrait
     const expected = [
       ["seat-1", "alex.png", "Alex bot profile"],

@@ -65,3 +65,39 @@
 .admin-portrait img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; }
 .admin-portrait-name { margin: 8px 0; font-weight: 700; overflow-wrap: anywhere; }
 .admin-portrait-actions { display: flex; gap: 8px; justify-content: center; }
+
+/* The hero's initial until a photo is approved (plan 094). */
+.seat-hero-initial {
+  display: grid; place-items: center;
+  background: #efe5d8;
+  color: #5c5244;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.8rem; font-weight: 700;
+}
+.seat-hero-initial::before { content: attr(data-initial); }
+
+/* One-time photo prompt on the bot lineup page (plan 094). */
+.portrait-prompt {
+  display: flex; gap: 14px; align-items: flex-start;
+  max-width: 720px; margin: 0 auto 18px;
+  padding: 14px 16px;
+  background: #1d242c;
+  border: 1px solid rgba(242, 193, 78, 0.45);
+  border-radius: 12px;
+  text-align: left;
+}
+.portrait-prompt-icon {
+  width: 44px; height: 44px; flex: none;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  background: #efe5d8; color: #5c5244;
+  font-family: Georgia, "Times New Roman", serif; font-weight: 700;
+}
+.portrait-prompt-title { display: block; color: var(--accent, #f2c14e); margin-bottom: 4px; }
+.portrait-prompt-text { margin: 0 0 10px; font-size: 0.9rem; line-height: 1.45; color: var(--text, #e8e6e1); }
+.portrait-prompt-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.portrait-prompt-go, .portrait-prompt-later {
+  padding: 7px 14px; border-radius: 999px; font-weight: 700; font-size: 0.85rem; cursor: pointer;
+}
+.portrait-prompt-go { background: var(--accent, #f2c14e); color: #1f1b16; border: 1px solid transparent; }
+.portrait-prompt-later { background: transparent; color: var(--text, #e8e6e1); border: 1px solid rgba(255, 255, 255, 0.25); }
