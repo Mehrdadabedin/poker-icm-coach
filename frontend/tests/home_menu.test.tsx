@@ -96,7 +96,7 @@ describe("menu cards (plan 066)", () => {
     const cards = Array.from(menu.querySelectorAll("button.hm-card"));
     expect(cards.map((c) => c.querySelector(".hm-title")?.textContent)).toEqual([
       "Start practice", "ICM coach", "Ranges", "ICM calculator",
-      "My mistakes", "Hand history", "Report", "Tournament settings",
+      "My mistakes", "Hand history", "Report", "Tournament settings", "Your portrait",
     ]);
     for (const card of cards) {
       expect(card.querySelector("svg.hm-icon")).toHaveAttribute("aria-hidden", "true");

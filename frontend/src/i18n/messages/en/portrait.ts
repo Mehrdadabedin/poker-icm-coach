@@ -1,0 +1,21 @@
+/* English: the player's portrait page and its home menu card (plan 094). */
+export const portrait = {
+  "portrait.title": "Your portrait",
+  "portrait.status.none": "NO PHOTO",
+  "portrait.status.pending": "WAITING FOR REVIEW",
+  "portrait.status.approved": "APPROVED",
+  "portrait.status.rejected": "NOT APPROVED",
+  "portrait.hint.none": "Add a photo of yourself. It stays hidden until an admin approves it.",
+  "portrait.hint.pending": "An admin checks your photo before it shows on your seat at the table.",
+  "portrait.hint.approved": "Your photo shows on your seat at the table.",
+  "portrait.hint.rejected": "An admin did not approve this photo. Choose another one.",
+  "portrait.choose": "Choose a photo",
+  "portrait.change": "Choose another photo",
+  "portrait.remove": "Remove photo",
+  "portrait.uploading": "Uploading…",
+  "portrait.note": "JPG, PNG or WebP. The photo is resized before upload.",
+  "portrait.error": "That file could not be used. Choose a JPG, PNG or WebP photo.",
+  "portrait.alt": "Your photo",
+  "home.portrait.title": "Your portrait",
+  "home.portrait.text": "Your photo on your seat at the table",
+} as const;

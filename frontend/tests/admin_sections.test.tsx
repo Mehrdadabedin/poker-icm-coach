@@ -6,10 +6,11 @@ import { describe, expect, it } from "vitest";
 import { ADMIN_SECTIONS, findAdminSection } from "../src/components/AdminSections";
 
 describe("Admin section registry (A07)", () => {
-  it("defines exactly the five Admin sections once each", () => {
+  it("defines exactly the six Admin sections once each", () => {
     expect(ADMIN_SECTIONS.map((s) => s.id)).toEqual([
       "dashboard",
       "users",
+      "photos", // plan 094: player photos wait here for approval
       "activity",
       "bot-profiles",
       "future",

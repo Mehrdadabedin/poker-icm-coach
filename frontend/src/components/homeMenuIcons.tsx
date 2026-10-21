@@ -56,6 +56,13 @@ export const MENU_ICONS = {
       <circle cx="10" cy="17" r="2" />
     </>
   ),
+  portrait: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="10" r="3" />
+      <path d="M6.5 18.5c1.2-2.3 3.2-3.5 5.5-3.5s4.3 1.2 5.5 3.5" />
+    </>
+  ),
   admin: (
     <>
       <path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z" />

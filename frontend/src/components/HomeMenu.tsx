@@ -35,6 +35,7 @@ const GROUPS: { label: MessageKey; entries: Entry[] }[] = [
     label: "home.setup",
     entries: [
       { to: "/settings", icon: "settings", title: "home.settings.title", text: "home.settings.text", testId: "menu-settings" },
+      { to: "/portrait", icon: "portrait", title: "home.portrait.title", text: "home.portrait.text", testId: "menu-portrait" },
     ],
   },
 ];
