@@ -1,4 +1,5 @@
 /* Which language the site speaks (plan 093). */
+import { inAndroidApp } from "../services/platform";
 
 // Chinese (Simplified, for mainland China) comes after Spanish: a zh.ts and "zh" here.
 export const LANGS = ["en", "es"] as const;
@@ -16,11 +17,20 @@ export const LANG_KEY = "icmbot.lang";
 
 const SPANISH_HOST = /(^|\.)icmbot\.es$/;
 
+/** Also ready inside the Android app, before the website: the app loads
+ * icmbot.one and has no address bar for ?lang=, so the phone's language is the
+ * only way in. Chinese joins here only once it is fully translated. */
+export const APP_READY: readonly Lang[] = ["en", "es"];
+
+const readyFor = (inApp: boolean, ready: readonly Lang[]): readonly Lang[] =>
+  (inApp ? [...ready, ...APP_READY] : ready);
+
 /** The languages the menu offers: every READY one, the one in use, and Spanish
  * on icmbot.es, so a visitor there who picks English can always come back
  * (the owner, 20 Oct: the buttons vanished after clicking English). */
-export function offeredLangs(lang: Lang, host: string, ready: readonly Lang[] = READY): Lang[] {
-  return LANGS.filter((l) => ready.includes(l) || l === lang || (l === "es" && SPANISH_HOST.test(host)));
+export function offeredLangs(lang: Lang, host: string, ready: readonly Lang[] = READY, inApp = false): Lang[] {
+  const shown = readyFor(inApp, ready);
+  return LANGS.filter((l) => shown.includes(l) || l === lang || (l === "es" && SPANISH_HOST.test(host)));
 }
 
 export const isLang = (value: string | null | undefined): value is Lang =>
@@ -31,18 +41,20 @@ export interface LangSources {
   saved: string | null;
   host: string;
   browser: readonly string[];
+  inApp: boolean;
 }
 
 /** ?lang= first, then the visitor's own choice, then the domain, then the
- * browser (only a READY language), then English. icmbot.es is the Spanish site:
- * it speaks Spanish from the start and each screen turns Spanish as it is
- * translated (the owner, 20 Oct). */
-export function detectLang({ search, saved, host, browser }: LangSources, ready: readonly Lang[] = READY): Lang {
+ * browser (only a READY language, or APP_READY in the app), then English.
+ * icmbot.es is the Spanish site: it speaks Spanish from the start and each
+ * screen turns Spanish as it is translated (the owner, 20 Oct). */
+export function detectLang({ search, saved, host, browser, inApp }: LangSources, ready: readonly Lang[] = READY): Lang {
   const asked = new URLSearchParams(search).get("lang");
   if (isLang(asked)) return asked;
   if (isLang(saved)) return saved;
   if (SPANISH_HOST.test(host)) return "es";
-  const fromBrowser = browser.map((tag) => tag.toLowerCase().split("-")[0]).find((tag) => isLang(tag) && ready.includes(tag));
+  const usable = readyFor(inApp, ready);
+  const fromBrowser = browser.map((tag) => tag.toLowerCase().split("-")[0]).find((tag) => isLang(tag) && usable.includes(tag));
   return isLang(fromBrowser) ? fromBrowser : "en";
 }
 
@@ -68,6 +80,7 @@ export function currentSources(): LangSources {
     saved: readSaved(),
     host: window.location.hostname,
     browser: navigator.languages?.length ? navigator.languages : [navigator.language],
+    inApp: inAndroidApp(),
   };
 }
 

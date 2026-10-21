@@ -26,7 +26,10 @@ sentences from the server.
   translated. icmbot.one follows a Spanish browser only once Spanish is in
   READY, so nobody there meets a half-translated site.
 - The language menu shows when there is a choice: on icmbot.es, with
-  ?lang=es, and everywhere once Spanish is READY.
+  ?lang=es, in the Android app, and everywhere once Spanish is READY.
+- The Android app (it loads icmbot.one, plan 085) follows the phone's
+  language for APP_READY languages (English and Spanish) before the website
+  does, since the app has no ?lang= and no icmbot.es.
 
 # Steps (one pull request each)
 
@@ -201,3 +204,9 @@ icmbot.one picture with the floating coach screen replaced by a screenshot
 of the Spanish table (NO IR, IGUALAR 100, SUBIR A 250, 45.000), warped onto
 the screen's corners. A new file name, because the preview apps cache a
 picture by its URL.
+
+App Spanish, tests only (I did not check it on a phone): inside the app
+(user agent ICMBOTApp), a Spanish phone gets Spanish and the menu offers
+English and Spanish; ?lang= and a saved choice still come first. icmbot.one
+in a normal browser is unchanged (a Spanish browser still gets English). No
+new app build is needed: the app loads the live site.
