@@ -20,7 +20,7 @@ vi.mock("../src/analytics", async (importOriginal) => ({
 const holes = (text: string) => [...text.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
 
 const src = (over: Partial<LangSources> = {}): LangSources =>
-  ({ search: "", saved: null, host: "icmbot.one", browser: ["en-GB"], ...over });
+  ({ search: "", saved: null, host: "icmbot.one", browser: ["en-GB"], inApp: false, ...over });
 
 afterEach(() => {
   cleanup();
@@ -46,6 +46,14 @@ describe("which language the site speaks", () => {
     expect(detectLang(src({ browser: ["es-ES"] }))).toBe("en"); // nobody meets a half-translated site
     expect(detectLang(src({ browser: ["es-MX", "en"] }), ["en", "es"])).toBe("es");
     expect(detectLang(src({ browser: ["zh-CN", "en"] }), ["en", "es"])).toBe("en"); // Chinese comes later
+  });
+
+  it("follows a Spanish phone in the Android app before the website is ready", () => {
+    expect(detectLang(src({ browser: ["es-ES"], inApp: true }))).toBe("es");
+    expect(detectLang(src({ browser: ["es-ES"], inApp: false }))).toBe("en"); // icmbot.one in a browser is unchanged
+    expect(detectLang(src({ browser: ["es-ES"], inApp: true, saved: "en" }))).toBe("en"); // the choice still wins
+    expect(detectLang(src({ browser: ["es-ES"], inApp: true, search: "?lang=en" }))).toBe("en");
+    expect(detectLang(src({ browser: ["en-US"], inApp: true }))).toBe("en");
   });
 
   it("has every key in every language, with the same placeholders", () => {
@@ -74,6 +82,12 @@ describe("the language buttons", () => {
     expect(offeredLangs("en", "icmbot.one")).toEqual(["en"]);
     expect(offeredLangs("es", "icmbot.one")).toEqual(["en", "es"]);
     expect(offeredLangs("en", "icmbot.one", ["en", "es"])).toEqual(["en", "es"]);
+  });
+
+  it("offer Spanish in the Android app, so app users can switch both ways", () => {
+    expect(offeredLangs("en", "icmbot.one", READY, true)).toEqual(["en", "es"]);
+    expect(offeredLangs("es", "icmbot.one", READY, true)).toEqual(["en", "es"]);
+    expect(offeredLangs("en", "icmbot.one", READY, false)).toEqual(["en"]);
   });
 });
 
@@ -122,5 +136,19 @@ describe("the sign-in screen", () => {
     fireEvent.click(screen.getByTestId("lang-en"));
     expect(screen.getByTestId("auth-submit")).toHaveTextContent("Sign in");
     expect(localStorage.getItem(LANG_KEY)).toBe("en");
+  });
+
+  it("speaks Spanish on a Spanish phone in the Android app, with the menu to switch", () => {
+    vi.spyOn(navigator, "userAgent", "get").mockReturnValue("Mozilla/5.0 (Linux; Android 14) ICMBOTApp");
+    vi.spyOn(navigator, "languages", "get").mockReturnValue(["es-ES"]);
+    try {
+      render(<I18nProvider><MemoryRouter><LoginForm onLogin={() => undefined} /><LanguageMenu /></MemoryRouter></I18nProvider>);
+      expect(screen.getByTestId("auth-submit")).toHaveTextContent("Iniciar sesión");
+      fireEvent.click(screen.getByTestId("lang-en"));
+      expect(screen.getByTestId("auth-submit")).toHaveTextContent("Sign in");
+      expect(screen.getByTestId("lang-es")).toBeInTheDocument();
+    } finally {
+      vi.restoreAllMocks();
+    }
   });
 });

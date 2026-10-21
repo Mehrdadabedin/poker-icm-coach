@@ -1,11 +1,13 @@
 import { useI18n } from "../i18n/I18n";
-import { LANG_NAMES, offeredLangs } from "../i18n/lang";
+import { LANG_NAMES, offeredLangs, READY } from "../i18n/lang";
+import { inAndroidApp } from "../services/platform";
 
 /** Language buttons, each language in its own words (plan 093). Always there
- * on icmbot.es; on icmbot.one once Spanish is READY (or while previewing it). */
+ * on icmbot.es and in the Android app; on icmbot.one once Spanish is READY
+ * (or while previewing it). */
 export function LanguageMenu({ short = false }: { short?: boolean }) {
   const { lang, setLang, t } = useI18n();
-  const offered = offeredLangs(lang, window.location.hostname);
+  const offered = offeredLangs(lang, window.location.hostname, READY, inAndroidApp());
   if (offered.length < 2) return null;
   return (
     <nav className="lang-menu" aria-label={t("lang.label")} data-testid="lang-menu">
