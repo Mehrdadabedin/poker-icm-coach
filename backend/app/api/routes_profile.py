@@ -12,21 +12,11 @@ from app.api.deps import require_user
 from app.schemas.profile_schemas import AccountDeletion, ProfileIn
 from app.services import profiles
 from app.services.account_erase import erase_account
+from app.services.account_export import account_view, export_account, profile_view
 from app.services.profiles import Profile
 from app.services.user_registry import auth_registry
 
 router = APIRouter(tags=["profile"])
-
-
-def _view(profile: Profile) -> dict:
-    return {
-        "firstName": profile.first_name,
-        "lastName": profile.last_name,
-        "displayName": profile.display_name,
-        "birthday": profile.birthday.isoformat(),
-        "gender": profile.gender,
-        "genderText": profile.gender_text,
-    }
 
 
 @router.get("/api/profile")
@@ -34,7 +24,7 @@ def my_profile(user: str = Depends(require_user)) -> dict:
     found = profiles.store.get(user)
     if found is None:
         raise HTTPException(status_code=404, detail="no profile yet")
-    return _view(found)
+    return profile_view(found)
 
 
 @router.put("/api/profile")
@@ -43,7 +33,18 @@ def save_profile(body: ProfileIn, user: str = Depends(require_user)) -> dict:
         owner=user, first_name=body.firstName, last_name=body.lastName,
         display_name=body.displayName, birthday=body.birthday, gender=body.gender,
         gender_text=body.genderText))
-    return _view(saved)
+    return profile_view(saved)
+
+
+@router.get("/api/account")
+def my_account(user: str = Depends(require_user)) -> dict:
+    """How the player signs in, so the app asks for a password or for DELETE."""
+    return account_view(user)
+
+
+@router.get("/api/account/export")
+def export_my_data(user: str = Depends(require_user)) -> dict:
+    return export_account(user)
 
 
 @router.delete("/api/account")
