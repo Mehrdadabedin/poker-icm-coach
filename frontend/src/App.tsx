@@ -14,7 +14,7 @@ import { TablePage } from "./pages/TablePage";
 import { RangesPage } from "./pages/RangesPage";
 import { CoachPage } from "./pages/CoachPage";
 import { SettingsPage } from "./pages/SettingsPage";
-import { PortraitPage } from "./pages/PortraitPage";
+import { ProfilePage } from "./pages/ProfilePage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { ReportPage } from "./pages/ReportPage";
 import { StatisticsPage } from "./pages/StatisticsPage";
@@ -71,7 +71,9 @@ export function App() {
           <Route path="/ranges" element={<RangesPage />} />
           <Route path="/coach" element={<CoachPage />} />
           <Route path="/settings" element={<SettingsPage />} />
-          <Route path="/portrait" element={<PortraitPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          {/* plan 095: the portrait is part of the profile page */}
+          <Route path="/portrait" element={<Navigate to="/profile" replace />} />
           <Route path="/history" element={<HistoryPage />} />
           <Route path="/report" element={<ReportPage />} />
           <Route path="/statistics" element={<StatisticsPage />} />

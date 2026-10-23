@@ -15,8 +15,9 @@ import { tools } from "./en/tools";
 import { practice } from "./en/practice";
 import { portrait } from "./en/portrait";
 import { portraitPrompt } from "./en/portraitPrompt";
+import { profile } from "./en/profile";
 
-export const en = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools, ...practice, ...portrait, ...portraitPrompt };
+export const en = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools, ...practice, ...portrait, ...portraitPrompt, ...profile };
 
 export type MessageKey = keyof typeof en;
 export type Messages = Record<MessageKey, string>;

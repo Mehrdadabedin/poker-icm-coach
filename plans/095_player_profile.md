@@ -4,8 +4,8 @@ title: Player Profile
 phase: 7
 status: in-progress
 depends_on: [094]
-test_file: backend/tests/test_profiles.py, backend/tests/test_account_delete.py
-implementation_files: [backend/app/models/orm_profiles.py, backend/app/services/profiles.py, backend/app/schemas/profile_schemas.py, backend/app/api/routes_profile.py, backend/app/services/account_erase.py, backend/app/services/account_admin.py, backend/app/main.py, backend/alembic/versions/e8b4c1d7f2a9_user_profiles.py]
+test_file: backend/tests/test_profiles.py, backend/tests/test_account_delete.py, backend/tests/test_account_export.py, frontend/tests/profile.test.tsx
+implementation_files: [backend/app/models/orm_profiles.py, backend/app/services/profiles.py, backend/app/schemas/profile_schemas.py, backend/app/api/routes_profile.py, backend/app/services/account_erase.py, backend/app/services/account_admin.py, backend/app/main.py, backend/alembic/versions/e8b4c1d7f2a9_user_profiles.py, backend/app/services/account_export.py, frontend/src/pages/ProfilePage.tsx, frontend/src/components/ProfileForm.tsx, frontend/src/components/AccountPanel.tsx, frontend/src/components/PortraitPanel.tsx, frontend/src/services/profileApi.ts, frontend/src/styles/profile.css]
 ---
 
 # Objective
@@ -65,4 +65,19 @@ Steps 1 to 3, 23 Oct: backend test_profiles.py (24), test_account_delete.py
 database. Alembic upgrade, downgrade and upgrade again on PostgreSQL 16. Each
 safeguard was broken on purpose (password check, age check, profile erase,
 owner from the token) and the tests went red, then green after restoring.
-Not checked on Render. Steps 4 to 8 are not built yet.
+Not checked on Render.
+
+Steps 4 and 5, 23 Oct: `GET /api/account` (how the account signs in) and
+`GET /api/account/export`, test_account_export.py (4); the profile page,
+frontend profile.test.tsx (15). Backend 765 passed, 20 skipped without a
+database; frontend 450. Local browser (Chromium, 23 Oct): a new account,
+the form saved "José María Ñúñez", display name "Pepe 7", 1985-07-20, man;
+the server returned the same values and the title became "Welcome, José
+María"; two columns at 1200 px, one column at 600 px; a wrong password on
+Delete account showed "The password is not correct." and the account stayed;
+`#/portrait` opens `#/profile`; the home menu shows "Your profile". The
+export with saved hands is not checked against PostgreSQL. Steps 6 to 8 are
+not built yet.
+
+Not in this plan: changing the password from the profile (the only password
+route is the forced Admin change), and the statistics card from the mockup.

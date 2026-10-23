@@ -7,7 +7,7 @@ import { I18nProvider } from "../src/i18n/I18n";
 import { AdminPortraitsView } from "../src/components/AdminPortraitsView";
 import { PokerSeat } from "../src/components/PokerSeat";
 import type { PlayerView } from "../src/models/game";
-import { PortraitPage } from "../src/pages/PortraitPage";
+import { PortraitPanel } from "../src/components/PortraitPanel";
 
 const { request, resizePortrait } = vi.hoisted(() => ({ request: vi.fn(), resizePortrait: vi.fn() }));
 vi.mock("../src/services/api", async (importOriginal) => ({
@@ -21,7 +21,7 @@ vi.mock("../src/services/resizePortrait", async (importOriginal) => ({
 
 const PHOTO = "data:image/webp;base64,UklGRg==";
 const page = (lang: "en" | "es" = "en") =>
-  render(<I18nProvider initial={lang}><MemoryRouter><PortraitPage /></MemoryRouter></I18nProvider>);
+  render(<I18nProvider initial={lang}><MemoryRouter><PortraitPanel /></MemoryRouter></I18nProvider>);
 const seat = (player: PlayerView) =>
   render(<I18nProvider initial="en"><PokerSeat player={player} active={false} /></I18nProvider>);
 const hero: PlayerView = { seat: 0, name: "Ana", stack: 45000, stackInBB: 450, position: "BTN", bet: 0,

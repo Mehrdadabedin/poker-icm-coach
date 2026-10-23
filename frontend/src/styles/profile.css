@@ -1,0 +1,84 @@
+/* Plan 095: the profile page. The photo card (plan 094) on the left, personal
+   details and the account on the right; one column on a phone. The cards
+   share the portrait card's light paper look. */
+.profile-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 340px) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  margin-top: 8px;
+}
+.profile-side .portrait-card { margin: 0; max-width: none; }
+.profile-table-note { margin: 10px 4px 0; color: var(--muted, #9b958a); font-size: 0.8rem; line-height: 1.5; }
+.profile-main { display: flex; flex-direction: column; gap: 16px; }
+
+.profile-card {
+  padding: 20px 22px;
+  background: #fffdf8;
+  color: #2a2620;
+  border: 1px solid #ece4d6;
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+}
+.profile-card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.profile-card-title {
+  margin: 0 0 14px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.15rem; font-weight: 700; color: #1f1b16;
+}
+.profile-private { color: #7a7366; font-size: 0.78rem; }
+
+.profile-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px 14px; }
+.profile-wide { grid-column: 1 / -1; }
+.profile-field { display: flex; flex-direction: column; gap: 4px; }
+.profile-field label { color: #6b655c; font-size: 0.8rem; font-weight: 600; }
+.profile-field input, .profile-field select, .account-confirm input {
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid #cfc6b6;
+  border-radius: 10px;
+  background: #fff;
+  color: #1f1b16;
+  font-size: 0.95rem;
+}
+.profile-field input:focus, .profile-field select:focus, .account-confirm input:focus {
+  outline: 2px solid #c9a24a; outline-offset: 1px;
+}
+.profile-why { margin: 14px 0; color: #6b655c; font-size: 0.85rem; line-height: 1.5; }
+.profile-save { width: 100%; border-radius: 999px; padding: 11px 16px; font-weight: 700; }
+.profile-status { margin: 10px 0 0; color: #276b35; font-size: 0.85rem; font-weight: 600; }
+.profile-error { color: #9b2f25; font-size: 0.8rem; }
+form .profile-error[role="alert"]:last-child { display: block; margin-top: 10px; }
+
+.account-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid #ece4d6;
+  font-size: 0.88rem; color: #4a453d;
+}
+.account-row .btn, .account-actions .btn {
+  flex: none;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid #cfc6b6;
+  background: #fffdf8;
+  color: #1f1b16;
+  font-weight: 700;
+  cursor: pointer;
+}
+.account-danger { color: #7a3b33; }
+.account-row .account-delete, .account-actions .account-delete { color: #9b2f25; border-color: #f0c9c4; }
+.account-confirm {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 12px 0;
+  border-top: 1px solid #ece4d6;
+  font-size: 0.85rem; color: #6b655c;
+}
+.account-actions { display: flex; gap: 8px; }
+.account-actions .btn:disabled { opacity: 0.6; cursor: default; }
+
+@media (max-width: 760px) {
+  .profile-layout { grid-template-columns: minmax(0, 1fr); }
+  .profile-grid { grid-template-columns: minmax(0, 1fr); }
+  .account-row { flex-direction: column; align-items: stretch; }
+}
