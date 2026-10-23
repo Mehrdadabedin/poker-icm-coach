@@ -4,8 +4,8 @@ title: Player Profile
 phase: 7
 status: in-progress
 depends_on: [094]
-test_file: backend/tests/test_profiles.py
-implementation_files: [backend/app/models/orm_profiles.py, backend/app/services/profiles.py, backend/app/schemas/profile.py, backend/app/api/routes_profile.py, backend/app/services/account_erase.py, backend/app/services/account_admin.py, backend/app/main.py, backend/alembic/versions/e8b4c1d7f2a9_user_profiles.py]
+test_file: backend/tests/test_profiles.py, backend/tests/test_account_delete.py
+implementation_files: [backend/app/models/orm_profiles.py, backend/app/services/profiles.py, backend/app/schemas/profile_schemas.py, backend/app/api/routes_profile.py, backend/app/services/account_erase.py, backend/app/services/account_admin.py, backend/app/main.py, backend/alembic/versions/e8b4c1d7f2a9_user_profiles.py]
 ---
 
 # Objective
@@ -60,4 +60,9 @@ of their data.
 
 # Checked
 
-Steps 1 to 3: see `progress.md`. Steps 4 to 8 are not built yet.
+Steps 1 to 3, 23 Oct: backend test_profiles.py (24), test_account_delete.py
+(8) and test_profiles_db.py (2, PostgreSQL); full suite 781 passed with a
+database. Alembic upgrade, downgrade and upgrade again on PostgreSQL 16. Each
+safeguard was broken on purpose (password check, age check, profile erase,
+owner from the token) and the tests went red, then green after restoring.
+Not checked on Render. Steps 4 to 8 are not built yet.

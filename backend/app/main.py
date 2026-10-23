@@ -16,12 +16,14 @@ from app.api.routes_history import router as history_router
 from app.api.routes_meta import router as meta_router
 from app.api.routes_oauth import router as oauth_router
 from app.api.routes_portrait import router as portrait_router
+from app.api.routes_profile import router as profile_router
 from app.core.config import settings
 from app.core.version import app_version
 from app.database.session import engine
 from app.services.auth import auth_store
 from app.services.history_archive import bind_history_archive
 from app.services.portraits import bind_portraits
+from app.services.profiles import bind_profiles
 from app.services.session_store import session_store
 from app.services.user_registry_admin import bootstrap_admin
 
@@ -37,6 +39,7 @@ async def lifespan(_: FastAPI):
     bind_history_archive(engine, settings.history_storage == "database" or (
         settings.history_storage == "auto" and settings.auth_storage == "database"))
     bind_portraits(engine, settings.auth_storage == "database")
+    bind_profiles(engine, settings.auth_storage == "database")
     yield
 
 
@@ -55,6 +58,7 @@ app.include_router(away_router)
 app.include_router(meta_router)
 app.include_router(history_router)
 app.include_router(portrait_router)
+app.include_router(profile_router)
 
 
 @app.get("/api/health")

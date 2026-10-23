@@ -3,3 +3,4 @@ from app.models.orm_documents import *  # noqa: F401,F403
 from app.models.orm_hands import *  # noqa: F401,F403
 from app.models.orm_history import *  # noqa: F401,F403
 from app.models.orm_portraits import *  # noqa: F401,F403
+from app.models.orm_profiles import *  # noqa: F401,F403
