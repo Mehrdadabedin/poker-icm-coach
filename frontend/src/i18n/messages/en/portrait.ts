@@ -11,6 +11,7 @@ export const portrait = {
   "portrait.hint.rejected": "An admin did not approve this photo. Choose another one.",
   "portrait.choose": "Choose a photo",
   "portrait.change": "Choose another photo",
+  "portrait.camera": "Take a photo",
   "portrait.remove": "Remove photo",
   "portrait.uploading": "Uploading…",
   "portrait.note": "JPG, PNG or WebP. The photo is resized before upload.",

@@ -46,4 +46,14 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- The portrait page's "Take a photo" (plan 094) hands off to the camera
+         app. Android 11+ hides that app from this one unless it is listed here,
+         and the file chooser then opens the gallery instead. No CAMERA
+         permission: an app that declares it must hold it to send this intent. -->
+    <queries>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+    </queries>
 </manifest>
