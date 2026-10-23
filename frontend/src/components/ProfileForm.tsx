@@ -1,5 +1,6 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { useT } from "../i18n/I18n";
+import { BirthdayPicker } from "./BirthdayPicker";
 import type { MessageKey } from "../i18n/messages/en";
 import { getUsername } from "../services/api";
 import { fromIso, formatTyped, toIso } from "../services/birthdayInput";
@@ -84,13 +85,16 @@ export function ProfileForm({ initial, onSaved }: { initial: Profile | null; onS
         {text("lastName", 40)}
         <div className="profile-wide">{text("displayName", 24)}</div>
         <Field id="profile-birthday" label={t("profile.birthday")} error={err("birthday")}>
-          <input id="profile-birthday" type="text" inputMode="numeric" autoComplete="bday" required
-            placeholder={t("profile.birthdayPlaceholder")} maxLength={10} value={birthdayText}
-            onChange={(e) => {
-              const typed = formatTyped(e.target.value);
-              setBirthdayText(typed);
-              set("birthday", toIso(typed) ?? "");
-            }} data-testid="profile-birthday" />
+          <div className="birthday-row">
+            <input id="profile-birthday" type="text" inputMode="numeric" autoComplete="bday" required
+              placeholder={t("profile.birthdayPlaceholder")} maxLength={10} value={birthdayText}
+              onChange={(e) => {
+                const typed = formatTyped(e.target.value);
+                setBirthdayText(typed);
+                set("birthday", toIso(typed) ?? "");
+              }} data-testid="profile-birthday" />
+            <BirthdayPicker value={form.birthday} onPick={(iso) => { setBirthdayText(fromIso(iso)); set("birthday", iso); }} />
+          </div>
         </Field>
         <Field id="profile-gender" label={t("profile.gender")} error={err("gender")}>
           <select id="profile-gender" value={form.gender} data-testid="profile-gender"

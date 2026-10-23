@@ -82,3 +82,34 @@ form .profile-error[role="alert"]:last-child { display: block; margin-top: 10px;
   .profile-grid { grid-template-columns: minmax(0, 1fr); }
   .account-row { flex-direction: column; align-items: stretch; }
 }
+
+/* The birthday: typed dd/mm/yyyy, or picked from a calendar whose year and
+   month are lists (owner: a phone's date picker is slow for a birth year). */
+.birthday-row { position: relative; display: flex; gap: 6px; }
+.birthday-row > input { flex: 1; min-width: 0; }
+.birthday-picker { display: flex; }
+.birthday-open {
+  flex: none; width: 42px;
+  display: grid; place-items: center;
+  border: 1px solid #cfc6b6; border-radius: 10px;
+  background: #fff; color: #5c5244; cursor: pointer;
+}
+.birthday-open[aria-expanded="true"] { border-color: #c9a24a; color: #1f1b16; }
+.birthday-pop {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 5;
+  padding: 12px;
+  background: #fffdf8;
+  border: 1px solid #e2d3bd; border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
+}
+.birthday-selects { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 8px; margin-bottom: 10px; }
+.birthday-days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; }
+.birthday-day {
+  aspect-ratio: 1; min-height: 32px;
+  border: 1px solid transparent; border-radius: 8px;
+  background: #f6efe3; color: #2a2620;
+  font-size: 0.9rem; cursor: pointer;
+}
+.birthday-day:hover { border-color: #c9a24a; }
+.birthday-day.is-picked { background: #1565c0; color: #fff; }
+.birthday-weekday { text-align: center; color: #7a7366; font-size: 0.72rem; font-weight: 700; }

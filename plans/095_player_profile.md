@@ -85,6 +85,12 @@ with the number keyboard, the slashes added while typing (02021971 shows
 API still takes yyyy-mm-dd. Frontend birthday_input.test.ts (20) and one more
 profile test; 474 passed. Local browser at 375 px: typed 02021971, saved, the
 server returned 1971-02-02.
+Then (owner: "type it as well", and an easy calendar for the year): a
+calendar button beside the box opens a calendar whose year (adult years,
+newest first, down to 1900) and month are lists, Monday first, month and
+weekday names in the page language; a day fills the same box. Frontend
+birthday_picker.test.tsx (5). Local browser at 375 px: 1985, July, 20 gave
+20/07/1985.
 
 Not in this plan: changing the password from the profile (the only password
 route is the forced Admin change), and the statistics card from the mockup.
