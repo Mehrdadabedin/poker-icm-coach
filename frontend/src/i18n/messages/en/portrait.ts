@@ -1,4 +1,4 @@
-/* English: the player's portrait page and its home menu card (plan 094). */
+/* English: the player's portrait page (plan 094). */
 export const portrait = {
   "portrait.title": "Your portrait",
   "portrait.status.none": "NO PHOTO",
@@ -17,6 +17,4 @@ export const portrait = {
   "portrait.note": "JPG, PNG or WebP. The photo is resized before upload.",
   "portrait.error": "That file could not be used. Choose a JPG, PNG or WebP photo.",
   "portrait.alt": "Your photo",
-  "home.portrait.title": "Your portrait",
-  "home.portrait.text": "Your photo on your seat at the table",
 } as const;

@@ -1,4 +1,4 @@
-/* Spanish: the player's portrait page and its home menu card (plan 094). */
+/* Spanish: the player's portrait page (plan 094). */
 import type { portrait as en } from "../en/portrait";
 
 export const portrait: Record<keyof typeof en, string> = {
@@ -19,6 +19,4 @@ export const portrait: Record<keyof typeof en, string> = {
   "portrait.note": "JPG, PNG o WebP. La foto se reduce antes de subirla.",
   "portrait.error": "No se pudo usar ese archivo. Elige una foto JPG, PNG o WebP.",
   "portrait.alt": "Tu foto",
-  "home.portrait.title": "Tu retrato",
-  "home.portrait.text": "Tu foto en tu asiento de la mesa",
 };

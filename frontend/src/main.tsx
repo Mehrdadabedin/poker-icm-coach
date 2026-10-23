@@ -47,6 +47,7 @@ import "./styles/home-menu.css";
 import "./styles/report.css";
 import "./styles/lang-menu.css";
 import "./styles/portrait.css";
+import "./styles/profile.css";
 
 initializeGoogleAnalytics();
 

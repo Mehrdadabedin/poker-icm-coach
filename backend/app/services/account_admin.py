@@ -7,9 +7,8 @@ between is still refused by the flag.
 """
 from __future__ import annotations
 
-from app.services import history_archive, portraits
+from app.services.account_erase import erase_account
 from app.services.auth import auth_store
-from app.services.session_store import session_store
 from app.services.user_registry import auth_registry
 
 
@@ -40,12 +39,6 @@ def unsuspend(target: str, actor: str) -> None:
 
 
 def delete(target: str, actor: str) -> dict[str, int]:
-    """Remove the account, its logins, its live tables, its saved history and its photo."""
+    """Remove the account and everything that belongs to it."""
     _check(target, actor)
-    auth_registry.delete(target)
-    return {
-        "logins_revoked": auth_store.revoke_user(target),
-        "tables_closed": session_store.remove_owned_by(target),
-        "history_deleted": history_archive.archive.delete_owner(target),
-        "portrait_deleted": int(portraits.store.delete(target)),
-    }
+    return erase_account(target)

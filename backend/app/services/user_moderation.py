@@ -38,6 +38,17 @@ class Moderation:
                 entry.pop("suspended", None)
             self._save()
 
+    def uses_password(self, username: str) -> bool:
+        """False for an account that signs in only through Google."""
+        with self._lock:
+            return "hash" in (self._users.get(username) or {})
+
+    def sign_in_details(self, username: str) -> dict[str, object]:
+        """How the account signs in, for the player's own view; never the hash."""
+        with self._lock:
+            entry = self._users.get(username) or {}
+            return {"signIn": entry.get("provider") or "password", "email": entry.get("email")}
+
     def delete(self, username: str) -> None:
         """Raises KeyError for an unknown username."""
         with self._lock:
