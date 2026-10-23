@@ -10,6 +10,7 @@ export const profile = {
   "profile.lastName": "Last name",
   "profile.displayName": "Display name at the table",
   "profile.birthday": "Birthday",
+  "profile.birthdayPlaceholder": "dd/mm/yyyy",
   "profile.gender": "Gender (optional)",
   "profile.genderText": "Describe your gender",
   "profile.gender.prefer_not_to_say": "Prefer not to say",

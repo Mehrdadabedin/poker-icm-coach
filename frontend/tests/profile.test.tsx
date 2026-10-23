@@ -63,7 +63,8 @@ describe("profile details", () => {
     type("profile-firstName", "Ana");
     type("profile-lastName", "Torres");
     type("profile-displayName", "Ana T.");
-    type("profile-birthday", "1990-03-02");
+    type("profile-birthday", "02031990");
+    expect(screen.getByTestId("profile-birthday")).toHaveValue("02/03/1990");
     type("profile-gender", "woman");
     fireEvent.click(screen.getByTestId("profile-save"));
     expect(await screen.findByRole("status")).toHaveTextContent("Saved");
@@ -80,7 +81,7 @@ describe("profile details", () => {
   it("refuses a player under 18 before sending anything", async () => {
     open();
     await screen.findByTestId("profile-form");
-    type("profile-birthday", `${new Date().getFullYear() - 10}-01-01`);
+    type("profile-birthday", `0101${new Date().getFullYear() - 10}`);
     fireEvent.click(screen.getByTestId("profile-save"));
     expect(await screen.findByTestId("profile-birthday-error")).toHaveTextContent("18 or older");
     expect(sent("PUT /api/profile")).toHaveLength(0);
@@ -90,9 +91,19 @@ describe("profile details", () => {
     serve("PUT /api/profile", { status: 422, body: { detail: [{ loc: ["body", "lastName"], msg: "bad" }] } });
     open();
     await screen.findByTestId("profile-form");
-    type("profile-birthday", "1990-03-02");
+    type("profile-birthday", "02/03/1990");
     fireEvent.click(screen.getByTestId("profile-save"));
     expect(await screen.findByTestId("profile-lastName-error")).toHaveTextContent("Use 1 to 40 letters.");
+  });
+
+  it("shows a saved birthday as dd/mm/yyyy and refuses a date that does not exist", async () => {
+    serve("GET /api/profile", { status: 200, body: ANA });
+    open();
+    expect(await screen.findByTestId("profile-birthday")).toHaveValue("02/03/1990");
+    type("profile-birthday", "31021990");
+    fireEvent.click(screen.getByTestId("profile-save"));
+    expect(await screen.findByTestId("profile-birthday-error")).toHaveTextContent("Enter a real birthday.");
+    expect(sent("PUT /api/profile")).toHaveLength(0);
   });
 
   it("asks for a description only for a self-described gender", async () => {

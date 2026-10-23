@@ -12,6 +12,7 @@ export const profile: Record<keyof typeof en, string> = {
   "profile.lastName": "Apellidos",
   "profile.displayName": "Nombre en la mesa",
   "profile.birthday": "Fecha de nacimiento",
+  "profile.birthdayPlaceholder": "dd/mm/aaaa",
   "profile.gender": "Género (opcional)",
   "profile.genderText": "Describe tu género",
   "profile.gender.prefer_not_to_say": "Prefiero no decirlo",

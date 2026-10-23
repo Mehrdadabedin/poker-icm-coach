@@ -2,6 +2,7 @@ import { useState, type FormEvent, type ReactNode } from "react";
 import { useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/messages/en";
 import { getUsername } from "../services/api";
+import { fromIso, formatTyped, toIso } from "../services/birthdayInput";
 import { ageOn, ApiStatusError, GENDERS, saveProfile, type Profile, type ProfileField } from "../services/profileApi";
 
 const MIN_AGE = 18;
@@ -27,6 +28,7 @@ function Field({ id, label, error, children }: { id: string; label: string; erro
 export function ProfileForm({ initial, onSaved }: { initial: Profile | null; onSaved: (p: Profile) => void }) {
   const t = useT();
   const [form, setForm] = useState<Profile>(initial ?? blank());
+  const [birthdayText, setBirthdayText] = useState(() => fromIso(initial?.birthday ?? ""));
   const [errors, setErrors] = useState<Errors>({});
   const [state, setState] = useState<"idle" | "saving" | "saved" | "failed">("idle");
 
@@ -38,6 +40,10 @@ export function ProfileForm({ initial, onSaved }: { initial: Profile | null; onS
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
+    if (birthdayText && !toIso(birthdayText)) {
+      setErrors({ birthday: "profile.error.birthday" });
+      return;
+    }
     if (form.birthday && ageOn(form.birthday) < MIN_AGE) {
       setErrors({ birthday: "profile.error.age" });
       return;
@@ -46,6 +52,7 @@ export function ProfileForm({ initial, onSaved }: { initial: Profile | null; onS
     try {
       const saved = await saveProfile({ ...form, genderText: form.gender === "self_described" ? form.genderText : null });
       setForm(saved);
+      setBirthdayText(fromIso(saved.birthday));
       onSaved(saved);
       setState("saved");
     } catch (error) {
@@ -77,8 +84,13 @@ export function ProfileForm({ initial, onSaved }: { initial: Profile | null; onS
         {text("lastName", 40)}
         <div className="profile-wide">{text("displayName", 24)}</div>
         <Field id="profile-birthday" label={t("profile.birthday")} error={err("birthday")}>
-          <input id="profile-birthday" type="date" value={form.birthday} required
-            onChange={(e) => set("birthday", e.target.value)} data-testid="profile-birthday" />
+          <input id="profile-birthday" type="text" inputMode="numeric" autoComplete="bday" required
+            placeholder={t("profile.birthdayPlaceholder")} maxLength={10} value={birthdayText}
+            onChange={(e) => {
+              const typed = formatTyped(e.target.value);
+              setBirthdayText(typed);
+              set("birthday", toIso(typed) ?? "");
+            }} data-testid="profile-birthday" />
         </Field>
         <Field id="profile-gender" label={t("profile.gender")} error={err("gender")}>
           <select id="profile-gender" value={form.gender} data-testid="profile-gender"

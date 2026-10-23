@@ -79,5 +79,12 @@ Delete account showed "The password is not correct." and the account stayed;
 export with saved hands is not checked against PostgreSQL. Steps 6 to 8 are
 not built yet.
 
+Birthday field, 23 Oct (owner: a phone's date picker is slow): one text box
+with the number keyboard, the slashes added while typing (02021971 shows
+02/02/1971), a date that does not exist (31/02) refused before sending; the
+API still takes yyyy-mm-dd. Frontend birthday_input.test.ts (20) and one more
+profile test; 474 passed. Local browser at 375 px: typed 02021971, saved, the
+server returned 1971-02-02.
+
 Not in this plan: changing the password from the profile (the only password
 route is the forced Admin change), and the statistics card from the mockup.
