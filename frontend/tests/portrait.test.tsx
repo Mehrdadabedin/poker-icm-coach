@@ -8,6 +8,7 @@ import { AdminPortraitsView } from "../src/components/AdminPortraitsView";
 import { PokerSeat } from "../src/components/PokerSeat";
 import type { PlayerView } from "../src/models/game";
 import { PortraitPanel } from "../src/components/PortraitPanel";
+import { APP_USER_AGENT } from "../src/services/platform";
 
 const { request, resizePortrait } = vi.hoisted(() => ({ request: vi.fn(), resizePortrait: vi.fn() }));
 vi.mock("../src/services/api", async (importOriginal) => ({
@@ -22,6 +23,7 @@ vi.mock("../src/services/resizePortrait", async (importOriginal) => ({
 const PHOTO = "data:image/webp;base64,UklGRg==";
 const page = (lang: "en" | "es" = "en") =>
   render(<I18nProvider initial={lang}><MemoryRouter><PortraitPanel /></MemoryRouter></I18nProvider>);
+const asApp = () => vi.spyOn(navigator, "userAgent", "get").mockReturnValue(`Mozilla/5.0 ${APP_USER_AGENT}`);
 const seat = (player: PlayerView) =>
   render(<I18nProvider initial="en"><PokerSeat player={player} active={false} /></I18nProvider>);
 const hero: PlayerView = { seat: 0, name: "Ana", stack: 45000, stackInBB: 450, position: "BTN", bet: 0,
@@ -88,6 +90,43 @@ describe("the portrait page", () => {
     fireEvent.click(screen.getByTestId("portrait-remove"));
     expect(await screen.findByText("SIN FOTO")).toBeInTheDocument();
     expect(request).toHaveBeenCalledWith("/api/portrait", { method: "DELETE" });
+  });
+});
+
+describe("taking a photo with the camera", () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it("is offered in the app, next to the gallery, and opens the front camera", async () => {
+    asApp();
+    request.mockImplementation(async (_path: string, options?: RequestInit) =>
+      (options?.method === "PUT" ? { status: "pending", image: PHOTO } : { status: "none", image: null }));
+    resizePortrait.mockResolvedValue({ contentType: "image/jpeg", data: "/9j/" });
+    page();
+    expect(await screen.findByTestId("portrait-camera")).toHaveTextContent("Take a photo");
+    expect(screen.getByTestId("portrait-choose")).toHaveTextContent("Choose a photo");
+    const camera = screen.getByTestId("portrait-camera-input");
+    expect(camera).toHaveAttribute("capture", "user");
+    expect(camera).toHaveAttribute("accept", "image/*"); // the app opens the camera only for image/*
+    const shot = new File(["x"], "JPEG_1.jpg", { type: "image/jpeg" });
+    fireEvent.change(camera, { target: { files: [shot] } });
+    expect(await screen.findByText("WAITING FOR REVIEW")).toBeInTheDocument();
+    expect(resizePortrait).toHaveBeenCalledWith(shot);
+  });
+
+  it("is offered on a touch screen, in Spanish too", async () => {
+    vi.spyOn(window, "matchMedia").mockImplementation((query: string) =>
+      ({ matches: query === "(pointer: coarse)" }) as MediaQueryList);
+    request.mockResolvedValue({ status: "none", image: null });
+    page("es");
+    expect(await screen.findByTestId("portrait-camera")).toHaveTextContent("Hacer una foto");
+  });
+
+  it("is not offered on a desktop browser", async () => {
+    request.mockResolvedValue({ status: "none", image: null });
+    page();
+    await screen.findByText("NO PHOTO");
+    expect(screen.queryByTestId("portrait-camera")).toBeNull();
+    expect(screen.queryByTestId("portrait-camera-input")).toBeNull();
   });
 });
 
