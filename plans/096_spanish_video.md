@@ -28,4 +28,4 @@ keep ICMBOT_promo.mp4. (Asked as plan 094; 094 is the player portrait, so this i
 
 1. Scenes, recorder, poster, landing switch, tests (done).
 2. Voice samples in ~/Downloads/ICMBOT_voice_samples/es/ (done, owner picks).
-3. Narrate all lines, assemble `ICMBOT_promo.es.mp4`, watch it, PR (waiting for the voice).
+3. Voice: jessica (owner's pick, 27 Oct). Narrated, `ICMBOT_promo.es.mp4` built (56.7 s, 7.4 MB, -16.4 LUFS) (done). PR after the owner's go.
