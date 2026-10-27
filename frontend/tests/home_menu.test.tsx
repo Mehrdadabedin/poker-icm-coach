@@ -95,7 +95,7 @@ describe("menu cards (plan 066)", () => {
     expect(labels).toEqual(["STUDY", "REVIEW", "SETUP"]);
     const cards = Array.from(menu.querySelectorAll("button.hm-card"));
     expect(cards.map((c) => c.querySelector(".hm-title")?.textContent)).toEqual([
-      "Start practice", "ICM coach", "Ranges", "ICM calculator",
+      "Start practice", "ICM coach", "Ranges", "ICM calculator", "Glossary",
       "My mistakes", "Hand history", "Report", "Tournament settings", "Your profile",
     ]);
     for (const card of cards) {

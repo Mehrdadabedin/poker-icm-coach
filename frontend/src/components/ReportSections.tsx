@@ -2,6 +2,8 @@ import { Link } from "react-router-dom";
 import { useT } from "../i18n/I18n";
 import { localNumber } from "../i18n/lang";
 import { en, type MessageKey } from "../i18n/messages/en";
+import { STAT_TERM } from "../glossary/terms";
+import { GlossaryTerm, LinkedText } from "./GlossaryTerm";
 import {
   change, heatColour, historyLink, leakText, statVerdict,
   type Leak, type Period, type PlayerStat, type Report, type Summary,
@@ -15,20 +17,20 @@ export function SummaryCards({ summary, period }: { summary: Summary; period: Pe
   const t = useT();
   const agree = change(summary.agreement, summary.previous?.agreement, period, true, t);
   const miss = change(summary.mistakesPer100, summary.previous?.mistakesPer100, period, false, t);
-  const cards: [string, string, ReturnType<typeof change>][] = [
+  const cards: [string, string, ReturnType<typeof change>, string?][] = [
     [t("report.kpi.tournaments"), String(summary.tournaments), null],
     [t("report.kpi.wins"), String(summary.wins), null],
     [t("report.kpi.top3"), String(summary.top3), null],
-    [t("report.kpi.average"), num(summary.averageFinish), null],
-    [t("report.kpi.agreement"), num(summary.agreement, "%"), agree],
-    [t("report.kpi.mistakes"), num(summary.mistakesPer100), miss],
+    [t("report.kpi.average"), num(summary.averageFinish), null, "averageFinish"],
+    [t("report.kpi.agreement"), num(summary.agreement, "%"), agree, "agreement"],
+    [t("report.kpi.mistakes"), num(summary.mistakesPer100), miss, "mistakesPer100"],
   ];
   return (
     <div className="report-kpis" data-testid="report-summary">
-      {cards.map(([label, value, delta]) => (
+      {cards.map(([label, value, delta, term]) => (
         <div className="report-kpi" key={label}>
           <b>{value}</b>
-          <span>{label}</span>
+          <span>{term ? <GlossaryTerm id={term}>{label}</GlossaryTerm> : label}</span>
           {delta && <i className={delta.good ? "good" : "bad"}>{delta.text}</i>}
         </div>
       ))}
@@ -49,7 +51,7 @@ export function MistakeMap({ heatmap }: { heatmap: Report["heatmap"] }) {
         <tbody>
           {rows.map((p) => (
             <tr key={p} data-testid={`report-heat-${p}`}>
-              <th>{p}</th>
+              <th><LinkedText text={p} /></th>
               {heatmap.streets.map((s) => {
                 const c = heatmap.cells.find((cell) => cell.position === p && cell.street === s);
                 if (!c) return <td key={s} className="heat-empty">—</td>;
@@ -75,7 +77,7 @@ export function Leaks({ leaks, labels }: { leaks: Leak[]; labels: Map<string, st
     <ol className="report-leaks">
       {leaks.map((l, i) => (
         <li key={leakText(l)} data-testid={`report-leak-${i + 1}`}>
-          <span className="leak-text">{leakText(l, t)}</span>
+          <span className="leak-text"><LinkedText text={leakText(l, t)} /></span>
           <span className="leak-count">{t(l.count === 1 ? "report.times.one" : "report.times.other", { n: l.count })}</span>
           <span className="leak-hands">
             {l.hands.map((h) => (
@@ -122,7 +124,7 @@ export function PlayerStats({ stats }: { stats: PlayerStat[] }) {
             const verdict = statVerdict(s, t);
             return (
               <tr key={s.key} data-testid={`report-stat-${s.key}`}>
-                <td>{statLabel(s.key, t)}</td>
+                <td>{STAT_TERM[s.key] ? <GlossaryTerm id={STAT_TERM[s.key]}>{statLabel(s.key, t)}</GlossaryTerm> : statLabel(s.key, t)}</td>
                 <td>{s.value === null ? "—" : `${localNumber(s.value)}%`}</td>
                 <td>{s.low}–{s.high}%</td>
                 <td className={`verdict-${verdict.tone}`}>{verdict.text}</td>

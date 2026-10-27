@@ -1,5 +1,6 @@
 import type { Card, CoachAdvice } from "../models/game";
 import { CoachReason } from "./CoachReason";
+import { RowLabel } from "./GlossaryTerm";
 import { useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/messages/en";
 import { actionWord, coachReason, factorRow } from "../i18n/coach";
@@ -51,7 +52,7 @@ export function CoachPanelView({ coach, className = "coach-panel", testId, colla
               const [label, value] = factorRow(k, v, coach, t);
               return (
                 <div key={k} className="coach-row">
-                  <dt>{label}</dt>
+                  <dt><RowLabel code={k} label={label} /></dt>
                   <dd>{value}</dd>
                 </div>
               );

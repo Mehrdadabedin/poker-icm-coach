@@ -2,6 +2,7 @@ import { useT } from "../i18n/I18n";
 import { actionWord, coachReason, factorRow, tr } from "../i18n/coach";
 import { localFixed } from "../i18n/lang";
 import { formatChips, type CoachAdvice } from "../models/game";
+import { LinkedText, RowLabel } from "./GlossaryTerm";
 
 export type Advice = CoachAdvice & {
   confidence: number;
@@ -43,11 +44,11 @@ export function CoachAdvicePanel({ advice }: { advice: Advice }) {
       )}
 
       {advice.education && <p className="coach-education" data-testid="coach-education">{advice.education}</p>}
-      <p>{coachReason(advice, t)}</p>
+      <p><LinkedText text={coachReason(advice, t)} /></p>
       <dl>
         {Object.entries(advice.detail).map(([k, v]) => {
           const [label, value] = factorRow(k, v, advice, t);
-          return <div key={k} className="coach-row"><dt>{label}</dt><dd>{value}</dd></div>;
+          return <div key={k} className="coach-row"><dt><RowLabel code={k} label={label} /></dt><dd>{value}</dd></div>;
         })}
       </dl>
     </div>

@@ -20,6 +20,7 @@ import { ReportPage } from "./pages/ReportPage";
 import { StatisticsPage } from "./pages/StatisticsPage";
 import { MistakesPage } from "./pages/MistakesPage";
 import { IcmCalculatorPage } from "./pages/IcmCalculatorPage";
+import { GlossaryPage } from "./pages/GlossaryPage";
 import { TrainingPage } from "./pages/TrainingPage";
 import { BotProfilesPage } from "./pages/BotProfilesPage";
 import { AuthCallbackPage } from "./pages/AuthCallbackPage";
@@ -79,6 +80,7 @@ export function App() {
           <Route path="/statistics" element={<StatisticsPage />} />
           <Route path="/mistakes" element={<MistakesPage />} />
           <Route path="/icm-calculator" element={<IcmCalculatorPage />} />
+          <Route path="/glossary" element={<GlossaryPage />} />
         </Routes>
       </HashRouter>
     </I18nProvider>

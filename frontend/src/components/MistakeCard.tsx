@@ -6,6 +6,7 @@ import { useT } from "../i18n/I18n";
 import { numberLocale } from "../i18n/lang";
 import { PRESSURE_KEY } from "../i18n/poker";
 import { formatChips } from "../models/game";
+import { LinkedText } from "./GlossaryTerm";
 
 export type Decision = {
   street: string; heroAction: string; coachAction: string; grade: string;
@@ -57,7 +58,7 @@ export function MistakeCard({ mistake }: { mistake: Mistake }) {
         <span aria-hidden="true">{" → "}</span>
         {t("mistake.coach")} <b className="mistake-coach">{actionWord(d.coachAction, t)}</b>
       </p>
-      <p className="mistake-why">{coachReason({ reasoning: d.explanation, ...d }, t)}</p>
+      <p className="mistake-why"><LinkedText text={coachReason({ reasoning: d.explanation, ...d }, t)} /></p>
     </article>
   );
 }

@@ -11,6 +11,8 @@ export const home = {
   "home.ranges.text": "Baseline ranges by position and stack",
   "home.calculator.title": "ICM calculator",
   "home.calculator.text": "What each stack is worth",
+  "home.glossary.title": "Glossary",
+  "home.glossary.text": "What CO, SPR, VPIP and the other terms mean",
   "home.mistakes.title": "My mistakes",
   "home.mistakes.text": "Decisions the coach played differently",
   "home.history.title": "Hand history",
