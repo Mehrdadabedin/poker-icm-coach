@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useI18n } from "../i18n/I18n";
+import { useT } from "../i18n/I18n";
 import { demoVideo } from "../landing/demoVideo";
 
 const DEMO_ID = "lm-demo";
@@ -19,8 +19,8 @@ export function scrollToDemo(): void {
  * the video file is not requested before that, and it never autoplays: the
  * visitor starts it with the player's own controls. */
 export function MinimalDemo() {
-  const { lang, t } = useI18n();
-  const { src, poster } = demoVideo(lang);
+  const t = useT();
+  const { src, poster } = demoVideo();
   useEffect(() => {
     scrollToDemo();
   }, []);

@@ -22,7 +22,7 @@ keep ICMBOT_promo.mp4. (Asked as plan 094; 094 is the player portrait, so this i
   coach panel shows Spanish action words, so the recorder compares against a
   small Spanish word table. English runs are unchanged.
 - The poster tagline was English (PRACTICE IMPROVE WIN): `ICMBOT_video_poster.es.png`.
-- `demoVideo(lang)` picks `.es` files for Spanish, current files otherwise.
+- `demoVideo()` picks the `.es` files by domain only: icmbot.es and www.icmbot.es. Page language and ?lang do not matter (owner, 27 Oct). On localhost, `?demoVideo=es` shows it for testing.
 
 # Steps
 

@@ -1,28 +1,50 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { I18nProvider } from "../src/i18n/I18n";
-import type { Lang } from "../src/i18n/lang";
+import { demoVideo } from "../src/landing/demoVideo";
 import { LandingDemo } from "../src/landing/LandingDemo";
 import { MinimalDemo } from "../src/landing-minimal/MinimalDemo";
 
-const cases: [Lang, string, string][] = [
-  ["en", "/videos/ICMBOT_promo.mp4", "/videos/ICMBOT_video_poster.png"],
-  ["es", "/videos/ICMBOT_promo.es.mp4", "/videos/ICMBOT_video_poster.es.png"],
-];
+const EN = { src: "/videos/ICMBOT_promo.mp4", poster: "/videos/ICMBOT_video_poster.png" };
+const ES = { src: "/videos/ICMBOT_promo.es.mp4", poster: "/videos/ICMBOT_video_poster.es.png" };
 
-describe("demo video by language", () => {
-  it.each(cases)("landing demo in %s", (lang, src, poster) => {
-    render(<I18nProvider initial={lang}><LandingDemo /></I18nProvider>);
-    const player = screen.getByTestId("landing-video-player");
-    expect(player).toHaveAttribute("poster", poster);
-    expect(player.querySelector("source")).toHaveAttribute("src", src);
-    expect(screen.getByTestId("landing-video-poster").querySelector("img")).toHaveAttribute("src", poster);
+describe("demo video by domain", () => {
+  it.each(["icmbot.es", "www.icmbot.es"])("%s plays the Spanish video", (host) => {
+    expect(demoVideo(host, "")).toEqual(ES);
   });
 
-  it.each(cases)("minimal demo in %s", (lang, src, poster) => {
-    render(<I18nProvider initial={lang}><MinimalDemo /></I18nProvider>);
-    const video = screen.getByTestId("minimal-video");
-    expect(video).toHaveAttribute("poster", poster);
-    expect(video.querySelector("source")).toHaveAttribute("src", src);
+  it.each(["icmbot.one", "www.icmbot.one", "poker-icm-coach.onrender.com", "noticmbot.es", "icmbot.es.evil.com"])(
+    "%s keeps the English video, also with ?lang=es",
+    (host) => {
+      expect(demoVideo(host, "")).toEqual(EN);
+      expect(demoVideo(host, "?lang=es")).toEqual(EN);
+      expect(demoVideo(host, "?demoVideo=es")).toEqual(EN);
+    },
+  );
+
+  it("localhost shows the Spanish video only with ?demoVideo=es", () => {
+    expect(demoVideo("localhost", "")).toEqual(EN);
+    expect(demoVideo("localhost", "?lang=es")).toEqual(EN);
+    expect(demoVideo("localhost", "?demoVideo=es")).toEqual(ES);
+  });
+});
+
+describe("landing components follow the domain, not the language", () => {
+  afterEach(() => window.history.replaceState(null, "", "/"));
+
+  it("Spanish page on a non-Spanish domain keeps the English video", () => {
+    render(<I18nProvider initial="es"><LandingDemo /></I18nProvider>);
+    expect(screen.getByTestId("landing-video-player").querySelector("source")).toHaveAttribute("src", EN.src);
+  });
+
+  it("?demoVideo=es on localhost switches both landing demos", () => {
+    window.history.replaceState(null, "", "/?demoVideo=es");
+    const landing = render(<I18nProvider initial="en"><LandingDemo /></I18nProvider>);
+    const player = screen.getByTestId("landing-video-player");
+    expect(player).toHaveAttribute("poster", ES.poster);
+    expect(player.querySelector("source")).toHaveAttribute("src", ES.src);
+    landing.unmount();
+    render(<I18nProvider initial="en"><MinimalDemo /></I18nProvider>);
+    expect(screen.getByTestId("minimal-video").querySelector("source")).toHaveAttribute("src", ES.src);
   });
 });

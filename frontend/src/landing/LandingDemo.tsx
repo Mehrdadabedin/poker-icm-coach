@@ -1,11 +1,10 @@
 import { useRef, useState } from "react";
-import { useI18n } from "../i18n/I18n";
 import { demoVideo } from "./demoVideo";
 
 /** A47 video section, right under the hero: the current bundled player and
  * poster stay (a new video replaces the file later, not the markup). */
 export function LandingDemo() {
-  const { src, poster } = demoVideo(useI18n().lang);
+  const { src, poster } = demoVideo();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [showPoster, setShowPoster] = useState(true);
 
