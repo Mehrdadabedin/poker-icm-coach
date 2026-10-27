@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { useT } from "../i18n/I18n";
+import { useI18n } from "../i18n/I18n";
+import { demoVideo } from "../landing/demoVideo";
 
 const DEMO_ID = "lm-demo";
 
@@ -18,7 +19,8 @@ export function scrollToDemo(): void {
  * the video file is not requested before that, and it never autoplays: the
  * visitor starts it with the player's own controls. */
 export function MinimalDemo() {
-  const t = useT();
+  const { lang, t } = useI18n();
+  const { src, poster } = demoVideo(lang);
   useEffect(() => {
     scrollToDemo();
   }, []);
@@ -31,9 +33,9 @@ export function MinimalDemo() {
         controls
         preload="metadata"
         playsInline
-        poster="/videos/ICMBOT_video_poster.png"
+        poster={poster}
       >
-        <source src="/videos/ICMBOT_promo.mp4" type="video/mp4" />
+        <source key={src} src={src} type="video/mp4" />
       </video>
     </section>
   );

@@ -13,6 +13,13 @@ const SITE = process.env.SITE ?? "http://localhost:5175";
 const API = process.env.API ?? "http://localhost:8766";
 const USER = process.env.DEMO_USER ?? "demoplayer";
 const ZOOM = process.env.ZOOM ?? "1.4";
+// LANG_PARAM=es records the Spanish UI (?lang=es on the first load, then remembered)
+const LANG_PARAM = process.env.LANG_PARAM ?? "";
+// the panel shows the action in the site's language; the server answers in English
+const PANEL_WORDS = LANG_PARAM === "es"
+  ? { FOLD: "NO IR", CHECK: "PASAR", CALL: "IGUALAR", BET: "APOSTAR", RAISE: "SUBIR", "OPEN JAM": "ALL-IN",
+      RESHOVE: "ALL-IN", "CALL JAM": "IGUALAR ALL-IN", "OPEN RAISE": "SUBIR" }
+  : {};
 const password = readFileSync(PASS_FILE, "utf8").trim();
 mkdirSync(OUT, { recursive: true });
 
@@ -98,8 +105,9 @@ async function panelSays() {
 // server for the current decision and wait until the panel shows the same.
 async function coachSays() {
   const advice = String((await server("/coach", "POST")).recommendedAction).trim().toUpperCase();
+  const shown = PANEL_WORDS[advice] ?? advice;
   const end = Date.now() + 8000;
-  while ((await panelSays()) !== advice) {
+  while ((await panelSays()) !== shown) {
     if (Date.now() > end) throw new Error(`panel never showed ${advice}`);
     await pause(150);
   }
@@ -191,7 +199,7 @@ async function mistakeHand() {
 }
 
 // 1. the minimal landing page, then sign in as the demo player
-await page.goto(`${SITE}/#/`);
+await page.goto(`${SITE}/${LANG_PARAM ? `?lang=${LANG_PARAM}` : ""}#/`);
 await tid("minimal-hero").waitFor();
 mark("landing");
 await pause(3500);

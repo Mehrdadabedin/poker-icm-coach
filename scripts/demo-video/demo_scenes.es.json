@@ -1,0 +1,112 @@
+{
+  "voice": {
+    "provider": "openrouter",
+    "model": "elevenlabs/eleven-v4",
+    "voice": "jessica"
+  },
+  "scenes": [
+    {
+      "from": [
+        "landing",
+        0
+      ],
+      "to": [
+        "login",
+        0
+      ],
+      "line": "Te presentamos ICM Bot, el coach de ICM para el póker de torneos."
+    },
+    {
+      "from": [
+        "login",
+        0
+      ],
+      "to": [
+        "table",
+        1.0
+      ],
+      "line": "Inicia sesión, elige ocho bots y empieza tu torneo."
+    },
+    {
+      "from": [
+        "showcase-start",
+        -0.3
+      ],
+      "to": [
+        "raise-pick",
+        0
+      ],
+      "line": "En cada decisión, el coach te muestra la mejor jugada, y por qué."
+    },
+    {
+      "from": [
+        "raise-pick",
+        -0.2
+      ],
+      "to": [
+        "raise-done",
+        2.4
+      ],
+      "line": "Subir son dos toques: eliges el tamaño y pulsas Intro."
+    },
+    {
+      "from": [
+        "mistake-start",
+        -0.3
+      ],
+      "to": [
+        "mistake-start",
+        4.5
+      ],
+      "line": "Juega en contra del coach, y lo sabrás."
+    },
+    {
+      "from": [
+        "mistakes",
+        -0.3
+      ],
+      "to": [
+        "mistakes",
+        3.8
+      ],
+      "line": "Mis errores muestra cada decisión que el coach jugaría distinto, con el motivo."
+    },
+    {
+      "from": [
+        "history",
+        -0.3
+      ],
+      "to": [
+        "history",
+        3.0
+      ],
+      "line": "El historial de manos guarda cada torneo, mano a mano."
+    },
+    {
+      "from": [
+        "report",
+        -0.3
+      ],
+      "to": [
+        "report-stack",
+        2.0
+      ],
+      "line": "Y el nuevo Informe muestra tus resultados, y tu stack, mano a mano,"
+    },
+    {
+      "from": [
+        "report-map",
+        -0.6
+      ],
+      "to": [
+        "end",
+        0
+      ],
+      "line": "dónde cometes errores, tus mayores fugas y cómo eliges el tamaño de tus apuestas."
+    }
+  ],
+  "endCard": {
+    "image": "frontend/public/videos/ICMBOT_video_poster.es.png",
+    "line": "ICM Bot. Solo para practicar, sin dinero real. Empieza a entrenar gratis en icmbot punto es."
+  }
+}
