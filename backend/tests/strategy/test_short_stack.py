@@ -51,7 +51,7 @@ def _bb_vs_shove(cards: str, hero_bb: float, shove_bb: float, btn_bb: float = 0,
 def test_the_small_blind_shoves_the_nash_range() -> None:
     advice = _sb("7s 6h", 8, 7)  # was FOLD: "76o is not in the SB jam range"
     assert advice.recommended_action == "OPEN JAM"
-    assert advice.reasoning == "76o is in the SB shove range at 8 BB (Nash push/fold, 62% of hands)."
+    assert advice.reasoning == "76o is in the SB shove range at 8 BB (push/fold equilibrium, 62% of hands)."
 
 
 def test_a_hand_outside_the_range_folds() -> None:
@@ -67,8 +67,8 @@ def test_a_short_big_blind_sets_the_depth() -> None:
 
 
 def test_a_limper_or_a_deep_stack_keeps_the_old_ranges() -> None:
-    assert "Nash" not in _sb("7s 6h", 8, 7, 7).reasoning  # a limper is still in the hand
-    assert "Nash" not in _sb("7s 6h", 15, 15).reasoning  # 15 BB is past push/fold
+    assert "push/fold" not in _sb("7s 6h", 8, 7, 7).reasoning  # a limper is still in the hand
+    assert "push/fold" not in _sb("7s 6h", 15, 15).reasoning  # 15 BB is past push/fold
 
 
 def test_the_big_blind_calls_a_shove_at_the_pot_odds() -> None:

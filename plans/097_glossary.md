@@ -32,11 +32,17 @@ coach's labels open it.
 - A tap, not a hover: a term is a button that opens a short definition next to
   it, with "Open in glossary". At the table the hand stays on screen; the link
   leaves the table, and BACK TO TABLE brings the player back.
-- Linked: positions, BB, SB, ICM, SPR, EV and Nash wherever the coach's reason
+- Linked: positions, BB, SB, ICM, SPR, EV and "push/fold equilibrium" wherever the coach's reason
   says them (table panel, phone card, ICM coach tool, My Mistakes); the
   factor-row labels that have an entry; the Report's player stats, KPIs,
   heatmap positions and leaks; the session statistics cards. Hands such as
   K8o and numbers are never linked.
+
+- No "Nash" in anything a player reads (the owner, 27 Oct): a poker
+  training app is called Nash (nash-poker.com). The coach's small blind
+  reason and the glossary say "push/fold equilibrium" (Spanish "equilibrio
+  push/fold"). It is the same game-theory result, from our own solver; the
+  solver code keeps its name. Nothing from that app is in the project.
 
 # Steps
 
