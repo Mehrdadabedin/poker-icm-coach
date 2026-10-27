@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { Card, CoachAdvice } from "../models/game";
 import { CoachReason } from "./CoachReason";
+import { RowLabel } from "./GlossaryTerm";
 import { useT } from "../i18n/I18n";
 import { actionWord, coachReason, factorRow } from "../i18n/coach";
 
@@ -30,7 +31,7 @@ export function MobileCoachCard({ coach, heroCards }: { coach: CoachAdvice; hero
         <dl className="mobile-coach-rows">
           {Object.entries(coach.detail).slice(0, 14).map(([k, v]) => {
             const [label, value] = factorRow(k, v, coach, t);
-            return <div key={k}><dt>{label}</dt><dd>{value}</dd></div>;
+            return <div key={k}><dt><RowLabel code={k} label={label} /></dt><dd>{value}</dd></div>;
           })}
         </dl>
       )}

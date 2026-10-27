@@ -40,6 +40,7 @@ import "./styles/bot-profiles.css";
 import "./styles/winloss.css";
 import "./styles/winner.css";
 import "./styles/final-standings.css";
+import "./styles/glossary.css";
 import "./styles/mistakes.css";
 import "./styles/icm-calculator.css";
 import "./styles/page-header.css";

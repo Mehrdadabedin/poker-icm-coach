@@ -37,6 +37,9 @@ function HiddenSidebar() {
   );
 }
 
+// the reason is one paragraph; SB in it is a glossary button (plan 097)
+const reason = (_: string, el: Element | null) => el?.tagName === "P" && el.textContent === "K3o is not in the SB open range.";
+
 describe("side panel HIDE / SHOW", () => {
   it("collapses and restores the hand history entries", () => {
     render(<HiddenSidebar />);
@@ -54,12 +57,12 @@ describe("side panel HIDE / SHOW", () => {
   it("keeps the recommendation while the coach detail is hidden", () => {
     render(<HiddenSidebar />);
     expect(screen.getByText("ICM COACH")).toBeInTheDocument();
-    expect(screen.getByText("K3o is not in the SB open range.")).toBeInTheDocument();
+    expect(screen.getByText(reason)).toBeInTheDocument();
     expect(screen.getByText("ICM PRESSURE")).toBeInTheDocument();
     fireEvent.click(screen.getByTestId("coach-toggle"));
     expect(screen.getByText("FOLD")).toBeInTheDocument();
     expect(screen.queryByText("ICM PRESSURE")).not.toBeInTheDocument();
-    expect(screen.queryByText("K3o is not in the SB open range.")).not.toBeInTheDocument();
+    expect(screen.queryByText(reason)).not.toBeInTheDocument();
     fireEvent.click(screen.getByTestId("coach-toggle"));
     expect(screen.getByText("ICM PRESSURE")).toBeInTheDocument();
   });

@@ -1,5 +1,6 @@
 import { Fragment } from "react";
 import type { Card } from "../models/game";
+import { LinkedText } from "./GlossaryTerm";
 
 const ORDER = "23456789TJQKA";
 const SUIT: Record<string, string> = { s: "♠", h: "♥", d: "♦", c: "♣" };
@@ -28,17 +29,18 @@ export function CardChips({ cards }: { cards: Card[] }) {
 /** The coach's reason with the hero's hand shown as their two cards instead of
  * the shorthand: "83o is not in the LJ open range" reads 8♥ 3♣ (the owner, 19
  * Oct). Only the hero's own shorthand is replaced, as a whole word, so a
- * number such as "45%" is never mistaken for a hand. */
+ * number such as "45%" is never mistaken for a hand. Positions and terms such
+ * as CO or ICM open their glossary entry (plan 097). */
 export function CoachReason({ text, cards }: { text: string; cards?: Card[] | null }) {
   const name = cards ? handClass(cards) : null;
-  if (!cards || !name) return <>{text}</>;
+  if (!cards || !name) return <LinkedText text={text} />;
   const parts = text.split(new RegExp(`(?<![\\w.])${name}(?![\\w%])`));
   return (
     <>
       {parts.map((part, i) => (
         <Fragment key={i}>
           {i > 0 && <CardChips cards={cards} />}
-          {part}
+          <LinkedText text={part} />
         </Fragment>
       ))}
     </>

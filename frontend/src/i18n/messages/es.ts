@@ -16,5 +16,7 @@ import { practice } from "./es/practice";
 import { portrait } from "./es/portrait";
 import { portraitPrompt } from "./es/portraitPrompt";
 import { profile } from "./es/profile";
+import { glossary } from "./es/glossary";
+import { glossaryTerms } from "./es/glossaryTerms";
 
-export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools, ...practice, ...portrait, ...portraitPrompt, ...profile };
+export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools, ...practice, ...portrait, ...portraitPrompt, ...profile, ...glossary, ...glossaryTerms };

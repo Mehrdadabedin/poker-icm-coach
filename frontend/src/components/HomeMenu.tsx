@@ -21,6 +21,7 @@ const GROUPS: { label: MessageKey; entries: Entry[] }[] = [
       { to: "/coach", icon: "coach", title: "home.coach.title", text: "home.coach.text", testId: "menu-coach" },
       { to: "/ranges", icon: "ranges", title: "home.ranges.title", text: "home.ranges.text", testId: "menu-ranges" },
       { to: "/icm-calculator", icon: "calculator", title: "home.calculator.title", text: "home.calculator.text", testId: "menu-icm-calculator" },
+      { to: "/glossary", icon: "glossary", title: "home.glossary.title", text: "home.glossary.text", testId: "menu-glossary" },
     ],
   },
   {

@@ -28,6 +28,13 @@ export const MENU_ICONS = {
       <path d="M8.5 12h.01M12 12h.01M15.5 12h.01M8.5 16h.01M12 16h.01M15.5 16h.01" />
     </>
   ),
+  glossary: (
+    <>
+      <path d="M5 5a2 2 0 0 1 2-2h12v15H7a2 2 0 0 0-2 2z" />
+      <path d="M5 20a2 2 0 0 0 2 2h12v-4" />
+      <path d="M9 8h6M9 11.5h4" />
+    </>
+  ),
   mistakes: (
     <>
       <circle cx="10.5" cy="10.5" r="6.5" />

@@ -13,6 +13,8 @@ export const home: Record<keyof typeof en, string> = {
   "home.ranges.text": "Rangos base por posición y stack",
   "home.calculator.title": "Calculadora ICM",
   "home.calculator.text": "Cuánto vale cada stack",
+  "home.glossary.title": "Glosario",
+  "home.glossary.text": "Qué significan CO, SPR, VPIP y los demás términos",
   "home.mistakes.title": "Mis errores",
   "home.mistakes.text": "Decisiones que el coach jugaría distinto",
   "home.history.title": "Historial de manos",
