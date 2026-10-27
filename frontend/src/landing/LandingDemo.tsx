@@ -1,8 +1,10 @@
 import { useRef, useState } from "react";
+import { demoVideo } from "./demoVideo";
 
 /** A47 video section, right under the hero: the current bundled player and
  * poster stay (a new video replaces the file later, not the markup). */
 export function LandingDemo() {
+  const { src, poster } = demoVideo();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [showPoster, setShowPoster] = useState(true);
 
@@ -28,13 +30,13 @@ export function LandingDemo() {
             controls
             preload="metadata"
             playsInline
-            poster="/videos/ICMBOT_video_poster.png"
+            poster={poster}
             ref={videoRef}
             onPlay={() => setShowPoster(false)}
             onPause={() => setShowPoster(true)}
             onEnded={() => setShowPoster(true)}
           >
-            <source src="/videos/ICMBOT_promo.mp4" type="video/mp4" />
+            <source key={src} src={src} type="video/mp4" />
           </video>
           {showPoster && (
             <button
@@ -44,7 +46,7 @@ export function LandingDemo() {
               aria-label="Play ICM BOT demo video"
               onClick={startPlayback}
             >
-              <img src="/videos/ICMBOT_video_poster.png" alt="" draggable={false} />
+              <img src={poster} alt="" draggable={false} />
             </button>
           )}
         </div>
