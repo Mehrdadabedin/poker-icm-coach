@@ -90,6 +90,15 @@ describe("the glossary's words", () => {
     for (const text of ["K8o", "45%", "COVERAGE", "BBQ", "UTG+1x", "CHECK"]) expect(TOKEN_PATTERN.test(text), text).toBe(false);
     expect("UTG+1 opens".split(TOKEN_PATTERN)).toEqual(["", "UTG+1", " opens"]);
   });
+
+  it("says push/fold equilibrium, never Nash, and links it in each language (the owner, 27 Oct)", () => {
+    for (const lang of LANGS) {
+      expect(Object.values(MESSAGES[lang]).filter((text) => /nash/i.test(text)), lang).toEqual([]);
+      const reason = MESSAGES[lang]["coach.reason.sb_shove_in"];
+      const linked = reason.split(TOKEN_PATTERN).filter((_, i) => i % 2 === 1).map(tokenTerm);
+      expect(linked, lang).toEqual(["SB", "BB", "pushFold"]);
+    }
+  });
 });
 
 describe("the coach's terms at the table", () => {

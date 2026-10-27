@@ -22,7 +22,7 @@ export const TERMS: Term[] = [
   ...group("positions", POSITIONS, Object.fromEntries(POSITIONS.map((p) => [p, p === "UTG1" ? "UTG+1" : p]))),
   ...group("actions", ["fold", "check", "call", "bet", "raise", "minRaise", "allIn", "openRaise",
     "threeBet", "fourBet", "openJam", "reshove", "callJam", "streets"], { threeBet: "3-BET", fourBet: "4-BET" }),
-  ...group("coach", ["range", "openRange", "jamRange", "nash", "steal", "premium", "handNotation", "equity",
+  ...group("coach", ["range", "openRange", "jamRange", "pushFold", "steal", "premium", "handNotation", "equity",
     "potOdds", "ev", "chipEv", "icmEv", "foldEquity", "outs", "effectiveStack", "stackBand", "coverage",
     "spr", "boardTexture", "heroVillain", "grade", "leak"], { ev: "EV", spr: "SPR", icmEv: "ICM EV", chipEv: "CHIP EV" }),
   ...group("tournament", ["icm", "icmPressure", "riskPremium", "tournamentEquity", "prizePool", "bubble",
@@ -41,7 +41,9 @@ export const exKey = (id: string) => `gl.${id}.ex` as MessageKey;
 /** Abbreviations linked wherever the coach writes them, in any language. */
 const TOKENS: Record<string, string> = {
   ...Object.fromEntries(POSITIONS.map((p) => [p === "UTG1" ? "UTG+1" : p, p])),
-  ICM: "icm", SPR: "spr", EV: "ev", Nash: "nash",
+  ICM: "icm", SPR: "spr", EV: "ev",
+  // the coach's short-stack phrase, as each language writes it
+  "push/fold equilibrium": "pushFold", "equilibrio push/fold": "pushFold",
 };
 
 // longest first, so UTG+1 wins over UTG; never inside a word or a number
