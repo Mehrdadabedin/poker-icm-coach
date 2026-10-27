@@ -24,8 +24,8 @@ TEXT: dict[str, str] = {
     "raise_beats": "Equity {eq} beats pot odds {odds}.",
     "call_about": "Equity {eq} about equal to pot odds {odds}.",
     "fold_below": "Equity {eq} below required {req}.",
-    "sb_shove_in": "{hand} is in the SB shove range at {depth} BB (Nash push/fold, {share} of hands).",
-    "sb_shove_out": "{hand} is not in the SB shove range at {depth} BB (Nash push/fold, {share} of hands).",
+    "sb_shove_in": "{hand} is in the SB shove range at {depth} BB (push/fold equilibrium, {share} of hands).",
+    "sb_shove_out": "{hand} is not in the SB shove range at {depth} BB (push/fold equilibrium, {share} of hands).",
     "allin_beats_sb": "Equity {eq} against the SB shove range at {depth} BB beats the pot odds {odds}.",
     "allin_below_sb": "Equity {eq} against the SB shove range at {depth} BB is below the pot odds {odds}.",
     "allin_icm_sb": "Equity {eq} against the SB shove range at {depth} BB. "
