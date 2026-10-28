@@ -60,6 +60,10 @@ class DatabaseArchive(NullArchive):
         history_tournaments.create(engine, checkfirst=True)
         history_hands.create(engine, checkfirst=True)
 
+    @property
+    def engine(self) -> Engine:
+        return self._engine
+
     def _upsert_tournament(self, connection: Any, session: GameSession) -> None:
         ended = datetime.now(UTC) if session.status != "active" else None
         row = insert(history_tournaments).values(

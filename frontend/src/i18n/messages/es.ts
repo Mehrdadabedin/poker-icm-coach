@@ -21,6 +21,7 @@ import { glossaryTerms } from "./es/glossaryTerms";
 import { tabs } from "./es/tabs";
 import { theme } from "./es/theme";
 import { plans } from "./es/plans";
+import { leaderboard } from "./es/leaderboard";
 import { tableStrip } from "./es/tableStrip";
 
-export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools, ...practice, ...portrait, ...portraitPrompt, ...profile, ...glossary, ...glossaryTerms, ...tabs, ...theme, ...plans, ...tableStrip };
+export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools, ...practice, ...portrait, ...portraitPrompt, ...profile, ...glossary, ...glossaryTerms, ...tabs, ...theme, ...plans, ...tableStrip, ...leaderboard };

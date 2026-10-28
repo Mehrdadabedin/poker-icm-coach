@@ -2,9 +2,9 @@
 id: 102
 title: Leaderboard
 phase: 8
-status: planned
+status: complete
 depends_on: [076, 092, 095]
-test_file: backend/tests/api/test_leaderboard.py
+test_file: [backend/tests/test_leaderboard.py, backend/tests/test_leaderboard_db.py]
 implementation_files: [backend/app/services/leaderboard.py, backend/app/api/routes_leaderboard.py, backend/app/main.py, frontend/src/pages/LeaderboardPage.tsx, frontend/src/components/LeaderboardPodium.tsx, frontend/src/styles/leaderboard.css, frontend/src/App.tsx, frontend/src/i18n/messages/en/leaderboard.ts, frontend/src/i18n/messages/es/leaderboard.ts]
 ---
 
@@ -36,6 +36,10 @@ Design: Phase 2 canvas, https://claude.ai/artifact/3kjEBZMVYhwtXRQ8NbX9ic, scree
   display name, points; under the name, wins (1st places) and tournaments
   played. Ties: more wins first, then fewer tournaments, then who got there
   first.
+- Photo cost: the response carries an approved photo (data URL, up to 200 KB)
+  only for the top 3 and the caller's own row, at most 4 photos. A hundred
+  would make the page slow; every other row gets `photo: null` and shows the
+  initial.
 - The top 3 on a podium (2nd, 1st, 3rd), places 4 to 100 in a list. The
   player's own row is always shown at the bottom, with the rank, even
   outside the top 100 ("You: 214th, 120 points").
@@ -66,3 +70,11 @@ Design: Phase 2 canvas, https://claude.ai/artifact/3kjEBZMVYhwtXRQ8NbX9ic, scree
 - Display names only, no username anywhere in the response; players
   without a profile, admins and `demoplayer` left out.
 - Frontend: podium, list, own row, both languages.
+
+# Built (frontend)
+
+- `pages/LeaderboardPage.tsx` at `#/leaderboard` (Home tab), `components/LeaderboardPodium.tsx`, `LeaderboardParts.tsx` (rows, own row), `LeaderboardHomeCard.tsx` on phone and wide Home, `services/leaderboardApi.ts`.
+- Words in `messages/en|es/leaderboard.ts`; tokens `--lb-silver`, `--lb-bronze`, `--lb-points` in `styles/tokens/leaderboard.css`; styles in `styles/leaderboard.css`.
+- Dates use `en-GB` day-month order ("26 Oct to 1 Nov (UTC)"). `tests/home_menu.test.tsx` mocks the leaderboard hook so its "no request" checks still hold.
+- Tests: `frontend/tests/leaderboard.test.tsx` (12), contrast pairs added to `theme.test.tsx`.
+- Singular forms ("1 win", "1 victoria", "1 point") through `.one` and `.other` keys; the Home card's own line uses the ordinal ("10th", "10.º"); the own row is `position: sticky` inside the page container, so on a wide screen it has the list's exact width and position.

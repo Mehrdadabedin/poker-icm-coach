@@ -15,6 +15,8 @@ vi.mock("../src/services/api", async (importOriginal) => ({
   adminSummary: vi.fn(async () => { throw new Error("API 403"); }),
 }));
 
+vi.mock("../src/services/leaderboardApi", () => ({ useLeaderboard: () => ({ board: null, failed: false }) }));
+
 const AWAY_KEY = "icm_away_table";
 const notFound = () => Promise.reject(new Error('API 404: {"detail":"table not found"}'));
 

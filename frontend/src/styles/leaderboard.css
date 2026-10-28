@@ -1,0 +1,55 @@
+/* The leaderboard page and the Home card (plan 102). */
+.leaderboard-page { padding-bottom: 12px; }
+.lb-head { display: flex; align-items: center; gap: 10px; margin: 8px 0 12px; }
+.lb-title { margin: 0; flex: 1; }
+.lb-back { border: 0; background: none; color: var(--text); font-size: 2rem; line-height: 1; cursor: pointer; padding: 0 6px; }
+.lb-top { color: var(--text-muted); font-weight: 700; }
+.lb-switch { display: grid; grid-template-columns: 1fr 1fr; padding: 4px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
+.lb-tab { padding: 10px; border: 0; border-radius: 9px; background: none; color: var(--text-muted); font: inherit; font-weight: 700; cursor: pointer; }
+.lb-tab-on { background: var(--accent-fill); color: var(--accent-ink); }
+.lb-meta { display: flex; justify-content: space-between; gap: 8px; margin: 12px 0; color: var(--text-muted); font-size: 0.85rem; }
+.lb-updated { display: flex; align-items: center; gap: 6px; }
+.lb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--lb-points); }
+.lb-empty, .lb-card-empty { margin: 28px 0; text-align: center; color: var(--text-muted); }
+
+.lb-podium { display: flex; align-items: flex-end; justify-content: center; gap: 12px; margin: 8px 0 18px; padding: 0; list-style: none; }
+.lb-place { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+.lb-place .lb-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-place-points { font-family: Archivo, sans-serif; font-weight: 800; font-size: 1.25rem; color: var(--lb-points); }
+.lb-place-1 .lb-place-points { font-size: 1.5rem; }
+.lb-ring { position: relative; display: block; padding: 3px; border-radius: 50%; border: 3px solid var(--lb-silver); }
+.lb-place-1 .lb-ring { border-color: var(--accent-fill); }
+.lb-place-3 .lb-ring { border-color: var(--lb-bronze); }
+.lb-badge { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--lb-silver); color: var(--accent-ink); font-size: 0.8rem; font-weight: 800; }
+.lb-ring .lb-badge { position: absolute; left: 50%; bottom: -12px; transform: translateX(-50%); }
+.lb-place-1 .lb-badge, .lb-badge-1 { background: var(--accent-fill); }
+.lb-place-3 .lb-badge, .lb-badge-3 { background: var(--lb-bronze); }
+.lb-place { padding-bottom: 12px; }
+
+.lb-avatar { flex: 0 0 auto; border-radius: 50%; object-fit: cover; }
+.lb-initial { display: inline-flex; align-items: center; justify-content: center; background: var(--line); color: var(--text); font-weight: 800; }
+.lb-name { color: var(--text); }
+.lb-stats { color: var(--text-muted); font-size: 0.8rem; }
+.lb-who { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.lb-who .lb-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-list { margin: 0; padding: 0; list-style: none; }
+.lb-row { display: flex; align-items: center; gap: 12px; padding: 10px 4px; border-top: 1px solid var(--line); }
+.lb-rank { width: 28px; text-align: center; color: var(--text-muted); font-weight: 700; }
+.lb-points { font-family: Archivo, sans-serif; font-weight: 800; color: var(--lb-points); }
+
+/* in the page container, so it has the list's exact width and position; sticky keeps it on screen */
+.lb-own { position: sticky; bottom: 0; z-index: 5; display: flex; align-items: center; gap: 12px; margin-top: 8px; padding: 12px 16px; border: 1px solid var(--upgrade-border); border-radius: 14px 14px 0 0; background: var(--bg) linear-gradient(var(--upgrade-bg), var(--upgrade-bg)); color: var(--text); }
+body.has-tab-bar .lb-own { bottom: calc(72px + env(safe-area-inset-bottom)); }
+.lb-own-rank, .lb-own-points { color: var(--accent); font-family: Archivo, sans-serif; font-weight: 800; }
+.lb-own-link { color: var(--accent); font-weight: 700; }
+
+.lb-card { flex-direction: column; align-items: stretch; gap: 10px; margin-top: 12px; cursor: default; }
+.lb-card:hover { transform: none; }
+.lb-card-head { display: flex; align-items: center; gap: 12px; }
+.lb-card-head .hm-icon { margin-top: 0; }
+.lb-card-dates { margin-left: auto; color: var(--text-muted); font-size: 0.8rem; }
+.lb-card-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.lb-card-row { display: flex; align-items: center; gap: 10px; }
+.lb-card-row .lb-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lb-card-me { display: flex; justify-content: space-between; margin: 0; padding-top: 10px; border-top: 1px solid var(--line); color: var(--accent); font-weight: 700; }
+.lb-card-more { align-self: flex-end; border: 0; background: none; color: var(--accent); font: inherit; font-weight: 700; cursor: pointer; }
