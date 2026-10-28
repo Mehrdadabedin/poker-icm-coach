@@ -2,7 +2,7 @@
 id: 104
 title: Retire /classic, a Real Link Preview and Hero
 phase: 8
-status: in-progress
+status: complete
 depends_on: [069, 101, 102, 103]
 test_file: frontend/tests/site_meta.test.ts
 implementation_files: [frontend/src/landing-minimal/MinimalHero.tsx, frontend/src/i18n/messages/en/landing.ts, frontend/src/i18n/messages/es/landing.ts, frontend/src/App.tsx, frontend/src/pages/LandingPage.tsx, frontend/src/landing/, frontend/src/main.tsx, frontend/src/styles/landing.css, frontend/src/styles/tokens/landing.css, frontend/src/hooks/useTabBarShown.ts, frontend/index.html, frontend/src/i18n/siteMeta.ts, frontend/public/images/, scripts/og-image/]
