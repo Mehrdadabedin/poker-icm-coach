@@ -10,7 +10,7 @@
 .lb-meta { display: flex; justify-content: space-between; gap: 8px; margin: 12px 0; color: var(--text-muted); font-size: 0.85rem; }
 .lb-updated { display: flex; align-items: center; gap: 6px; }
 .lb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--lb-points); }
-.lb-empty, .lb-card-empty { margin: 28px 0; text-align: center; color: var(--text-muted); }
+.lb-empty { margin: 28px 0; text-align: center; color: var(--text-muted); }
 
 .lb-podium { display: flex; align-items: flex-end; justify-content: center; gap: 12px; margin: 8px 0 18px; padding: 0; list-style: none; }
 .lb-place { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
@@ -43,13 +43,3 @@ body.has-tab-bar .lb-own { bottom: calc(72px + env(safe-area-inset-bottom)); }
 .lb-own-rank, .lb-own-points { color: var(--accent); font-family: Archivo, sans-serif; font-weight: 800; }
 .lb-own-link { color: var(--accent); font-weight: 700; }
 
-.lb-card { flex-direction: column; align-items: stretch; gap: 10px; margin-top: 12px; cursor: default; }
-.lb-card:hover { transform: none; }
-.lb-card-head { display: flex; align-items: center; gap: 12px; }
-.lb-card-head .hm-icon { margin-top: 0; }
-.lb-card-dates { margin-left: auto; color: var(--text-muted); font-size: 0.8rem; }
-.lb-card-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
-.lb-card-row { display: flex; align-items: center; gap: 10px; }
-.lb-card-row .lb-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.lb-card-me { display: flex; justify-content: space-between; margin: 0; padding-top: 10px; border-top: 1px solid var(--line); color: var(--accent); font-weight: 700; }
-.lb-card-more { align-self: flex-end; border: 0; background: none; color: var(--accent); font: inherit; font-weight: 700; cursor: pointer; }

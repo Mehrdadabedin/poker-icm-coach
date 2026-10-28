@@ -2,7 +2,6 @@ import { useAwayTable } from "../hooks/useAwayTable";
 import { useStartPractice } from "../hooks/useStartPractice";
 import { useIsFree } from "../services/plan";
 import { UpgradeCard } from "./UpgradeCard";
-import { LeaderboardHomeCard } from "./LeaderboardHomeCard";
 import { MenuCard } from "./MenuCard";
 import { ADMIN, GROUPS } from "./menuEntries";
 import { useT } from "../i18n/I18n";
@@ -42,9 +41,12 @@ export function HomeMenu({ isAdmin, phone = false }: { isAdmin: boolean; phone?:
           onPick={free ? () => void startFree() : undefined}
           entry={{ to: "/bot-profiles", icon: "start", title: "home.start.title", text: free ? "plans.start.text" : "home.start.text", testId: "start-practice" }}
         />
+        <MenuCard
+          big
+          entry={{ to: "/leaderboard", icon: "leaderboard", title: "home.leaderboard.title", text: "home.leaderboard.text", testId: "menu-leaderboard" }}
+        />
       </div>
       <div className="hm-upgrade"><UpgradeCard title="plans.unlock.title" text="plans.unlock.text" /></div>
-      <LeaderboardHomeCard />
       {!phone && groups.map((group) => (
         <section key={group.label} aria-label={t(group.label)}>
           <p className="hm-label">{t(group.label)}</p>

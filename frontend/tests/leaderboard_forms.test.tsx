@@ -1,10 +1,9 @@
-/* Singular and plural words, the ordinal on the Home card, and where the own row sits (plan 102). */
+/* Singular and plural words, the own row's ordinal, and where the own row sits (plan 102). */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, render, screen, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { I18nProvider } from "../src/i18n/I18n";
 import type { Lang } from "../src/i18n/lang";
-import { LeaderboardHomeCard } from "../src/components/LeaderboardHomeCard";
 import { LeaderboardPage } from "../src/pages/LeaderboardPage";
 import type { Leaderboard, LeaderboardMe, LeaderboardRow } from "../src/services/leaderboardApi";
 
@@ -16,13 +15,13 @@ const row = (rank: number, wins: number, played: number, points = 100): Leaderbo
 const board = (rows: LeaderboardRow[], me: LeaderboardMe | null = null): Leaderboard =>
   ({ period: "week", weekStart: "2026-10-26T00:00:00Z", weekEnd: "2026-11-01T23:59:59Z", updatedAt: new Date().toISOString(), rows, me });
 
-function open(data: Leaderboard, lang: Lang, ui: "page" | "card") {
+function open(data: Leaderboard, lang: Lang) {
   request.mockResolvedValue(data);
   render(
     <I18nProvider initial={lang}>
       <MemoryRouter initialEntries={["/"]}>
         <Routes>
-          <Route path="/" element={ui === "page" ? <LeaderboardPage /> : <LeaderboardHomeCard />} />
+          <Route path="/" element={<LeaderboardPage />} />
         </Routes>
       </MemoryRouter>
     </I18nProvider>,
@@ -42,7 +41,7 @@ describe.each([
   ["es", { one: "1 victoria · 1 jugado", many: "3 victorias · 5 jugados", zero: "0 victorias · 4 jugados", point: "1 punto", points: "100 puntos" }],
 ] as const)("singular and plural in %s", (lang, words) => {
   it("uses the singular for 1 in the podium, the list and the own row", async () => {
-    open(board(ROWS, ME), lang, "page");
+    open(board(ROWS, ME), lang);
     await settle();
     expect(within(screen.getByTestId("lb-podium-1")).getByText(words.one)).toBeInTheDocument();
     expect(within(screen.getByTestId("lb-podium-2")).getByText(words.many)).toBeInTheDocument();
@@ -54,22 +53,19 @@ describe.each([
   });
 });
 
-describe("the Home card's own line", () => {
+describe("the own row's place", () => {
   it.each([
-    ["en", { ...ME, rank: 10, points: 260 }, "10th · 260 points"],
-    ["en", { ...ME, rank: 22, points: 1 }, "22nd · 1 point"],
-    ["es", { ...ME, rank: 10, points: 260 }, "10.º · 260 puntos"],
-    ["es", { ...ME, rank: 3, points: 1 }, "3.º · 1 punto"],
-  ] as const)("reads the ordinal and points in %s: %s", async (lang, me, text) => {
-    open(board([row(1, 1, 1)], me), lang, "card");
+    ["en", 10, "10th"], ["en", 22, "22nd"], ["es", 10, "10.º"], ["es", 3, "3.º"],
+  ] as const)("reads the ordinal in %s: %s", async (lang, rank, text) => {
+    open(board([row(1, 1, 1)], { ...ME, rank }), lang);
     await settle();
-    expect(screen.getByTestId("leaderboard-card-me")).toHaveTextContent(text);
+    expect(within(screen.getByTestId("lb-own")).getByText(text)).toBeInTheDocument();
   });
 });
 
 describe("the pinned own row", () => {
   it("sits in the list's own container, so it has the list's width and position", async () => {
-    open(board(ROWS, ME), "en", "page");
+    open(board(ROWS, ME), "en");
     await settle();
     const own = screen.getByTestId("lb-own");
     expect(own.parentElement).toBe(screen.getByTestId("lb-list").parentElement);

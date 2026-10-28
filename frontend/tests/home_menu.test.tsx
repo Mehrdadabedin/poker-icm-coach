@@ -15,7 +15,6 @@ vi.mock("../src/services/api", async (importOriginal) => ({
   adminSummary: vi.fn(async () => { throw new Error("API 403"); }),
 }));
 
-vi.mock("../src/services/leaderboardApi", () => ({ useLeaderboard: () => ({ board: null, failed: false }) }));
 
 const AWAY_KEY = "icm_away_table";
 const notFound = () => Promise.reject(new Error('API 404: {"detail":"table not found"}'));
@@ -27,6 +26,7 @@ function openHome() {
         <Route path="/" element={<HomePage />} />
         <Route path="/bot-profiles" element={<div data-testid="bot-profiles-page" />} />
         <Route path="/table/:tableId" element={<div data-testid="table-page" />} />
+        <Route path="/leaderboard" element={<div data-testid="leaderboard-page" />} />
       </Routes>
     </MemoryRouter>,
   );
@@ -97,7 +97,7 @@ describe("menu cards (plan 066)", () => {
     expect(labels).toEqual(["STUDY", "REVIEW", "SETUP"]);
     const cards = Array.from(menu.querySelectorAll("button.hm-card"));
     expect(cards.map((c) => c.querySelector(".hm-title")?.textContent)).toEqual([
-      "Start practice", "ICM coach", "Ranges", "ICM calculator", "Glossary",
+      "Start practice", "Leaderboard", "ICM coach", "Ranges", "ICM calculator", "Glossary",
       "My mistakes", "Hand history", "Report", "Tournament settings", "Appearance", "Your profile",
     ]);
     for (const card of cards) {
@@ -131,5 +131,18 @@ describe("START PRACTICE", () => {
     await settle();
     expect(screen.getByTestId("bot-profiles-page")).toBeInTheDocument();
     expect(screen.queryByText(/RANDOM OPPONENTS/)).toBeNull();
+  });
+});
+
+describe("LEADERBOARD (plan 102)", () => {
+  it("is a plain card next to Start practice that opens the leaderboard page, with no board on Home", async () => {
+    openHome();
+    await settle();
+    const card = screen.getByTestId("menu-leaderboard");
+    expect(card).toHaveTextContent("LeaderboardThis week's top 100 and your place");
+    expect(card.closest(".hm-play")).not.toBeNull();
+    expect(request.mock.calls.some(([path]) => String(path).includes("/api/leaderboard"))).toBe(false);
+    fireEvent.click(card);
+    expect(screen.getByTestId("leaderboard-page")).toBeInTheDocument();
   });
 });
