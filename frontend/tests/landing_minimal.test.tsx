@@ -1,5 +1,4 @@
-/* The minimal landing page, the landing page at / since plan 069. The old
- * page stays at /classic (see landing.test.tsx); /minimal links still work. */
+/* The minimal landing page, the landing page at / since plan 069. /classic and /minimal links open it. */
 import { describe, expect, it, vi, beforeAll, beforeEach, afterEach } from "vitest";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 
@@ -44,9 +43,10 @@ describe("minimal landing page (/minimal)", () => {
     expect(screen.queryByTestId("landing-page")).toBeNull();
   });
 
-  it("keeps the old landing page at /classic, and old /minimal links still open this page", async () => {
+  it("sends old /classic and /minimal links to this page at #/", async () => {
     await openAt("#/classic");
-    expect(screen.getByTestId("landing-page")).toBeInTheDocument();
+    expect(screen.getByTestId("minimal-landing-page")).toBeInTheDocument();
+    expect(window.location.hash).toBe("#/");
     cleanup();
     await openAt("#/minimal");
     expect(screen.getByTestId("minimal-landing-page")).toBeInTheDocument();
@@ -61,10 +61,21 @@ describe("minimal landing page (/minimal)", () => {
     // the practice-only note lives in the footer, not under the hero button
     expect(screen.getByTestId("minimal-hero")).not.toHaveTextContent("Practice only");
     const picture = screen.getByTestId("minimal-hero-visual");
-    expect(picture).toHaveAttribute("src", "/images/hero-coach-screen.webp");
+    expect(picture).toHaveAttribute("src", "/images/hero-app.webp");
     expect(picture).toHaveAttribute("width", "1602");
     expect(picture).toHaveAttribute("height", "982");
     expect(picture.getAttribute("alt")).toContain("ICM coach recommends a raise");
+  });
+
+  it("shows the Spanish hero picture when the page is in Spanish", async () => {
+    window.history.replaceState(null, "", "/?lang=es");
+    await openAt("#/");
+    const picture = screen.getByTestId("minimal-hero-visual");
+    expect(picture).toHaveAttribute("src", "/images/hero-app-es.webp");
+    expect(picture).toHaveAttribute("width", "1602");
+    expect(picture).toHaveAttribute("height", "982");
+    expect(picture.getAttribute("alt")).toContain("el coach ICM recomienda subir");
+    window.history.replaceState(null, "", "/");
   });
 
   it("has a top bar with Log in and Start free only, and no section menu", async () => {

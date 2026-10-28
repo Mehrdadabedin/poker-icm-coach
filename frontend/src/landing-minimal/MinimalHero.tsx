@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useT } from "../i18n/I18n";
+import { useI18n } from "../i18n/I18n";
 
 interface MinimalHeroProps {
   demoOpen: boolean;
@@ -10,7 +10,7 @@ interface MinimalHeroProps {
  * primary button and a rounded outline button that opens the demo video, then the
  * picture of the ICM coach screen. */
 export function MinimalHero({ demoOpen, onWatchDemo }: MinimalHeroProps) {
-  const t = useT();
+  const { t, lang } = useI18n();
   return (
     <section className="lm-hero" aria-labelledby="lm-hero-title" data-testid="minimal-hero">
       <h1 className="lm-title" id="lm-hero-title">
@@ -34,7 +34,7 @@ export function MinimalHero({ demoOpen, onWatchDemo }: MinimalHeroProps) {
       <p className="lm-tagline" data-testid="minimal-tagline">{t("landing.tagline")}</p>
       <img
         className="lm-hero-img"
-        src="/images/hero-coach-screen.webp"
+        src={lang === "es" ? "/images/hero-app-es.webp" : "/images/hero-app.webp"}
         alt={t("landing.hero.alt")}
         width={1602}
         height={982}

@@ -1,0 +1,32 @@
+<!doctype html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="card.css">
+<style>
+body { width: 1200px; height: 630px; }
+.logo { position: absolute; left: 600px; top: 14px; transform: translateX(-50%); height: 50px;
+  mix-blend-mode: lighten; /* the logo file has a black background */ }
+/* the centred 630 x 630 square (x 285 to 915) is what WhatsApp's small preview
+   shows: the logo and the phone sit inside it, the text sits left and right */
+/* the screenshot is cut just below the bet controls (no empty page under them) */
+.phone { left: 454px; top: 72px; width: 292px; height: 545px; border-radius: 32px; border-width: 8px; }
+.phone img { border-radius: 24px; object-fit: cover; object-position: top; }
+.side { position: absolute; top: 0; height: 630px; width: 255px; display: flex; flex-direction: column; justify-content: center; }
+.left { left: 30px; } .right { right: 20px; }
+h1 { text-wrap: balance; font-size: 44px; line-height: 1.08; font-weight: 800; letter-spacing: -0.5px; }
+ul { list-style: none; padding: 0; display: grid; gap: 26px; }
+li { font-size: 21px; line-height: 1.2; font-weight: 600; padding-left: 34px; position: relative; text-wrap: balance; }
+li:first-child { white-space: nowrap; }
+li::before { content: "\2713"; position: absolute; left: 0; top: -2px; color: var(--accent); font-size: 26px; font-weight: 800; }
+</style>
+<img class="logo" src="../../frontend/public/Logo/logo.png" alt="">
+<div class="side left"><h1 id="h"></h1></div>
+<div class="side right"><ul id="l"></ul></div>
+<div class="phone"><img id="phone" alt=""></div>
+<script src="strings.js"></script>
+<script>
+const q = new URLSearchParams(location.search), s = STRINGS[q.get("lang")];
+document.documentElement.lang = q.get("lang");
+h.textContent = s.headline;
+l.innerHTML = s.points.map((p) => `<li>${p}</li>`).join("");
+phone.src = q.get("phone");
+</script>

@@ -1,0 +1,17 @@
+<!doctype html>
+<meta charset="utf-8">
+<link rel="stylesheet" href="card.css">
+<style>
+body { width: 1602px; height: 982px; }
+.laptop { left: 60px; top: 80px; width: 1290px; height: 806px; padding: 12px; }
+.base { left: 10px; top: 884px; width: 1390px; }
+.phone { left: 1226px; top: 250px; width: 318px; height: 678px; border-radius: 40px; border-width: 9px; }
+.phone img { border-radius: 31px; }
+</style>
+<div class="laptop"><img id="wide" alt=""></div><div class="base"></div>
+<div class="phone"><img id="phone" alt=""></div>
+<script>
+const q = new URLSearchParams(location.search);
+document.documentElement.lang = q.get("lang");
+wide.src = q.get("wide"); phone.src = q.get("phone");
+</script>

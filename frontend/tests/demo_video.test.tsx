@@ -2,7 +2,6 @@ import { afterEach, describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { I18nProvider } from "../src/i18n/I18n";
 import { demoVideo } from "../src/landing/demoVideo";
-import { LandingDemo } from "../src/landing/LandingDemo";
 import { MinimalDemo } from "../src/landing-minimal/MinimalDemo";
 
 const EN = { src: "/videos/ICMBOT_promo.mp4", poster: "/videos/ICMBOT_video_poster.png" };
@@ -29,22 +28,19 @@ describe("demo video by domain", () => {
   });
 });
 
-describe("landing components follow the domain, not the language", () => {
+describe("the landing demo follows the domain, not the language", () => {
   afterEach(() => window.history.replaceState(null, "", "/"));
 
   it("Spanish page on a non-Spanish domain keeps the English video", () => {
-    render(<I18nProvider initial="es"><LandingDemo /></I18nProvider>);
-    expect(screen.getByTestId("landing-video-player").querySelector("source")).toHaveAttribute("src", EN.src);
+    render(<I18nProvider initial="es"><MinimalDemo /></I18nProvider>);
+    expect(screen.getByTestId("minimal-video").querySelector("source")).toHaveAttribute("src", EN.src);
   });
 
-  it("?demoVideo=es on localhost switches both landing demos", () => {
+  it("?demoVideo=es on localhost switches the landing demo", () => {
     window.history.replaceState(null, "", "/?demoVideo=es");
-    const landing = render(<I18nProvider initial="en"><LandingDemo /></I18nProvider>);
-    const player = screen.getByTestId("landing-video-player");
+    render(<I18nProvider initial="en"><MinimalDemo /></I18nProvider>);
+    const player = screen.getByTestId("minimal-video");
     expect(player).toHaveAttribute("poster", ES.poster);
     expect(player.querySelector("source")).toHaveAttribute("src", ES.src);
-    landing.unmount();
-    render(<I18nProvider initial="en"><MinimalDemo /></I18nProvider>);
-    expect(screen.getByTestId("minimal-video").querySelector("source")).toHaveAttribute("src", ES.src);
   });
 });

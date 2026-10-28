@@ -1,26 +1,6 @@
 :root,
 :root[data-theme="dark"],
 .keep-dark {
-  --landing-bg: var(--band);
-  --landing-bg-soft: #0c0e13;
-  --landing-card: #12151c;
-  --landing-card-border: #232836;
-  --landing-text: #eef1f6;
-  --landing-muted: #9aa5b4;
-  --landing-gold: #f2b33d;
-  --landing-blue: #0b6cf0;
-  --landing-final-border: #2b3142;
-  --landing-footer-link: #c9cdd6;
-  --landing-quiz-answer-bg: #0f1218;
-  --landing-btn-gold-ink: #14110a;
-  --landing-btn-gold-bg: #f2b33d; /* the gold button fill */
-  --landing-btn-blue-ink: #fff;
-  --landing-btn-google-bg: #ffffff;
-  --landing-btn-google-ink: #1f1f1f;
-  --landing-step-ink: #14140c;
-  --landing-step-bg: #f2b33d;
-  --landing-video-bg: #000;
-  --landing-video-frame: linear-gradient(160deg, #10131a 0%, #0a0c10 55%, #12151c 100%); /* fixed */
   --landing-min-bg: #fafaf8;
   --landing-min-text: #141414;
   --landing-min-muted: #5f5e5a;
@@ -43,25 +23,6 @@
 }
 
 :root[data-theme="light"] {
-  --landing-bg: #fafaf8;
-  --landing-bg-soft: #f3f2ee;
-  --landing-card: #ffffff;
-  --landing-card-border: #e5e3dc;
-  --landing-text: #141414;
-  --landing-muted: #5f5e5a;
-  --landing-gold: #8a5a00;
-  --landing-blue: #0b5cc4;
-  --landing-final-border: #d6d3c9;
-  --landing-footer-link: #3d3c39;
-  --landing-quiz-answer-bg: #f3f2ee;
-  --landing-btn-gold-ink: #141414;
-  --landing-btn-gold-bg: #f2c14e; /* gold buttons keep their gold in the light theme */
-  --landing-btn-blue-ink: #ffffff;
-  --landing-btn-google-bg: #ffffff;
-  --landing-btn-google-ink: #1f1f1f;
-  --landing-step-ink: #141414;
-  --landing-step-bg: #f2c14e;
-  --landing-video-bg: #000;
   --landing-min-bg: #fafaf8;
   --landing-min-text: #141414;
   --landing-min-muted: #5f5e5a;

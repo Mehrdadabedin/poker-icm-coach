@@ -79,7 +79,6 @@
    (66px of the 2170x725 file renders the tagline glyphs ~8px tall). The header is a
    content-sized flex row, so it resizes with the mark. */
 @media (min-width: 960px) {
-  .lp-brand .brand-logo,
   .header-title .brand-logo {
     height: 66px;
     max-height: 66px;

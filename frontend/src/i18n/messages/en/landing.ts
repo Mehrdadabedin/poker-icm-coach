@@ -10,7 +10,7 @@ export const landing = {
   "landing.startTraining": "Start training free",
   "landing.watchDemo": "Watch the demo",
   "landing.tagline": "PRACTICE · IMPROVE · WIN",
-  "landing.hero.alt": "The ICMBOT table on a floating screen, where the ICM coach recommends a raise with K8s",
+  "landing.hero.alt": "ICMBOT on a laptop and a phone: the ICM coach recommends a raise and says why, next to a table with 9 players and the action buttons",
   "landing.demo": "Demo video",
   "landing.how": "How it works",
   "landing.how.signup.title": "Sign up",

@@ -12,8 +12,7 @@ import { MinimalHow } from "../landing-minimal/MinimalHow";
 /** The landing page at / (plan 069): one message, one action, one picture,
  * then How it works in three steps, three features and the same action again.
  * It owns no auth state; every link goes to the sign-in flow at /login. The
- * landing WebMCP tools (watch_demo, start_training, explain_icm) moved here
- * from the old page, which stays at /classic for now. */
+ * landing WebMCP tools are watch_demo, start_training and explain_icm. */
 export function MinimalLandingPage() {
   const navigate = useNavigate();
   const [demoOpen, setDemoOpen] = useState(false);
