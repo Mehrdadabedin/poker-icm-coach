@@ -13,6 +13,7 @@ from app.api.routes_auth import router as auth_router
 from app.api.routes_away import router as away_router
 from app.api.routes_game import router as game_router
 from app.api.routes_history import router as history_router
+from app.api.routes_leaderboard import router as leaderboard_router
 from app.api.routes_meta import router as meta_router
 from app.api.routes_oauth import router as oauth_router
 from app.api.routes_portrait import router as portrait_router
@@ -61,6 +62,7 @@ app.include_router(meta_router)
 app.include_router(history_router)
 app.include_router(portrait_router)
 app.include_router(profile_router)
+app.include_router(leaderboard_router)
 
 
 @app.get("/api/health")
