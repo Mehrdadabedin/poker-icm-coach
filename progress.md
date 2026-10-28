@@ -105,6 +105,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 100 | Free and Pro Plans | 8 | planned | - | Phase 2: Free = practice with random bots, no coach; admins always have everything, Pro items show them an open lock; locked items keep their place with a lock and open Upgrade; server returns 402 for Pro endpoints; existing players stay Pro, glossary free; price and payment still open |
 | 101 | Table with the Coach on Top | 8 | planned | - | Phase 2: on an upright phone a one-line coach strip on top, the factor rows in a sheet on tap, hand history in a drawer, so the felt fits without scrolling |
 | 102 | Leaderboard | 8 | planned | - | Phase 2: top 100 by points from stored finish places (100/70/50/35/25/15/10/5/2), this week and all time, display names only, own row always shown, no weekly cap |
+| 103 | Light and Dark Theme | 8 | planned | - | Phase 2: Setup, APPEARANCE: Dark, Light, Same as my phone (default), kept on the device; colours move into tokens.css; the felt and action buttons stay the same in both; built after 099, before 100 to 102 |
 
 ## Current Phase
 
