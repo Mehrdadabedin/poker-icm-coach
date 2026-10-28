@@ -2,9 +2,9 @@
 id: 100
 title: Free and Pro Plans
 phase: 8
-status: planned
+status: complete
 depends_on: [095, 099]
-test_file: backend/tests/api/test_plans.py
+test_file: [backend/tests/test_plans.py, backend/tests/test_plans_db.py]
 implementation_files: [backend/app/models/orm_plans.py, backend/app/services/plans.py, backend/app/api/deps.py, backend/app/api/routes_game.py, backend/app/api/routes_history.py, backend/app/api/routes_profile.py, frontend/src/services/plan.ts, frontend/src/components/LockedItem.tsx, frontend/src/components/UpgradeSheet.tsx, frontend/src/pages/BotProfilesPage.tsx, frontend/src/i18n/messages/en/plans.ts, frontend/src/i18n/messages/es/plans.ts]
 ---
 
@@ -87,3 +87,19 @@ building).
   the Upgrade sheet), and there is no Upgrade entry.
 - Frontend: locked items show the lock and open the sheet; Pro shows no
   locks and no Upgrade entry; both languages.
+
+# Built (29 Oct)
+
+- Backend: `user_plans` (memory or PostgreSQL, like profiles), `plan_for`/`is_pro` (admin is always Pro),
+  `require_pro` (402 `pro_required`) on the coach, ranges, ICM, hands, statistics, history and report
+  endpoints, random lineup for Free (`services/bot_lineup.py`), `plan` and `admin` in `GET /api/account`,
+  `PUT /api/admin/users/{u}/plan`, plan in the admin user list, plan deleted with the account.
+  Existing accounts are made Pro once, on the first start that creates `user_plans` (source `grandfathered`).
+  Tests: `test_plans.py`, `test_plans_db.py`. Existing tests stay Pro through a conftest default plan of `pro`.
+  `GET /api/icm` and `GET /api/ranges` used to be public; they now need a login.
+- Frontend: `usePlan()`, locks on the six Pro cards (closed gold lock for Free, open green lock with PRO for
+  admins), Upgrade sheet (Coming soon, no price), Upgrade cards on Learn and Review, a row in Profile, the
+  phone Home card, `ProOnly` on the Pro routes, Free Start practice without a lineup, a locked chip where the
+  coach would be, a locked line in the hand history panel.
+- Admin, Users: a Free/Pro switch per user (an admin row reads "Pro (admin)"). The "Unlock the ICM coach" card shows on the wide Home too. Locked card titles and text use dimmer tokens (`--lock-title`, `--lock-text`).
+- Not built: payment.

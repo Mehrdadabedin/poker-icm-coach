@@ -2,6 +2,8 @@ import type { ActionKind, CoachAdvice, TableState } from "../models/game";
 import { HandResult } from "./HandResult";
 import { HandReview } from "./HandReview";
 import { HeroControls } from "./HeroControls";
+import { useIsFree } from "../services/plan";
+import { LockedCoachChip } from "./LockedCoach";
 import { MobileCoachCard } from "./MobileCoachCard";
 import { PokerTable } from "./PokerTable";
 import { TableHeader } from "./TableHeader";
@@ -42,6 +44,7 @@ export interface LiveTableViewProps {
 /** The live table scene: header, felt (or review), and side panels. */
 export function LiveTableView(props: LiveTableViewProps) {
   const t = useT();
+  const free = useIsFree();
   const {
     state, overlay, cover, coach, comparison, countdown, paused, acting, showLabels,
     showResultLabels, nameBySeat, coachCollapsed, historyCollapsed, reviewOpen,
@@ -80,7 +83,7 @@ export function LiveTableView(props: LiveTableViewProps) {
       ) : (
         <>
           <PokerTable state={state} overlay={overlay} cover={cover}
-            top={coachNow ? <MobileCoachCard coach={coachNow} heroCards={hero?.holeCards} /> : null}>
+            top={free ? <LockedCoachChip place="top" /> : coachNow ? <MobileCoachCard coach={coachNow} heroCards={hero?.holeCards} /> : null}>
             {cover ? null : handOver && state.review ? (
               <HandResult
                 review={state.review}

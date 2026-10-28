@@ -12,6 +12,11 @@ const coachCompare = vi.fn(async () => ({
   explanation: "ALL_IN diverges from the recommended FOLD",
 }));
 
+vi.mock("../src/services/profileApi", async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  getAccount: async () => ({ username: "Hero", admin: false, signIn: "password", email: null, plan: "pro" }),
+}));
+
 vi.mock("../src/services/api", async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   sendAction: (...args: unknown[]) => sendAction(...(args as [])),
