@@ -12,6 +12,7 @@
 @import "./tokens/account.css";
 @import "./tokens/signin.css";
 @import "./tokens/landing.css";
+@import "./tokens/plans.css";
 
 :root,
 :root[data-theme="dark"],

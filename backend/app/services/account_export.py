@@ -11,7 +11,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from app.core.tournament_settings import settings as tournament_settings
-from app.services import history_archive, portraits, profiles
+from app.services import history_archive, plans, portraits, profiles
 from app.services.profiles import Profile
 from app.services.user_registry import auth_registry
 
@@ -29,6 +29,7 @@ def profile_view(profile: Profile) -> dict[str, Any]:
 
 def account_view(username: str) -> dict[str, Any]:
     return {"username": username, "admin": auth_registry.is_admin(username),
+            "plan": plans.plan_for(username),
             **auth_registry.sign_in_details(username)}
 
 

@@ -8,7 +8,7 @@ from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from app.api.deps import require_user
+from app.api.deps import require_pro
 from app.api.routes_meta import hand_view
 from app.services import history_archive
 from app.services.hand_history import record_from_dict
@@ -18,12 +18,12 @@ router = APIRouter(prefix="/api/history")
 
 
 @router.get("/tournaments")
-def my_tournaments(user: str = Depends(require_user)) -> dict:
+def my_tournaments(user: str = Depends(require_pro)) -> dict:
     return {"tournaments": [tournament_view(r) for r in history_archive.archive.tournaments(user)]}
 
 
 @router.get("/tournaments/{table_id}/hands")
-def tournament_hands(table_id: str, user: str = Depends(require_user)) -> dict:
+def tournament_hands(table_id: str, user: str = Depends(require_pro)) -> dict:
     rows = history_archive.archive.hands(user, table_id)
     if rows is None:
         raise HTTPException(status_code=404, detail="tournament not found")
@@ -32,7 +32,7 @@ def tournament_hands(table_id: str, user: str = Depends(require_user)) -> dict:
 
 @router.get("/report")
 def my_report(period: Period = "30d", tournament: str | None = Query(None, max_length=32),
-              user: str = Depends(require_user)) -> dict:
+              user: str = Depends(require_pro)) -> dict:
     archive = history_archive.archive
     rows = archive.tournaments(user)
     if tournament is not None and all(r["id"] != tournament for r in rows):

@@ -22,6 +22,7 @@ from app.core.version import app_version
 from app.database.session import engine
 from app.services.auth import auth_store
 from app.services.history_archive import bind_history_archive
+from app.services.plans import bind_plans
 from app.services.portraits import bind_portraits
 from app.services.profiles import bind_profiles
 from app.services.session_store import session_store
@@ -40,6 +41,7 @@ async def lifespan(_: FastAPI):
         settings.history_storage == "auto" and settings.auth_storage == "database"))
     bind_portraits(engine, settings.auth_storage == "database")
     bind_profiles(engine, settings.auth_storage == "database")
+    bind_plans(engine, settings.auth_storage == "database")  # after the registry is loaded
     yield
 
 

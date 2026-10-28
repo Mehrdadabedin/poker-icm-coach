@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from fastapi import Header, HTTPException
 
+from app.services import plans
 from app.services.auth import auth_store
 from app.services.user_registry import auth_registry
 
@@ -43,4 +44,12 @@ def require_admin(authorization: str = Header(default="")) -> str:
         raise HTTPException(status_code=403, detail="admin access required")
     if auth_registry.requires_password_change(user):
         raise HTTPException(status_code=403, detail="admin password change required")
+    return user
+
+
+def require_pro(authorization: str = Header(default="")) -> str:
+    """Authenticated user on Pro (or an Admin); 402 for a Free player."""
+    user = require_user(authorization)
+    if not plans.is_pro(user):
+        raise HTTPException(status_code=402, detail="pro_required")
     return user

@@ -2,11 +2,16 @@
  * one hand, preflop and again on the flop, and nothing else the effect watched
  * changed between those two turns, so the panel kept showing preflop numbers. */
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render } from "@testing-library/react";
+import { act, render } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 
 const coachAdvice = vi.fn(async () => ({ recommendedAction: "FOLD", detail: {} }));
 let gameState: Record<string, unknown>;
+
+vi.mock("../src/services/profileApi", async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  getAccount: async () => ({ username: "Hero", admin: false, signIn: "password", email: null, plan: "pro" }),
+}));
 
 vi.mock("../src/services/api", async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
@@ -41,7 +46,9 @@ async function table() {
 }
 
 async function renderTable() {
-  return render(await table());
+  const view = render(await table());
+  await act(async () => undefined); // the plan answers, then the coach is asked
+  return view;
 }
 
 const baseState = {

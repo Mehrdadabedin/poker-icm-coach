@@ -1,0 +1,42 @@
+/* Free and Pro (plan 100): locked cards, the Upgrade card, the sheet and the locked chip. */
+.hm-card-locked .hm-title { color: var(--lock-title); }
+.hm-card-locked .hm-desc { color: var(--lock-text); }
+.hm-lock { margin-left: auto; display: flex; flex-direction: column; align-items: center; gap: 2px; flex: 0 0 auto; }
+.hm-lock-icon { width: 24px; height: 24px; fill: none; stroke: var(--accent); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.hm-lock-open .hm-lock-icon { stroke: var(--lock-open-ink); }
+.hm-lock-pro { color: var(--lock-open-ink); font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; }
+.hm-card-upgrade { border-color: var(--upgrade-border); background: var(--upgrade-bg); }
+.hm-card-upgrade:hover { background: var(--upgrade-bg); border-color: var(--upgrade-border); }
+.hm-upgrade, .profile-upgrade { margin-top: 12px; }
+.hm-upgrade:empty { display: none; }
+
+.sheet-scrim { position: fixed; inset: 0; z-index: 50; display: flex; align-items: flex-end; justify-content: center; background: var(--sheet-scrim); }
+.sheet { position: relative; width: 100%; max-width: 480px; padding: 12px 20px 22px; border: 1px solid var(--line); border-radius: 18px 18px 0 0; background: var(--surface); color: var(--text); }
+.sheet-handle { display: block; width: 40px; height: 4px; margin: 0 auto 12px; border-radius: 2px; background: var(--sheet-handle); }
+.sheet-close { position: absolute; top: 8px; right: 12px; border: 0; background: none; color: var(--text-muted); font-size: 1.6rem; line-height: 1; cursor: pointer; }
+.sheet-title { display: flex; align-items: center; gap: 8px; margin: 4px 0 6px; font-size: 1.2rem; letter-spacing: 0.08em; }
+.sheet-title svg, .sheet-ticks svg { width: 22px; height: 22px; fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.sheet-line { margin: 0 0 14px; color: var(--text-muted); }
+.sheet-ticks { margin: 0 0 18px; padding: 0; list-style: none; display: grid; gap: 10px; }
+.sheet-ticks li { display: flex; align-items: center; gap: 10px; }
+.sheet-ticks svg { flex: 0 0 auto; stroke: var(--lock-open-ink); }
+.sheet-soon { width: 100%; padding: 13px; border: 0; border-radius: 12px; background: var(--sheet-soon-bg); color: var(--sheet-soon-ink); font: inherit; font-weight: 700; cursor: default; }
+.sheet-later { width: 100%; margin-top: 8px; padding: 11px; border: 0; background: none; color: var(--text-muted); font: inherit; cursor: pointer; }
+
+.pro-locked-page { text-align: center; }
+.pro-locked-icon { width: 44px; height: 44px; margin: 24px auto 0; fill: none; stroke: var(--accent); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.pro-locked-text { max-width: 420px; margin: 0 auto 18px; color: var(--text-muted); }
+
+.coach-chip, .locked-line { display: flex; align-items: center; gap: 8px; padding: 8px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--text); font: inherit; cursor: pointer; }
+.coach-chip-icon { width: 18px; height: 18px; flex: 0 0 auto; fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.coach-chip-note { color: var(--text-muted); font-size: 0.8rem; }
+.coach-chip-unlock { margin-left: auto; color: var(--accent); font-weight: 700; }
+.locked-line { margin: 8px 0; width: 100%; font-size: 0.85rem; text-align: left; }
+.coach-chip-top { display: none; }
+@media (max-width: 767px) and (max-aspect-ratio: 4/3) {
+  .table-wrap > .coach-chip-top { display: flex; margin: 0 0 6px; }
+  .coach-chip-side { display: none; }
+}
+@media (min-width: 960px) {
+  .table-page > .table-cols > .coach-chip-side { grid-area: coach; align-self: start; margin-top: 0; }
+}

@@ -29,17 +29,17 @@ def test_the_validated_position_vocabulary_matches_the_game_engine() -> None:
 def test_icm_rejects_more_players_than_the_exact_recursion_supports() -> None:
     """The exact ICM recursion is combinatorial: an unbounded list is a DoS."""
     stacks = ",".join(["1000"] * 14)
-    assert anon.get(f"/api/icm?stacks={stacks}&payouts=0.5,0.3,0.2").status_code == 422
+    assert client.get(f"/api/icm?stacks={stacks}&payouts=0.5,0.3,0.2").status_code == 422
 
 
 def test_icm_rejects_negative_and_non_finite_input() -> None:
-    assert anon.get("/api/icm?stacks=-100,200&payouts=0.5,0.5").status_code == 422
-    assert anon.get("/api/icm?stacks=100,200&payouts=nan,0.5").status_code == 422
-    assert anon.get("/api/icm?stacks=100,200&payouts=-0.5,0.5").status_code == 422
+    assert client.get("/api/icm?stacks=-100,200&payouts=0.5,0.5").status_code == 422
+    assert client.get("/api/icm?stacks=100,200&payouts=nan,0.5").status_code == 422
+    assert client.get("/api/icm?stacks=100,200&payouts=-0.5,0.5").status_code == 422
 
 
 def test_icm_still_answers_a_valid_query() -> None:
-    response = anon.get("/api/icm?stacks=45000,30000,20000&payouts=0.5,0.3,0.2")
+    response = client.get("/api/icm?stacks=45000,30000,20000&payouts=0.5,0.3,0.2")
     assert response.status_code == 200
     assert len(response.json()["equities"]) == 3
 
@@ -47,20 +47,20 @@ def test_icm_still_answers_a_valid_query() -> None:
 def test_coach_advice_rejects_an_unknown_rank_instead_of_crashing() -> None:
     body = dict(COACH_BODY, heroCards=[{"rank": "X", "suit": "s"},
                                        {"rank": "K", "suit": "s"}])
-    assert anon.post("/api/coach/advice", json=body).status_code == 422
+    assert client.post("/api/coach/advice", json=body).status_code == 422
 
 
 def test_coach_advice_bounds_the_table_size() -> None:
-    assert anon.post("/api/coach/advice",
+    assert client.post("/api/coach/advice",
                      json=dict(COACH_BODY, stacks=[1000] * 14)).status_code == 422
-    assert anon.post("/api/coach/advice",
+    assert client.post("/api/coach/advice",
                      json=dict(COACH_BODY, heroCards=[])).status_code == 422
-    assert anon.post("/api/coach/advice",
+    assert client.post("/api/coach/advice",
                      json=dict(COACH_BODY, position="NOWHERE")).status_code == 422
 
 
 def test_coach_advice_still_answers_a_valid_request() -> None:
-    response = anon.post("/api/coach/advice", json=COACH_BODY)
+    response = client.post("/api/coach/advice", json=COACH_BODY)
     assert response.status_code == 200, response.text
     assert response.json()["recommendedAction"]
 
@@ -84,12 +84,12 @@ def test_settings_still_accepts_a_valid_update() -> None:
 
 
 def test_ranges_rejects_an_unknown_position_and_out_of_range_depth() -> None:
-    assert anon.get("/api/ranges?position=NOWHERE").status_code == 422
+    assert client.get("/api/ranges?position=NOWHERE").status_code == 422
     # A raw "+" decodes to a space: the client must encode UTG+1.
-    assert anon.get("/api/ranges?position=UTG+1").status_code == 422
-    assert anon.get("/api/ranges?position=UTG%2B1").status_code == 200
-    assert anon.get("/api/ranges?position=BTN&stack_bb=100000").status_code == 422
-    assert anon.get("/api/ranges?position=BTN&stack_bb=30").status_code == 200
+    assert client.get("/api/ranges?position=UTG+1").status_code == 422
+    assert client.get("/api/ranges?position=UTG%2B1").status_code == 200
+    assert client.get("/api/ranges?position=BTN&stack_bb=100000").status_code == 422
+    assert client.get("/api/ranges?position=BTN&stack_bb=30").status_code == 200
 
 
 def test_tables_per_user_are_capped_so_sessions_cannot_leak() -> None:

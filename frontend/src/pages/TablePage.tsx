@@ -8,12 +8,13 @@ import { TableGone } from "../components/TableGone";
 import { useAutoNext } from "../hooks/useAutoNext";
 import { useAutoFinish } from "../hooks/useAutoFinish";
 import { useGame } from "../hooks/useGame";
+import { useTableCoach } from "../hooks/useTableCoach";
+import { usePlan } from "../services/plan";
 import { useTableActions } from "../hooks/useTableActions";
 import { useTableAway } from "../hooks/useTableAway";
-import type { ActionKind, CoachAdvice } from "../models/game";
 import { tournamentChampion } from "../models/game";
 import { useDisplayPreferences } from "../services/preferences";
-import { clearAuth, coachAdvice, coachCompare, getToken, getUsername, request } from "../services/api";
+import { clearAuth, getToken, getUsername, request } from "../services/api";
 import type { HandHistoryEntry } from "../webmcp/registerGameTools";
 import { useGameWebMcp } from "../webmcp/useGameWebMcp";
 
@@ -30,10 +31,8 @@ export function TablePage() {
   const [watchToEnd, setWatchToEnd] = useState(false); // A44: hero watched -> auto-finish
   const { state, error, nextHand, acting, refresh: refreshTable } = useGame(tableId);
   const { countdown, paused, start, stop, pause, resume } = useAutoNext(nextHand, REVIEW_SECONDS);
-  const [coach, setCoach] = useState<CoachAdvice | null>(null);
   const [coachHidden, setCoachHidden] = useState(false);
   const [historyHidden, setHistoryHidden] = useState(false);
-  const [comparison, setComparison] = useState<Record<string, string> | null>(null);
   const { actionLabels, resultLabels } = useDisplayPreferences();
   const lineup = useMemo(() => {
     const profiles = (state?.players ?? [])
@@ -44,6 +43,8 @@ export function TablePage() {
   }, [state]);
   const actions = useTableActions({ tableId, refresh: refreshTable, navigate, lineup });
   useTableAway(tableId, state?.tableLabel ?? "", state?.away);
+  const plan = usePlan();
+  const { coach, comparison, onAction } = useTableCoach(tableId, state, actions.act, plan);
   const hero = state?.players.find((p) => p.isHero);
   const champion = state ? tournamentChampion(state) : null;
   const previewWinner = winnerPreviewEnabled(import.meta.env.DEV, searchParams.get("testWinner"));
@@ -65,22 +66,6 @@ export function TablePage() {
     start,
   });
 
-  // The hero can be the actor more than once in a hand, on a later street or on
-  // the same one after somebody reopens the betting. The 350 ms poll often never
-  // catches the gap between those turns, so without a dependency that moves with
-  // the action the panel kept showing the numbers from the earlier decision:
-  // preflop pot odds with three cards out, or a board texture of n/a. street
-  // covers the first case and the length of the action log covers the second.
-  useEffect(() => {
-    if (state?.waitingForHero) {
-      coachAdvice(tableId)
-        .then((data) => setCoach(data))
-        .catch(() => undefined);
-    } else if (state?.phase !== "handOver") {
-      setCoach(null);
-    }
-  }, [state?.waitingForHero, state?.handNumber, state?.phase, state?.street,
-      state?.actionLog?.length, tableId]);
   useEffect(() => {
     if (state?.phase === "handOver" && !showReview && !championShown && !eliminationModalOpen) {
       start();
@@ -90,18 +75,6 @@ export function TablePage() {
     }
     return () => stop();
   }, [state?.phase, state?.handNumber, showReview, start, stop, championShown, eliminationModalOpen]);
-
-  // A46: a coach-grade banner must not survive the hand it graded.
-  useEffect(() => setComparison(null), [state?.handNumber]);
-
-  const onAction = async (kind: ActionKind, amount?: number) => {
-    const next = await actions.act(kind, amount);
-    if (next) {
-      const grade = await coachCompare(tableId).catch(() => null);
-      setComparison(grade);
-    }
-    return next;
-  };
 
   useGameWebMcp({
     enabled: authed,

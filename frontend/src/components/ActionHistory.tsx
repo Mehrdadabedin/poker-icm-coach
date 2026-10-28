@@ -2,6 +2,7 @@ import { formatChips, HandHistoryEntry, ReviewAction, TableAction } from "../mod
 import { useT } from "../i18n/I18n";
 import { ACTION_KEY } from "../i18n/poker";
 import type { MessageKey } from "../i18n/messages/en";
+import { LockedLine } from "./LockedCoach";
 import { OverallPerformance, WinLoseAnalysis } from "./WinLoseAnalysis";
 
 export type HistoryView = "history" | "analysis";
@@ -24,6 +25,8 @@ interface ActionHistoryProps {
   onViewChange?: (view: HistoryView) => void;
   hands?: HandHistoryEntry[] | null;
   currentLevel?: number;
+  /** Free plan: the completed hands and the statistics are Pro */
+  locked?: boolean;
 }
 
 /** Structured hand history grouped by street (PRE-FLOP / FLOP / TURN / RIVER).
@@ -37,7 +40,7 @@ interface ActionHistoryProps {
  * component renders the history alone (the review screen). */
 
 export function ActionHistory({ actions, heroSeat, nameBySeat, collapsed = false, onToggle,
-                             view = "history", onViewChange, hands = null, currentLevel }: ActionHistoryProps) {
+                             view = "history", onViewChange, hands = null, currentLevel, locked = false }: ActionHistoryProps) {
   const t = useT();
   const seatName = (a: AnyAction): string => (a as ReviewAction).name ?? nameBySeat.get(a.seat) ?? t("showdown.seat", { n: a.seat });
   const groups = STREET_ORDER.map((street) => ({
@@ -71,11 +74,14 @@ export function ActionHistory({ actions, heroSeat, nameBySeat, collapsed = false
           </button>
         )}
       </div>
-      {!collapsed && onViewChange && view === "analysis" ? (
+      {!collapsed && onViewChange && view === "analysis" && locked ? (
+        <LockedLine />
+      ) : !collapsed && onViewChange && view === "analysis" ? (
         <WinLoseAnalysis hands={hands ?? []} currentLevel={currentLevel} loading={hands === null} />
       ) : (
         <>
-      {!collapsed && onViewChange && <OverallPerformance hands={hands ?? []} loading={hands === null} />}
+      {!collapsed && onViewChange && locked && <LockedLine />}
+      {!collapsed && onViewChange && !locked && <OverallPerformance hands={hands ?? []} loading={hands === null} />}
       {!collapsed && blindPosts.length > 0 && (
         <div className="history-line history-blind">
           <span className="history-street-dot">·</span>

@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { Card, CoachAdvice, HandHistoryEntry, TableAction } from "../models/game";
 import { request } from "../services/api";
+import { usePlan } from "../services/plan";
 import { ActionHistory, HistoryView } from "./ActionHistory";
+import { LockedCoachChip } from "./LockedCoach";
 import { CoachPanelView } from "./CoachPanelView";
 
 interface TableSidebarProps {
@@ -29,12 +31,15 @@ interface TableSidebarProps {
  * GET). The switch never touches game, table, timer or history data. */
 export function TableSidebar({ actions, heroSeat, nameBySeat, coach, heroCards, tableId, handNumber, currentLevel,
                               coachCollapsed, historyCollapsed, onToggleCoach, onToggleHistory }: TableSidebarProps) {
+  const plan = usePlan();
+  const locked = plan.known && !plan.pro;
   const [view, setView] = useState<HistoryView>("history");
   const [hands, setHands] = useState<HandHistoryEntry[] | null>(null);
 
   // Read-only, per-table: fetch when handNumber advances (a hand completed),
   // not on the 350 ms state poll and not on a view switch.
   useEffect(() => {
+    if (locked || plan.loading) return undefined;
     let cancelled = false;
     request<{ hands: HandHistoryEntry[] }>(`/api/game/${encodeURIComponent(tableId)}/hands`)
       .then((data) => {
@@ -46,7 +51,7 @@ export function TableSidebar({ actions, heroSeat, nameBySeat, coach, heroCards, 
     return () => {
       cancelled = true;
     };
-  }, [tableId, handNumber]);
+  }, [tableId, handNumber, locked, plan.loading]);
 
   return (
     <div className="table-cols">
@@ -59,9 +64,10 @@ export function TableSidebar({ actions, heroSeat, nameBySeat, coach, heroCards, 
         view={view}
         onViewChange={setView}
         hands={hands}
+        locked={locked}
         currentLevel={currentLevel}
       />
-      {coach && (
+      {locked ? <LockedCoachChip place="side" /> : coach && (
         <CoachPanelView
           coach={coach}
           className="coach-panel table-side"

@@ -5,6 +5,7 @@ import pytest
 
 from app.core.config import settings
 from app.poker.card import card_from_str
+from app.services import plans
 from app.services.auth import auth_store
 from app.services.user_registry import auth_registry
 
@@ -24,4 +25,7 @@ def _disable_runtime_files_for_tests() -> None:
     settings.auth_sessions_file = ""
     auth_registry.bind_path("")
     auth_store.bind_path("")
+    # Plan 100: existing tests use the coach with fresh users, so tests start
+    # on Pro; test_plans.py sets "free" for itself.
+    plans.bind_plans(None, False).default_plan = "pro"
     yield

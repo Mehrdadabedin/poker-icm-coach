@@ -1,0 +1,24 @@
+:root,
+:root[data-theme="dark"],
+.keep-dark {
+  /* Free and Pro (plan 100): locked text, the open lock of an admin, the Upgrade card and the sheet */
+  --lock-title: #bcc2c9; /* a locked card: a little dimmer than an open one */
+  --lock-text: #8d97a2;
+  --lock-open-ink: #6fd69a;
+  --upgrade-border: #f2c14e;
+  --upgrade-bg: rgba(242, 193, 78, 0.12);
+  --sheet-scrim: rgba(0, 0, 0, 0.62);
+  --sheet-handle: #4a5663;
+  --sheet-soon-bg: #f2c14e;
+  --sheet-soon-ink: #141414;
+}
+
+:root[data-theme="light"] {
+  --lock-title: #55544f;
+  --lock-text: #75746d;
+  --lock-open-ink: #176b3a;
+  --upgrade-border: #8a5a00;
+  --upgrade-bg: rgba(138, 90, 0, 0.1);
+  --sheet-scrim: rgba(20, 20, 20, 0.5);
+  --sheet-handle: #c9c6bb;
+}
