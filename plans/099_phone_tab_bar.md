@@ -2,10 +2,10 @@
 id: 099
 title: Phone Tab Bar
 phase: 8
-status: planned
+status: complete
 depends_on: [066, 083, 095]
 test_file: frontend/tests/tab_bar.test.tsx
-implementation_files: [frontend/src/components/TabBar.tsx, frontend/src/components/tabBarIcons.tsx, frontend/src/styles/tab-bar.css, frontend/src/pages/LearnPage.tsx, frontend/src/pages/ReviewPage.tsx, frontend/src/pages/SetupPage.tsx, frontend/src/App.tsx, frontend/src/i18n/messages/en/tabs.ts, frontend/src/i18n/messages/es/tabs.ts]
+implementation_files: [frontend/src/components/TabBar.tsx, frontend/src/components/TabBarHost.tsx, frontend/src/components/ProfileTabIcon.tsx, frontend/src/components/tabBarIcons.tsx, frontend/src/components/TabPage.tsx, frontend/src/components/MenuCard.tsx, frontend/src/components/menuEntries.ts, frontend/src/components/HomeBand.tsx, frontend/src/hooks/useIsPhone.ts, frontend/src/hooks/useIsAdmin.ts, frontend/src/services/authEvents.ts, frontend/src/styles/tab-bar.css, frontend/src/pages/LearnPage.tsx, frontend/src/pages/ReviewPage.tsx, frontend/src/pages/SetupPage.tsx, frontend/src/App.tsx, frontend/src/i18n/messages/en/tabs.ts, frontend/src/i18n/messages/es/tabs.ts]
 ---
 
 # Objective
@@ -57,3 +57,21 @@ Design: Phase 2 canvas, https://claude.ai/artifact/3kjEBZMVYhwtXRQ8NbX9ic, scree
 # Not in this plan
 
 The free plan's locks (100), the table (101), the leaderboard (102).
+
+# Built (28 Oct)
+
+- Bar: 72 px plus the safe area, `#07080a`, five tabs; the current tab is gold, also inside its
+  pages (Glossary under Learn, Report under Review, Settings under Setup).
+- Shown when `inAndroidApp()` or the window is under 768 px, the user is signed in, and the route
+  is not `/table/*`, `/auth/callback`, `/change-password` or `/classic`. The sign-in screen has no
+  session, so it shows none. `body.has-tab-bar` adds the bottom padding.
+- The sign-in screen changes the session without a route change, so `HomePage` announces it
+  (`services/authEvents.ts`) and the bar listens.
+- On a phone Home keeps only Continue table and Start practice; wide screens are unchanged.
+- The card lists moved to `menuEntries.ts` (one source for Home and the tab pages); the Admin
+  check moved to `useIsAdmin`.
+- The Profile tab shows the approved photo, else the display name's initial, and a gold dot until
+  a profile is saved. It refetches when the player leaves `#/profile`.
+- The Profile page header drops HOME while the bar shows (`PageHeader hideHome`, `useTabBarShown`); the
+  other pages keep their HOME button.
+- Not built: locks (plan 100), the Leaderboard card (plan 102).

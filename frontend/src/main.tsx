@@ -45,6 +45,7 @@ import "./styles/mistakes.css";
 import "./styles/icm-calculator.css";
 import "./styles/page-header.css";
 import "./styles/home-menu.css";
+import "./styles/tab-bar.css";
 import "./styles/report.css";
 import "./styles/lang-menu.css";
 import "./styles/portrait.css";

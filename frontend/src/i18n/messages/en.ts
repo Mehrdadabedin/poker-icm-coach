@@ -18,8 +18,9 @@ import { portraitPrompt } from "./en/portraitPrompt";
 import { profile } from "./en/profile";
 import { glossary } from "./en/glossary";
 import { glossaryTerms } from "./en/glossaryTerms";
+import { tabs } from "./en/tabs";
 
-export const en = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools, ...practice, ...portrait, ...portraitPrompt, ...profile, ...glossary, ...glossaryTerms };
+export const en = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools, ...practice, ...portrait, ...portraitPrompt, ...profile, ...glossary, ...glossaryTerms, ...tabs };
 
 export type MessageKey = keyof typeof en;
 export type Messages = Record<MessageKey, string>;

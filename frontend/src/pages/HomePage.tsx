@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { adminSummary, clearAuth, getToken, getUsername, logout, me } from "../services/api";
+import { clearAuth, getToken, getUsername, logout, me } from "../services/api";
+import { announceAuth } from "../services/authEvents";
+import { useIsAdmin } from "../hooks/useIsAdmin";
+import { useIsPhone } from "../hooks/useIsPhone";
 import { Copyright } from "../components/Copyright";
 import { BrandLogo } from "../components/BrandLogo";
+import { HomeBand } from "../components/HomeBand";
 import { HomeMenu } from "../components/HomeMenu";
 import { LanguageMenu } from "../components/LanguageMenu";
 import { LoginForm } from "../components/LoginForm";
@@ -15,26 +19,8 @@ export function HomePage() {
   const t = useT();
   const authNotice = (location.state as { authNotice?: string } | null)?.authNotice ?? null;
   const [user, setUser] = useState<string | null>(() => (getToken() ? getUsername() : null));
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  // BUG 2 hardening: a stored token may be stale/invalid (backend restart,
-  // expiry, credentials changed). Validate it on load; if the backend rejects
-  // it, clear the saved session and show the login form instead of leaving the
-  // user in a broken half-authenticated state.
-  // Server-declared Admin check (visible menu only; the backend stays the
-  // boundary). 403 for normal users, so only Admins see the ADMIN entry.
-  const token = getToken();
-  useEffect(() => {
-    if (!token) {
-      setIsAdmin(false);
-      return;
-    }
-    let cancelled = false;
-    adminSummary()
-      .then(() => { if (!cancelled) setIsAdmin(true); })
-      .catch(() => { if (!cancelled) setIsAdmin(false); });
-    return () => { cancelled = true; };
-  }, [token]);
+  const isAdmin = useIsAdmin();
+  const phone = useIsPhone();
 
   useEffect(() => {
     if (!getToken()) return;
@@ -47,6 +33,8 @@ export function HomePage() {
         setUser(null);
       });
   }, []);
+
+  useEffect(() => announceAuth(), [user]);
 
   const signOut = async () => {
     try {
@@ -87,21 +75,10 @@ export function HomePage() {
   // need the dark band.
   return (
     <div className="home-screen" data-testid="home-page">
-      <div className="home-band">
-        <div className="top-bar app-header" data-testid="session-bar">
-          <h1 className="screen-title header-title" data-testid="app-title"><BrandLogo /></h1>
-          <div className="header-right">
-            <LanguageMenu short />
-            <span className="header-user">{t("menu.playingAs")} <b data-testid="session-username">{user}</b></span>
-            <button className="btn btn-logout" onClick={() => void signOut()} data-testid="logout-btn">
-              {t("table.logout")}
-            </button>
-          </div>
-        </div>
-      </div>
+      <HomeBand user={user} onSignOut={() => void signOut()} />
       <main className="home-body">
         <p className="home-tagline">{t("home.tagline")}</p>
-        <HomeMenu isAdmin={isAdmin} />
+        <HomeMenu isAdmin={isAdmin} phone={phone} />
         <Copyright />
       </main>
     </div>
