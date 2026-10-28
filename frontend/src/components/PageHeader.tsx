@@ -8,7 +8,7 @@ import { useT } from "../i18n/I18n";
  * on the left; the user, BACK TO TABLE (after stepping away from one), HOME and
  * LOG OUT on the right, in the table header's style. It replaced the large
  * HOME button each page carried in its own place. */
-export function PageHeader() {
+export function PageHeader({ hideHome = false }: { hideHome?: boolean }) {
   const navigate = useNavigate();
   const username = getUsername();
   const away = useAwayTable();
@@ -38,9 +38,11 @@ export function PageHeader() {
             {t("page.backToTable", { label: away.label ? ` ${away.label}` : "" })}
           </button>
         )}
-        <button className="btn btn-small header-btn" onClick={() => navigate("/")} data-testid="home-btn">
-          {t("table.home")}
-        </button>
+        {!hideHome && (
+          <button className="btn btn-small header-btn" onClick={() => navigate("/")} data-testid="home-btn">
+            {t("table.home")}
+          </button>
+        )}
         {username && (
           <button className="btn btn-logout" onClick={() => void signOut()} data-testid="logout-btn">
             {t("table.logout")}

@@ -3,6 +3,7 @@ import { Navigate } from "react-router-dom";
 import { AccountPanel } from "../components/AccountPanel";
 import { Copyright } from "../components/Copyright";
 import { PageHeader } from "../components/PageHeader";
+import { useTabBarShown } from "../hooks/useTabBarShown";
 import { PortraitPanel } from "../components/PortraitPanel";
 import { ProfileForm } from "../components/ProfileForm";
 import { useT } from "../i18n/I18n";
@@ -16,6 +17,7 @@ const greetingFor = (profile: Profile) =>
  * account section, on one page. Signed-out visitors go to sign in. */
 export function ProfilePage() {
   const t = useT();
+  const tabBarShown = useTabBarShown();
   const signedIn = Boolean(getToken());
   const [profile, setProfile] = useState<Profile | null | undefined>(undefined);
   const [account, setAccount] = useState<Account | null>(null);
@@ -30,7 +32,7 @@ export function ProfilePage() {
   const name = profile?.firstName || getUsername() || "";
   return (
     <div className="page profile-page" data-testid="profile-page">
-      <PageHeader />
+      <PageHeader hideHome={tabBarShown} />
       <h1 className="screen-title" data-testid="profile-greeting">
         {profile ? t(`profile.greeting.${greetingFor(profile)}`, { name }) : t("profile.title")}
       </h1>

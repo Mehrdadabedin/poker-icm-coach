@@ -21,6 +21,10 @@ import { StatisticsPage } from "./pages/StatisticsPage";
 import { MistakesPage } from "./pages/MistakesPage";
 import { IcmCalculatorPage } from "./pages/IcmCalculatorPage";
 import { GlossaryPage } from "./pages/GlossaryPage";
+import { LearnPage } from "./pages/LearnPage";
+import { ReviewPage } from "./pages/ReviewPage";
+import { SetupPage } from "./pages/SetupPage";
+import { TabBarHost } from "./components/TabBarHost";
 import { TrainingPage } from "./pages/TrainingPage";
 import { BotProfilesPage } from "./pages/BotProfilesPage";
 import { AuthCallbackPage } from "./pages/AuthCallbackPage";
@@ -81,7 +85,11 @@ export function App() {
           <Route path="/mistakes" element={<MistakesPage />} />
           <Route path="/icm-calculator" element={<IcmCalculatorPage />} />
           <Route path="/glossary" element={<GlossaryPage />} />
+          <Route path="/learn" element={<LearnPage />} />
+          <Route path="/review" element={<ReviewPage />} />
+          <Route path="/setup" element={<SetupPage />} />
         </Routes>
+        <TabBarHost />
       </HashRouter>
     </I18nProvider>
   );
