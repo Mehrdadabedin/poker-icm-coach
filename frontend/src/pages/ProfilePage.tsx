@@ -18,7 +18,8 @@ const greetingFor = (profile: Profile) =>
 export function ProfilePage() {
   const t = useT();
   const tabBarShown = useTabBarShown();
-  const signedIn = Boolean(getToken());
+  // read once: a visitor who arrives signed out goes to sign in; ending the session here goes home
+  const [signedIn] = useState(() => Boolean(getToken()));
   const [profile, setProfile] = useState<Profile | null | undefined>(undefined);
   const [account, setAccount] = useState<Account | null>(null);
 

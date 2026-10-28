@@ -4,7 +4,7 @@
 
 .bot-profiles-intro {
   max-width: 640px; margin: 0 auto 22px; text-align: center;
-  color: var(--muted, #9aa6b5); font-size: 0.95rem; line-height: 1.5;
+  color: var(--muted); font-size: 0.95rem; line-height: 1.5;
 }
 
 .bot-profiles-grid {
@@ -14,21 +14,21 @@
 
 .bot-profile-card {
   display: flex; flex-direction: column; align-items: center; gap: 8px;
-  padding: 20px 14px; border: 1px solid rgba(21, 101, 192, 0.25);
-  border-radius: 12px; background: #171d24; color: var(--text, #e8e6e1);
+  padding: 20px 14px; border: 1px solid var(--bot-card-border);
+  border-radius: 12px; background: var(--bot-card-bg); color: var(--body-text);
   font: inherit; text-align: center; cursor: pointer;
   transition: border-color 120ms ease, box-shadow 120ms ease, transform 120ms ease;
 }
-.bot-profile-card:hover { border-color: rgba(250, 209, 90, 0.55); }
+.bot-profile-card:hover { border-color: var(--bot-card-hover-border); }
 .bot-profile-card.selected {
-  border-color: var(--accent, #f2c14e);
-  box-shadow: 0 0 0 1px var(--accent, #f2c14e), 0 6px 18px rgba(0, 0, 0, 0.35);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 6px 18px rgba(0, 0, 0, 0.35);
 }
 
 .bot-avatar {
   display: flex; align-items: center; justify-content: center;
   width: 72px; height: 72px; border-radius: 50%; overflow: hidden;
-  background: #171d24; border: 3px solid rgba(255, 255, 255, 0.25);
+  background: var(--bot-card-bg); border: 3px solid var(--bot-avatar-border);
 }
 .bot-portrait {
   display: block; width: 100%; height: 100%;
@@ -38,25 +38,25 @@
 .bot-profile-name { font-size: 1.05rem; letter-spacing: 0.5px; }
 
 .bot-profile-style {
-  color: var(--accent, #f2c14e); font-size: 0.78rem;
+  color: var(--accent); font-size: 0.78rem;
   font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
 }
 
 .bot-profile-desc {
-  color: var(--muted, #9aa6b5); font-size: 0.82rem; line-height: 1.45;
+  color: var(--muted); font-size: 0.82rem; line-height: 1.45;
   min-height: 3.6em;
 }
 
 .bot-profile-selected {
   margin-top: auto; padding: 5px 12px; border-radius: 999px;
   font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px;
-  background: rgba(250, 209, 90, 0.14); color: var(--accent, #f2c14e);
+  background: var(--bot-selected-bg); color: var(--accent);
 }
-.bot-profile-card:not(.selected) .bot-profile-selected { background: transparent; color: var(--muted, #9aa6b5); }
+.bot-profile-card:not(.selected) .bot-profile-selected { background: transparent; color: var(--muted); }
 
 .bot-profiles-current {
   max-width: 640px; margin: 20px auto 0; text-align: center;
-  color: var(--text, #e8e6e1); font-size: 0.9rem; letter-spacing: 0.5px;
+  color: var(--body-text); font-size: 0.9rem; letter-spacing: 0.5px;
 }
 
 @media (max-width: 640px) {
@@ -72,42 +72,42 @@
 .bot-profiles-bar .screen-title { margin-bottom: 0; }
 .bot-profile-back {
   flex: 0 0 auto; min-height: 32px; padding: 4px 16px;
-  border: 1px solid var(--accent, #f2c14e); border-radius: 8px;
-  background: transparent; color: var(--accent, #f2c14e);
+  border: 1px solid var(--accent); border-radius: 8px;
+  background: transparent; color: var(--accent);
   font: inherit; font-size: 0.72rem; font-weight: 700; letter-spacing: 1.5px;
   cursor: pointer;
 }
-.bot-profile-back:hover { background: rgba(242, 193, 78, 0.12); }
+.bot-profile-back:hover { background: var(--bot-back-hover-bg); }
 
 /* ---- A27: add/remove counters ---- */
 .bot-profile-counter {
   display: flex; align-items: center; gap: 10px; margin-top: 6px;
 }
 .bot-profile-counter button {
-  width: 32px; height: 32px; border: 1px solid rgba(21, 101, 192, 0.35);
-  border-radius: 8px; background: #10161d; color: var(--text, #e8e6e1);
+  width: 32px; height: 32px; border: 1px solid var(--bot-counter-border);
+  border-radius: 8px; background: var(--bot-counter-bg); color: var(--body-text);
   font-size: 1.1rem; line-height: 1; cursor: pointer;
 }
-.bot-profile-counter button:hover:not(:disabled) { border-color: var(--accent, #f2c14e); }
+.bot-profile-counter button:hover:not(:disabled) { border-color: var(--accent); }
 .bot-profile-counter button:disabled { opacity: 0.35; cursor: not-allowed; }
 .bot-profile-count {
-  min-width: 24px; text-align: center; font-weight: 800; color: var(--accent, #f2c14e);
+  min-width: 24px; text-align: center; font-weight: 800; color: var(--accent);
 }
 
 /* ---- A27: total + summary ---- */
 .bot-profiles-total {
   margin: 22px 0 0; text-align: center; font-weight: 800;
-  letter-spacing: 2px; color: var(--accent, #f2c14e);
+  letter-spacing: 2px; color: var(--accent);
 }
 .bot-profiles-summary {
   display: flex; flex-direction: column; gap: 6px; align-items: center;
   max-width: 640px; margin: 12px auto 0; padding: 14px;
-  border: 1px solid rgba(21, 101, 192, 0.25); border-radius: 12px;
-  background: #171d24; color: var(--text, #e8e6e1); font-size: 0.88rem;
+  border: 1px solid var(--bot-card-border); border-radius: 12px;
+  background: var(--bot-card-bg); color: var(--body-text); font-size: 0.88rem;
 }
 .bot-profiles-error {
   max-width: 640px; margin: 12px auto 0; text-align: center;
-  color: #ff8f8f; font-size: 0.88rem;
+  color: var(--bot-error-ink); font-size: 0.88rem;
 }
 .bot-profiles-page .btn-primary { display: block; margin: 18px auto 0; }
 

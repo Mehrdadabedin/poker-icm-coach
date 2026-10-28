@@ -4,9 +4,9 @@
   max-width: 340px;
   margin: 24px auto;
   padding: 24px;
-  background: #fffdf8;
-  color: #2a2620;
-  border: 1px solid #ece4d6;
+  background: var(--account-card-bg);
+  color: var(--account-card-text);
+  border: 1px solid var(--account-card-border);
   border-radius: 16px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
 }
@@ -15,32 +15,32 @@
   font-family: Georgia, "Times New Roman", serif;
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1f1b16;
+  color: var(--account-title);
   letter-spacing: 0;
 }
 .portrait-row { display: flex; align-items: center; gap: 12px; }
 .portrait-circle {
   width: 124px; height: 124px; flex: none;
   border-radius: 50%;
-  background: #efe5d8;
-  border: 1px solid #e2d3bd;
+  background: var(--account-avatar-bg);
+  border: 1px solid var(--account-popup-border);
   display: grid; place-items: center;
   overflow: hidden;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.15rem; font-weight: 700; color: #5c5244;
+  font-size: 1.15rem; font-weight: 700; color: var(--account-control-ink);
 }
 .portrait-circle img { width: 100%; height: 100%; object-fit: cover; }
 .portrait-badge {
   padding: 3px 9px;
   border-radius: 999px;
-  background: #ece9e3;
-  color: #6b655c;
+  background: var(--portrait-badge-bg);
+  color: var(--account-muted);
   font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em;
 }
-.portrait-badge-pending { background: #fbefd2; color: #8a6412; }
-.portrait-badge-approved { background: #dff1e2; color: #276b35; }
-.portrait-badge-rejected { background: #f8dfdc; color: #9b2f25; }
-.portrait-hint { margin: 16px 0; color: #6b655c; font-size: 0.9rem; line-height: 1.45; }
+.portrait-badge-pending { background: var(--portrait-pending-bg); color: var(--portrait-pending-ink); }
+.portrait-badge-approved { background: var(--portrait-approved-bg); color: var(--account-ok); }
+.portrait-badge-rejected { background: var(--portrait-rejected-bg); color: var(--account-error); }
+.portrait-hint { margin: 16px 0; color: var(--account-muted); font-size: 0.9rem; line-height: 1.45; }
 .portrait-button, .portrait-remove {
   width: 100%;
   padding: 11px 16px;
@@ -48,21 +48,21 @@
   font-size: 0.95rem; font-weight: 700;
   cursor: pointer;
 }
-.portrait-button { background: #fffdf8; color: #1f1b16; border: 1px solid #cfc6b6; }
-.portrait-button:hover:not(:disabled) { background: #f6efe3; }
+.portrait-button { background: var(--account-card-bg); color: var(--account-title); border: 1px solid var(--account-input-border); }
+.portrait-button:hover:not(:disabled) { background: var(--account-hover-bg); }
 .portrait-camera { margin-top: 8px; }
-.portrait-remove { margin-top: 8px; background: transparent; color: #9b2f25; border: 1px solid transparent; }
-.portrait-remove:hover:not(:disabled) { border-color: #f0c9c4; }
+.portrait-remove { margin-top: 8px; background: transparent; color: var(--account-error); border: 1px solid transparent; }
+.portrait-remove:hover:not(:disabled) { border-color: var(--account-danger-border); }
 .portrait-button:disabled, .portrait-remove:disabled { opacity: 0.6; cursor: default; }
-.portrait-error { margin: 10px 0 0; color: #9b2f25; font-size: 0.85rem; }
-.portrait-note { margin: 14px 0 0; color: #7a7366; font-size: 0.75rem; line-height: 1.6; }
+.portrait-error { margin: 10px 0 0; color: var(--account-error); font-size: 0.85rem; }
+.portrait-note { margin: 14px 0 0; color: var(--account-faint); font-size: 0.75rem; line-height: 1.6; }
 
 /* The hero's approved photo on the seat, like a BOT's portrait (A35). */
-.seat-hero .seat-hero-portrait { border-color: var(--accent, #f2c14e); }
+.seat-hero .seat-hero-portrait { border-color: var(--accent); }
 
 /* Admin review (plan 094). */
 .admin-portraits { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
-.admin-portrait { padding: 12px; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; text-align: center; }
+.admin-portrait { padding: 12px; border: 1px solid var(--admin-portrait-border); border-radius: 10px; text-align: center; }
 .admin-portrait img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; }
 .admin-portrait-name { margin: 8px 0; font-weight: 700; overflow-wrap: anywhere; }
 .admin-portrait-actions { display: flex; gap: 8px; justify-content: center; }
@@ -70,8 +70,8 @@
 /* The hero's initial until a photo is approved (plan 094). */
 .seat-hero-initial {
   display: grid; place-items: center;
-  background: #efe5d8;
-  color: #5c5244;
+  background: var(--account-avatar-bg);
+  color: var(--account-control-ink);
   font-family: Georgia, "Times New Roman", serif;
   font-size: 0.8rem; font-weight: 700;
 }
@@ -82,8 +82,8 @@
   display: flex; gap: 14px; align-items: flex-start;
   max-width: 720px; margin: 0 auto 18px;
   padding: 14px 16px;
-  background: #1d242c;
-  border: 1px solid rgba(242, 193, 78, 0.45);
+  background: var(--surface);
+  border: 1px solid var(--portrait-prompt-border);
   border-radius: 12px;
   text-align: left;
 }
@@ -91,14 +91,14 @@
   width: 44px; height: 44px; flex: none;
   border-radius: 50%;
   display: grid; place-items: center;
-  background: #efe5d8; color: #5c5244;
+  background: var(--account-avatar-bg); color: var(--account-control-ink);
   font-family: Georgia, "Times New Roman", serif; font-weight: 700;
 }
-.portrait-prompt-title { display: block; color: var(--accent, #f2c14e); margin-bottom: 4px; }
-.portrait-prompt-text { margin: 0 0 10px; font-size: 0.9rem; line-height: 1.45; color: var(--text, #e8e6e1); }
+.portrait-prompt-title { display: block; color: var(--accent); margin-bottom: 4px; }
+.portrait-prompt-text { margin: 0 0 10px; font-size: 0.9rem; line-height: 1.45; color: var(--body-text); }
 .portrait-prompt-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .portrait-prompt-go, .portrait-prompt-later {
   padding: 7px 14px; border-radius: 999px; font-weight: 700; font-size: 0.85rem; cursor: pointer;
 }
-.portrait-prompt-go { background: var(--accent, #f2c14e); color: #1f1b16; border: 1px solid transparent; }
-.portrait-prompt-later { background: transparent; color: var(--text, #e8e6e1); border: 1px solid rgba(255, 255, 255, 0.25); }
+.portrait-prompt-go { background: var(--accent-fill); color: var(--portrait-prompt-go-ink); border: 1px solid transparent; }
+.portrait-prompt-later { background: transparent; color: var(--body-text); border: 1px solid var(--portrait-later-border); }

@@ -9,14 +9,14 @@
   margin-top: 8px;
 }
 .profile-side .portrait-card { margin: 0; max-width: none; }
-.profile-table-note { margin: 10px 4px 0; color: var(--muted, #9b958a); font-size: 0.8rem; line-height: 1.5; }
+.profile-table-note { margin: 10px 4px 0; color: var(--muted); font-size: 0.8rem; line-height: 1.5; }
 .profile-main { display: flex; flex-direction: column; gap: 16px; }
 
 .profile-card {
   padding: 20px 22px;
-  background: #fffdf8;
-  color: #2a2620;
-  border: 1px solid #ece4d6;
+  background: var(--account-card-bg);
+  color: var(--account-card-text);
+  border: 1px solid var(--account-card-border);
   border-radius: 16px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
 }
@@ -24,55 +24,55 @@
 .profile-card-title {
   margin: 0 0 14px;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 1.15rem; font-weight: 700; color: #1f1b16;
+  font-size: 1.15rem; font-weight: 700; color: var(--account-title);
 }
-.profile-private { color: #7a7366; font-size: 0.78rem; }
+.profile-private { color: var(--account-faint); font-size: 0.78rem; }
 
 .profile-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px 14px; }
 .profile-wide { grid-column: 1 / -1; }
 .profile-field { display: flex; flex-direction: column; gap: 4px; }
-.profile-field label { color: #6b655c; font-size: 0.8rem; font-weight: 600; }
+.profile-field label { color: var(--account-muted); font-size: 0.8rem; font-weight: 600; }
 .profile-field input, .profile-field select, .account-confirm input {
   width: 100%;
   padding: 9px 11px;
-  border: 1px solid #cfc6b6;
+  border: 1px solid var(--account-input-border);
   border-radius: 10px;
-  background: #fff;
-  color: #1f1b16;
+  background: var(--account-input-bg);
+  color: var(--account-title);
   font-size: 0.95rem;
 }
 .profile-field input:focus, .profile-field select:focus, .account-confirm input:focus {
-  outline: 2px solid #c9a24a; outline-offset: 1px;
+  outline: 2px solid var(--account-focus); outline-offset: 1px;
 }
-.profile-why { margin: 14px 0; color: #6b655c; font-size: 0.85rem; line-height: 1.5; }
+.profile-why { margin: 14px 0; color: var(--account-muted); font-size: 0.85rem; line-height: 1.5; }
 .profile-save { width: 100%; border-radius: 999px; padding: 11px 16px; font-weight: 700; }
-.profile-status { margin: 10px 0 0; color: #276b35; font-size: 0.85rem; font-weight: 600; }
-.profile-error { color: #9b2f25; font-size: 0.8rem; }
+.profile-status { margin: 10px 0 0; color: var(--account-ok); font-size: 0.85rem; font-weight: 600; }
+.profile-error { color: var(--account-error); font-size: 0.8rem; }
 form .profile-error[role="alert"]:last-child { display: block; margin-top: 10px; }
 
 .account-row {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
   padding: 12px 0;
-  border-top: 1px solid #ece4d6;
-  font-size: 0.88rem; color: #4a453d;
+  border-top: 1px solid var(--account-card-border);
+  font-size: 0.88rem; color: var(--account-body);
 }
 .account-row .btn, .account-actions .btn {
   flex: none;
   padding: 8px 14px;
   border-radius: 999px;
-  border: 1px solid #cfc6b6;
-  background: #fffdf8;
-  color: #1f1b16;
+  border: 1px solid var(--account-input-border);
+  background: var(--account-card-bg);
+  color: var(--account-title);
   font-weight: 700;
   cursor: pointer;
 }
-.account-danger { color: #7a3b33; }
-.account-row .account-delete, .account-actions .account-delete { color: #9b2f25; border-color: #f0c9c4; }
+.account-danger { color: var(--account-danger); }
+.account-row .account-delete, .account-actions .account-delete { color: var(--account-error); border-color: var(--account-danger-border); }
 .account-confirm {
   display: flex; flex-direction: column; gap: 8px;
   padding: 12px 0;
-  border-top: 1px solid #ece4d6;
-  font-size: 0.85rem; color: #6b655c;
+  border-top: 1px solid var(--account-card-border);
+  font-size: 0.85rem; color: var(--account-muted);
 }
 .account-actions { display: flex; gap: 8px; }
 .account-actions .btn:disabled { opacity: 0.6; cursor: default; }
@@ -91,15 +91,15 @@ form .profile-error[role="alert"]:last-child { display: block; margin-top: 10px;
 .birthday-open {
   flex: none; width: 42px;
   display: grid; place-items: center;
-  border: 1px solid #cfc6b6; border-radius: 10px;
-  background: #fff; color: #5c5244; cursor: pointer;
+  border: 1px solid var(--account-input-border); border-radius: 10px;
+  background: var(--account-input-bg); color: var(--account-control-ink); cursor: pointer;
 }
-.birthday-open[aria-expanded="true"] { border-color: #c9a24a; color: #1f1b16; }
+.birthday-open[aria-expanded="true"] { border-color: var(--account-focus); color: var(--account-title); }
 .birthday-pop {
   position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 5;
   padding: 12px;
-  background: #fffdf8;
-  border: 1px solid #e2d3bd; border-radius: 14px;
+  background: var(--account-card-bg);
+  border: 1px solid var(--account-popup-border); border-radius: 14px;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.22);
 }
 .birthday-selects { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); gap: 8px; margin-bottom: 10px; }
@@ -107,9 +107,9 @@ form .profile-error[role="alert"]:last-child { display: block; margin-top: 10px;
 .birthday-day {
   aspect-ratio: 1; min-height: 32px;
   border: 1px solid transparent; border-radius: 8px;
-  background: #f6efe3; color: #2a2620;
+  background: var(--account-hover-bg); color: var(--account-card-text);
   font-size: 0.9rem; cursor: pointer;
 }
-.birthday-day:hover { border-color: #c9a24a; }
-.birthday-day.is-picked { background: #1565c0; color: #fff; }
-.birthday-weekday { text-align: center; color: #7a7366; font-size: 0.72rem; font-weight: 700; }
+.birthday-day:hover { border-color: var(--account-focus); }
+.birthday-day.is-picked { background: var(--account-primary-bg); color: var(--account-primary-ink); }
+.birthday-weekday { text-align: center; color: var(--account-faint); font-size: 0.72rem; font-weight: 700; }
