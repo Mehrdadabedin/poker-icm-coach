@@ -14,5 +14,6 @@ export const tableStrip: Record<keyof typeof en, string> = {
   "drawer.title": "Historial de la mano",
   "drawer.thisHand": "Esta mano",
   "drawer.lastHands": "Últimas manos",
+  "drawer.byPosition": "Por posición",
   "botKey.title": "Aros de los bots",
 };

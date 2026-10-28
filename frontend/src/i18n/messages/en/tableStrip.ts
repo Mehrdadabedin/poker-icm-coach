@@ -12,5 +12,6 @@ export const tableStrip = {
   "drawer.title": "Hand history",
   "drawer.thisHand": "This hand",
   "drawer.lastHands": "Last hands",
+  "drawer.byPosition": "By position",
   "botKey.title": "Bot rings",
 } as const;

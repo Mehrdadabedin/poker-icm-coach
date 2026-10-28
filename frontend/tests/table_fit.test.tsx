@@ -1,10 +1,10 @@
 /* The table on a wide screen (plan 106): the "i" button, the history panel, the coach panel. */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, fireEvent, screen } from "@testing-library/react";
+import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
 import { setUpright, view } from "./strip_helpers";
 
 const { request, plan } = vi.hoisted(() => ({
-  request: vi.fn((_path: string) => new Promise(() => undefined)),
+  request: vi.fn((_path: string): Promise<unknown> => new Promise(() => undefined)),
   plan: { free: false },
 }));
 vi.mock("../src/services/api", async (importOriginal) => ({ ...(await importOriginal<Record<string, unknown>>()), request }));
@@ -68,6 +68,37 @@ describe("the history panel", () => {
     fireEvent.click(screen.getByTestId("drawer-tab-last"));
     expect(screen.getByTestId("locked-line")).toBeInTheDocument();
     expect(request).not.toHaveBeenCalledWith(expect.stringContaining("/hands"));
+  });
+});
+
+const played = { handNumber: 1, heroPosition: "UTG", pot: 1000, winnerSeats: [0], stage: "", net: 100, heroDecision: "CALL",
+  coachRecommendation: "CALL", grade: "PREFERRED", level: 1, blindLevel: "100/100" };
+
+describe("the By position tab", () => {
+  it("shows the position and blind-level results from the completed hands", async () => {
+    request.mockResolvedValue({ hands: [played, { ...played, handNumber: 2, net: -50 }] });
+    view();
+    fireEvent.click(screen.getByTestId("history-chip"));
+    expect(screen.getByTestId("drawer-tab-position")).toHaveTextContent("By position");
+    fireEvent.click(screen.getByTestId("drawer-tab-position"));
+    await waitFor(() => expect(screen.getByTestId("win-lose-analysis")).toBeInTheDocument());
+    expect(request).toHaveBeenCalledWith("/api/game/local-1/hands");
+  });
+
+  it("is in the phone drawer too", () => {
+    setUpright(true);
+    view();
+    fireEvent.click(screen.getByTestId("history-chip"));
+    expect(screen.getByTestId("drawer-tab-position")).toBeInTheDocument();
+  });
+
+  it("is the lock line for a Free player, and reads Por posición in Spanish", () => {
+    plan.free = true;
+    view({}, {}, "es");
+    fireEvent.click(screen.getByTestId("history-chip"));
+    expect(screen.getByTestId("drawer-tab-position")).toHaveTextContent("Por posición");
+    fireEvent.click(screen.getByTestId("drawer-tab-position"));
+    expect(screen.getByTestId("locked-line")).toBeInTheDocument();
   });
 });
 

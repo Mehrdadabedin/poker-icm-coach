@@ -9,7 +9,7 @@ const auth = await account();
 const sizes = JSON.parse(process.env.FIT_SIZES ?? "[[1280,650],[1440,900]]");
 for (const theme of ["dark", "light"]) {
   for (const [width, height] of sizes) {
-    const { context, page } = await openTable(browser, auth, { width, height, theme });
+    const { context, page } = await openTable(browser, auth, { width, height, theme, lang: process.env.FIT_LANG ?? "en" });
     const name = `${out}/${width}x${height}-${theme}`;
     await page.screenshot({ path: `${name}-closed.png` });
     await page.getByTestId("details-btn").click();

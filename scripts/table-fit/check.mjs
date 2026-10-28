@@ -9,10 +9,10 @@ const fail = (where, what) => failures.push(`${where}: ${what}`);
 const browser = await chromium.launch();
 const auth = await account();
 
-for (const theme of ["dark", "light"]) {
+for (const lang of ["en", "es"]) for (const theme of ["dark", "light"]) {
   for (const [width, height] of WINDOWS) {
-    const where = `${theme} ${width}x${height}`;
-    const { context, page } = await openTable(browser, auth, { width, height, theme });
+    const where = `${lang} ${theme} ${width}x${height}`;
+    const { context, page } = await openTable(browser, auth, { width, height, theme, lang });
     const m = await page.evaluate(() => {
       const box = (el) => { const r = el.getBoundingClientRect(); return { top: r.top, left: r.left, bottom: r.bottom, right: r.right }; };
       const pageEl = document.querySelector("[data-testid=table-page]");
@@ -30,14 +30,26 @@ for (const theme of ["dark", "light"]) {
     for (const [q, b] of [...m.bet, ...m.buttons.map((b) => ["a bet button", b])]) {
       if (b.top < 0 || b.left < 0 || b.bottom > m.h || b.right > m.w) fail(where, `${q} is outside the window (${JSON.stringify(b)})`);
     }
+    const cut = await page.evaluate(() => [...document.querySelectorAll("button:not(.tbl-chip), .tbl-info")]
+      .filter((n) => n.offsetParent && n.scrollWidth > n.clientWidth).map((n) => n.textContent.trim().slice(0, 30)));
+    for (const c of cut) fail(where, `"${c}" is cut`);
+    await page.getByTestId("history-chip").click();
+    const open = await page.evaluate(() => {
+      const panel = document.querySelector("[data-testid=history-drawer]").getBoundingClientRect();
+      return { panel: panel.bottom, controls: document.querySelector(".hero-controls").getBoundingClientRect().top,
+        tabs: [...document.querySelectorAll(".drawer-tab")].filter((n) => n.scrollWidth > n.clientWidth).length,
+        tabCount: document.querySelectorAll(".drawer-tab").length };
+    });
+    if (open.panel > open.controls) fail(where, `the history panel (bottom ${open.panel}) reaches the bet controls (top ${open.controls})`);
+    if (open.tabCount !== 3 || open.tabs) fail(where, "the three history tabs do not fit");
     console.log(`${where}: page scroll ${m.docScroll}/${m.pageScroll}, bet area bottom ${Math.round(m.bet[0][1].bottom)} of ${m.h}`);
     await context.close();
   }
 }
 
 // seats: one table, resized through the six widths. A 10-letter name stands in for the longest.
-for (const theme of ["dark", "light"]) {
-const { context, page } = await openTable(browser, auth, { width: 1280, height: 800, theme });
+for (const lang of ["en", "es"]) for (const theme of ["dark", "light"]) {
+const { context, page } = await openTable(browser, auth, { width: 1280, height: 800, theme, lang });
 await page.evaluate(() => document.querySelectorAll(".seat:not(.seat-hero) .seat-name").forEach((el) => { el.textContent = "Bartholome"; }));
 for (const width of WIDTHS) {
   const height = width < 500 ? 800 : width < 1000 ? 1024 : 800;
@@ -48,7 +60,7 @@ for (const width of WIDTHS) {
     const cut = [...el.querySelectorAll(".seat-name, .seat-stack")].filter((n) => n.scrollWidth > n.clientWidth).map((n) => n.className);
     return { seat: el.dataset.seat, top: r.top, left: r.left, bottom: r.bottom, right: r.right, cut };
   }));
-  const where = `${theme} seats at ${width}px`;
+  const where = `${lang} ${theme} seats at ${width}px`;
   for (const s of seats) if (s.cut.length) fail(where, `seat ${s.seat} cuts ${s.cut.join(", ")}`);
   for (let i = 0; i < seats.length; i += 1) {
     for (let j = i + 1; j < seats.length; j += 1) {

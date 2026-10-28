@@ -27,16 +27,17 @@ export async function account() {
 }
 
 /** Opens a table at the given window size and theme and waits for the hero's bet controls. */
-export async function openTable(browser, auth, { width, height, theme }) {
+export async function openTable(browser, auth, { width, height, theme, lang = "en" }) {
   const context = await browser.newContext({ viewport: { width, height } });
-  await context.addInitScript(([token, username, mode]) => {
+  await context.addInitScript(([token, username, mode, language]) => {
+    localStorage.setItem("icmbot.lang", language);
     localStorage.setItem("icm_auth_token", token);
     localStorage.setItem("icm_username", username);
     localStorage.setItem("icmbot.theme", mode);
     localStorage.setItem("icmbot.analytics.consent", "declined");
-  }, [auth.token, auth.username, theme]);
+  }, [auth.token, auth.username, theme, lang]);
   const page = await context.newPage();
-  await page.goto(APP);
+  await page.goto(`${APP}/?lang=${lang}`);
   await page.getByTestId("start-practice").click();
   // a Free account starts at once; a Pro one first picks its eight bots
   const next = await Promise.race([
@@ -51,5 +52,7 @@ export async function openTable(browser, auth, { width, height, theme }) {
   }
   await page.getByTestId("table-page").waitFor({ timeout: 30_000 });
   await page.getByTestId("bet-sizer").waitFor({ timeout: 60_000 });
+  // a Pro account has the coach panel on wide screens once the advice arrives
+  if (process.env.FIT_USER && width >= 768) await page.getByTestId("coach-panel").waitFor({ timeout: 30_000 });
   return { context, page };
 }

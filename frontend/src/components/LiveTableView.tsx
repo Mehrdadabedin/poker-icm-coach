@@ -134,7 +134,7 @@ export function LiveTableView(props: LiveTableViewProps) {
           </PokerTable>
           <HistoryDrawer open={phone.drawerOpen} onClose={() => phone.setDrawerOpen(false)} actions={state.actionLog ?? []}
             heroSeat={state.heroSeat} nameBySeat={nameBySeat} tableId={state.tableId} handNumber={state.handNumber}
-            locked={free} side={!upright} />
+            locked={free} side={!upright} currentLevel={state.level} />
           {!upright && !handOver && (
             <TableSidebar coach={coach} heroCards={hero?.holeCards} coachCollapsed={coachCollapsed} onToggleCoach={onToggleCoach} />
           )}

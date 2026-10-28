@@ -2,7 +2,7 @@
 .coach-sheet-head, .drawer-head { display: flex; align-items: center; gap: 10px; }
 .sheet-x { width: 44px; height: 44px; margin: -8px -6px -8px 0; border: 0; background: none; color: var(--text-muted); font-size: 1.6rem; cursor: pointer; }
 .drawer-tabs { display: flex; flex: 1 1 auto; gap: 6px; }
-.drawer-tab { min-height: 44px; padding: 0 12px; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--text-muted); font: inherit; font-weight: 700; cursor: pointer; }
+.drawer-tab { min-height: 44px; padding: 0 8px; font-size: 0.85rem; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--text-muted); font: inherit; font-weight: 700; cursor: pointer; }
 .drawer-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
 .drawer-body { overflow-y: auto; min-height: 0; }
 .drawer-body .action-history { margin: 0; }
