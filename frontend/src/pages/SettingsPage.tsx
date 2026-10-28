@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { request } from "../services/api";
-import { AppearancePicker } from "../components/AppearancePicker";
 import { Copyright } from "../components/Copyright";
 import { PageHeader } from "../components/PageHeader";
 import { useT } from "../i18n/I18n";
@@ -97,7 +96,6 @@ export function SettingsPage() {
         <p className="note">{t("settings.loading")}</p>
       )}
       <p className="note">{t("settings.rules")}</p>
-      <AppearancePicker />
       <Copyright />
     </div>
   );

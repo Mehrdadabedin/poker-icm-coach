@@ -21,6 +21,8 @@ export const home = {
   "home.report.text": "Results, leaks and progress across tournaments",
   "home.settings.title": "Tournament settings",
   "home.settings.text": "Stacks, blinds and speed for new tournaments",
+  "home.appearance.title": "Appearance",
+  "home.appearance.text": "Dark, light or the same as your phone",
   "home.admin.title": "Admin",
   "home.admin.text": "Users and moderation",
   "home.continue.title": "Continue table {label}",

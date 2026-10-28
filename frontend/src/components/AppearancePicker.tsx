@@ -21,8 +21,9 @@ const ICON: Record<ThemeChoice, JSX.Element> = {
   ),
 };
 
-/** APPEARANCE (plan 103): Dark, Light or Same as my phone, kept on this device. */
-export function AppearancePicker() {
+/** APPEARANCE (plan 103): Dark, Light or Same as my phone, kept on this device.
+ * On its own page the page's heading (id appearance-title) names it instead. */
+export function AppearancePicker({ heading = true }: { heading?: boolean }) {
   const t = useT();
   const [choice, setChoice] = useState<ThemeChoice>(getThemeChoice);
   const pick = (next: ThemeChoice) => {
@@ -31,7 +32,7 @@ export function AppearancePicker() {
   };
   return (
     <section className="appearance" aria-labelledby="appearance-title" data-testid="appearance-picker">
-      <h3 id="appearance-title" className="appearance-title">{t("theme.title")}</h3>
+      {heading && <h3 id="appearance-title" className="appearance-title">{t("theme.title")}</h3>}
       <div className="appearance-options" role="radiogroup" aria-labelledby="appearance-title">
         {CHOICES.map((value) => (
           <button key={value} type="button" role="radio" aria-checked={choice === value}

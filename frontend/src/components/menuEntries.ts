@@ -28,6 +28,7 @@ export const REVIEW: Entry[] = [
 
 export const SETUP: Entry[] = [
   { to: "/settings", icon: "settings", title: "home.settings.title", text: "home.settings.text", testId: "menu-settings" },
+  { to: "/appearance", icon: "appearance", title: "home.appearance.title", text: "home.appearance.text", testId: "menu-appearance" },
   { to: "/profile", icon: "portrait", title: "home.profile.title", text: "home.profile.text", testId: "menu-profile" },
 ];
 
