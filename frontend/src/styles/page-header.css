@@ -4,6 +4,8 @@
    buttons get their own centred row under it and the username gives way. */
 
 .page-header { margin-bottom: 6px; }
+/* the black band with the logo in both themes (the logo is drawn for it) */
+:root[data-theme="light"] .page-header { background: var(--band); border-radius: 8px; }
 
 @media (max-width: 959px) {
   .page-header { flex-wrap: wrap; justify-content: center; }

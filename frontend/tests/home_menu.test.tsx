@@ -107,10 +107,10 @@ describe("menu cards (plan 066)", () => {
     // the Report (plan 078) replaces Statistics, which asked for a table id
     expect(screen.queryByTestId("menu-statistics")).toBeNull();
     expect(screen.getByTestId("home-page")).toHaveClass("home-screen");
-    // under the mouse a card turns a clearly brighter slate than its #1d242c
+    // under the mouse a card turns a clearly different surface (colours are tokens, plan 103)
     const css = (await import("fs")).readFileSync("src/styles/home-menu.css", "utf8");
-    expect(css).toMatch(/\.hm-card \{[^}]*background: #1d242c;/);
-    expect(css).toMatch(/\.hm-card:hover \{[^}]*background: #3a4656;/);
+    expect(css).toMatch(/\.hm-card \{[^}]*background: var\(--surface\);/);
+    expect(css).toMatch(/\.hm-card:hover \{[^}]*background: var\(--hm-card-hover-bg\);/);
   });
 });
 
