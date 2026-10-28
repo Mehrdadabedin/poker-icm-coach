@@ -1,0 +1,17 @@
+/* Colours are the dark values of frontend/src/styles/tokens.css. This page is
+   not an app stylesheet: it only lays screenshots into a picture. */
+:root { --bg: #14181d; --surface: #1d242c; --line: #2c3540; --text: #f3f1ea;
+  --muted: #a7b0ba; --accent: #f2c14e; --band: #07080a; }
+* { box-sizing: border-box; margin: 0; }
+body { background: var(--bg); color: var(--text); overflow: hidden;
+  font-family: "Archivo", "Helvetica Neue", Arial, sans-serif; position: relative; }
+body::before { content: ""; position: absolute; inset: 0;
+  background: radial-gradient(60% 80% at 50% 45%, var(--surface) 0%, var(--bg) 55%, var(--band) 100%); }
+.phone { position: absolute; background: var(--band); border: 2px solid var(--line);
+  box-shadow: 0 18px 50px var(--band); }
+.phone img { display: block; width: 100%; height: 100%; }
+.laptop { position: absolute; background: var(--band); border: 2px solid var(--line);
+  border-radius: 18px 18px 6px 6px; box-shadow: 0 24px 70px var(--band); }
+.laptop img { display: block; width: 100%; height: 100%; border-radius: 6px; }
+.base { position: absolute; height: 22px; background: linear-gradient(var(--line), var(--surface));
+  border-radius: 0 0 26px 26px; box-shadow: 0 14px 30px var(--band); }
