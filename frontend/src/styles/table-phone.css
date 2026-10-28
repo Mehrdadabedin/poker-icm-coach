@@ -6,15 +6,20 @@
   .table-wrap > .table-status { position: absolute; top: 49px; left: 0; right: 0; z-index: 30; margin: 0; border: 1px solid var(--line); background: var(--surface); }
   .table-status[hidden] { display: none; }
   .table-wrap > .table-felt { border-width: 6px; gap: 4px; }
-  .table-wrap > .table-header { margin-bottom: 4px; }
+  .table-wrap > .table-header { margin-bottom: 4px; gap: 4px 6px; padding-left: 8px; padding-right: 8px; }
   .hero-controls { padding: 4px 6px; margin-top: 0; }
-  .table-header .tbl-chips { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  .table-header .tbl-chips { margin-left: auto; display: flex; align-items: center; gap: 4px; }
   .tbl-chip {
-    position: relative; min-height: 34px; min-width: 34px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px;
-    background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 0.72rem; cursor: pointer;
+    position: relative; display: grid; place-items: center; flex: 0 0 auto; width: 36px; height: 36px; padding: 0;
+    border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--accent); font: inherit; cursor: pointer;
   }
-  .tbl-chip::after { content: ""; position: absolute; inset: -5px -3px; }
-  .tbl-chip-i { padding: 0; font-style: italic; font-family: Georgia, serif; font-size: 0.95rem; }
+  .tbl-chip::after { content: ""; position: absolute; inset: -4px; }
+  .tbl-chip svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .tbl-chip-i { font-style: italic; font-family: Georgia, serif; font-size: 1rem; font-weight: 700; }
+  .tbl-chip-grade-PREFERRED { border-color: var(--coach-pos); border-width: 2px; }
+  .tbl-chip-grade-ACCEPTABLE { border-color: var(--accent); border-width: 2px; }
+  .tbl-chip-grade-SUBOPTIMAL { border-color: var(--coach-neg); border-width: 2px; }
+  .tbl-chip .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .tbl-chip[aria-expanded="true"] { background: var(--accent-fill); color: var(--accent-ink); }
 
   .coach-strip-wrap { position: relative; margin: 0 0 4px; }
@@ -31,7 +36,7 @@
   .strip-action.act-call, .strip-action.act-check { color: var(--coach-pos); }
   .strip-action.act-raise, .strip-action.act-bet, .strip-action.act-open, .strip-action.act-3-bet { color: var(--accent); }
   .strip-action.act-all-in, .strip-action.act-reshove { color: var(--coach-allin-text); }
-  .strip-grade, .tbl-chip b { font: 900 14px/1 "Archivo", system-ui, sans-serif; color: var(--text); }
+  .strip-grade { font: 900 14px/1 "Archivo", system-ui, sans-serif; color: var(--text); }
   .grade-PREFERRED { color: var(--coach-pos) !important; }
   .grade-ACCEPTABLE { color: var(--accent) !important; }
   .grade-SUBOPTIMAL { color: var(--coach-neg) !important; }

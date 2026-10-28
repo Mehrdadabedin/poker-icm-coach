@@ -3,8 +3,8 @@ import type { tableStrip as en } from "../en/tableStrip";
 
 export const tableStrip: Record<keyof typeof en, string> = {
   "strip.details": "Detalles de la mesa",
-  "strip.history": "Historial",
-  "strip.coach": "Coach",
+  "strip.historyLabel": "Historial de manos",
+  "strip.coachLabel": "Coach ICM",
   "strip.why": "¿Por qué? ›",
   "strip.whyLabel": "Por qué este consejo",
   "strip.idle": "Coach ICM · espera tu turno",

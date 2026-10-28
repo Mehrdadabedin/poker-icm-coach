@@ -71,3 +71,10 @@ building).
   and hides it, the choice survives a reload, and wide screens show it.
 - Free: the locked chip shows, no coach request is made, a tap opens the
   Upgrade sheet.
+
+# Round icon buttons (owner, 29 Oct)
+
+On the upright phone the Coach (only while the strip is folded), "i" and History controls are 36 px round
+icon buttons (aria-labels "ICM coach", "Table details", "Hand history"; Spanish "Coach ICM", "Detalles de la mesa",
+"Historial de manos"), so LEVEL, TIME and POT keep their row at 360 px. The grade on the folded Coach button shows as a
+coloured ring, and its word is read by screen readers.

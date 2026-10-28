@@ -1,8 +1,8 @@
 /* English: the table on an upright phone: status chips, coach strip and sheet, history drawer (plan 101). */
 export const tableStrip = {
   "strip.details": "Table details",
-  "strip.history": "History",
-  "strip.coach": "Coach",
+  "strip.historyLabel": "Hand history",
+  "strip.coachLabel": "ICM coach",
   "strip.why": "Why ›",
   "strip.whyLabel": "Why this advice",
   "strip.idle": "ICM coach · waiting for your turn",

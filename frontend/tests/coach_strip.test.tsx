@@ -72,7 +72,7 @@ describe("the coach strip", () => {
     const first = view();
     fireEvent.click(screen.getByTestId("strip-fold"));
     expect(screen.queryByTestId("coach-strip")).toBeNull();
-    expect(screen.getByTestId("coach-chip-folded")).toHaveTextContent("Coach");
+    expect(screen.getByTestId("coach-chip-folded")).toHaveAttribute("aria-label", "ICM coach");
     first.unmount();
     view();
     expect(screen.queryByTestId("coach-strip")).toBeNull();
@@ -140,10 +140,23 @@ describe("the history drawer", () => {
   });
 });
 
+describe("the round icon buttons", () => {
+  it("have only an icon, an English label, and the grade as text for a screen reader", () => {
+    localStorage.setItem("icmbot.coachStrip", "0");
+    view();
+    expect(screen.getByTestId("history-chip")).toHaveAttribute("aria-label", "Hand history");
+    expect(screen.getByTestId("history-chip")).toHaveTextContent("");
+    expect(screen.getByTestId("details-btn")).toHaveAttribute("aria-label", "Table details");
+    expect(screen.getByTestId("coach-chip-folded")).toHaveAttribute("aria-label", "ICM coach");
+    expect(screen.getByTestId("coach-chip-folded")).toHaveTextContent("");
+  });
+});
+
 describe("Spanish", () => {
   it("words the chips, the strip and the drawer", () => {
     view({}, {}, "es");
     expect(screen.getByTestId("details-btn")).toHaveAttribute("aria-label", "Detalles de la mesa");
+    expect(screen.getByTestId("history-chip")).toHaveAttribute("aria-label", "Historial de manos");
     expect(screen.getByTestId("strip-why")).toHaveTextContent("¿Por qué?");
     fireEvent.click(screen.getByTestId("history-chip"));
     expect(screen.getByTestId("drawer-tab-hand")).toHaveTextContent("Esta mano");
