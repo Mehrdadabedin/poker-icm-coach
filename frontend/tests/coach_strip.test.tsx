@@ -27,12 +27,12 @@ describe("the second status line", () => {
     expect(screen.getByTestId("table-status")).toHaveAttribute("hidden");
   });
 
-  it("shows on a wide screen, with no i button and no history chip", () => {
+  it("is hidden on a wide screen too, with the i button and the history chip (plan 106)", () => {
     setUpright(false);
     view();
-    expect(screen.getByTestId("table-status")).not.toHaveAttribute("hidden");
-    expect(screen.queryByTestId("details-btn")).toBeNull();
-    expect(screen.queryByTestId("history-chip")).toBeNull();
+    expect(screen.getByTestId("table-status")).toHaveAttribute("hidden");
+    expect(screen.getByTestId("details-btn")).toBeInTheDocument();
+    expect(screen.getByTestId("history-chip")).toBeInTheDocument();
   });
 });
 
@@ -102,11 +102,12 @@ describe("the coach strip", () => {
     expect(screen.getByTestId("coach-chip-folded")).toHaveTextContent("PREFERRED");
   });
 
-  it("keeps the grade banner and the side panels on a wide screen", () => {
+  it("keeps the grade banner and the coach panel on a wide screen", () => {
     setUpright(false);
     view({ waitingForHero: false }, { comparison: { grade: "PREFERRED", explanation: "ok" } });
     expect(screen.getByTestId("comparison")).toBeInTheDocument();
-    expect(screen.getByTestId("action-history")).toBeInTheDocument();
+    expect(screen.getByTestId("coach-panel")).toBeInTheDocument();
+    expect(screen.queryByTestId("action-history")).toBeNull();
     expect(screen.queryByTestId("coach-strip")).toBeNull();
   });
 });

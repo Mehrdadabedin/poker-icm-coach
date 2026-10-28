@@ -17,20 +17,22 @@ interface HistoryDrawerProps {
   handNumber: number;
   /** Free plan: the completed hands are Pro */
   locked: boolean;
+  /** Wide screens: a panel over the right of the table, without a dimmed page (plan 106) */
+  side?: boolean;
 }
 
 /** The hand history from the bottom of an upright phone (plan 101): this hand's
  * actions and the last hands. It closes with its button, a tap outside, Escape
  * and the Android back button. */
-export function HistoryDrawer({ open, onClose, actions, heroSeat, nameBySeat, tableId, handNumber, locked }: HistoryDrawerProps) {
+export function HistoryDrawer({ open, onClose, actions, heroSeat, nameBySeat, tableId, handNumber, locked, side = false }: HistoryDrawerProps) {
   const t = useT();
   const [tab, setTab] = useState<"hand" | "last">("hand");
   const hands = useTableHands(tableId, handNumber, open && !locked);
   useDismiss(open, onClose);
   if (!open) return null;
   return (
-    <div className="drawer-scrim" onClick={onClose} data-testid="history-scrim">
-      <div className="drawer" role="dialog" aria-modal="true" aria-label={t("drawer.title")} onClick={(e) => e.stopPropagation()} data-testid="history-drawer">
+    <div className={side ? "drawer-scrim drawer-side" : "drawer-scrim"} onClick={onClose} data-testid="history-scrim">
+      <div className="drawer" role="dialog" aria-modal={!side} aria-label={t("drawer.title")} onClick={(e) => e.stopPropagation()} data-testid="history-drawer">
         <span className="drawer-handle" aria-hidden="true" />
         <div className="drawer-head">
           <div className="drawer-tabs" role="tablist">

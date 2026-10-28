@@ -32,7 +32,6 @@ export interface LiveTableViewProps {
   showResultLabels: boolean;
   nameBySeat: Map<number, string>;
   coachCollapsed: boolean;
-  historyCollapsed: boolean;
   reviewOpen: boolean;
   username: string | null;
   onHome: () => void;
@@ -44,7 +43,6 @@ export interface LiveTableViewProps {
   onBackReview: () => void;
   onAction: (kind: ActionKind, amount?: number) => void;
   onToggleCoach: () => void;
-  onToggleHistory: () => void;
 }
 
 /** The live table scene: header, felt (or review), and side panels. */
@@ -54,11 +52,12 @@ export function LiveTableView(props: LiveTableViewProps) {
   const upright = useUprightPhone();
   const {
     state, overlay, cover, coach, comparison, countdown, paused, acting, showLabels,
-    showResultLabels, nameBySeat, coachCollapsed, historyCollapsed, reviewOpen,
+    showResultLabels, nameBySeat, coachCollapsed, reviewOpen,
     username, onHome, onMistakes, onLogout, onTogglePause, onReview, onNext, onBackReview,
-    onAction, onToggleCoach, onToggleHistory,
+    onAction, onToggleCoach,
   } = props;
   const phone = usePhoneTable(upright ? comparison : null);
+  const toggleHistory = () => phone.setDrawerOpen(!phone.drawerOpen);
   const hero = state.players.find((p) => p.isHero);
   const handOver = state.phase === "handOver" && !!state.review;
   const isReview = handOver && reviewOpen;
@@ -95,12 +94,12 @@ export function LiveTableView(props: LiveTableViewProps) {
               <CoachStrip coach={coachNow} heroCards={hero?.holeCards} grade={phone.grade} sheetOpen={phone.sheetOpen}
                 onSheet={phone.setSheetOpen} onFold={() => phone.setStripOpen(false)} />
             )) : free ? <LockedCoachChip place="top" /> : coachNow ? <MobileCoachCard coach={coachNow} heroCards={hero?.holeCards} /> : null}
-            trail={upright && (
-              <TableChips detailsOpen={phone.details} onDetails={() => phone.setDetails(!phone.details)}
-                onHistory={() => phone.setDrawerOpen(true)}
-                coachChip={!free && !phone.stripOpen ? { grade: phone.grade, onClick: () => phone.setStripOpen(true) } : null} />
+            trail={(
+              <TableChips detailsOpen={phone.details} historyOpen={phone.drawerOpen}
+                onDetails={() => phone.setDetails(!phone.details)} onHistory={toggleHistory}
+                coachChip={upright && !free && !phone.stripOpen ? { grade: phone.grade, onClick: () => phone.setStripOpen(true) } : null} />
             )}
-            detailsHidden={upright && !phone.details}>
+            detailsHidden={!phone.details}>
             {upright && free && <BotKey />}
             {cover ? null : handOver && state.review ? (
               <HandResult
@@ -133,24 +132,11 @@ export function LiveTableView(props: LiveTableViewProps) {
               </div>
             )}
           </PokerTable>
-          {upright ? (
-            <HistoryDrawer open={phone.drawerOpen} onClose={() => phone.setDrawerOpen(false)} actions={state.actionLog ?? []}
-              heroSeat={state.heroSeat} nameBySeat={nameBySeat} tableId={state.tableId} handNumber={state.handNumber} locked={free} />
-          ) : !handOver && (
-            <TableSidebar
-              actions={state.actionLog ?? []}
-              heroSeat={state.heroSeat}
-              nameBySeat={nameBySeat}
-              coach={coach}
-              heroCards={hero?.holeCards}
-              tableId={state.tableId}
-              handNumber={state.handNumber}
-              currentLevel={state.level}
-              coachCollapsed={coachCollapsed}
-              historyCollapsed={historyCollapsed}
-              onToggleCoach={onToggleCoach}
-              onToggleHistory={onToggleHistory}
-            />
+          <HistoryDrawer open={phone.drawerOpen} onClose={() => phone.setDrawerOpen(false)} actions={state.actionLog ?? []}
+            heroSeat={state.heroSeat} nameBySeat={nameBySeat} tableId={state.tableId} handNumber={state.handNumber}
+            locked={free} side={!upright} />
+          {!upright && !handOver && (
+            <TableSidebar coach={coach} heroCards={hero?.holeCards} coachCollapsed={coachCollapsed} onToggleCoach={onToggleCoach} />
           )}
         </>
       )}

@@ -25,10 +25,10 @@ export function view(state: Partial<TableState> = {}, extra: Partial<LiveTableVi
       actionLog: [{ seat: 3, action: "raise", amount: 300, street: "preflop" }], ...state,
     },
     coach: advice, comparison: null, countdown: null, paused: false, acting: false, showLabels: false,
-    showResultLabels: false, nameBySeat: new Map([[3, "Bot3"]]), coachCollapsed: false, historyCollapsed: false,
+    showResultLabels: false, nameBySeat: new Map([[3, "Bot3"]]), coachCollapsed: false,
     reviewOpen: false, username: "Alice", onHome: noop, onMistakes: noop, onLogout: noop,
     onTogglePause: noop, onReview: noop, onNext: noop, onBackReview: noop, onAction: noop,
-    onToggleCoach: noop, onToggleHistory: noop, ...extra,
+    onToggleCoach: noop, ...extra,
   };
   const ui = (p: LiveTableViewProps) => (
     <I18nProvider initial={lang}><MemoryRouter><LiveTableView {...p} /></MemoryRouter></I18nProvider>

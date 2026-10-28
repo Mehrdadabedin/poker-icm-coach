@@ -1,0 +1,74 @@
+/* The table fits the window on wide screens (plan 106): the page is as tall as the window, the
+   felt takes what the header, the status line and the bet controls leave, and the coach panel
+   scrolls inside itself. Phones keep mobile.css, table-landscape.css and table-phone.css. */
+@media (min-width: 768px) and (max-aspect-ratio: 5/4), (min-width: 960px) {
+  .table-page {
+    height: 100dvh; padding: 0 8px 6px; gap: 6px 10px; overflow-y: auto;
+    display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 52px minmax(0, 1fr);
+    grid-template-areas: "head head" "coach table";
+  }
+  .table-page > .hand-review { grid-area: 2 / 1 / 3 / -1; min-height: 0; overflow-y: auto; }
+
+  .app-header.table-header { grid-area: head; height: 52px; margin: 0; padding: 0 10px; border-radius: 0; }
+  .app-header.table-header .header-title .brand-logo { height: 32px; max-height: 32px; }
+  .app-header.table-header .header-right > .btn {
+    min-height: 30px; height: 30px; min-width: 0; padding: 0 12px; font-size: 0.75rem; border-radius: 6px;
+  }
+  .app-header.table-header .header-right > .header-icon-btn { min-width: 56px; }
+
+  .table-wrap {
+    grid-area: table; position: relative; display: flex; flex-direction: column;
+    width: 100%; max-width: none; margin: 0; min-height: 0; container-type: size;
+  }
+  .table-wrap > .table-header {
+    flex: 0 0 36px; height: 36px; margin: 0 0 6px; padding: 0 10px; align-items: center; justify-content: flex-start;
+    gap: 6px 18px; font-size: 0.75rem; white-space: nowrap;
+  }
+  .table-wrap > .table-header .tbl-chip { width: 30px; height: 30px; }
+  .table-wrap > .table-header .tbl-chip-i[aria-expanded="true"],
+  .table-wrap > .table-header .tbl-chip[aria-expanded="true"] { background: var(--accent-fill); color: var(--accent-ink); border-color: var(--accent-fill); }
+  .table-wrap > .table-status {
+    position: absolute; top: 36px; left: 0; right: 0; z-index: 30; height: 32px; margin: 0; padding: 0 10px;
+    flex-wrap: nowrap; overflow: hidden; white-space: nowrap; font-size: 0.75rem;
+    border: 1px solid var(--line); background: var(--surface);
+  }
+  .table-status[hidden] { display: none; }
+
+  /* the felt is as wide as the height left allows: 100cqh less the status line, the controls and the gaps */
+  .table-wrap > .table-felt {
+    flex: 0 0 auto; margin: auto; min-height: 0; aspect-ratio: 2 / 1; border-width: 8px;
+    width: min(100cqw, calc((100cqh - 36px - 118px - 18px) * 2));
+  }
+
+  .table-wrap > .hero-controls,
+  .table-wrap > .hand-result { flex: 0 0 118px; height: 118px; margin: 0; max-width: none; overflow: hidden; }
+  .table-wrap > .hero-controls { display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 0 10px; }
+  .hero-controls .hero-info { display: none; }
+  .hero-controls .controls-row { flex-wrap: nowrap; gap: 8px; }
+  .hero-controls .controls-row .btn { height: 44px; min-height: 44px; min-width: 0; padding: 0 8px; font-size: 0.9rem; line-height: 1.1; }
+  .hero-controls .btn-size small { font-size: 0.65rem; }
+  .hero-controls .bet-sizer { margin: 0; display: flex; align-items: center; gap: 8px; }
+  .hero-controls .size-presets { display: flex; gap: 6px; flex: 0 0 auto; }
+  .hero-controls .size-preset { width: 78px; min-height: 42px; height: 42px; padding: 0 2px; gap: 0; justify-content: center; }
+  .hero-controls .size-preset b { font-size: 0.85rem; line-height: 1.1; }
+  .hero-controls .size-preset span { font-size: 0.65rem; line-height: 1.1; }
+  .hero-controls .size-slider { flex: 1 1 0; min-width: 0; grid-template-columns: 30px minmax(40px, 1fr) 30px 96px; gap: 6px; }
+  .hero-controls .size-step { min-height: 30px; height: 30px; }
+  .hero-controls .size-amount input { min-height: 40px; height: 40px; }
+  .hero-controls .size-amount small { display: none; }
+  .table-wrap > .comparison-box { position: absolute; left: 50%; bottom: 124px; z-index: 5; transform: translateX(-50%); max-width: 70%; margin: 0; }
+
+  .table-page > .table-cols { display: contents; }
+  .table-page > .table-cols > :is(.coach-panel, .coach-chip-side) {
+    grid-area: coach; align-self: stretch; margin: 0; width: clamp(200px, 20vw, 300px); min-height: 0; overflow-y: auto;
+  }
+  .table-page > .table-cols > .coach-panel.coach-collapsed { align-self: start; width: auto; }
+}
+
+/* a window under 600px tall may scroll */
+@media (min-width: 768px) and (max-aspect-ratio: 5/4) and (max-height: 599px), (min-width: 960px) and (max-height: 599px) {
+  .table-page { height: auto; min-height: 100dvh; overflow-y: visible; }
+  .table-wrap { container-type: normal; }
+  .table-wrap > .table-felt { width: min(100%, 640px); }
+  .table-page > .table-cols > :is(.coach-panel, .coach-chip-side) { align-self: start; }
+}

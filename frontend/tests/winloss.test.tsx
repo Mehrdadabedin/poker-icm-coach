@@ -1,16 +1,8 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it } from "vitest";
 import { useState } from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { ActionHistory } from "../src/components/ActionHistory";
-import { TableSidebar } from "../src/components/TableSidebar";
 import { HandHistoryEntry, TableAction } from "../src/models/game";
-
-// TableSidebar fetches /api/game/{tableId}/hands through services/api.request.
-const { request } = vi.hoisted(() => ({ request: vi.fn() }));
-vi.mock("../src/services/api", async (importOriginal) => ({
-  ...(await importOriginal<Record<string, unknown>>()),
-  request,
-}));
 
 const actions: TableAction[] = [
   { seat: 2, action: "call", amount: 100, street: "preflop" },
@@ -122,31 +114,5 @@ describe("hand history panel two-view switch (A18)", () => {
         view="analysis" onViewChange={() => undefined} hands={[]} />,
     );
     expect(screen.getByTestId("wl-empty")).toBeInTheDocument();
-  });
-});
-
-describe("TableSidebar fetch (A18)", () => {
-  beforeEach(() => request.mockReset());
-
-  const sidebar = (handNumber: number) => (
-    <TableSidebar actions={actions} heroSeat={0} nameBySeat={names} coach={null}
-      tableId="t-1" handNumber={handNumber} currentLevel={2} />
-  );
-
-  it("fetches once per hand for the default view, not per poll or view switch", async () => {
-    request.mockResolvedValue({ hands });
-    const { rerender } = render(sidebar(2));
-    await waitFor(() => expect(screen.getByTestId("wl-overall")).toBeInTheDocument());
-    expect(request).toHaveBeenCalledTimes(1);
-    expect(request.mock.calls[0][0]).toBe("/api/game/t-1/hands");
-
-    rerender(sidebar(2)); // a 350 ms poll with the same hand
-    rerender(sidebar(2));
-    fireEvent.change(screen.getByTestId("history-view-select"), { target: { value: "analysis" } });
-    expect(screen.getByTestId("win-lose-analysis")).toBeInTheDocument();
-    expect(request, "refetched without a new hand").toHaveBeenCalledTimes(1);
-
-    rerender(sidebar(3));
-    await waitFor(() => expect(request).toHaveBeenCalledTimes(2));
   });
 });

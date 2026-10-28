@@ -2,7 +2,7 @@
 id: 106
 title: The Table Fits the Window
 phase: 8
-status: planned
+status: complete
 depends_on: [101, 103]
 test_file: frontend/tests/table_fit.test.tsx
 implementation_files: [frontend/src/components/TableHeader.tsx, frontend/src/components/PokerTable.tsx, frontend/src/components/PokerSeat.tsx, frontend/src/components/LiveTableView.tsx, frontend/src/components/HeroControls.tsx, frontend/src/components/BetSizer.tsx, frontend/src/components/HistoryDrawer.tsx, frontend/src/styles/felt.css, frontend/src/styles/seats.css, frontend/src/styles/controls.css, frontend/src/styles/bet-sizer.css, frontend/src/styles/table-desktop.css]

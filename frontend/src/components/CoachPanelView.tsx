@@ -29,7 +29,7 @@ interface CoachPanelViewProps {
 export function CoachPanelView({ coach, className = "coach-panel", testId, collapsed = false, onToggle, heroCards }: CoachPanelViewProps) {
   const t = useT();
   return (
-    <div className={className} data-testid={testId}>
+    <div className={collapsed ? `${className} coach-collapsed` : className} data-testid={testId}>
       <div className="panel-head">
         <h3>{t("coach.title")}</h3>
         {onToggle && (

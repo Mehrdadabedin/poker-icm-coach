@@ -25,10 +25,10 @@ function view(state: Partial<TableState>, extra: Partial<LiveTableViewProps> = {
   const props: LiveTableViewProps = {
     state: { ...sampleTableState(), waitingForHero: true, ...state }, coach: advice,
     comparison: null, countdown: null, paused: false, acting: false, showLabels: false,
-    showResultLabels: false, nameBySeat: new Map(), coachCollapsed: false, historyCollapsed: false,
+    showResultLabels: false, nameBySeat: new Map(), coachCollapsed: false,
     reviewOpen: false, username: "Alice", onHome: noop, onMistakes: noop, onLogout: noop,
     onTogglePause: noop, onReview: noop, onNext: noop, onBackReview: noop, onAction: noop,
-    onToggleCoach: noop, onToggleHistory: noop, ...extra,
+    onToggleCoach: noop, ...extra,
   };
   return render(<LiveTableView {...props} />);
 }
