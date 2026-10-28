@@ -150,8 +150,7 @@ const PAIRS: [string, string, string?][] = [
   ["--portrait-pending-ink", "--portrait-pending-bg"], ["--coach-chip-ink", "--coach-chip-bg"],
   ["--coach-good-ink", "--coach-good-bg"], ["--coach-bubble-text", "--coach-bubble-bg"],
   ["--coach-bubble-muted", "--coach-bubble-bg"], ["--review-good-text", "--review-good-badge-bg"],
-  ["--glossary-mark-ink", "--glossary-badge-bg"], ["--landing-btn-gold-ink", "--landing-btn-gold-bg"],
-  ["--landing-step-ink", "--landing-step-bg"],
+  ["--glossary-mark-ink", "--glossary-badge-bg"],
   // coach colours as text
   ["--coach-pos", "--surface"], ["--coach-neg", "--surface"], ["--coach-fold-text", "--surface"],
   ["--coach-raise", "--surface"], ["--coach-raise-soft", "--surface"], ["--coach-street", "--surface"],
@@ -171,12 +170,12 @@ const PAIRS: [string, string, string?][] = [
   ["--icm-error-text", "--icm-error-bg"], ["--signin-error", "--signin-error-bg"], ["--bot-error-ink", "--surface"],
   ["--account-error", "--account-card-bg"], ["--glossary-gold", "--surface"],
   ["--account-card-text", "--account-card-bg"], ["--account-primary-ink", "--account-primary-bg"],
-  ["--header-play-ink", "--header-play-bg"], ["--landing-btn-google-ink", "--landing-btn-google-bg"],
+  ["--header-play-ink", "--header-play-bg"],
   ["--landing-min-text", "--landing-min-bg"], ["--review-primary-ink", "--review-primary-bg"],
   ["--signin-submit-ink", "--signin-submit-bg"], ["--signin-provider-dark-ink", "--signin-provider-dark-bg"],
   ["--signin-provider-light-ink", "--signin-provider-light-bg"], ["--dealer-ink", "--dealer-bg"],
   ["--explain-note-ink", "--explain-note-bg"], ["--lock-title", "--surface"], ["--lock-text", "--surface"], ["--lock-open-ink", "--surface"], ["--text", "--upgrade-bg"],
-  ["--accent", "--upgrade-bg"], ["--sheet-soon-ink", "--sheet-soon-bg"], ["--landing-text", "--landing-bg"], ["--landing-muted", "--landing-bg"], ["--landing-muted", "--landing-card"], ["--lb-points", "--surface"], ["--lb-points", "--bg"], ["--accent-ink", "--lb-silver"], ["--accent-ink", "--lb-bronze"],
+  ["--accent", "--upgrade-bg"], ["--sheet-soon-ink", "--sheet-soon-bg"], ["--lb-points", "--surface"], ["--lb-points", "--bg"], ["--accent-ink", "--lb-silver"], ["--accent-ink", "--lb-bronze"],
 ];
 
 describe("contrast", () => {

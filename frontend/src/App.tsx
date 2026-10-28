@@ -6,7 +6,6 @@ import { AdminPage } from "./pages/AdminPage";
 import { AppLinkListener } from "./components/AppLinkListener";
 import { I18nProvider } from "./i18n/I18n";
 import { HomePage } from "./pages/HomePage";
-import { LandingPage } from "./pages/LandingPage";
 import { MinimalLandingPage } from "./pages/MinimalLandingPage";
 import { getToken } from "./services/api";
 import { inAndroidApp } from "./services/platform";
@@ -64,9 +63,8 @@ export function App() {
         <AppLinkListener />
         <Routes>
           <Route path="/" element={<EntryPage />} />
-          {/* plan 069: the old landing page stays at /classic for a while to
-              compare; links shared to /minimal open the landing page at / */}
-          <Route path="/classic" element={<LandingPage />} />
+          {/* plan 104: old /classic and /minimal links open the landing page at / */}
+          <Route path="/classic" element={<Navigate to="/" replace />} />
           <Route path="/minimal" element={<Navigate to="/" replace />} />
           <Route path="/login" element={<HomePage />} />
           <Route path="/change-password" element={<AdminChangePasswordPage />} />

@@ -1,5 +1,4 @@
-/* The minimal landing page, the landing page at / since plan 069. The old
- * page stays at /classic (see landing.test.tsx); /minimal links still work. */
+/* The minimal landing page, the landing page at / since plan 069. /classic and /minimal links open it. */
 import { describe, expect, it, vi, beforeAll, beforeEach, afterEach } from "vitest";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 
@@ -44,9 +43,10 @@ describe("minimal landing page (/minimal)", () => {
     expect(screen.queryByTestId("landing-page")).toBeNull();
   });
 
-  it("keeps the old landing page at /classic, and old /minimal links still open this page", async () => {
+  it("sends old /classic and /minimal links to this page at #/", async () => {
     await openAt("#/classic");
-    expect(screen.getByTestId("landing-page")).toBeInTheDocument();
+    expect(screen.getByTestId("minimal-landing-page")).toBeInTheDocument();
+    expect(window.location.hash).toBe("#/");
     cleanup();
     await openAt("#/minimal");
     expect(screen.getByTestId("minimal-landing-page")).toBeInTheDocument();
