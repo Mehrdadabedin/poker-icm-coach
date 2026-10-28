@@ -5,7 +5,9 @@
   /* the second line floats over the strip, so showing it never pushes the buttons off the screen */
   .table-wrap > .table-status { position: absolute; top: 49px; left: 0; right: 0; z-index: 30; margin: 0; border: 1px solid var(--line); background: var(--surface); }
   .table-status[hidden] { display: none; }
-  .table-wrap > .table-felt { border-width: 6px; gap: 4px; }
+  .table-page { min-height: 100dvh; }
+  /* a tall screen's empty space goes to the felt: its rows spread out and the buttons stay at the bottom (plan 106) */
+  .table-wrap > .table-felt { border-width: 6px; gap: 4px; flex: 1 1 auto; align-content: space-evenly; }
   .table-wrap > .table-header { margin-bottom: 4px; gap: 4px 6px; padding-left: 8px; padding-right: 8px; }
   .hero-controls { padding: 4px 6px; margin-top: 0; }
 
