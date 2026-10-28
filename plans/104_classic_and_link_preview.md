@@ -1,11 +1,11 @@
 ---
 id: 104
-title: Retire /classic and a Real Link Preview
+title: Retire /classic, a Real Link Preview and Hero
 phase: 8
 status: planned
 depends_on: [069, 101, 102, 103]
 test_file: frontend/tests/site_meta.test.ts
-implementation_files: [frontend/src/App.tsx, frontend/src/pages/LandingPage.tsx, frontend/src/landing/, frontend/src/main.tsx, frontend/src/styles/landing.css, frontend/src/styles/tokens/landing.css, frontend/src/hooks/useTabBarShown.ts, frontend/index.html, frontend/src/i18n/siteMeta.ts, frontend/public/images/, scripts/og-image/]
+implementation_files: [frontend/src/landing-minimal/MinimalHero.tsx, frontend/src/i18n/messages/en/landing.ts, frontend/src/i18n/messages/es/landing.ts, frontend/src/App.tsx, frontend/src/pages/LandingPage.tsx, frontend/src/landing/, frontend/src/main.tsx, frontend/src/styles/landing.css, frontend/src/styles/tokens/landing.css, frontend/src/hooks/useTabBarShown.ts, frontend/index.html, frontend/src/i18n/siteMeta.ts, frontend/public/images/, scripts/og-image/]
 ---
 
 # Objective
@@ -68,12 +68,22 @@ The owner (28 Oct), held until the Phase 2 look was live (099, 101, 103):
   what the picture shows, in both languages. The table picture from PR #106
   (`og-table-*`) is deleted once nothing names it.
 
-# Question for the owner
+## 3. The landing hero picture
 
-The landing page's own hero picture (`hero-coach-screen.webp`) is the same
-AI picture with the same mistakes. Replace it too, with a wider version of
-the new card (no headline, as the page has its own)? Recommended: yes, in
-this plan, so the first thing a visitor sees is the real app.
+The owner's answer (28 Oct): yes, replace it in this plan.
+
+- `hero-coach-screen.webp` (the same AI picture, 8 players, garbled text)
+  becomes a wider version of the card, made by the same script, with no
+  headline (the page has its own): a laptop frame with a real 1280 x 800
+  screenshot of the wide table (coach panel on the left, all 9 seats), and
+  the phone from the preview card in front of it at the right.
+- Same shape as today, 1602 x 982, so the page layout does not move; WebP,
+  under 250 KB.
+- One per language: `hero-app.webp` and `hero-app-es.webp` (the Spanish one
+  shows the app in Spanish); `MinimalHero` picks the file by the page's
+  language, as the landing already does for the demo video (plan 096).
+- `landing.hero.alt` in English and Spanish describes the new picture.
+- The old `hero-coach-screen.webp` is deleted once nothing names it.
 
 # Tests
 
@@ -82,7 +92,9 @@ this plan, so the first thing a visitor sees is the real app.
   somewhere in the code, so unused pictures cannot pile up again.
 - `site_meta.test.ts`: both preview pictures exist and are 1200 x 630 JPEGs
   (the test from PR #106), and each site points to its own file.
-- The script runs again and gives the same layout (screenshots in
+- The landing hero uses `hero-app.webp` in English and `hero-app-es.webp`
+  in Spanish, 1602 x 982, with the new alt text.
+- The script runs again and gives the same layout (the cards and heroes in
   `/tmp/og/` for the owner to approve before anything is committed).
 
 # After deploy
