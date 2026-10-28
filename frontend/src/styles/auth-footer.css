@@ -41,7 +41,7 @@
 
 .auth-legal-text {
   margin: 0;
-  color: #9dacbd;
+  color: var(--signin-legal-text);
   font-size: calc(22 * var(--k));
   letter-spacing: calc(9 * var(--k));
   /* The trailing letter-space would push the line left of centre. */
@@ -89,7 +89,7 @@
 /* A31: transient notice above the sign-in panel (e.g. session expired). */
 .auth-notice {
   margin: 0 0 14px; padding: 10px 14px; text-align: center;
-  border: 1px solid rgba(242, 193, 78, 0.4); border-radius: 8px;
-  background: rgba(242, 193, 78, 0.08); color: var(--accent, #f2c14e);
+  border: 1px solid var(--signin-notice-border); border-radius: 8px;
+  background: var(--signin-notice-bg); color: var(--accent);
   font-size: 0.9rem; line-height: 1.4;
 }

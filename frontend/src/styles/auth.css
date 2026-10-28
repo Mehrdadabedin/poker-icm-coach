@@ -15,23 +15,23 @@
      of growing taller than the viewport on wide, short screens. The height
      divisor is the panel's own ink height at --k = 1: 1050 reference pixels. */
   --k: clamp(0.5px, min(calc(100vw / 1024), calc(100vh / 1310)), 1px);
-  --auth-gold: #fad15a;
-  --auth-gold-rule: #fcf159;
-  --auth-text: #e9eef5;
-  --auth-muted: #99a8ba;
-  --auth-dim: #75828f;
-  --auth-line: #2c373f;
-  --auth-rule: #333d47;
-  --auth-field: #111a21;
-  --auth-icon: #919faf;
-  --auth-blue: #086aec;
-  --auth-ink: #0f151d;
+  --auth-gold: var(--signin-gold);
+  --auth-gold-rule: var(--signin-gold-rule);
+  --auth-text: var(--signin-text);
+  --auth-muted: var(--signin-muted);
+  --auth-dim: var(--signin-dim);
+  --auth-line: var(--signin-field-border);
+  --auth-rule: var(--signin-rule);
+  --auth-field: var(--signin-field-bg);
+  --auth-icon: var(--signin-icon);
+  --auth-blue: var(--signin-submit-bg);
+  --auth-ink: var(--signin-provider-light-ink);
   /* One error red for every sign-in message on this screen. */
-  --auth-red: #ff6b6b;
+  --auth-red: var(--signin-error);
 }
 
 .home-page.auth-page {
-  background: #0e141a;
+  background: var(--signin-page-bg);
   max-width: none;
   gap: 0;
   /* A24: the sign-in screen carries a 214px brand mark where it used to carry a
@@ -61,6 +61,12 @@
      bottom margin) + 52k (this margin). 20k here brings the Google area up so the
      rule and the pills read as one block, without touching anything inside them. */
   margin-bottom: calc(20 * var(--k));
+}
+/* the logo is drawn for a dark background: light theme keeps the black band behind it */
+:root[data-theme="light"] .auth-brand {
+  background: var(--band);
+  border-radius: calc(18 * var(--k));
+  padding: calc(18 * var(--k)) calc(10 * var(--k)) calc(14 * var(--k));
 }
 
 .auth-title {

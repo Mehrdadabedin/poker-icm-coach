@@ -5,13 +5,13 @@
    and the real product as the one picture. */
 
 .lm-page {
-  --lm-bg: #fafaf8;
-  --lm-text: #141414;
-  --lm-muted: #5f5e5a;
-  --lm-line: #e5e3dc;
-  --lm-gold: #f5b21a;
-  --lm-gold-ink: #2c1a00;
-  --lm-accent: #8a5a00;
+  --lm-bg: var(--landing-min-bg);
+  --lm-text: var(--landing-min-text);
+  --lm-muted: var(--landing-min-muted);
+  --lm-line: var(--landing-min-line);
+  --lm-gold: var(--landing-min-gold);
+  --lm-gold-ink: var(--landing-min-gold-ink);
+  --lm-accent: var(--landing-min-accent);
   --lm-head: "Archivo", system-ui, sans-serif;
   --lm-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --lm-gutter: clamp(20px, 5vw, 56px);
@@ -28,9 +28,9 @@
 
 /* ---- top bar: a black band in the logo's own colour, a plain link, one
    gold outline button (gold reads well on black) ---- */
-.lm-header-band { background: #07080a; }
-.lm-header-band .lm-login { color: #c9cfd8; }
-.lm-header-band .lm-login:hover { color: #fff; }
+.lm-header-band { background: var(--landing-min-band); }
+.lm-header-band .lm-login { color: var(--landing-min-login); }
+.lm-header-band .lm-login:hover { color: var(--landing-min-login-hover); }
 .lm-header-band .lm-btn-quiet { border-color: var(--lm-gold); color: var(--lm-gold); }
 
 .lm-header {
@@ -69,7 +69,7 @@
 }
 
 .lm-btn-quiet { border-color: var(--lm-accent); color: var(--lm-accent); }
-.lm-btn-quiet:hover { background: rgba(245, 178, 26, 0.14); }
+.lm-btn-quiet:hover { background: var(--landing-min-quiet-hover); }
 
 .lm-btn-primary {
   min-height: 56px;
@@ -129,12 +129,12 @@
   min-height: 56px;
   padding: 14px 32px;
   border: 1.5px solid var(--lm-text);
-  background: rgba(20, 20, 20, 0.05);
+  background: var(--landing-min-outline-bg);
   color: var(--lm-text);
   font-size: 1.02rem;
   cursor: pointer;
 }
-.lm-btn-outline:hover { background: rgba(20, 20, 20, 0.1); }
+.lm-btn-outline:hover { background: var(--landing-min-outline-hover); }
 
 /* ---- the hero picture ---- */
 .lm-hero-img {
@@ -144,12 +144,12 @@
   height: auto;
   margin: clamp(44px, 7vw, 84px) auto 0;
   border-radius: 16px;
-  box-shadow: 0 30px 60px -30px rgba(20, 20, 20, 0.45), 0 2px 6px rgba(20, 20, 20, 0.06);
+  box-shadow: 0 30px 60px -30px var(--landing-min-shot-shadow), 0 2px 6px var(--landing-min-shot-shadow-soft);
 }
 
 /* ---- demo video: mounted only after "Watch the demo" ---- */
 .lm-demo { max-width: 880px; margin: clamp(40px, 6vw, 72px) auto 0; }
-.lm-video { display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; background: #000; }
+.lm-video { display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; background: var(--landing-min-video-bg); }
 
 /* the cards are in landing-minimal-cards.css; the tagline, How it works, the
    closing and the footer in landing-minimal-sections.css */

@@ -1,17 +1,17 @@
-/* Signed-in home (plan 066): a white page under a black top bar (the logo's
-   white letters need a dark background), the menu as dark cards with a gold
-   icon and one line each. The other pages keep the dark theme. */
+/* Signed-in home (plan 066): the page follows the theme under a black top bar
+   (the logo's white letters need a dark background), the menu as cards with a
+   gold icon and one line each. */
 
-.home-screen { min-height: 100vh; background: #fafaf8; color: #141414; }
-.home-band { background: #07080a; color: #c9cfd8; }
+.home-screen { min-height: 100vh; background: var(--bg); color: var(--text); }
+.home-band { background: var(--band); color: var(--band-text); }
 .home-band .app-header { max-width: 980px; padding: 14px 12px; }
 
 .home-body { max-width: 980px; margin: 0 auto; padding: 8px 20px 24px; }
-.home-body .home-tagline { margin: 18px 0 6px; color: #5f5e5a; text-align: center; }
-.home-body .app-footer { color: #6b6a65; border-top-color: #e2e0d9; }
+.home-body .home-tagline { margin: 18px 0 6px; color: var(--text-muted); text-align: center; }
+.home-body .app-footer { color: var(--text-muted); border-top-color: var(--line); }
 
 .home-body .home-menu { width: 100%; }
-.hm-label { margin: 26px 0 12px; color: #6b6a65; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.16em; }
+.hm-label { margin: 26px 0 12px; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.16em; }
 .hm-play { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 18px; }
 .hm-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
 
@@ -21,24 +21,24 @@
   gap: 14px;
   width: 100%;
   padding: 18px;
-  border: 1px solid #2c3540;
+  border: 1px solid var(--line);
   border-radius: 16px;
-  background: #1d242c;
-  color: #f3f1ea;
+  background: var(--surface);
+  color: var(--text);
   font: inherit;
   text-align: left;
   cursor: pointer;
   transition: background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 
-/* under the mouse: a clearly brighter slate, lifted, with a dark grey shadow */
+/* under the mouse: a clearly different surface, lifted, with a soft shadow */
 .hm-card:hover {
-  background: #3a4656;
-  border-color: #5a6a80;
-  box-shadow: 0 16px 32px -12px rgba(51, 51, 51, 0.55);
+  background: var(--hm-card-hover-bg);
+  border-color: var(--hm-card-hover-border);
+  box-shadow: 0 16px 32px -12px var(--hm-card-hover-shadow);
   transform: translateY(-3px);
 }
-.hm-card:focus-visible { outline: 3px solid #f2c14e; outline-offset: 3px; }
+.hm-card:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
 
 .hm-icon {
   flex: 0 0 auto;
@@ -46,14 +46,14 @@
   height: 24px;
   margin-top: 2px;
   fill: none;
-  stroke: #f2c14e;
+  stroke: var(--accent);
   stroke-width: 1.7;
   stroke-linecap: round;
   stroke-linejoin: round;
 }
 
 .hm-title { display: block; font-size: 1rem; font-weight: 700; }
-.hm-desc { display: block; margin-top: 4px; color: #9aa3ad; font-size: 0.85rem; line-height: 1.35; }
+.hm-desc { display: block; margin-top: 4px; color: var(--hm-desc); font-size: 0.85rem; line-height: 1.35; }
 
 .hm-card-big { padding: 22px; }
 .hm-card-big .hm-icon { width: 30px; height: 30px; }

@@ -11,11 +11,14 @@
   max-width: 900px;
   margin: 0 auto;
   padding: 18px 20px;
-  border: 1px solid rgba(242, 193, 78, 0.35);
+  border: 1px solid var(--consent-border);
   border-radius: 12px;
-  background: #1d242c;
+  background: var(--surface);
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.42);
 }
+
+/* the phone tab bar (plan 099) is 72 px high: sit 16 px above it */
+body.has-tab-bar .analytics-consent { bottom: calc(72px + 16px + env(safe-area-inset-bottom)); }
 
 .analytics-consent__copy {
   min-width: 0;
@@ -23,13 +26,13 @@
 
 .analytics-consent__title {
   margin: 0 0 5px;
-  color: var(--accent, #f2c14e);
+  color: var(--accent);
   font-size: 1rem;
 }
 
 .analytics-consent__copy p {
   margin: 0;
-  color: var(--text, #e8e6e1);
+  color: var(--body-text);
   font-size: 0.9rem;
   line-height: 1.45;
 }
@@ -43,7 +46,7 @@
 .analytics-consent__button {
   min-height: 44px;
   padding: 0 14px;
-  border: 1px solid var(--accent, #f2c14e);
+  border: 1px solid var(--accent);
   border-radius: 8px;
   font: inherit;
   font-weight: 600;
@@ -51,17 +54,17 @@
 }
 
 .analytics-consent__button--accept {
-  background: var(--accent, #f2c14e);
-  color: #17191b;
+  background: var(--accent-fill);
+  color: var(--consent-accept-ink);
 }
 
 .analytics-consent__button--reject {
   background: transparent;
-  color: var(--text, #e8e6e1);
+  color: var(--body-text);
 }
 
 .analytics-consent__button:focus-visible {
-  outline: 3px solid #fff;
+  outline: 3px solid var(--consent-focus);
   outline-offset: 2px;
 }
 

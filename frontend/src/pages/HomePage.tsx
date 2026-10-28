@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { clearAuth, getToken, getUsername, logout, me } from "../services/api";
-import { announceAuth } from "../services/authEvents";
 import { useIsAdmin } from "../hooks/useIsAdmin";
 import { useIsPhone } from "../hooks/useIsPhone";
 import { Copyright } from "../components/Copyright";
@@ -33,8 +32,6 @@ export function HomePage() {
         setUser(null);
       });
   }, []);
-
-  useEffect(() => announceAuth(), [user]);
 
   const signOut = async () => {
     try {

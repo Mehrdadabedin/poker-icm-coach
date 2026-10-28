@@ -25,7 +25,7 @@ export function PageHeader({ hideHome = false }: { hideHome?: boolean }) {
   };
 
   return (
-    <div className="top-bar app-header page-header" data-testid="page-header">
+    <div className="top-bar app-header page-header keep-dark" data-testid="page-header">
       <div className="screen-title header-title"><BrandLogo /></div>
       <div className="header-right">
         {username && <span className="header-user" data-testid="header-username">{username}</span>}

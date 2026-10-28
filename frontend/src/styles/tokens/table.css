@@ -1,0 +1,123 @@
+/* Tokens of the table area (plan 103): see tokens.css. */
+
+:root,
+:root[data-theme="dark"],
+.keep-dark {
+  --seat-bg: #0b241b; /* fixed, opaque: the old 42% black over the felt, without letting the page show through */
+  --seat-ink-dim: #86a395; /* fixed: text of a folded, out or lost seat */
+  --wl-track: #2b3440; /* the empty part of a ring chart */
+  /* fixed: the felt, cards and action buttons look the same in both themes */
+  --felt: #1c6b4f; /* fixed */
+  --felt-dark: #10422f; /* fixed */
+  --felt-rim: #8a5a2b; /* fixed */
+  --seat-border: rgba(255, 255, 255, 0.18); /* fixed */
+  --seat-hero-ring: #4f9dff; /* fixed */
+  --seat-text-green: #d8f5e6; /* fixed */
+  --seat-fold-ink: #ff8f8f; /* fixed */
+  --dealer-bg: #fff; /* fixed */
+  --dealer-ink: #111; /* fixed */
+  --btn-ink: #fff; /* fixed */
+  --btn-fold: #c62828; /* fixed */
+  --btn-call: #2e7d32; /* fixed */
+  --btn-allin: #4f2683; /* fixed */
+  --btn-action-blue: #1565c0; /* fixed */
+  --btn-pause: #e65100; /* fixed */
+  --btn-gold-ink: #241c05; /* fixed */
+  --accent-ink-warm: #17191b; /* fixed */
+  --seat-won-glow: rgba(46, 125, 50, 0.5); /* fixed */
+  --card-face: #fff; /* fixed */
+  --card-face-alt: #f7f4ec; /* fixed */
+  --card-ink: #111; /* fixed */
+  --winner-scrim: rgba(4, 7, 10, 0.92); /* fixed */
+  --winner-name-ink: #fff; /* fixed */
+  --winner-place-bg: #0a141c; /* fixed */
+
+  --table-header-bg: rgba(29, 36, 44, 0.7);
+  --coach-raise: #4f9dff;
+  --coach-raise-soft: #8fc1ff;
+  --coach-street: #9fc5ff;
+  --coach-bubble-bg: #0f2a4a;
+  --coach-bubble-text: #d6e4f5;
+  --coach-bubble-muted: #9aa3ad;
+  --coach-bubble-rule: rgba(143, 193, 255, 0.15);
+  --coach-chip-bg: #2c3540;
+  --coach-chip-ink: #fff;
+  --table-raised-bg: #243040;
+  --table-raised-border: #35455a;
+  --coach-good-bg: #10341f;
+  --coach-good-line: #2e7d32;
+  --coach-good-ink: #d8f5e6;
+  --coach-bad-bg: #3a1216;
+  --coach-bad-line: #c62828;
+  --coach-fold-text: #ff8f8f;
+  --coach-pos: #81c784;
+  --coach-neg: #e57373;
+  --coach-allin-text: #b39ddb;
+  --coach-strong-text: #fff;
+  --coach-active-bg: #241c05;
+  --picker-bg: #141a21;
+  --picker-border: #444;
+  --field-bg: #0f1318;
+  --field-border: #3a4653;
+  --size-active-bg: #2a2414;
+  --coach-divider: rgba(255, 255, 255, 0.15);
+  --history-rule: #232b34;
+  --explain-note-ink: #d8f5e6;
+  --explain-note-bg: #10161d;
+  --menu-trigger-border: rgba(242, 193, 78, 0.45);
+  --menu-trigger-bg: rgba(255, 255, 255, 0.06);
+  --menu-border: rgba(255, 255, 255, 0.12);
+  --menu-user-muted: #9aa3ad;
+  --modal-bg: rgba(20, 24, 29, 0.97);
+  --modal-border: rgba(242, 193, 78, 0.55);
+  --standing-row-bg: rgba(255, 255, 255, 0.05);
+  --standing-hero-ring: #4f9dff;
+  --standing-hero-bg: rgba(79, 157, 255, 0.12);
+  --result-flow-text: rgba(255, 255, 255, 0.75);
+}
+
+:root[data-theme="light"] {
+  --wl-track: #e5e3dc;
+  --table-header-bg: rgba(255, 255, 255, 0.7);
+  --coach-raise: #0b5cc4;
+  --coach-raise-soft: #0b5cc4;
+  --coach-street: #0b5cc4;
+  --coach-bubble-bg: #e8f1fd;
+  --coach-bubble-text: #1f2a37;
+  --coach-bubble-muted: #5f5e5a;
+  --coach-bubble-rule: rgba(11, 92, 196, 0.2);
+  --coach-chip-bg: #4a4944;
+  --coach-chip-ink: #fff;
+  --table-raised-bg: #f3f2ee;
+  --table-raised-border: #d6d3c9;
+  --coach-good-bg: #e3f4e8;
+  --coach-good-line: #1b7a3a;
+  --coach-good-ink: #14532d;
+  --coach-bad-bg: #fbe6e4;
+  --coach-bad-line: #b3261e;
+  --coach-fold-text: #b3261e;
+  --coach-pos: #1b7a3a;
+  --coach-neg: #b3261e;
+  --coach-allin-text: #5b3a9e;
+  --coach-strong-text: #141414;
+  --coach-active-bg: #fdf3d6;
+  --picker-bg: #f3f2ee;
+  --picker-border: #d6d3c9;
+  --field-bg: #ffffff;
+  --field-border: #d6d3c9;
+  --size-active-bg: #fdf3d6;
+  --coach-divider: rgba(0, 0, 0, 0.12);
+  --history-rule: #ece9e1;
+  --explain-note-ink: #14532d;
+  --explain-note-bg: #f3f2ee;
+  --menu-trigger-border: rgba(138, 90, 0, 0.45);
+  --menu-trigger-bg: rgba(0, 0, 0, 0.05);
+  --menu-border: #e5e3dc;
+  --menu-user-muted: #5f5e5a;
+  --modal-bg: rgba(255, 255, 255, 0.97);
+  --modal-border: rgba(138, 90, 0, 0.55);
+  --standing-row-bg: rgba(0, 0, 0, 0.04);
+  --standing-hero-ring: #0b5cc4;
+  --standing-hero-bg: rgba(11, 92, 196, 0.1);
+  --result-flow-text: rgba(20, 20, 20, 0.75);
+}

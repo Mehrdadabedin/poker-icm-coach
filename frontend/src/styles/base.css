@@ -1,15 +1,5 @@
 /* Base layout and felt for the poker table. */
 
-:root {
-  --felt: #1c6b4f;
-  --felt-dark: #10422f;
-  --felt-rim: #8a5a2b;
-  --accent: #f2c14e;
-  --bg: #14181d;
-  --text: #e8e6e1;
-  --muted: #9aa0a6;
-}
-
 * {
   box-sizing: border-box;
 }
@@ -17,7 +7,7 @@
 body {
   margin: 0;
   background: var(--bg);
-  color: var(--text);
+  color: var(--body-text);
   font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
@@ -53,7 +43,7 @@ body {
   padding: 6px 10px;
   font-size: 0.8rem;
   color: var(--muted);
-  background: #1d242c;
+  background: var(--surface);
   border-radius: 8px;
   margin-bottom: 6px;
 }
@@ -66,7 +56,7 @@ body {
   padding: 4px 10px;
   font-size: 0.78rem;
   color: var(--muted);
-  background: rgba(29, 36, 44, 0.7);
+  background: var(--table-header-bg);
   border-radius: 8px;
   margin-bottom: 6px;
 }

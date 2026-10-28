@@ -44,8 +44,8 @@
 }
 
 .header-icon-play {
-  background: #2e7d32;
-  color: #fff;
+  background: var(--header-play-bg);
+  color: var(--header-play-ink);
 }
 
 .header-title {

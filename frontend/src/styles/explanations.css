@@ -2,7 +2,7 @@
 
 /* ---- structured action history ---- */
 .action-history {
-  background: #1d242c;
+  background: var(--surface);
   border-radius: 10px;
   padding: 10px 12px;
   font-size: 0.8rem;
@@ -25,7 +25,7 @@
 }
 
 .history-street-title {
-  color: #4f9dff;
+  color: var(--coach-raise);
   font-weight: 800;
   font-size: 0.72rem;
   letter-spacing: 1px;
@@ -49,18 +49,18 @@
 }
 
 .history-hero {
-  color: #4f9dff;
+  color: var(--coach-raise);
 }
 
 .history-action {
   font-weight: 600;
 }
 
-.history-action-fold { color: #ff8f8f; }
+.history-action-fold { color: var(--coach-fold-text); }
 .history-action-check { color: var(--muted); }
-.history-action-call { color: #81c784; }
+.history-action-call { color: var(--coach-pos); }
 .history-action-bet, .history-action-raise { color: var(--accent); }
-.history-action-all_in { color: #b39ddb; }
+.history-action-all_in { color: var(--coach-allin-text); }
 
 /* ---- bot explanations ---- */
 .bot-explanations h3 .hint {
@@ -70,7 +70,7 @@
 }
 
 .expl-item {
-  border-bottom: 1px solid #2c3540;
+  border-bottom: 1px solid var(--line);
 }
 
 .expl-head {
@@ -80,7 +80,7 @@
   align-items: center;
   background: transparent;
   border: none;
-  color: var(--text);
+  color: var(--body-text);
   font-size: 0.85rem;
   padding: 8px 4px;
   cursor: pointer;
@@ -113,7 +113,7 @@
 .expl-factors > div {
   display: flex;
   justify-content: space-between;
-  border-top: 1px solid #232b34;
+  border-top: 1px solid var(--history-rule);
   padding: 3px 0;
   font-size: 0.75rem;
 }
@@ -134,8 +134,8 @@
 .expl-decision {
   margin: 8px 0 0;
   font-size: 0.8rem;
-  color: #d8f5e6;
-  background: #10161d;
+  color: var(--explain-note-ink);
+  background: var(--explain-note-bg);
   border-radius: 6px;
   padding: 6px 8px;
 }

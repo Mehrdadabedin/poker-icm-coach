@@ -88,7 +88,7 @@ export function PokerTable({ state, children, overlay, cover, top }: PokerTableP
         <span className="tbl-info">{t(isReview ? "status.handComplete" : "status.liveHand")}</span>
       </div>
       {top}
-      <div className="table-felt">
+      <div className="table-felt keep-dark">
         {sorted.map((p) => {
           const reveal = revealBySeat.get(p.seat);
           return (

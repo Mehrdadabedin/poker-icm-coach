@@ -1,6 +1,6 @@
 /* A47 - ICMBOT public landing page.
-   Palette and typography define the whole page: dark #07080A / #0C0E13 bands,
-   cards #12151C with #232836 borders, gold #F2B33D, blue #0B6CF0, Archivo
+   Palette and typography define the whole page: colours come from
+   tokens/landing.css (dark bands, cards, gold, blue), Archivo
    headings + Instrument Sans body (Google Fonts with system fallbacks). Every
    rule is scoped to .landing-page / .lp-* so the rest of the app is untouched. */
 
@@ -9,14 +9,14 @@
      cover size is derived from it instead of a hard-coded number */
   --lp-header-h: 77px;
   --lp-section-pad-top: clamp(34px, 6vw, 72px);
-  --lp-gold: #f2b33d;
-  --lp-blue: #0b6cf0;
-  --lp-bg: #07080a;
-  --lp-bg-soft: #0c0e13;
-  --lp-card: #12151c;
-  --lp-card-border: #232836;
-  --lp-text: #eef1f6;
-  --lp-muted: #9aa5b4;
+  --lp-gold: var(--landing-gold);
+  --lp-blue: var(--landing-blue);
+  --lp-bg: var(--landing-bg);
+  --lp-bg-soft: var(--landing-bg-soft);
+  --lp-card: var(--landing-card);
+  --lp-card-border: var(--landing-card-border);
+  --lp-text: var(--landing-text);
+  --lp-muted: var(--landing-muted);
   --lp-head: "Archivo", system-ui, sans-serif;
   --lp-body: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   display: flex; flex-direction: column;
@@ -33,6 +33,14 @@
 
 /* ---- header: sticky solid band, content on a ~1240px centred grid ---- */
 .lp-header {
+  /* the header band keeps its dark look in both themes (keep-dark): the local set
+     is resolved again here, against the dark tokens */
+  --lp-gold: var(--landing-gold);
+  --lp-blue: var(--landing-blue);
+  --lp-bg: var(--landing-bg);
+  --lp-card-border: var(--landing-card-border);
+  --lp-text: var(--landing-text);
+  --lp-muted: var(--landing-muted);
   position: sticky; top: 0; z-index: 50;
   background: var(--lp-bg);  /* solid: nothing shows through */
   border-bottom: 1px solid var(--lp-card-border);
@@ -80,12 +88,12 @@
 }
 .lp-btn:hover { filter: brightness(1.08); }
 
-.lp-btn-primary { background: var(--lp-blue); color: #fff; }
+.lp-btn-primary { background: var(--lp-blue); color: var(--landing-btn-blue-ink); }
 .lp-btn-ghost { background: transparent; border-color: var(--lp-gold); color: var(--lp-gold); }
-.lp-btn-gold { background: var(--lp-gold); color: #14110a; font-weight: 800; }
+.lp-btn-gold { background: var(--landing-btn-gold-bg); color: var(--landing-btn-gold-ink); font-weight: 800; }
 .lp-btn-outline { background: transparent; border-color: var(--lp-card-border); color: var(--lp-text); }
 .lp-btn-xl { min-height: 54px; padding: 13px 30px; font-size: 1rem; }
-.lp-btn-google { background: #ffffff; color: #1f1f1f; }
+.lp-btn-google { background: var(--landing-btn-google-bg); color: var(--landing-btn-google-ink); }
 .lp-nav-btn { min-height: 40px; padding: 8px 18px; font-size: 0.82rem; }
 
 /* the sticky header sits above the sections it scrolls to; a section's own top

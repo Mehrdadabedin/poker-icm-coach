@@ -29,22 +29,22 @@
 }
 
 .auth-provider-dark {
-  background: #020203;
-  border-color: #41474c;
-  color: #fff;
+  background: var(--signin-provider-dark-bg);
+  border-color: var(--signin-provider-dark-border);
+  color: var(--signin-provider-dark-ink);
 }
 
 .auth-provider-light {
-  background: #fff;
+  background: var(--signin-provider-light-bg);
   color: var(--auth-ink);
 }
 
 .auth-provider-dark:hover {
-  background: #121317;
+  background: var(--signin-provider-dark-hover);
 }
 
 .auth-provider-light:hover {
-  background: #eef0f3;
+  background: var(--signin-provider-light-hover);
 }
 
 .auth-provider-mark,
@@ -90,7 +90,7 @@
   gap: calc(20 * var(--k));
   height: calc(20 * var(--k));
   margin-top: calc(9 * var(--k));
-  color: var(--auth-or, #8c9aae);
+  color: var(--signin-or-text);
   font-size: calc(25 * var(--k));
 }
 

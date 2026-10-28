@@ -26,7 +26,7 @@ export function TableHeader({ state, username, paused, handOver, isReview, onHom
   const closeMenu = useCallback(() => setMenuOpen(false), []);
   const name = username ?? state.username ?? "";
   return (
-    <div className="top-bar app-header table-header" data-testid="app-header">
+    <div className="top-bar app-header table-header keep-dark" data-testid="app-header">
       <button type="button" className="header-menu-btn" aria-label={t("menu.label")} aria-expanded={menuOpen}
         aria-controls="table-menu" data-testid="menu-btn" onClick={() => setMenuOpen((open) => !open)}>
         <MenuIcon />

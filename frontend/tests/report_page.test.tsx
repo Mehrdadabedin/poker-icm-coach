@@ -171,9 +171,9 @@ describe("report wording", () => {
   });
 
   it("colours a cell green with no mistakes and red from one in four", () => {
-    expect(heatColour(0)).toBe("hsl(130 35% 27%)");
-    expect(heatColour(0.25)).toBe("hsl(0 35% 27%)");
-    expect(heatColour(0.9)).toBe("hsl(0 35% 27%)");
+    expect(heatColour(0)).toBe("hsl(130 35% var(--heat-lightness))");
+    expect(heatColour(0.25)).toBe("hsl(0 35% var(--heat-lightness))");
+    expect(heatColour(0.9)).toBe("hsl(0 35% var(--heat-lightness))");
     expect(statVerdict(stat("vpip", null, 0, 18, 26)).text).toBe("few hands (0)");
   });
 });

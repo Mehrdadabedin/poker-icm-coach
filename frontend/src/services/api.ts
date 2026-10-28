@@ -1,5 +1,6 @@
 // API client for the FastAPI backend (part 034 endpoints + A03 auth).
 import { ActionKind, TableState } from "../models/game";
+import { announceAuth } from "./authEvent";
 
 export const API_BASE = import.meta.env.VITE_API_URL ?? "";
 const TOKEN_KEY = "icm_auth_token";
@@ -17,10 +18,11 @@ export const getUsername = (): string | null => localStorage.getItem(USERNAME_KE
 export const saveAuth = (token: string, username: string): void => {
   localStorage.setItem(TOKEN_KEY, token);
   localStorage.setItem(USERNAME_KEY, username);
+  announceAuth();
 };
 export const clearAuth = (): void => {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USERNAME_KEY);
+  [TOKEN_KEY, USERNAME_KEY].forEach((key) => localStorage.removeItem(key));
+  announceAuth();
 };
 
 export async function request<T>(path: string, options?: RequestInit): Promise<T> {

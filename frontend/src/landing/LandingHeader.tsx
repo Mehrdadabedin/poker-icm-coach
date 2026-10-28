@@ -16,7 +16,7 @@ const NAV_LINKS = [
  * scroll in-page; the app is a HashRouter, so they never set location.hash. */
 export function LandingHeader() {
   return (
-    <header className="lp-header" data-testid="landing-header">
+    <header className="lp-header keep-dark" data-testid="landing-header">
       <div className="lp-header-inner">
         <p className="lp-brand" data-testid="landing-brand"><BrandLogo /></p>
         <nav className="lp-nav-links" aria-label="Landing sections">

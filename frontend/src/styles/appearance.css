@@ -1,0 +1,25 @@
+/* APPEARANCE picker (plan 103). Colours come from tokens.css only. */
+.appearance { margin: 28px 0 8px; }
+.appearance-title { margin: 0 0 12px; color: var(--text-muted); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.16em; }
+.appearance-options { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.appearance-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-height: 72px;
+  padding: 12px 6px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+}
+.appearance-option svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.appearance-current { border: 2px solid var(--accent); color: var(--accent); }
+.appearance-option:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+.appearance-note { margin: 10px 0 0; color: var(--text-muted); font-size: 0.8rem; }

@@ -10,8 +10,8 @@
   flex: 1;
   min-height: 44px;
   border-radius: 10px;
-  border: 2px solid #2c3540;
-  background: #1d242c;
+  border: 2px solid var(--line);
+  background: var(--surface);
   color: var(--muted);
   font-weight: 800;
   font-size: 0.9rem;
@@ -21,7 +21,7 @@
 .coach-mode-toggle button.active {
   border-color: var(--accent);
   color: var(--accent);
-  background: #241c05;
+  background: var(--coach-active-bg);
 }
 
 .exact-cards {
@@ -35,7 +35,7 @@
   display: inline-flex;
   gap: 6px;
   align-items: center;
-  background: #141a21;
+  background: var(--picker-bg);
   border-radius: 8px;
   padding: 6px 8px;
 }
@@ -49,9 +49,9 @@
 .card-picker select {
   min-height: 38px;
   border-radius: 6px;
-  border: 1px solid #444;
-  background: #0f1318;
-  color: var(--text);
+  border: 1px solid var(--picker-border);
+  background: var(--field-bg);
+  color: var(--body-text);
   padding: 2px 6px;
   font-size: 0.9rem;
 }
@@ -70,14 +70,14 @@
 }
 
 .board-picker {
-  background: #1d242c;
+  background: var(--surface);
   border-radius: 10px;
   padding: 10px;
   margin: 10px 0;
 }
 
 .board-street {
-  color: #4f9dff;
+  color: var(--coach-raise);
   font-weight: 800;
   font-size: 0.78rem;
   letter-spacing: 1px;
@@ -95,8 +95,8 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  background: #f7f4ec;
-  color: #111;
+  background: var(--card-face-alt);
+  color: var(--card-ink);
   font-weight: 800;
   font-size: 0.85rem;
   border-radius: 6px;
@@ -104,8 +104,8 @@
 }
 
 .chip-remove {
-  background: #c62828;
-  color: #fff;
+  background: var(--coach-bad-line);
+  color: var(--btn-ink);
   border: none;
   border-radius: 4px;
   width: 18px;
@@ -123,13 +123,13 @@
 }
 
 .ev-pos {
-  background: #10341f;
-  border-color: #2e7d32;
+  background: var(--coach-good-bg);
+  border-color: var(--coach-good-line);
 }
 
 .ev-neg {
-  background: #3a1216;
-  border-color: #c62828;
+  background: var(--coach-bad-bg);
+  border-color: var(--coach-bad-line);
 }
 
 .ev-row {
@@ -146,18 +146,18 @@
 }
 
 .ev-note {
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: 1px solid var(--coach-divider);
   margin-top: 6px;
   padding-top: 6px;
   font-size: 0.75rem;
-  color: #d8f5e6;
+  color: var(--coach-good-ink);
 }
 
 .outs-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 6px;
-  background: #141a21;
+  background: var(--picker-bg);
   border-radius: 8px;
   padding: 8px;
   margin: 8px 0;
@@ -166,14 +166,14 @@
 }
 
 .outs-grid b {
-  color: var(--text);
+  color: var(--body-text);
 }
 
 .coach-education {
-  background: #10341f;
+  background: var(--coach-good-bg);
   border-left: 3px solid var(--accent);
   border-radius: 6px;
   padding: 8px 10px;
   font-size: 0.85rem;
-  color: #e8e6e1;
+  color: var(--body-text);
 }

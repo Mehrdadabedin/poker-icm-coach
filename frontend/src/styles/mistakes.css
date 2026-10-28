@@ -4,10 +4,10 @@
 
 .mistakes-filter {
   padding: 6px 14px;
-  border: 1px solid #444;
+  border: 1px solid var(--review-field-border);
   border-radius: 20px;
-  background: #0f1318;
-  color: var(--text);
+  background: var(--review-field-bg);
+  color: var(--body-text);
   font-size: 0.82rem;
   cursor: pointer;
 }
@@ -18,17 +18,17 @@
 
 .mistake {
   padding: 14px 16px;
-  border: 1px solid #2b333d;
-  border-left: 4px solid #e53935;
+  border: 1px solid var(--review-card-border);
+  border-left: 4px solid var(--review-miss);
   border-radius: 10px;
-  background: #1d242c;
+  background: var(--surface);
 }
 
 /* a mistake in a hand the hero won (plan 070): still listed, softer edge */
-.mistake-won { border-left-color: #c9a227; }
+.mistake-won { border-left-color: var(--review-won-accent); }
 .mistake-won-tag {
-  padding: 1px 8px; border-radius: 12px; background: rgba(46, 125, 50, 0.25);
-  color: #a5d6a7; font-weight: 700; font-size: 0.7rem; letter-spacing: 1px;
+  padding: 1px 8px; border-radius: 12px; background: var(--review-good-badge-bg);
+  color: var(--review-good-text); font-weight: 700; font-size: 0.7rem; letter-spacing: 1px;
 }
 
 .mistake-head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; color: var(--muted); font-size: 0.8rem; }
@@ -36,9 +36,9 @@
 .mistake-street { text-transform: uppercase; letter-spacing: 1px; color: var(--accent); }
 
 .mistake-pressure { padding: 1px 8px; border-radius: 12px; font-weight: 700; font-size: 0.7rem; }
-.mistake-pressure-low { background: rgba(46, 125, 50, 0.2); color: #a5d6a7; }
-.mistake-pressure-medium { background: rgba(242, 193, 78, 0.18); color: #f2c14e; }
-.mistake-pressure-high, .mistake-pressure-very-high { background: rgba(229, 57, 53, 0.2); color: #ef9a9a; }
+.mistake-pressure-low { background: var(--review-pressure-low-bg); color: var(--review-good-text); }
+.mistake-pressure-medium { background: var(--review-pressure-mid-bg); color: var(--accent); }
+.mistake-pressure-high, .mistake-pressure-very-high { background: var(--review-pressure-high-bg); color: var(--review-bad-text); }
 
 .mistake-cards { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 10px 0 6px; }
 
@@ -46,20 +46,20 @@
   min-width: 34px;
   padding: 3px 6px;
   border-radius: 5px;
-  background: #f4f4f4;
-  color: #111;
+  background: var(--review-mini-card-face);
+  color: var(--review-mini-card-ink);
   font-weight: 800;
   text-align: center;
 }
 
-.mistake-card-red { color: #c62828; }
+.mistake-card-red { color: var(--review-mini-card-red); }
 
 .mistake-board-label { margin-left: 10px; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; }
 
 .mistake-spot { margin: 4px 0; color: var(--muted); font-size: 0.85rem; }
 
 .mistake-line { margin: 6px 0; font-size: 0.95rem; }
-.mistake-you { color: #ef9a9a; }
-.mistake-coach { color: #a5d6a7; }
+.mistake-you { color: var(--review-bad-text); }
+.mistake-coach { color: var(--review-good-text); }
 
-.mistake-why { margin: 4px 0 0; color: var(--text); font-size: 0.88rem; line-height: 1.45; }
+.mistake-why { margin: 4px 0 0; color: var(--body-text); font-size: 0.88rem; line-height: 1.45; }

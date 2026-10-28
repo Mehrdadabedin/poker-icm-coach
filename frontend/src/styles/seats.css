@@ -4,8 +4,8 @@
   position: absolute;
   width: 92px;
   min-height: 58px;
-  background: rgba(0, 0, 0, 0.42);
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--seat-bg);
+  border: 1px solid var(--seat-border);
   border-radius: 10px;
   padding: 4px 6px;
   font-size: 0.7rem;
@@ -19,7 +19,7 @@
 }
 
 .seat-hero {
-  outline: 2px solid #4f9dff;
+  outline: 2px solid var(--seat-hero-ring);
 }
 
 /* A17: widen the hero seat so two professional 52px hole cards fit without
@@ -28,12 +28,17 @@
   width: 120px;
 }
 
-.seat-folded {
-  opacity: 0.45;
+/* folded, out and lost seats get dimmer text and photo, not opacity: the seat box stays opaque
+   (a see-through box looks grey where it reaches past the felt onto a pale page) */
+.seat-folded :is(.seat-position, .seat-name, .seat-stack, .seat-bb, .seat-reveal-hand),
+.seat-out :is(.seat-position, .seat-name, .seat-stack, .seat-bb, .seat-reveal-hand),
+.seat-lost :is(.seat-position, .seat-name, .seat-stack, .seat-bb, .seat-reveal-hand) {
+  color: var(--seat-ink-dim);
 }
-
-.seat-out {
-  opacity: 0.55;
+.seat-folded .seat-bot-portrait,
+.seat-out .seat-bot-portrait,
+.seat-lost .seat-bot-portrait {
+  filter: grayscale(0.6) brightness(0.55);
 }
 
 .seat-position {
@@ -51,7 +56,7 @@
 
 .seat-stack {
   font-size: 0.66rem;
-  color: #d8f5e6;
+  color: var(--seat-text-green);
 }
 
 .seat-bb {
@@ -63,8 +68,8 @@
   bottom: -14px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--accent);
-  color: #241c05;
+  background: var(--accent-fill);
+  color: var(--btn-gold-ink);
   border-radius: 8px;
   padding: 1px 6px;
   font-size: 0.62rem;
@@ -74,7 +79,7 @@
 
 .seat-fold-label,
 .seat-out-label {
-  color: #ff8f8f;
+  color: var(--seat-fold-ink);
   font-weight: 800;
   font-size: 0.6rem;
 }
@@ -86,8 +91,8 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #fff;
-  color: #111;
+  background: var(--dealer-bg);
+  color: var(--dealer-ink);
   font-weight: 800;
   font-size: 0.65rem;
   display: flex;
@@ -117,42 +122,38 @@
 }
 
 .seat-status-won {
-  background: #2e7d32;
-  color: #fff;
+  background: var(--btn-call);
+  color: var(--btn-ink);
 }
 
 .seat-status-lost {
-  background: #c62828;
-  color: #fff;
+  background: var(--btn-fold);
+  color: var(--btn-ink);
 }
 
 .seat-status-allin {
-  background: #4f2683;
-  color: #fff;
+  background: var(--btn-allin);
+  color: var(--btn-ink);
 }
 
 .seat-status-action {
-  background: #1565c0;
-  color: #fff;
+  background: var(--btn-action-blue);
+  color: var(--btn-ink);
   font-size: 0.55rem;
 }
 
 .seat-won {
-  outline: 2px solid #2e7d32;
-  box-shadow: 0 0 12px rgba(46, 125, 50, 0.5);
-}
-
-.seat-lost {
-  opacity: 0.75;
+  outline: 2px solid var(--btn-call);
+  box-shadow: 0 0 12px var(--seat-won-glow);
 }
 
 .seat-allin {
-  border-color: #4f2683;
+  border-color: var(--btn-allin);
 }
 
 .seat-reveal-hand {
   font-size: 0.56rem;
-  color: #d8f5e6;
+  color: var(--seat-text-green);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -169,7 +170,7 @@
   width: 30px; height: 30px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--accent, #f2c14e); /* overridden per profile via inline style */
+  border: 2px solid var(--accent); /* overridden per profile via inline style */
   user-select: none;
 }
 

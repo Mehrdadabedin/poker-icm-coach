@@ -1,14 +1,14 @@
 /* The language menu (plan 093): small pills, the chosen one in gold. */
 .lang-menu { display: flex; justify-content: center; gap: 6px; margin: 14px 0 0; }
 .lang-menu button {
-  padding: 3px 12px; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 999px;
+  padding: 3px 12px; border: 1px solid var(--lang-border); border-radius: 999px;
   background: transparent; color: var(--muted); font-size: 0.78rem; cursor: pointer;
 }
 .lang-menu button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
 /* at the top of the landing page, in the black band, before Log in */
 .lm-header-band .lang-menu { margin: 0; gap: 4px; }
-.lm-header-band .lang-menu button { padding: 2px 8px; color: #c9cfd8; border-color: rgba(255, 255, 255, 0.25); }
-.lm-header-band .lang-menu button[aria-pressed="true"] { color: var(--lm-gold, #f2c14e); border-color: currentColor; }
+.lm-header-band .lang-menu button { padding: 2px 8px; color: var(--band-text); border-color: var(--lang-band-border); }
+.lm-header-band .lang-menu button[aria-pressed="true"] { color: var(--lm-gold); border-color: currentColor; }
 /* in the signed-in home header, beside "Playing as" */
 .app-header .lang-menu { margin: 0; gap: 4px; }
 .app-header .lang-menu button { padding: 2px 8px; }
