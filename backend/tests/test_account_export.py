@@ -27,12 +27,12 @@ def fresh_stores() -> None:
 
 def test_the_account_says_how_it_signs_in() -> None:
     assert login_client("ExportPass").get("/api/account").json() == {
-        "username": "ExportPass", "admin": False, "signIn": "password", "email": None}
+        "username": "ExportPass", "admin": False, "plan": "pro", "signIn": "password", "email": None}
     username = auth_registry.register_external("ExportGoogle", "google", "sub-export", "g@example.com")
     client = TestClient(app)
     client.headers["Authorization"] = f"Bearer {auth_store.login(username)}"
     assert client.get("/api/account").json() == {
-        "username": username, "admin": False, "signIn": "google", "email": "g@example.com"}
+        "username": username, "admin": False, "plan": "pro", "signIn": "google", "email": "g@example.com"}
 
 
 def test_the_export_holds_the_players_own_data_and_no_secrets() -> None:

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException
 
-from app.api.deps import require_user
+from app.api.deps import require_pro, require_user
 from app.api.routes_game import get_session
 from app.core.tournament_settings import settings as tournament_settings
 from app.icm.icm_engine import ICMEngine
@@ -49,14 +49,14 @@ def hand_view(r: HandHistoryRecord) -> dict:
 
 @router.get("/game/{table_id}/hands")
 def list_hands(table_id: str, stage: str | None = None,
-               user: str = Depends(require_user)) -> dict:
+               user: str = Depends(require_pro)) -> dict:
     session = get_session(table_id, user)
     records = session.history.filter(stage=stage) if stage else session.history.all()
     return {"hands": [hand_view(r) for r in records]}
 
 
 @router.get("/game/{table_id}/statistics")
-def session_statistics(table_id: str, user: str = Depends(require_user)) -> dict:
+def session_statistics(table_id: str, user: str = Depends(require_pro)) -> dict:
     session = get_session(table_id, user)
     stats = aggregate(session.history.all())
     return {
@@ -77,7 +77,7 @@ def session_statistics(table_id: str, user: str = Depends(require_user)) -> dict
 
 
 @router.get("/icm")
-def icm_calculate(stacks: str, payouts: str) -> dict:
+def icm_calculate(stacks: str, payouts: str, _: str = Depends(require_pro)) -> dict:
     """Query: /api/icm?stacks=45000,30000,20000&payouts=0.4,0.25,0.2,0.1,0.05"""
     try:
         stack_list = [int(x) for x in stacks.split(",") if x.strip()]

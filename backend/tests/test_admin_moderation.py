@@ -70,7 +70,8 @@ def test_suspend_signs_the_user_out_and_blocks_login(admin: TestClient) -> None:
         "/api/auth/login", json={"username": "ModTarget", "password": TEST_PASSWORD})
     assert refused.status_code == 403 and refused.json()["detail"] == "this account is suspended"
     assert _row(admin, "ModTarget") == {
-        "username": "ModTarget", "provider": "local", "suspended": True, "admin": False}
+        "username": "ModTarget", "provider": "local", "suspended": True, "admin": False,
+        "plan": "pro"}
 
     assert admin.post("/api/admin/users/ModTarget/unsuspend").status_code == 200
     assert _password_login("ModTarget") == 200
@@ -100,7 +101,7 @@ def test_delete_removes_the_account_its_logins_and_its_tables(admin: TestClient)
     assert response.json() == {
         "username": "ModGone", "deleted": True, "logins_revoked": 2, "tables_closed": 1,
         "history_deleted": 0,  # no history database in the test suite (plan 076)
-        "portrait_deleted": 0, "profile_deleted": 0}
+        "portrait_deleted": 0, "profile_deleted": 0, "plan_deleted": 0}
     assert session_store.get(table_id) is None, "the deleted user's table is still live"
     assert target.get("/api/auth/me").status_code == 401
     assert _password_login("ModGone") == 401

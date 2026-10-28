@@ -125,14 +125,14 @@ def test_table_routes_require_an_authenticated_user() -> None:
             requires_user = any(
                 isinstance(d, ast.Call) and isinstance(d.func, ast.Name)
                 and d.func.id == "Depends"
-                and any(isinstance(a, ast.Name) and a.id == "require_user"
+                and any(isinstance(a, ast.Name) and a.id in ("require_user", "require_pro")
                         for a in d.args)
                 for d in args.defaults
             )
             if takes_table and not requires_user:
                 offenders.append(f"{name}:{node.name}")
     assert not offenders, (
-        f"table routes without require_user: {offenders}"
+        f"table routes without require_user or require_pro: {offenders}"
     )
 
 

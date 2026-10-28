@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from app.api.deps import require_user
+from app.api.deps import require_pro, require_user
 from app.core.config import settings
 from app.core.tournament_settings import settings as tournament_settings
 from app.poker.card import Card, parse_rank, parse_suit
@@ -18,6 +18,7 @@ from app.schemas.game_schemas import (
     Position,
     TournamentCreateRequest,
 )
+from app.services.bot_lineup import resolve_bots
 from app.services.game_session import GameSession
 from app.services.session_coach import advice_dict
 from app.services.session_store import session_store
@@ -50,32 +51,10 @@ def create_tournament(request: TournamentCreateRequest,
     # max(1.0, float(...)), so a bool always collapses to 1.0 and silently
     # discards whatever multiplier the client asked for.
     fast = request.fast_mode
-    # A26: optional BOT profile (validated here so unknown names fail cleanly).
-    bot_profile: str | None = None
-    if request.profile is not None:
-        from app.ai.personalities import profile_for
-
-        try:
-            profile_for(request.profile)
-        except KeyError as exc:
-            raise HTTPException(status_code=422, detail="unknown bot profile") from exc
-        bot_profile = request.profile
-    # A27: optional explicit BOT lineup. Exactly 8 personalities (one per
-    # opponent seat); each name must be a known archetype.
-    bot_profiles: list[str] | None = None
-    if request.bots is not None:
-        from app.ai.personalities import profile_for
-
-        if len(request.bots) != 8:
-            raise HTTPException(status_code=422,
-                                detail="bots must contain exactly 8 profiles")
-        for name in request.bots:
-            try:
-                profile_for(name)
-            except KeyError as exc:
-                raise HTTPException(status_code=422,
-                                    detail=f"unknown bot profile: {name}") from exc
-        bot_profiles = request.bots
+    try:
+        bot_profile, bot_profiles = resolve_bots(user, request.profile, request.bots)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     session = GameSession(
         fast_mode=fast,
         starting_stack=starting_stack,
@@ -143,7 +122,7 @@ def next_hand(table_id: str, user: str = Depends(require_user)) -> dict:
 
 
 @router.post("/game/{table_id}/coach", response_model=CoachResponseModel)
-def coach_advice(table_id: str, user: str = Depends(require_user)) -> dict:
+def coach_advice(table_id: str, user: str = Depends(require_pro)) -> dict:
     session = get_session(table_id, user)
     try:
         return session.coach_advice()
@@ -152,7 +131,7 @@ def coach_advice(table_id: str, user: str = Depends(require_user)) -> dict:
 
 
 @router.post("/game/{table_id}/coach/compare")
-def coach_compare(table_id: str, user: str = Depends(require_user)) -> dict:
+def coach_compare(table_id: str, user: str = Depends(require_pro)) -> dict:
     result = get_session(table_id, user).grade_hero()
     if result is None:
         raise HTTPException(status_code=400, detail="hero has not acted yet")
@@ -160,7 +139,8 @@ def coach_compare(table_id: str, user: str = Depends(require_user)) -> dict:
 
 
 @router.post("/coach/advice", response_model=CoachResponseModel)
-def standalone_coach_advice(request: CoachAdviceRequest) -> dict:
+def standalone_coach_advice(request: CoachAdviceRequest,
+                            _: str = Depends(require_pro)) -> dict:
     """Coach advice from a caller-supplied decision point (validated input)."""
 
     def to_card(model) -> Card:
@@ -181,7 +161,7 @@ def standalone_coach_advice(request: CoachAdviceRequest) -> dict:
 
 
 @router.get("/coach/hands")
-def coach_hands() -> dict:
+def coach_hands(_: str = Depends(require_pro)) -> dict:
     """All 169 starting-hand classes with a representative exact combo each."""
     from app.strategy.hand_classes import all_starting_hands
 
@@ -190,7 +170,8 @@ def coach_hands() -> dict:
 
 @router.get("/ranges", response_model=RangeGridResponse)
 def ranges(position: Position = "BTN",
-           stack_bb: int = Query(default=30, ge=2, le=200)) -> dict:
+           stack_bb: int = Query(default=30, ge=2, le=200),
+           _: str = Depends(require_pro)) -> dict:
     matrix = matrix_for_position(position, stack_bb)
     return {
         "position": position,

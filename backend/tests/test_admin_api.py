@@ -12,7 +12,7 @@ from app.main import app
 from app.services.user_registry import auth_registry
 from tests.api_helpers import TEST_PASSWORD, register_user
 
-SAFE_FIELDS = {"username", "provider", "suspended", "admin"}
+SAFE_FIELDS = {"username", "provider", "suspended", "admin", "plan"}
 
 
 def _login(username: str) -> TestClient:
@@ -71,8 +71,10 @@ def test_admin_user_list_safe_fields(monkeypatch) -> None:
     assert r.status_code == 200
     body = r.json()
     assert body["users"] == [
-        {"username": "alice", "provider": "google", "suspended": False, "admin": False},
-        {"username": "bob", "provider": "local", "suspended": False, "admin": False},
+        {"username": "alice", "provider": "google", "suspended": False, "admin": False,
+         "plan": "pro"},
+        {"username": "bob", "provider": "local", "suspended": False, "admin": False,
+         "plan": "pro"},
     ]
     assert body["total"] == 2 and body["limit"] == 50 and body["offset"] == 0
     # safe shape: exactly these four fields, nothing else anywhere

@@ -1,11 +1,9 @@
 """Issue #7 — coach advice street/board validation."""
 from __future__ import annotations
 
-from fastapi.testclient import TestClient
+from tests.api_helpers import login_client
 
-from app.main import app
-
-client = TestClient(app)
+client = login_client("StreetCheck")
 
 _BOARD = [
     {"rank": "2", "suit": "c"}, {"rank": "3", "suit": "d"}, {"rank": "4", "suit": "h"},

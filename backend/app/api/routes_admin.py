@@ -11,8 +11,10 @@ from collections.abc import Callable
 from fastapi import APIRouter, Depends, HTTPException, Path, Query
 
 from app.api.deps import require_admin
-from app.services import account_admin
+from app.schemas.plan_schemas import PlanIn
+from app.services import account_admin, plans
 from app.services import user_registry_admin as accounts
+from app.services.user_registry import auth_registry
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -49,7 +51,8 @@ def list_users(
     return {
         "users": [
             {"username": row.username, "provider": row.provider,
-             "suspended": row.suspended, "admin": row.admin}
+             "suspended": row.suspended, "admin": row.admin,
+             "plan": plans.plan_for(row.username)}
             for row in page
         ],
         "total": len(all_rows),
@@ -86,3 +89,12 @@ def delete_user(username: str = Username, admin: str = Depends(require_admin)) -
     """Delete an account, its logins and its live tables."""
     removed = _moderate(account_admin.delete, username, admin)
     return {"username": username, "deleted": True, **removed}
+
+
+@router.put("/users/{username}/plan")
+def set_user_plan(body: PlanIn, username: str = Username,
+                  _: str = Depends(require_admin)) -> dict:
+    """Set a player to Pro or Free by hand (testers, friends, refunds)."""
+    if not auth_registry.has_account(username):
+        raise HTTPException(status_code=404, detail="user not found")
+    return {"username": username, "plan": plans.set_plan(username, body.plan).plan}
