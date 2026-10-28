@@ -7,6 +7,7 @@ import time
 import uuid
 
 from app.ai.ai_framework import AIDecisionProvider
+from app.core.deal_seed import new_rng
 from app.game.actions import Action, ActionType
 from app.game.hand_engine import HandEngine
 from app.services.elimination import apply_reentry_or_elimination, is_final_hand
@@ -47,7 +48,7 @@ class GameSession:
             starting_stack=starting_stack, small_blind=small_blind,
             big_blind=big_blind, level_minutes=level_minutes, hero_name=hero_name)
         self.hero_seat = 0
-        self.rng = rng or random.Random()
+        self.rng = rng or new_rng()
         self.provider = AIDecisionProvider(rng=self.rng)
         self.bot_profile = bot_profile
         self.bot_profiles = bot_profiles

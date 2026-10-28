@@ -1,0 +1,121 @@
+{
+ "url": "icmbot.one",
+ "end": {
+  "line": "Tournament practice with an ICM coach",
+  "tag": "START FREE",
+  "button": "icmbot.one",
+  "seconds": 5
+ },
+ "shots": [
+  {
+   "take": "co",
+   "from": [
+    "dealt",
+    -0.3
+   ],
+   "dur": 2.0,
+   "text": "BEGINNER TO FINAL TABLE",
+   "hook": true
+  },
+  {
+   "take": "co",
+   "from": [
+    "coach",
+    0.0
+   ],
+   "dur": 2.0,
+   "text": "THE COACH SAYS WHY"
+  },
+  {
+   "take": "co",
+   "from": [
+    "gloss",
+    -0.4
+   ],
+   "dur": 2.0,
+   "text": "LEARN EVERY TERM"
+  },
+  {
+   "take": "co",
+   "from": [
+    "grade",
+    -0.3
+   ],
+   "dur": 2.0,
+   "text": "PLAY. GET GRADED."
+  },
+  {
+   "take": "co",
+   "from": [
+    "raise-pick",
+    -0.9
+   ],
+   "dur": 2.0,
+   "text": "SIZES IN BB",
+   "y": 450
+  },
+  {
+   "take": "shove",
+   "from": [
+    "shove-turn",
+    0.0
+   ],
+   "dur": 2.0,
+   "text": "PUSH/FOLD RANGES"
+  },
+  {
+   "take": "icm",
+   "from": [
+    "icm-turn",
+    0.0
+   ],
+   "dur": 3.0,
+   "text": "ICM ON ALL-IN CALLS"
+  },
+  {
+   "take": "champion",
+   "from": [
+    "bubble-turn",
+    0.0
+   ],
+   "dur": 2.0,
+   "text": "BUBBLE. FINAL TABLE."
+  },
+  {
+   "take": "champion",
+   "from": [
+    "champion",
+    0.3
+   ],
+   "dur": 2.0,
+   "text": "PLAY TO THE FINAL TABLE"
+  },
+  {
+   "take": "study",
+   "from": [
+    "mistakes",
+    0.0
+   ],
+   "dur": 2.0,
+   "text": "FIX YOUR MISTAKES"
+  },
+  {
+   "take": "study",
+   "from": [
+    "report",
+    0.0
+   ],
+   "dur": 2.0,
+   "text": "FIND YOUR LEAKS"
+  },
+  {
+   "take": "study",
+   "from": [
+    "tools",
+    0.0
+   ],
+   "dur": 2.0,
+   "text": "STUDY TOOLS"
+  }
+ ]
+}

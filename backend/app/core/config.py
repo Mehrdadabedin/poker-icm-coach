@@ -30,6 +30,8 @@ class Settings(BaseSettings):
     starting_big_blind: int = 100
     blind_level_minutes: int = 20
     fast_mode: bool = False
+    # Only for recording the ad video (scripts/ad-video). Never set on Render.
+    deal_seed: int | None = None
     history_dir: str = "data/history"
     auth_users_file: str = "data/users.json"
     auth_sessions_file: str = "data/sessions.json"
