@@ -55,16 +55,14 @@ The owner (28 Oct), held until the Phase 2 look was live (099, 101, 103):
   x from 285 to 915), so the layout has two zones:
   - inside that square, whole and readable: the ICMBOT logo on top and a
     phone frame with a real 390 x 844 screenshot of a live table on an
-    upright phone: the coach strip saying RAISE or CALL (the script deals
+    upright phone, cut just below the bet controls so no empty page shows: the coach strip saying RAISE or CALL (the script deals
     until the coach says one of those), all 9 seats and the action buttons.
     In the Spanish card the app is in Spanish (`?lang=es`);
   - left of the square: the headline ("Tournament poker practice with an ICM
     coach" / "Práctica de póker de torneos con un coach ICM"), at 44 px over
     several lines because the zone is 245 px wide (the earlier rule of 2
     lines at 64 px does not fit beside the square);
-  - right of the square: three short lines with a gold tick: "9 players, 8
-    bots", "The coach explains every decision", "Start free" (Spanish: "9
-    jugadores, 8 bots", "El coach explica cada decisión", "Empieza gratis").
+  - right of the square: three short lines with a gold tick, the first on one line (smaller type than the headline): "9 players · 8 bots", "The coach explains every decision", "Start free" (Spanish: "9 jugadores · 8 bots", "El coach explica cada decisión", "Empieza gratis").
   The headline and the lines may be cut in the small view; the logo and the
   phone may not. The full 1200 x 630 card must still read well, at 500 px
   wide too (how big it shows in a chat). The script writes a 300 px copy of
