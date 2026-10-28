@@ -2,7 +2,7 @@
 
 .seat {
   position: absolute;
-  width: 92px;
+  width: 110px;
   min-height: 58px;
   background: var(--seat-bg);
   border: 1px solid var(--seat-border);
@@ -10,6 +10,9 @@
   padding: 4px 6px;
   font-size: 0.7rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   transition: border-color 0.2s;
 }
 
@@ -25,7 +28,7 @@
 /* A17: widen the hero seat so two professional 52px hole cards fit without
    overflowing into neighbours (placement.css .seat rules are lower specificity). */
 .seat.seat-hero {
-  width: 120px;
+  width: 130px;
 }
 
 /* folded, out and lost seats get dimmer text and photo, not opacity: the seat box stays opaque
@@ -44,10 +47,22 @@
 .seat-position {
   color: var(--accent);
   font-weight: 700;
-  font-size: 0.62rem;
+  font-size: 0.6rem;
+  line-height: 1.2;
+}
+
+/* the photo beside the name, never over it (plan 106) */
+.seat-who {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .seat-name {
+  min-width: 0;
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
@@ -56,10 +71,12 @@
 
 .seat-stack {
   font-size: 0.66rem;
+  white-space: nowrap;
   color: var(--seat-text-green);
 }
 
 .seat-bb {
+  font-size: 0.85em;
   color: var(--muted);
 }
 
@@ -161,19 +178,13 @@
 }
 
 
-/* A35: small circular BOT profile portrait inside existing BOT seats.
-   Absolute positioning keeps the seat box, placement and content untouched.
-   The hero seat shows the player's own photo here once an Admin approved it (plan 094). */
+/* A35: small circular BOT profile portrait, beside the name (plan 106).
+   The hero's seat shows the player's own photo here once an Admin approved it (plan 094). */
 .seat-bot-portrait {
-  position: absolute;
-  top: 2px; right: 3px;
-  width: 30px; height: 30px;
+  flex: 0 0 auto;
+  width: 22px; height: 22px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--accent); /* overridden per profile via inline style */
   user-select: none;
-}
-
-@media (max-width: 640px) {
-  .seat-bot-portrait { width: 28px; height: 28px; top: 1px; right: 2px; }
 }

@@ -32,7 +32,6 @@ export function TablePage() {
   const { state, error, nextHand, acting, refresh: refreshTable } = useGame(tableId);
   const { countdown, paused, start, stop, pause, resume } = useAutoNext(nextHand, REVIEW_SECONDS);
   const [coachHidden, setCoachHidden] = useState(false);
-  const [historyHidden, setHistoryHidden] = useState(false);
   const { actionLabels, resultLabels } = useDisplayPreferences();
   const lineup = useMemo(() => {
     const profiles = (state?.players ?? [])
@@ -151,7 +150,6 @@ export function TablePage() {
       showResultLabels={resultLabels}
       nameBySeat={new Map(state.players.map((p) => [p.seat, p.name]))}
       coachCollapsed={coachHidden}
-      historyCollapsed={historyHidden}
       reviewOpen={showReview}
       username={getUsername()}
       onHome={() => navigate("/")}
@@ -166,7 +164,6 @@ export function TablePage() {
       onBackReview={() => setShowReview(false)}
       onAction={(kind, amount) => void onAction(kind, amount)}
       onToggleCoach={() => setCoachHidden((v) => !v)}
-      onToggleHistory={() => setHistoryHidden((v) => !v)}
     />
   );
 }

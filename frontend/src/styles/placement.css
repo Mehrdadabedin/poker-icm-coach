@@ -41,7 +41,7 @@ removed from the DOM (A43), and nth-child would shift every later seat.
 
 @media (min-width: 641px) and (max-width: 900px) {
   .seat {
-    width: 84px;
+    width: 100px;
   }
 }
 
@@ -52,12 +52,5 @@ removed from the DOM (A43), and nth-child would shift every later seat.
   }
   .board {
     top: 44%;
-  }
-}
-
-@media (min-width: 960px) {
-  .seat {
-    width: 84px;
-    min-height: 52px;
   }
 }

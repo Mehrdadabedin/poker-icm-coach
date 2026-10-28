@@ -33,6 +33,7 @@
   --winner-place-bg: #0a141c; /* fixed */
 
   --table-header-bg: rgba(29, 36, 44, 0.7);
+  --history-panel-bg: rgba(16, 20, 26, 0.78);
   --coach-raise: #4f9dff;
   --coach-raise-soft: #8fc1ff;
   --coach-street: #9fc5ff;
@@ -79,6 +80,7 @@
 :root[data-theme="light"] {
   --wl-track: #e5e3dc;
   --table-header-bg: rgba(255, 255, 255, 0.7);
+  --history-panel-bg: rgba(255, 255, 255, 0.78);
   --coach-raise: #0b5cc4;
   --coach-raise-soft: #0b5cc4;
   --coach-street: #0b5cc4;

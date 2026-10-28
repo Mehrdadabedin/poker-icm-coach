@@ -80,11 +80,11 @@ describe("the Free table", () => {
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
 
-  it("shows a locked line instead of the statistics", async () => {
+  it("shows a locked line under Last hands instead of the statistics", async () => {
     render(await table());
     await settle();
-    expect(screen.getByTestId("locked-line")).toBeInTheDocument();
-    fireEvent.change(screen.getByTestId("history-view-select"), { target: { value: "analysis" } });
+    fireEvent.click(screen.getByTestId("history-chip"));
+    fireEvent.click(screen.getByTestId("drawer-tab-last"));
     expect(screen.getByTestId("locked-line")).toBeInTheDocument();
   });
 });

@@ -1,0 +1,24 @@
+/* Parts the history drawer (upright phone) and the history panel (wide screens, plan 106) share. */
+.coach-sheet-head, .drawer-head { display: flex; align-items: center; gap: 10px; }
+.sheet-x { width: 44px; height: 44px; margin: -8px -6px -8px 0; border: 0; background: none; color: var(--text-muted); font-size: 1.6rem; cursor: pointer; }
+.drawer-tabs { display: flex; flex: 1 1 auto; gap: 6px; }
+.drawer-tab { min-height: 44px; padding: 0 8px; font-size: 0.85rem; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--text-muted); font: inherit; font-weight: 700; cursor: pointer; }
+.drawer-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+.drawer-body { overflow-y: auto; min-height: 0; }
+.drawer-body .action-history { margin: 0; }
+
+/* the round buttons at the right end of the first status line */
+.table-header .tbl-chips { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+.tbl-chip {
+  position: relative; display: grid; place-items: center; flex: 0 0 auto; width: 36px; height: 36px; padding: 0;
+  border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--accent); font: inherit; cursor: pointer;
+}
+.tbl-chip::after { content: ""; position: absolute; inset: -4px; }
+.tbl-chip svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.tbl-chip-i { font-style: italic; font-family: Georgia, serif; font-size: 1rem; font-weight: 700; }
+.tbl-chip-grade-PREFERRED { border-color: var(--coach-pos); border-width: 2px; }
+.tbl-chip-grade-ACCEPTABLE { border-color: var(--accent); border-width: 2px; }
+.tbl-chip-grade-SUBOPTIMAL { border-color: var(--coach-neg); border-width: 2px; }
+.tbl-chip .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.tbl-chip[aria-expanded="true"] { background: var(--accent-fill); color: var(--accent-ink); }
+

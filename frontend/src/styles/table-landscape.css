@@ -45,8 +45,8 @@
   .table-felt .seat .seat-cards .playing-card { width: 24px; }
   .table-felt .seat .seat-stack { font-size: 0.5rem; }
   .table-felt .seat .dealer-button { width: 13px; height: 13px; font-size: 0.48rem; }
-  /* the bot portrait covered the name and the stack: a badge on the corner */
-  .table-felt .seat .seat-bot-portrait { width: 18px; height: 18px; top: -7px; right: -7px; border-width: 1px; }
+  /* the photo sits beside the name (plan 106) */
+  .table-felt .seat .seat-bot-portrait { width: 14px; height: 14px; border-width: 1px; }
   /* the cards the player reads: 44px, overlapped so the seat stays narrow */
   .table-felt .seat.seat-hero { width: 17%; }
   .table-felt .seat.seat-hero .seat-cards { gap: 0; }
