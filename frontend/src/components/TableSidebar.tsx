@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { Card, CoachAdvice, HandHistoryEntry, TableAction } from "../models/game";
-import { request } from "../services/api";
+import { useState } from "react";
+import { Card, CoachAdvice, TableAction } from "../models/game";
+import { useTableHands } from "../hooks/useTableHands";
 import { usePlan } from "../services/plan";
 import { ActionHistory, HistoryView } from "./ActionHistory";
 import { LockedCoachChip } from "./LockedCoach";
@@ -34,24 +34,7 @@ export function TableSidebar({ actions, heroSeat, nameBySeat, coach, heroCards, 
   const plan = usePlan();
   const locked = plan.known && !plan.pro;
   const [view, setView] = useState<HistoryView>("history");
-  const [hands, setHands] = useState<HandHistoryEntry[] | null>(null);
-
-  // Read-only, per-table: fetch when handNumber advances (a hand completed),
-  // not on the 350 ms state poll and not on a view switch.
-  useEffect(() => {
-    if (locked || plan.loading) return undefined;
-    let cancelled = false;
-    request<{ hands: HandHistoryEntry[] }>(`/api/game/${encodeURIComponent(tableId)}/hands`)
-      .then((data) => {
-        if (!cancelled) setHands(data.hands);
-      })
-      .catch(() => {
-        if (!cancelled) setHands([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [tableId, handNumber, locked, plan.loading]);
+  const hands = useTableHands(tableId, handNumber, !locked && !plan.loading);
 
   return (
     <div className="table-cols">

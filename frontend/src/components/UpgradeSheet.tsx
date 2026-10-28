@@ -1,6 +1,5 @@
-import { useEffect } from "react";
+import { useDismiss } from "../hooks/useDismiss";
 import { closeUpgrade, useUpgradeOpen } from "../services/upgrade";
-import { inAndroidApp } from "../services/platform";
 import { useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/messages/en";
 
@@ -11,26 +10,7 @@ const TICKS: MessageKey[] = ["plans.sheet.tick1", "plans.sheet.tick2", "plans.sh
 export function UpgradeSheet() {
   const open = useUpgradeOpen();
   const t = useT();
-  useEffect(() => {
-    if (!open) return undefined;
-    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") closeUpgrade(); };
-    document.addEventListener("keydown", onKey);
-    let stopped = false;
-    let remove: (() => Promise<void>) | undefined;
-    if (inAndroidApp()) {
-      void import("@capacitor/app").then(async ({ App }) => {
-        const handle = await App.addListener("backButton", () => closeUpgrade());
-        if (stopped) return handle.remove();
-        remove = () => handle.remove();
-        return undefined;
-      });
-    }
-    return () => {
-      stopped = true;
-      document.removeEventListener("keydown", onKey);
-      void remove?.();
-    };
-  }, [open]);
+  useDismiss(open, closeUpgrade);
   if (!open) return null;
   return (
     <div className="sheet-scrim" onClick={closeUpgrade} data-testid="upgrade-scrim">

@@ -21,8 +21,9 @@ import { glossaryTerms } from "./en/glossaryTerms";
 import { tabs } from "./en/tabs";
 import { theme } from "./en/theme";
 import { plans } from "./en/plans";
+import { tableStrip } from "./en/tableStrip";
 
-export const en = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools, ...practice, ...portrait, ...portraitPrompt, ...profile, ...glossary, ...glossaryTerms, ...tabs, ...theme, ...plans };
+export const en = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools, ...practice, ...portrait, ...portraitPrompt, ...profile, ...glossary, ...glossaryTerms, ...tabs, ...theme, ...plans, ...tableStrip };
 
 export type MessageKey = keyof typeof en;
 export type Messages = Record<MessageKey, string>;
