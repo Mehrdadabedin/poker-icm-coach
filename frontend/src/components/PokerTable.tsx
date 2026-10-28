@@ -14,6 +14,10 @@ interface PokerTableProps {
   cover?: React.ReactNode;
   /** Right before the felt: the coach card on phones (plans 087, 089). */
   top?: React.ReactNode;
+  /** The right end of the first status line: the chips of an upright phone (plan 101). */
+  trail?: React.ReactNode;
+  /** The second status line is hidden (an upright phone, details off). */
+  detailsHidden?: boolean;
 }
 
 const TAGS: Record<string, MessageKey> = {
@@ -21,7 +25,7 @@ const TAGS: Record<string, MessageKey> = {
 };
 
 /** The 9-seat poker table: seats, community board, pot, header info. */
-export function PokerTable({ state, children, overlay, cover, top }: PokerTableProps) {
+export function PokerTable({ state, children, overlay, cover, top, trail, detailsHidden }: PokerTableProps) {
   const t = useT();
   // A43: an eliminated BOT leaves the felt entirely; the hero seat stays.
   const sorted = [...state.players]
@@ -66,8 +70,9 @@ export function PokerTable({ state, children, overlay, cover, top }: PokerTableP
         <span className="tbl-info" data-testid="pot-amount">
           {t("status.pot", { n: formatChips(state.pot) })}
         </span>
+        {trail}
       </div>
-      <div className="table-status" data-testid="table-status">
+      <div className="table-status" id="table-details" hidden={detailsHidden} data-testid="table-status">
         <span className="tbl-info">{t("status.hand", { n: state.handNumber })}</span>
         {state.playersRemaining !== undefined && (
           <span className="tbl-info" data-testid="players-remaining">

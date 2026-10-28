@@ -2,7 +2,7 @@
 id: 101
 title: Table with the Coach on Top
 phase: 8
-status: planned
+status: in-progress
 depends_on: [087, 097, 100]
 test_file: frontend/tests/coach_strip.test.tsx
 implementation_files: [frontend/src/components/CoachStrip.tsx, frontend/src/components/TableDrawer.tsx, frontend/src/components/LiveTableView.tsx, frontend/src/components/TableSidebar.tsx, frontend/src/components/MobileCoachCard.tsx, frontend/src/styles/table-phone.css, frontend/src/i18n/messages/en/table.ts, frontend/src/i18n/messages/es/table.ts]

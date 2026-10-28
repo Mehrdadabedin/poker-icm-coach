@@ -5,6 +5,12 @@ import { HeroControls } from "./HeroControls";
 import { useIsFree } from "../services/plan";
 import { LockedCoachChip } from "./LockedCoach";
 import { MobileCoachCard } from "./MobileCoachCard";
+import { BotKey } from "./BotKey";
+import { CoachStrip } from "./CoachStrip";
+import { HistoryDrawer } from "./HistoryDrawer";
+import { TableChips } from "./TableChips";
+import { usePhoneTable } from "../hooks/usePhoneTable";
+import { useUprightPhone } from "../hooks/useUprightPhone";
 import { PokerTable } from "./PokerTable";
 import { TableHeader } from "./TableHeader";
 import { TableSidebar } from "./TableSidebar";
@@ -45,12 +51,14 @@ export interface LiveTableViewProps {
 export function LiveTableView(props: LiveTableViewProps) {
   const t = useT();
   const free = useIsFree();
+  const upright = useUprightPhone();
   const {
     state, overlay, cover, coach, comparison, countdown, paused, acting, showLabels,
     showResultLabels, nameBySeat, coachCollapsed, historyCollapsed, reviewOpen,
     username, onHome, onMistakes, onLogout, onTogglePause, onReview, onNext, onBackReview,
     onAction, onToggleCoach, onToggleHistory,
   } = props;
+  const phone = usePhoneTable(upright ? comparison : null);
   const hero = state.players.find((p) => p.isHero);
   const handOver = state.phase === "handOver" && !!state.review;
   const isReview = handOver && reviewOpen;
@@ -83,7 +91,17 @@ export function LiveTableView(props: LiveTableViewProps) {
       ) : (
         <>
           <PokerTable state={state} overlay={overlay} cover={cover}
-            top={free ? <LockedCoachChip place="top" /> : coachNow ? <MobileCoachCard coach={coachNow} heroCards={hero?.holeCards} /> : null}>
+            top={upright ? (free ? <LockedCoachChip place="top" /> : phone.stripOpen && (
+              <CoachStrip coach={coachNow} heroCards={hero?.holeCards} grade={phone.grade} sheetOpen={phone.sheetOpen}
+                onSheet={phone.setSheetOpen} onFold={() => phone.setStripOpen(false)} />
+            )) : free ? <LockedCoachChip place="top" /> : coachNow ? <MobileCoachCard coach={coachNow} heroCards={hero?.holeCards} /> : null}
+            trail={upright && (
+              <TableChips detailsOpen={phone.details} onDetails={() => phone.setDetails(!phone.details)}
+                onHistory={() => phone.setDrawerOpen(true)}
+                coachChip={!free && !phone.stripOpen ? { grade: phone.grade, onClick: () => phone.setStripOpen(true) } : null} />
+            )}
+            detailsHidden={upright && !phone.details}>
+            {upright && free && <BotKey />}
             {cover ? null : handOver && state.review ? (
               <HandResult
                 review={state.review}
@@ -109,13 +127,16 @@ export function LiveTableView(props: LiveTableViewProps) {
                 onAction={(kind: ActionKind, amount?: number) => onAction(kind, amount)}
               />
             )}
-            {comparison && !handOver && (
+            {comparison && !handOver && !upright && (
               <div className="comparison-box" data-testid="comparison">
                 <b>{gradeLine(comparison, t).grade}</b> — {gradeLine(comparison, t).text}
               </div>
             )}
           </PokerTable>
-          {!handOver && (
+          {upright ? (
+            <HistoryDrawer open={phone.drawerOpen} onClose={() => phone.setDrawerOpen(false)} actions={state.actionLog ?? []}
+              heroSeat={state.heroSeat} nameBySeat={nameBySeat} tableId={state.tableId} handNumber={state.handNumber} locked={free} />
+          ) : !handOver && (
             <TableSidebar
               actions={state.actionLog ?? []}
               heroSeat={state.heroSeat}

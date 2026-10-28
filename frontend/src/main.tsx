@@ -35,6 +35,7 @@ import "./styles/brand.css";
 import "./styles/mobile.css";
 import "./styles/table-menu.css";
 import "./styles/table-landscape.css";
+import "./styles/table-phone.css";
 import "./styles/analytics-consent.css";
 import "./styles/admin.css";
 import "./styles/admin-moderation.css";

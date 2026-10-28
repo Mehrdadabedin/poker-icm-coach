@@ -1,0 +1,54 @@
+import { useState } from "react";
+import type { TableAction } from "../models/game";
+import { ActionHistory } from "./ActionHistory";
+import { LockedLine } from "./LockedCoach";
+import { OverallPerformance } from "./WinLoseAnalysis";
+import { useDismiss } from "../hooks/useDismiss";
+import { useTableHands } from "../hooks/useTableHands";
+import { useT } from "../i18n/I18n";
+
+interface HistoryDrawerProps {
+  open: boolean;
+  onClose: () => void;
+  actions: TableAction[];
+  heroSeat: number;
+  nameBySeat: Map<number, string>;
+  tableId: string;
+  handNumber: number;
+  /** Free plan: the completed hands are Pro */
+  locked: boolean;
+}
+
+/** The hand history from the bottom of an upright phone (plan 101): this hand's
+ * actions and the last hands. It closes with its button, a tap outside, Escape
+ * and the Android back button. */
+export function HistoryDrawer({ open, onClose, actions, heroSeat, nameBySeat, tableId, handNumber, locked }: HistoryDrawerProps) {
+  const t = useT();
+  const [tab, setTab] = useState<"hand" | "last">("hand");
+  const hands = useTableHands(tableId, handNumber, open && !locked);
+  useDismiss(open, onClose);
+  if (!open) return null;
+  return (
+    <div className="drawer-scrim" onClick={onClose} data-testid="history-scrim">
+      <div className="drawer" role="dialog" aria-modal="true" aria-label={t("drawer.title")} onClick={(e) => e.stopPropagation()} data-testid="history-drawer">
+        <span className="drawer-handle" aria-hidden="true" />
+        <div className="drawer-head">
+          <div className="drawer-tabs" role="tablist">
+            {(["hand", "last"] as const).map((id) => (
+              <button key={id} type="button" role="tab" aria-selected={tab === id} className="drawer-tab"
+                onClick={() => setTab(id)} data-testid={`drawer-tab-${id}`}>
+                {t(id === "hand" ? "drawer.thisHand" : "drawer.lastHands")}
+              </button>
+            ))}
+          </div>
+          <button type="button" className="sheet-x" aria-label={t("strip.close")} onClick={onClose} data-testid="history-close">×</button>
+        </div>
+        <div className="drawer-body">
+          {tab === "hand" ? (
+            <ActionHistory actions={actions} heroSeat={heroSeat} nameBySeat={nameBySeat} />
+          ) : locked ? <LockedLine /> : <OverallPerformance hands={hands ?? []} loading={hands === null} />}
+        </div>
+      </div>
+    </div>
+  );
+}

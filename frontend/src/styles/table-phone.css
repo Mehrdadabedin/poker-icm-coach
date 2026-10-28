@@ -1,0 +1,74 @@
+/* The table on an upright phone (plan 101): status chips, coach strip and
+   sheet, history drawer, bot key. Wide screens and landscape phones keep their
+   layouts; none of this is rendered there. */
+@media (max-width: 767px) and (max-aspect-ratio: 4/3) {
+  /* the second line floats over the strip, so showing it never pushes the buttons off the screen */
+  .table-wrap > .table-status { position: absolute; top: 49px; left: 0; right: 0; z-index: 30; margin: 0; border: 1px solid var(--line); background: var(--surface); }
+  .table-status[hidden] { display: none; }
+  .table-wrap > .table-felt { border-width: 6px; gap: 4px; }
+  .table-wrap > .table-header { margin-bottom: 4px; }
+  .hero-controls { padding: 4px 6px; margin-top: 0; }
+  .table-header .tbl-chips { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+  .tbl-chip {
+    position: relative; min-height: 34px; min-width: 34px; padding: 0 12px; border: 1px solid var(--line); border-radius: 999px;
+    background: var(--surface); color: var(--accent); font: inherit; font-weight: 700; font-size: 0.72rem; cursor: pointer;
+  }
+  .tbl-chip::after { content: ""; position: absolute; inset: -5px -3px; }
+  .tbl-chip-i { padding: 0; font-style: italic; font-family: Georgia, serif; font-size: 0.95rem; }
+  .tbl-chip[aria-expanded="true"] { background: var(--accent-fill); color: var(--accent-ink); }
+
+  .coach-strip-wrap { position: relative; margin: 0 0 4px; }
+  .coach-strip-wrap.strip-open { z-index: 60; }
+  .coach-strip {
+    display: flex; align-items: center; gap: 6px; min-height: 52px; padding: 0 4px 0 12px;
+    border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--text-muted);
+    position: relative; z-index: 1; cursor: pointer;
+  }
+  .strip-text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.8rem; }
+  .strip-text .gl-term { display: inline; padding: 0; }
+  .strip-action { font: 900 17px/1 "Archivo", system-ui, sans-serif; color: var(--coach-raise-soft); }
+  .strip-action.act-fold { color: var(--coach-fold-text); }
+  .strip-action.act-call, .strip-action.act-check { color: var(--coach-pos); }
+  .strip-action.act-raise, .strip-action.act-bet, .strip-action.act-open, .strip-action.act-3-bet { color: var(--accent); }
+  .strip-action.act-all-in, .strip-action.act-reshove { color: var(--coach-allin-text); }
+  .strip-grade, .tbl-chip b { font: 900 14px/1 "Archivo", system-ui, sans-serif; color: var(--text); }
+  .grade-PREFERRED { color: var(--coach-pos) !important; }
+  .grade-ACCEPTABLE { color: var(--accent) !important; }
+  .grade-SUBOPTIMAL { color: var(--coach-neg) !important; }
+  .strip-idle { color: var(--text-muted); }
+  .strip-why, .strip-fold { min-height: 44px; border: 0; background: none; font: inherit; cursor: pointer; }
+  .strip-why { flex: 0 0 auto; padding: 0 6px; color: var(--accent); font-weight: 700; font-size: 0.8rem; }
+  .strip-fold { flex: 0 0 auto; width: 36px; color: var(--text-muted); font-size: 1.3rem; line-height: 1; }
+
+  .strip-scrim { position: fixed; inset: 0; background: var(--sheet-scrim); }
+  .coach-sheet {
+    position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 2; max-height: calc(100dvh - 190px); overflow-y: auto;
+    padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--text);
+  }
+  .coach-sheet-head, .drawer-head { display: flex; align-items: center; gap: 10px; }
+  .coach-sheet-tag { flex: 1 1 auto; color: var(--coach-raise-soft); font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; }
+  .sheet-x { width: 44px; height: 44px; margin: -8px -6px -8px 0; border: 0; background: none; color: var(--text-muted); font-size: 1.6rem; cursor: pointer; }
+  .coach-sheet-why { margin: 6px 0 8px; font-size: 0.85rem; line-height: 1.45; }
+  .coach-sheet-rows { display: grid; gap: 2px; margin: 0; font-size: 0.78rem; }
+  .coach-sheet-rows div { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; border-top: 1px solid var(--line); }
+  .coach-sheet-rows dt { color: var(--text-muted); }
+  .coach-sheet-rows dd { margin: 0; text-align: right; }
+
+  .drawer-scrim { position: fixed; inset: 0; z-index: 50; display: flex; align-items: flex-end; background: var(--sheet-scrim); }
+  .drawer {
+    width: 100%; max-height: 72dvh; display: flex; flex-direction: column; padding: 10px 14px 16px;
+    border: 1px solid var(--line); border-radius: 22px 22px 0 0; background: var(--surface); color: var(--text);
+  }
+  .drawer-handle { display: block; width: 44px; height: 5px; margin: 0 auto 8px; border-radius: 3px; background: var(--sheet-handle); }
+  .drawer-tabs { display: flex; flex: 1 1 auto; gap: 6px; }
+  .drawer-tab { min-height: 44px; padding: 0 12px; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--text-muted); font: inherit; font-weight: 700; cursor: pointer; }
+  .drawer-tab[aria-selected="true"] { color: var(--accent); border-bottom-color: var(--accent); }
+  .drawer-body { overflow-y: auto; min-height: 0; }
+  .drawer-body .action-history { margin: 0; }
+
+  .bot-key { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 8px; white-space: nowrap; margin: 3px 0 0; font-size: 0.58rem; color: var(--text-muted); }
+  .bot-key-item { display: inline-flex; align-items: center; gap: 4px; }
+  .bot-key-dot { width: 9px; height: 9px; border-radius: 50%; }
+
+  .table-wrap > .coach-chip-top { min-height: 52px; margin: 0 0 4px; border-radius: 14px; }
+}
