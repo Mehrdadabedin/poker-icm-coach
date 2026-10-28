@@ -10,9 +10,9 @@ import { useT } from "../i18n/I18n";
  * All statistics come from ../models/winloss; no value here is hard-coded.
  */
 
-const GREEN = "#81c784"; // same green as history-action-call
-const RED = "#ff8f8f"; // same red as history-action-fold
-const TRACK = "#2b3440";
+const GREEN = "var(--coach-pos)"; // same green as history-action-call
+const RED = "var(--coach-fold-text)"; // same red as history-action-fold
+const TRACK = "var(--wl-track)";
 
 function formatProfit(net: number): string {
   return `${net >= 0 ? "+" : "-"}${formatChips(Math.abs(net))}`;

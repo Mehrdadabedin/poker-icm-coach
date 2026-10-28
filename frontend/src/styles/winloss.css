@@ -6,12 +6,12 @@
 .wl-analysis {
   padding: 2px 0 0;
   font-size: 0.72rem;
-  color: var(--text);
+  color: var(--body-text);
 }
 
 .wl-section {
   margin: 8px 0;
-  background: #1d242c;
+  background: var(--surface);
   border-radius: 10px;
   padding: 8px 10px;
 }
@@ -39,7 +39,7 @@
 }
 
 .wl-ring-label {
-  color: var(--text);
+  color: var(--body-text);
   font-size: 0.78rem;
   font-weight: 700;
 }
@@ -59,7 +59,7 @@
 
 .wl-metric dd {
   margin: 0;
-  color: var(--text);
+  color: var(--body-text);
   font-weight: 700;
 }
 
@@ -79,7 +79,7 @@
 }
 
 .wl-level-name {
-  color: var(--text);
+  color: var(--body-text);
   font-weight: 700;
 }
 
@@ -88,8 +88,8 @@
 }
 
 .wl-level-current {
-  background: var(--accent);
-  color: #17191b;
+  background: var(--accent-fill);
+  color: var(--accent-ink-warm);
   border-radius: 4px;
   font-size: 0.6rem;
   font-weight: 800;
@@ -111,11 +111,11 @@
 }
 
 .wl-bar-win {
-  background: var(--wl-win, #81c784);
+  background: var(--wl-win, var(--coach-pos));
 }
 
 .wl-bar-loss {
-  background: var(--wl-loss, #ff8f8f);
+  background: var(--wl-loss, var(--coach-fold-text));
 }
 
 .wl-position {
@@ -140,13 +140,13 @@
 }
 
 .wl-position-name {
-  color: var(--text);
+  color: var(--body-text);
   font-weight: 700;
   font-size: 0.72rem;
 }
 
 .wl-position-rate {
-  color: var(--text);
+  color: var(--body-text);
   font-weight: 700;
 }
 
@@ -158,16 +158,16 @@
 /* Selector in the panel head, styled to match the existing toggle button. */
 .history-view-select {
   font-size: 0.7rem;
-  color: var(--text);
+  color: var(--body-text);
   font-weight: 700;
   letter-spacing: 0.5px;
 }
 
 .history-view-select select {
-  background: #243040;
-  border: 1px solid #35455a;
+  background: var(--table-raised-bg);
+  border: 1px solid var(--table-raised-border);
   border-radius: 6px;
-  color: var(--text);
+  color: var(--body-text);
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.5px;

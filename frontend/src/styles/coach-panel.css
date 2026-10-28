@@ -1,6 +1,6 @@
 .coach-panel {
   margin-top: 10px;
-  background: #1d242c;
+  background: var(--surface);
   border-radius: 10px;
   padding: 12px;
 }
@@ -19,10 +19,10 @@
 
 .panel-head .coach-toggle {
   margin: 0 0 6px;
-  background: #243040;
-  border: 1px solid #35455a;
+  background: var(--table-raised-bg);
+  border: 1px solid var(--table-raised-border);
   border-radius: 6px;
-  color: var(--text);
+  color: var(--body-text);
   font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -51,12 +51,12 @@
 .coach-recommendation {
   font-size: 1.3rem;
   font-weight: 900;
-  color: #4f9dff;
+  color: var(--coach-raise);
 }
 
 /* the street the advice is for, next to the action: "BET on the flop" (plan 075) */
 .coach-recommendation-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; }
-.coach-street { color: #9fc5ff; font-size: 0.85rem; font-weight: 700; letter-spacing: 0.5px; }
+.coach-street { color: var(--coach-street); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.5px; }
 
 .confidence {
   color: var(--muted);
@@ -67,7 +67,7 @@
   display: flex;
   justify-content: space-between;
   gap: 10px;
-  border-top: 1px solid #2c3540;
+  border-top: 1px solid var(--line);
   padding: 4px 0;
   font-size: 0.78rem;
 }
@@ -90,7 +90,7 @@
   margin-top: 8px;
   padding: 8px;
   border-radius: 8px;
-  background: #10341f;
+  background: var(--coach-good-bg);
   font-size: 0.85rem;
 }
 
@@ -102,7 +102,7 @@
 }
 
 .error-box {
-  color: #ff8f8f;
+  color: var(--coach-fold-text);
 }
 
 .data-table {
@@ -114,13 +114,13 @@
 
 .data-table td,
 .data-table th {
-  border: 1px solid #2c3540;
+  border: 1px solid var(--line);
   padding: 6px 8px;
   text-align: left;
 }
 
-.pos { color: #81c784; }
-.neg { color: #e57373; }
+.pos { color: var(--coach-pos); }
+.neg { color: var(--coach-neg); }
 
 .stat-grid {
   display: grid;
@@ -130,7 +130,7 @@
 }
 
 .stat-card {
-  background: #1d242c;
+  background: var(--surface);
   border-radius: 10px;
   padding: 10px;
   text-align: center;
@@ -155,8 +155,8 @@
 
 .mode-card {
   flex: 1;
-  background: #1d242c;
-  border: 2px solid #2c3540;
+  background: var(--surface);
+  border: 2px solid var(--line);
   border-radius: 10px;
   padding: 14px;
   display: flex;
@@ -175,7 +175,7 @@
 }
 
 .mode-card b {
-  color: #fff;
+  color: var(--coach-strong-text);
   font-weight: 800;
 }
 

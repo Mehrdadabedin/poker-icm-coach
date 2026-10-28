@@ -29,7 +29,7 @@ coach card and the buttons: table-landscape.css (plan 089).
 }
 .hand-result .result-title { font-size: 1.3rem; letter-spacing: 1.5px; }
 .hand-result .result-subtitle { margin: 0; font-size: 1rem; }
-.result-flow { flex-basis: 100%; font-size: 0.75rem; color: rgba(255, 255, 255, 0.75); }
+.result-flow { flex-basis: 100%; font-size: 0.75rem; color: var(--result-flow-text); }
 .result-actions { display: flex; gap: 8px; flex: 1 1 260px; }
 .result-actions .btn { flex: 1 1 0; }
 

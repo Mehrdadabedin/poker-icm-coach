@@ -3,9 +3,9 @@
 
 .final-standings-panel {
   width: min(440px, 100%); max-height: 100%; overflow-y: auto;
-  padding: 16px 18px; border: 1px solid rgba(242, 193, 78, 0.55); border-radius: 14px;
-  background: rgba(20, 24, 29, 0.97); box-shadow: 0 12px 34px rgba(0, 0, 0, 0.6);
-  color: var(--text);
+  padding: 16px 18px; border: 1px solid var(--modal-border); border-radius: 14px;
+  background: var(--modal-bg); box-shadow: 0 12px 34px rgba(0, 0, 0, 0.6);
+  color: var(--body-text);
 }
 /* the button sits beside the title: the table area can be about 300px tall */
 .final-standings-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
@@ -15,14 +15,14 @@
 .final-standings-list { display: grid; gap: 3px; margin: 0; padding: 0; list-style: none; }
 .final-standings-list li {
   display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; align-items: center; gap: 8px;
-  padding: 4px 10px; border-radius: 8px; background: rgba(255, 255, 255, 0.05); font-size: 0.85rem;
+  padding: 4px 10px; border-radius: 8px; background: var(--standing-row-bg); font-size: 0.85rem;
 }
 .standing-place { font-weight: 800; color: var(--muted); }
 .standing-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .standing-chips { font-variant-numeric: tabular-nums; font-weight: 700; }
 .final-standings-list li.is-first .standing-place,
 .final-standings-list li.is-first .standing-chips { color: var(--accent); }
-.final-standings-list li.is-hero { outline: 2px solid #4f9dff; background: rgba(79, 157, 255, 0.12); }
+.final-standings-list li.is-hero { outline: 2px solid var(--standing-hero-ring); background: var(--standing-hero-bg); }
 .final-standings-list li.is-out { opacity: 0.6; }
 .final-standings-list li.is-out .standing-chips { font-size: 0.75rem; letter-spacing: 0.06em; }
 
