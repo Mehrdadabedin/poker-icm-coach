@@ -23,6 +23,8 @@ export const home: Record<keyof typeof en, string> = {
   "home.report.text": "Resultados, fugas y progreso entre torneos",
   "home.settings.title": "Ajustes del torneo",
   "home.settings.text": "Stacks, ciegas y velocidad de los torneos nuevos",
+  "home.appearance.title": "Apariencia",
+  "home.appearance.text": "Oscuro, claro o igual que tu teléfono",
   "home.admin.title": "Admin",
   "home.admin.text": "Usuarios y moderación",
   "home.continue.title": "Seguir en la mesa {label}",

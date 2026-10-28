@@ -83,8 +83,11 @@ screens 11 to 15 (approve before building).
 - `.keep-dark`: in the light theme an element with this class takes the dark block. Used on the felt,
   the table header, the page header band and the landing header (the logo is drawn for a dark band).
   `color` is set again there because it is inherited, not re-resolved.
-- `services/theme.ts`, a few lines in `index.html` (no flash), `AppearancePicker` on `/setup` and
-  `/settings`, English and Spanish words. The `theme-color` meta is the band's #07080a in both themes.
+- `services/theme.ts`, a few lines in `index.html` (no flash), `AppearancePicker`, English and
+  Spanish words. The owner (28 Oct, after merge): the picker sat under the tournament settings and
+  read as part of them, so it moved to an Appearance card of its own in SETUP (phone Setup tab and
+  wide home menu) and its page `#/appearance`; it shows nowhere else. Not the Profile page: that
+  holds the account, kept on the server, and the look is kept per device. The `theme-color` meta is the band's #07080a in both themes.
 - The Report heat map lightness is a token (`--heat-lightness`): `heatColour()` returns
   `hsl(h 35% var(--heat-lightness))`. The ring chart colours in `WinLoseAnalysis` are tokens too.
 - Plan 099 follow-ups: the cookie banner clears the tab bar; `clearAuth()` and `saveAuth()` announce
