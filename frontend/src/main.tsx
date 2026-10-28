@@ -2,6 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { App } from "./App";
 import { initializeGoogleAnalytics } from "./analytics";
+import { initTheme } from "./services/theme";
+import "./styles/tokens.css";
 import "./styles/base.css";
 import "./styles/app-header.css";
 import "./styles/seats.css";
@@ -46,11 +48,13 @@ import "./styles/icm-calculator.css";
 import "./styles/page-header.css";
 import "./styles/home-menu.css";
 import "./styles/tab-bar.css";
+import "./styles/appearance.css";
 import "./styles/report.css";
 import "./styles/lang-menu.css";
 import "./styles/portrait.css";
 import "./styles/profile.css";
 
+initTheme();
 initializeGoogleAnalytics();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

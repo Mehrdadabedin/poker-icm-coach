@@ -1,0 +1,28 @@
+:root,
+:root[data-theme="dark"],
+.keep-dark {
+  --hm-card-hover-bg: #3a4656;
+  --hm-card-hover-border: #5a6a80;
+  --hm-card-hover-shadow: rgba(51, 51, 51, 0.55);
+  --hm-desc: #9aa3ad;
+  --lang-border: rgba(255, 255, 255, 0.2);
+  --consent-border: rgba(242, 193, 78, 0.35);
+  --consent-accept-ink: #17191b;
+  --consent-focus: #fff;
+  /* fixed: on the black band and the play button, the same in both themes */
+  --band-text: #c9cfd8;
+  --lang-band-border: rgba(255, 255, 255, 0.25);
+  --header-play-bg: #2e7d32;
+  --header-play-ink: #fff;
+}
+
+:root[data-theme="light"] {
+  --hm-card-hover-bg: #f3f2ee;
+  --hm-card-hover-border: #d6d3c9;
+  --hm-card-hover-shadow: rgba(20, 20, 20, 0.16);
+  --hm-desc: #5f5e5a;
+  --lang-border: #d6d3c9;
+  --consent-border: rgba(138, 90, 0, 0.45);
+  --consent-accept-ink: #141414;
+  --consent-focus: #141414;
+}

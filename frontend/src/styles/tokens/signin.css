@@ -1,0 +1,63 @@
+/* Tokens of the signin area (plan 103): see tokens.css. */
+
+:root,
+:root[data-theme="dark"],
+.keep-dark {
+  --signin-gold: #fad15a;
+  --signin-gold-rule: #fcf159;
+  --signin-text: #e9eef5;
+  --signin-muted: #99a8ba;
+  --signin-dim: #75828f;
+  --signin-field-border: #2c373f;
+  --signin-rule: #333d47;
+  --signin-field-bg: #111a21;
+  --signin-icon: #919faf;
+  --signin-submit-bg: #086aec;
+  --signin-submit-bg-active: #0560dc;
+  --signin-submit-ink: #ffffff;
+  --signin-error: #ff6b6b;
+  --signin-error-border: rgba(255, 107, 107, 0.36);
+  --signin-error-bg: rgba(255, 107, 107, 0.07);
+  --signin-success: #7fd79b;
+  --signin-page-bg: #0e141a;
+  --signin-focus: #8ab4ff;
+  --signin-focus-ring: rgba(138, 180, 255, 0.2);
+  --signin-or-text: #8c9aae;
+  --signin-legal-text: #9dacbd;
+  --signin-notice-border: rgba(242, 193, 78, 0.4);
+  --signin-notice-bg: rgba(242, 193, 78, 0.08);
+  /* fixed: provider brand buttons, same in both themes */
+  --signin-provider-dark-bg: #020203; /* fixed */
+  --signin-provider-dark-border: #41474c; /* fixed */
+  --signin-provider-dark-ink: #ffffff; /* fixed */
+  --signin-provider-dark-hover: #121317; /* fixed */
+  --signin-provider-light-bg: #ffffff; /* fixed */
+  --signin-provider-light-ink: #0f151d; /* fixed */
+  --signin-provider-light-hover: #eef0f3; /* fixed */
+}
+
+:root[data-theme="light"] {
+  --signin-gold: #8a5a00;
+  --signin-gold-rule: #f2c14e;
+  --signin-text: #141414;
+  --signin-muted: #5f5e5a;
+  --signin-dim: #5f5e5a;
+  --signin-field-border: #d6d3c9;
+  --signin-rule: #d6d3c9;
+  --signin-field-bg: #ffffff;
+  --signin-icon: #5f5e5a;
+  --signin-submit-bg: #0b5cc4;
+  --signin-submit-bg-active: #0450b8;
+  --signin-submit-ink: #ffffff;
+  --signin-error: #b3261e;
+  --signin-error-border: rgba(179, 38, 30, 0.36);
+  --signin-error-bg: rgba(179, 38, 30, 0.07);
+  --signin-success: #1b7a3a;
+  --signin-page-bg: #fafaf8;
+  --signin-focus: #0b5cc4;
+  --signin-focus-ring: rgba(11, 92, 196, 0.2);
+  --signin-or-text: #5f5e5a;
+  --signin-legal-text: #5f5e5a;
+  --signin-notice-border: rgba(138, 90, 0, 0.4);
+  --signin-notice-bg: rgba(138, 90, 0, 0.08);
+}

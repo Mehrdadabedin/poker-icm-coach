@@ -2,10 +2,10 @@
 id: 103
 title: Light and Dark Theme
 phase: 8
-status: planned
+status: complete
 depends_on: [099]
 test_file: frontend/tests/theme.test.tsx
-implementation_files: [frontend/src/styles/tokens.css, frontend/src/services/theme.ts, frontend/src/components/AppearancePicker.tsx, frontend/src/pages/SetupPage.tsx, frontend/src/main.tsx, frontend/index.html, frontend/src/i18n/messages/en/theme.ts, frontend/src/i18n/messages/es/theme.ts]
+implementation_files: [frontend/src/styles/tokens.css, frontend/src/styles/tokens/, frontend/src/styles/appearance.css, frontend/src/services/theme.ts, frontend/src/components/AppearancePicker.tsx, frontend/src/pages/SetupPage.tsx, frontend/src/main.tsx, frontend/index.html, frontend/src/i18n/messages/en/theme.ts, frontend/src/i18n/messages/es/theme.ts]
 ---
 
 # Objective
@@ -68,3 +68,37 @@ screens 11 to 15 (approve before building).
 - Contrast of every text token on its background, in both themes, is at
   least 4.5:1.
 - Every existing test still passes.
+
+# Built (28 Oct)
+
+- `styles/tokens.css` (shared names) and `styles/tokens/{home,table,review,account,signin,landing}.css`
+  (one file per area, imported by `tokens.css`): 308 tokens, dark on `:root` and
+  `:root[data-theme="dark"]`, light on `:root[data-theme="light"]`. Fixed colours (felt, rail, cards,
+  action buttons, provider buttons, header bands) are marked `/* fixed */` in the dark block only. The
+  tokens of one area live in their own file instead of one `tokens.css`, so each stays under about 150 lines.
+- All 48 stylesheets use tokens; the dark theme resolves to the old values (checked rule by rule
+  against `origin/main`, except the home and tab pages, which take the dark page of screen 13).
+- Old pages kept their body text and muted grey as `--body-text` (#e8e6e1) and `--muted` (#9aa0a6);
+  `--text` is the new #f3f1ea.
+- `.keep-dark`: in the light theme an element with this class takes the dark block. Used on the felt,
+  the table header, the page header band and the landing header (the logo is drawn for a dark band).
+  `color` is set again there because it is inherited, not re-resolved.
+- `services/theme.ts`, a few lines in `index.html` (no flash), `AppearancePicker` on `/setup` and
+  `/settings`, English and Spanish words. The `theme-color` meta is the band's #07080a in both themes.
+- The Report heat map lightness is a token (`--heat-lightness`): `heatColour()` returns
+  `hsl(h 35% var(--heat-lightness))`. The ring chart colours in `WinLoseAnalysis` are tokens too.
+- Plan 099 follow-ups: the cookie banner clears the tab bar; `clearAuth()` and `saveAuth()` announce
+  the session change (`services/authEvent.ts`, no imports). `ProfilePage` reads the session once, so
+  ending it there (account deleted) goes home, not to sign-in.
+- Left as they were: the four bot avatar colours (`botProfiles.ts`) and the Google logo colours
+  (`AuthIcons.tsx`), which are brand colours; `rgba(0,0,0,a)` shadows and scrims.
+
+# Light-theme fixes after review (28 Oct)
+
+- Gold buttons keep #f2c14e with dark ink in both themes: `--accent-fill` and `--accent-ink` (#141414), and for
+  the landing page `--landing-btn-gold-bg` and `--landing-step-bg` (dark keeps its #f2b33d). `--accent` (#8a5a00 in light) is for gold text and icons only.
+- Seats have a fixed opaque dark box (`--seat-bg`); folded, out and lost seats use dimmer text
+  (`--seat-ink-dim`) and a dimmer photo instead of opacity.
+- The contrast test lists the badge, chip, admin, chart, error and button pairs (about 60) and checks that every
+  `-ink` or `-text` token with a `-bg` twin is listed. Two dark pairs were under 4.5:1 and changed:
+  the Report axis text (#6b7480 to #8e98a5) and the Ranges jam cell (#e65100 to #b03a00).

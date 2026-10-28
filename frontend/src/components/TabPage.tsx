@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { clearAuth, getUsername, logout } from "../services/api";
 import { Copyright } from "./Copyright";
@@ -8,7 +9,7 @@ import { useT } from "../i18n/I18n";
 import type { MessageKey } from "../i18n/messages/en";
 
 /** A tab's page (plan 099): the home page look, a title and the cards of one group. */
-export function TabPage({ title, entries, testId }: { title: MessageKey; entries: Entry[]; testId: string }) {
+export function TabPage({ title, entries, testId, children }: { title: MessageKey; entries: Entry[]; testId: string; children?: ReactNode }) {
   const navigate = useNavigate();
   const t = useT();
   const signOut = async () => {
@@ -28,6 +29,7 @@ export function TabPage({ title, entries, testId }: { title: MessageKey; entries
         <div className="hm-grid">
           {entries.map((entry) => <MenuCard key={entry.to} entry={entry} />)}
         </div>
+        {children}
         <Copyright />
       </main>
     </div>

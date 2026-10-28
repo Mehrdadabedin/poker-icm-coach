@@ -1,0 +1,54 @@
+/* Colours as CSS variables (plan 103). Dark is the default; light is chosen
+ * with <html data-theme="light"> (services/theme.ts). Every other stylesheet
+ * uses these names and no hex colour of its own.
+ *
+ * This file holds the shared tokens. The tokens of one area of the app live
+ * in tokens/<area>.css, imported below, with the same two blocks. Name tokens
+ * by role (--report-cell-border), never by colour (--gold). Where a colour is
+ * the same in both themes it is marked "fixed" in a comment. */
+@import "./tokens/home.css";
+@import "./tokens/table.css";
+@import "./tokens/review.css";
+@import "./tokens/account.css";
+@import "./tokens/signin.css";
+@import "./tokens/landing.css";
+
+:root,
+:root[data-theme="dark"],
+.keep-dark {
+  color-scheme: dark;
+  --bg: #14181d;
+  --surface: #1d242c;
+  --line: #2c3540;
+  --text: #f3f1ea;
+  --text-muted: #a7b0ba;
+  --accent: #f2c14e; /* gold text, icons and the current tab */
+  --tab-bar: #07080a;
+  --tab-line: #1f262e;
+  --tab-idle: #8b95a1;
+  /* older pages: the body text and muted grey they had before the tokens */
+  --body-text: #e8e6e1;
+  --muted: #9aa0a6;
+  /* fixed: the header band, gold buttons and their ink are the same in both themes */
+  --band: #07080a;
+  --accent-fill: #f2c14e;
+  --accent-ink: #141414;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #fafaf8;
+  --surface: #ffffff;
+  --line: #e5e3dc;
+  --text: #141414;
+  --text-muted: #5f5e5a;
+  --accent: #8a5a00;
+  --tab-bar: #ffffff;
+  --tab-line: #e5e3dc;
+  --tab-idle: #5f5e5a;
+  --body-text: #141414;
+  --muted: #5f5e5a;
+}
+
+/* text inside a keep-dark element is light again: `color` is inherited, not re-resolved */
+.keep-dark { color: var(--body-text); }

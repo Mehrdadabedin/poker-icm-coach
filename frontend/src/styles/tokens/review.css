@@ -1,0 +1,150 @@
+:root,
+:root[data-theme="dark"],
+.keep-dark {
+  --heat-lightness: 27%; /* the Report heat map cells (models/report.ts heatColour) */
+  --review-won-top: #14532d;
+  --review-won-bottom: #1b5e20;
+  --review-won-border: #2e7d32;
+  --review-lost-top: #5c1216;
+  --review-lost-bottom: #7f1d1d;
+  --review-lost-border: #c62828;
+  --review-chop-top: #4a3a0d;
+  --review-chop-bottom: #664d00;
+  --review-panel-alt: #232b34;
+  --review-border-strong: #3a4653;
+  --review-result-text: #fff;
+  --review-won-title: #a5d6a7;
+  --review-lost-title: #ffab91;
+  --review-cell-bg: #141a21;
+  --review-blue: #4f9dff;
+  --review-blue-glow: rgba(79, 157, 255, 0.35);
+  --review-hand-text: #d8f5e6;
+  --review-good-label: #81c784;
+  --review-lost-label: #ff8f8f;
+  --review-paused-text: #ffab91;
+  --review-field-border: #444;
+  --review-field-bg: #0f1318;
+  --review-card-border: #2b333d;
+  --review-miss: #e53935;
+  --review-won-accent: #c9a227;
+  --review-good-badge-bg: rgba(46, 125, 50, 0.25);
+  --review-good-text: #a5d6a7;
+  --review-pressure-low-bg: rgba(46, 125, 50, 0.2);
+  --review-pressure-mid-bg: rgba(242, 193, 78, 0.18);
+  --review-pressure-high-bg: rgba(229, 57, 53, 0.2);
+  --review-bad-text: #ef9a9a;
+  --review-mini-card-face: #f4f4f4; /* fixed */
+  --review-mini-card-ink: #111; /* fixed */
+  --review-mini-card-red: #c62828; /* fixed */
+  --report-good: #7fd18b;
+  --report-axis-text: #8e98a5;
+  --report-bar-fold: #e57c35;
+  --report-bar-allin: #e5a935;
+  --report-bar-other: #6b7480;
+  --report-size-third: #2bb3a3;
+  --report-insight-bg: rgba(242, 193, 78, 0.08);
+  --icm-input-bg: #243040;
+  --review-primary-bg: #1565c0; /* fixed */
+  --review-primary-ink: #fff; /* fixed */
+  --review-primary-hover: #1976d2;
+  --icm-error-text: #ff6b6b;
+  --icm-error-bg: rgba(255, 107, 107, 0.1);
+  --icm-error-border: rgba(255, 107, 107, 0.3);
+  --icm-highlight-bg: rgba(242, 193, 78, 0.05);
+  --icm-bad-label: #e57373;
+  --glossary-gold: #fad15a;
+  --glossary-pop-bg: #0f1d2e;
+  --glossary-pop-ex: #b9c6d6;
+  --glossary-pop-link: #8fc1ff;
+  --glossary-border: #2c373f;
+  --glossary-btn-bg: #1a2633;
+  --glossary-entry-bg: #121b24;
+  --glossary-term-text: #fff;
+  --glossary-def: #c9d3de;
+  --glossary-ex: #99a8ba;
+  --glossary-mark-ink: #241c05; /* fixed */
+  --glossary-badge-bg: #fad15a;
+  --glossary-focus-ring: rgba(250, 209, 90, 0.35);
+  --review-grid-border: #333;
+  --range-raise-bg: #1b5e20;
+  --range-raise-ink: #c8e6c9;
+  --range-call-bg: #4a148c;
+  --range-call-ink: #e1bee7;
+  --range-3bet-bg: #b71c1c;
+  --range-3bet-ink: #ffcdd2;
+  --range-jam-bg: #b03a00;
+  --range-jam-ink: #ffe0b2;
+  --review-primary-line: rgba(21, 101, 192, 0.25); /* fixed */
+  --review-focus-row: rgba(242, 193, 78, 0.16);
+}
+
+:root[data-theme="light"] {
+  --heat-lightness: 78%;
+  --glossary-badge-bg: #f2c14e;
+  --review-won-top: #d7f0dd;
+  --review-won-bottom: #c3e6cb;
+  --review-won-border: #1b7a3a;
+  --review-lost-top: #fadcd9;
+  --review-lost-bottom: #f4c4bf;
+  --review-lost-border: #b3261e;
+  --review-chop-top: #fbefc8;
+  --review-chop-bottom: #f5e1a0;
+  --review-panel-alt: #f3f2ee;
+  --review-border-strong: #d6d3c9;
+  --review-result-text: #141414;
+  --review-won-title: #1b5e20;
+  --review-lost-title: #8c1d18;
+  --review-cell-bg: #f3f2ee;
+  --review-blue: #0b5cc4;
+  --review-blue-glow: rgba(11, 92, 196, 0.3);
+  --review-hand-text: #14532d;
+  --review-good-label: #1b7a3a;
+  --review-lost-label: #b3261e;
+  --review-paused-text: #a8401a;
+  --review-field-border: #d6d3c9;
+  --review-field-bg: #f3f2ee;
+  --review-card-border: #e5e3dc;
+  --review-miss: #b3261e;
+  --review-won-accent: #8a5a00;
+  --review-good-badge-bg: rgba(27, 122, 58, 0.15);
+  --review-good-text: #17692f;
+  --review-pressure-low-bg: rgba(27, 122, 58, 0.14);
+  --review-pressure-mid-bg: rgba(138, 90, 0, 0.14);
+  --review-pressure-high-bg: rgba(179, 38, 30, 0.12);
+  --review-bad-text: #b3261e;
+  --report-good: #1b7a3a;
+  --report-axis-text: #5f5e5a;
+  --report-bar-fold: #c25a12;
+  --report-bar-allin: #b07800;
+  --report-bar-other: #8a8a85;
+  --report-size-third: #12776b;
+  --report-insight-bg: rgba(138, 90, 0, 0.08);
+  --icm-input-bg: #ece9e1;
+  --review-primary-hover: #0b5cc4;
+  --icm-error-text: #b3261e;
+  --icm-error-bg: rgba(179, 38, 30, 0.08);
+  --icm-error-border: rgba(179, 38, 30, 0.3);
+  --icm-highlight-bg: rgba(138, 90, 0, 0.06);
+  --icm-bad-label: #b3261e;
+  --glossary-gold: #8a5a00;
+  --glossary-pop-bg: #ffffff;
+  --glossary-pop-ex: #5f5e5a;
+  --glossary-pop-link: #0b5cc4;
+  --glossary-border: #d6d3c9;
+  --glossary-btn-bg: #f3f2ee;
+  --glossary-entry-bg: #ffffff;
+  --glossary-term-text: #141414;
+  --glossary-def: #3a3a36;
+  --glossary-ex: #5f5e5a;
+  --glossary-focus-ring: rgba(138, 90, 0, 0.3);
+  --review-grid-border: #d6d3c9;
+  --range-raise-bg: #c3e6cb;
+  --range-raise-ink: #14532d;
+  --range-call-bg: #e6d6f3;
+  --range-call-ink: #4a148c;
+  --range-3bet-bg: #f7cfcb;
+  --range-3bet-ink: #8c1d18;
+  --range-jam-bg: #fddcbc;
+  --range-jam-ink: #8a3a00;
+  --review-focus-row: rgba(138, 90, 0, 0.14);
+}
