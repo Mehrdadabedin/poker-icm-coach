@@ -17,6 +17,9 @@
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.42);
 }
 
+/* the phone tab bar (plan 099) is 72 px high: sit 16 px above it */
+body.has-tab-bar .analytics-consent { bottom: calc(72px + 16px + env(safe-area-inset-bottom)); }
+
 .analytics-consent__copy {
   min-width: 0;
 }
