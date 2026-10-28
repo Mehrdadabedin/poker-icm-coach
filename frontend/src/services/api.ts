@@ -1,6 +1,9 @@
 // API client for the FastAPI backend (part 034 endpoints + A03 auth).
 import { ActionKind, TableState } from "../models/game";
 import { announceAuth } from "./authEvent";
+import { announceProRequired, ProRequiredError } from "./proRequired";
+
+export { ProRequiredError };
 
 export const API_BASE = import.meta.env.VITE_API_URL ?? "";
 const TOKEN_KEY = "icm_auth_token";
@@ -34,6 +37,10 @@ export async function request<T>(path: string, options?: RequestInit): Promise<T
     const body = await response.text();
     if (response.status === 401) {
       throw new AuthError(`Authentication required (API ${response.status})`);
+    }
+    if (response.status === 402) {
+      announceProRequired();
+      throw new ProRequiredError();
     }
     throw new Error(`API ${response.status}: ${body}`);
   }
@@ -91,13 +98,9 @@ export function changePassword(newPassword: string): Promise<{ changed: boolean 
   });
 }
 
-export function logout(): Promise<{ ok: boolean }> {
-  return request<{ ok: boolean }>("/api/auth/logout", { method: "POST" });
-}
+export const logout = (): Promise<{ ok: boolean }> => request<{ ok: boolean }>("/api/auth/logout", { method: "POST" });
 
-export function me(): Promise<{ username: string }> {
-  return request<{ username: string }>("/api/auth/me");
-}
+export const me = (): Promise<{ username: string }> => request<{ username: string }>("/api/auth/me");
 
 export interface AuthProviders { google: boolean; apple: boolean; phone: boolean; }
 
@@ -124,9 +127,7 @@ export function createTournament(fastMode = 10, profile?: string, bots?: string[
   });
 }
 
-export function getState(tableId: string): Promise<TableState> {
-  return request<TableState>(`/api/game/${tableId}/state`);
-}
+export const getState = (tableId: string): Promise<TableState> => request<TableState>(`/api/game/${tableId}/state`);
 
 export function sendAction(
   tableId: string,
@@ -145,9 +146,8 @@ export function reentry(tableId: string): Promise<TableState> {
   return request<TableState>(`/api/game/${tableId}/reentry`, { method: "POST" });
 }
 
-export function nextHand(tableId: string): Promise<TableState> {
-  return request<TableState>(`/api/game/${tableId}/next-hand`, { method: "POST" });
-}
+export const nextHand = (tableId: string): Promise<TableState> =>
+  request<TableState>(`/api/game/${tableId}/next-hand`, { method: "POST" });
 
 export function coachAdvice(tableId: string) {
   return request<{
@@ -180,9 +180,7 @@ export interface Health {
   version: string;
 }
 
-export function health(): Promise<Health> {
-  return request<Health>("/api/health");
-}
+export const health = (): Promise<Health> => request<Health>("/api/health");
 
 export interface AdminSummary { total_registered_accounts: number; local_accounts: number; google_accounts: number; }
 
@@ -190,7 +188,7 @@ export interface AdminSummary { total_registered_accounts: number; local_account
 export function adminSummary(): Promise<AdminSummary> {
   return request<AdminSummary>("/api/admin/users/summary");
 }
-export interface AdminUserRow { username: string; provider: string; suspended?: boolean; admin?: boolean; }
+export interface AdminUserRow { username: string; provider: string; suspended?: boolean; admin?: boolean; plan?: "free" | "pro"; }
 
 export interface AdminUsersResponse { users: AdminUserRow[]; total: number; limit: number; offset: number; }
 

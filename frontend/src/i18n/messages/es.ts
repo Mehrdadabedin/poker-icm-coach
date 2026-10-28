@@ -20,5 +20,6 @@ import { glossary } from "./es/glossary";
 import { glossaryTerms } from "./es/glossaryTerms";
 import { tabs } from "./es/tabs";
 import { theme } from "./es/theme";
+import { plans } from "./es/plans";
 
-export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools, ...practice, ...portrait, ...portraitPrompt, ...profile, ...glossary, ...glossaryTerms, ...tabs, ...theme };
+export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools, ...practice, ...portrait, ...portraitPrompt, ...profile, ...glossary, ...glossaryTerms, ...tabs, ...theme, ...plans };

@@ -5,6 +5,7 @@ import { Copyright } from "../components/Copyright";
 import { PageHeader } from "../components/PageHeader";
 import { useTabBarShown } from "../hooks/useTabBarShown";
 import { PortraitPanel } from "../components/PortraitPanel";
+import { UpgradeCard } from "../components/UpgradeCard";
 import { ProfileForm } from "../components/ProfileForm";
 import { useT } from "../i18n/I18n";
 import { getToken, getUsername } from "../services/api";
@@ -37,6 +38,7 @@ export function ProfilePage() {
       <h1 className="screen-title" data-testid="profile-greeting">
         {profile ? t(`profile.greeting.${greetingFor(profile)}`, { name }) : t("profile.title")}
       </h1>
+      <div className="profile-upgrade"><UpgradeCard /></div>
       <div className="profile-layout">
         <div className="profile-side">
           <PortraitPanel />

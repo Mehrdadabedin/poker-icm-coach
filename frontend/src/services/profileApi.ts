@@ -19,6 +19,7 @@ export interface Account {
   admin: boolean;
   signIn: "password" | "google";
   email: string | null;
+  plan: "free" | "pro";
 }
 
 /** A refused request: the HTTP status, and for a 422 the fields the server named. */

@@ -1,4 +1,7 @@
 import { useAwayTable } from "../hooks/useAwayTable";
+import { useStartPractice } from "../hooks/useStartPractice";
+import { useIsFree } from "../services/plan";
+import { UpgradeCard } from "./UpgradeCard";
 import { MenuCard } from "./MenuCard";
 import { ADMIN, GROUPS } from "./menuEntries";
 import { useT } from "../i18n/I18n";
@@ -11,6 +14,8 @@ import { useT } from "../i18n/I18n";
 export function HomeMenu({ isAdmin, phone = false }: { isAdmin: boolean; phone?: boolean }) {
   const away = useAwayTable();
   const t = useT();
+  const free = useIsFree();
+  const startFree = useStartPractice();
   const groups = isAdmin
     ? GROUPS.map((g) => (g.label === "home.setup" ? { ...g, entries: [...g.entries, ADMIN] } : g))
     : GROUPS;
@@ -33,9 +38,11 @@ export function HomeMenu({ isAdmin, phone = false }: { isAdmin: boolean; phone?:
         )}
         <MenuCard
           big
-          entry={{ to: "/bot-profiles", icon: "start", title: "home.start.title", text: "home.start.text", testId: "start-practice" }}
+          onPick={free ? () => void startFree() : undefined}
+          entry={{ to: "/bot-profiles", icon: "start", title: "home.start.title", text: free ? "plans.start.text" : "home.start.text", testId: "start-practice" }}
         />
       </div>
+      <div className="hm-upgrade"><UpgradeCard title="plans.unlock.title" text="plans.unlock.text" /></div>
       {!phone && groups.map((group) => (
         <section key={group.label} aria-label={t(group.label)}>
           <p className="hm-label">{t(group.label)}</p>

@@ -1,0 +1,30 @@
+/* Spanish: Free and Pro, the locks and the Upgrade sheet (plan 100). */
+import type { plans as en } from "../en/plans";
+
+export const plans: Record<keyof typeof en, string> = {
+  "plans.pro": "PRO",
+  "plans.proOnly": "Solo Pro",
+  "plans.lock.closed": "Bloqueado: solo Pro",
+  "plans.lock.open": "Función Pro, abierta para administradores",
+  "plans.upgrade.title": "Mejorar a Pro",
+  "plans.upgrade.text": "Mira lo que añade Pro",
+  "plans.unlock.title": "Desbloquear el coach ICM",
+  "plans.unlock.text": "Un coach en cada decisión",
+  "plans.start.text": "Juega un torneo contra 8 bots al azar",
+  "plans.sheet.title": "ICMBOT PRO",
+  "plans.sheet.line": "Free te da torneos de práctica. Pro te muestra el porqué.",
+  "plans.sheet.tick1": "Coach ICM en cada decisión",
+  "plans.sheet.tick2": "Una nota tras cada acción",
+  "plans.sheet.tick3": "Elige tus 8 bots",
+  "plans.sheet.tick4": "Mis errores, historial de manos e informe",
+  "plans.sheet.soon": "Próximamente",
+  "plans.sheet.notNow": "Ahora no",
+  "plans.sheet.close": "Cerrar",
+  "plans.sheet.tick5": "Rangos y calculadora ICM",
+  "plans.locked.title": "Esto es una función Pro",
+  "plans.locked.text": "Free te da torneos de práctica. Pro añade el coach, tus herramientas de repaso, los rangos y la calculadora ICM.",
+  "plans.locked.button": "Mira lo que añade Pro",
+  "plans.chip.title": "Coach ICM",
+  "plans.chip.unlock": "Desbloquear",
+  "plans.table.locked": "Pro muestra tus manos completadas y tus estadísticas.",
+};

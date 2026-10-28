@@ -29,6 +29,8 @@ import { TrainingPage } from "./pages/TrainingPage";
 import { BotProfilesPage } from "./pages/BotProfilesPage";
 import { AuthCallbackPage } from "./pages/AuthCallbackPage";
 import { trackPageView } from "./analytics";
+import { ProOnly } from "./components/ProOnly";
+import { UpgradeSheet } from "./components/UpgradeSheet";
 import { AnalyticsConsentBanner } from "./components/AnalyticsConsentBanner";
 
 /** Public entry screen (A16): a visitor without a session gets the minimal
@@ -70,26 +72,27 @@ export function App() {
           <Route path="/table/:tableId" element={<TablePage />} />
           <Route path="/auth/callback" element={<AuthCallbackPage />} />
           <Route path="/training" element={<TrainingPage />} />
-          <Route path="/bot-profiles" element={<BotProfilesPage />} />
+          <Route path="/bot-profiles" element={<ProOnly><BotProfilesPage /></ProOnly>} />
           {/* the random-opponents step is gone: old /start links pick the 8 bots */}
           <Route path="/start" element={<Navigate to="/bot-profiles" replace />} />
-          <Route path="/ranges" element={<RangesPage />} />
-          <Route path="/coach" element={<CoachPage />} />
+          <Route path="/ranges" element={<ProOnly><RangesPage /></ProOnly>} />
+          <Route path="/coach" element={<ProOnly><CoachPage /></ProOnly>} />
           <Route path="/settings" element={<SettingsPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           {/* plan 095: the portrait is part of the profile page */}
           <Route path="/portrait" element={<Navigate to="/profile" replace />} />
-          <Route path="/history" element={<HistoryPage />} />
-          <Route path="/report" element={<ReportPage />} />
-          <Route path="/statistics" element={<StatisticsPage />} />
-          <Route path="/mistakes" element={<MistakesPage />} />
-          <Route path="/icm-calculator" element={<IcmCalculatorPage />} />
+          <Route path="/history" element={<ProOnly><HistoryPage /></ProOnly>} />
+          <Route path="/report" element={<ProOnly><ReportPage /></ProOnly>} />
+          <Route path="/statistics" element={<ProOnly><StatisticsPage /></ProOnly>} />
+          <Route path="/mistakes" element={<ProOnly><MistakesPage /></ProOnly>} />
+          <Route path="/icm-calculator" element={<ProOnly><IcmCalculatorPage /></ProOnly>} />
           <Route path="/glossary" element={<GlossaryPage />} />
           <Route path="/learn" element={<LearnPage />} />
           <Route path="/review" element={<ReviewPage />} />
           <Route path="/setup" element={<SetupPage />} />
         </Routes>
         <TabBarHost />
+        <UpgradeSheet />
       </HashRouter>
     </I18nProvider>
   );

@@ -9,19 +9,21 @@ export interface Entry {
   testId: string;
   /** filled into the title, as the table label in "Continue table D" */
   label?: string;
+  /** a Pro feature: Free players see a lock (plan 100) */
+  pro?: boolean;
 }
 
 export const STUDY: Entry[] = [
-  { to: "/coach", icon: "coach", title: "home.coach.title", text: "home.coach.text", testId: "menu-coach" },
-  { to: "/ranges", icon: "ranges", title: "home.ranges.title", text: "home.ranges.text", testId: "menu-ranges" },
-  { to: "/icm-calculator", icon: "calculator", title: "home.calculator.title", text: "home.calculator.text", testId: "menu-icm-calculator" },
+  { to: "/coach", icon: "coach", title: "home.coach.title", text: "home.coach.text", testId: "menu-coach", pro: true },
+  { to: "/ranges", icon: "ranges", title: "home.ranges.title", text: "home.ranges.text", testId: "menu-ranges", pro: true },
+  { to: "/icm-calculator", icon: "calculator", title: "home.calculator.title", text: "home.calculator.text", testId: "menu-icm-calculator", pro: true },
   { to: "/glossary", icon: "glossary", title: "home.glossary.title", text: "home.glossary.text", testId: "menu-glossary" },
 ];
 
 export const REVIEW: Entry[] = [
-  { to: "/mistakes", icon: "mistakes", title: "home.mistakes.title", text: "home.mistakes.text", testId: "menu-mistakes" },
-  { to: "/history", icon: "history", title: "home.history.title", text: "home.history.text", testId: "menu-history" },
-  { to: "/report", icon: "report", title: "home.report.title", text: "home.report.text", testId: "menu-report" },
+  { to: "/mistakes", icon: "mistakes", title: "home.mistakes.title", text: "home.mistakes.text", testId: "menu-mistakes", pro: true },
+  { to: "/history", icon: "history", title: "home.history.title", text: "home.history.text", testId: "menu-history", pro: true },
+  { to: "/report", icon: "report", title: "home.report.title", text: "home.report.text", testId: "menu-report", pro: true },
 ];
 
 export const SETUP: Entry[] = [

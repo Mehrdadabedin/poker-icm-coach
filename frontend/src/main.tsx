@@ -53,6 +53,7 @@ import "./styles/report.css";
 import "./styles/lang-menu.css";
 import "./styles/portrait.css";
 import "./styles/profile.css";
+import "./styles/plans.css";
 
 initTheme();
 initializeGoogleAnalytics();

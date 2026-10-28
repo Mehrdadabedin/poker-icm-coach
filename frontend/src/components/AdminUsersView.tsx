@@ -9,6 +9,7 @@ through AdminUserActions; the table updates in place on success.
 */
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { AdminPlanSwitch } from "./AdminPlanSwitch";
 import { AdminUserActions } from "./AdminUserActions";
 import {
   AdminUserRow,
@@ -124,6 +125,7 @@ export function AdminUsersView() {
                 <th>Username</th>
                 <th>Provider</th>
                 <th>Status</th>
+                <th>Plan</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -143,6 +145,9 @@ export function AdminUsersView() {
                     >
                       {row.suspended ? "Suspended" : "Active"}
                     </span>
+                  </td>
+                  <td>
+                    <AdminPlanSwitch row={row} onChanged={(next) => replaceRow(row.username, next)} onError={setActionError} />
                   </td>
                   <td>
                     <AdminUserActions
