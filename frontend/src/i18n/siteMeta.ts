@@ -28,9 +28,9 @@ export const SITE_META: Record<Lang, SiteMeta> = {
     ogDescription:
       "Play 9-handed tournaments against 8 bots. Before every decision, the ICM coach tells you what to do and why. Practice only, no real money.",
     twitterDescription: "Play 9-handed tournaments against 8 bots. Before every decision, the ICM coach tells you what to do and why.",
-    imageAlt: "ICMBOT robot with a human face holding two aces, the ICM coach screen beside it",
+    imageAlt: "The ICMBOT table on a screen: the ICM coach says raise and why, next to the poker table and the action buttons",
     locale: "en_US",
-    image: "/images/og-1200x630-v2.jpg",
+    image: "/images/og-table-1200x630.jpg",
   },
   es: {
     origin: "https://icmbot.es",
@@ -41,10 +41,9 @@ export const SITE_META: Record<Lang, SiteMeta> = {
     ogDescription:
       "Juega torneos de 9 jugadores contra 8 bots. Antes de cada decisión, el coach ICM te dice qué hacer y por qué. Solo práctica, sin dinero real.",
     twitterDescription: "Juega torneos de 9 jugadores contra 8 bots. Antes de cada decisión, el coach ICM te dice qué hacer y por qué.",
-    imageAlt: "El robot de ICMBOT con cara humana y dos ases en la mano, junto a la pantalla del coach ICM",
+    imageAlt: "La mesa de ICMBOT en una pantalla: el coach ICM dice subir y por qué, junto a la mesa de póker y los botones de acción",
     locale: "es_ES",
-    // the coach screen in the picture shows the Spanish table
-    image: "/images/og-1200x630-es.jpg",
+    image: "/images/og-table-1200x630-es.jpg",
   },
 };
 

@@ -8,6 +8,16 @@ const head = (html: string) => new DOMParser().parseFromString(html, "text/html"
 const meta = (doc: Document, key: string) =>
   doc.querySelector(`meta[property="${key}"], meta[name="${key}"]`)?.getAttribute("content");
 
+/** Width and height from a JPEG's start-of-frame marker, or null when it is not a JPEG. */
+function jpegSize(bytes: Buffer): [number, number] | null {
+  if (bytes[0] !== 0xff || bytes[1] !== 0xd8) return null;
+  for (let i = 2; i + 9 < bytes.length; i += 2 + bytes.readUInt16BE(i + 2)) {
+    const marker = bytes[i + 1];
+    if (marker >= 0xc0 && marker <= 0xc3) return [bytes.readUInt16BE(i + 7), bytes.readUInt16BE(i + 5)];
+  }
+  return null;
+}
+
 describe("site head (plan 093)", () => {
   it("index.html already is the icmbot.one head, so the English build needs no rewrite", () => {
     expect(siteHtml(INDEX, "en")).toBe(INDEX);
@@ -21,12 +31,12 @@ describe("site head (plan 093)", () => {
     expect(meta(doc, "og:url")).toBe("https://icmbot.es/");
     expect(meta(doc, "og:title")).toBe(es.ogTitle);
     expect(meta(doc, "og:description")).toBe(es.ogDescription);
-    expect(meta(doc, "og:image")).toBe("https://icmbot.es/images/og-1200x630-es.jpg");
+    expect(meta(doc, "og:image")).toBe("https://icmbot.es/images/og-table-1200x630-es.jpg");
     expect(meta(doc, "og:image:alt")).toBe(es.imageAlt);
     expect(meta(doc, "og:locale")).toBe("es_ES");
     expect(meta(doc, "twitter:title")).toBe(es.ogTitle);
     expect(meta(doc, "twitter:description")).toBe(es.twitterDescription);
-    expect(meta(doc, "twitter:image")).toBe("https://icmbot.es/images/og-1200x630-es.jpg");
+    expect(meta(doc, "twitter:image")).toBe("https://icmbot.es/images/og-table-1200x630-es.jpg");
     expect(meta(doc, "twitter:image:alt")).toBe(es.imageAlt);
     expect(doc.querySelector('link[rel="canonical"]')?.getAttribute("href")).toBe("https://icmbot.es/");
   });
@@ -51,6 +61,14 @@ describe("site head (plan 093)", () => {
 
   it("every site's preview picture is in public/", () => {
     for (const m of Object.values(SITE_META)) expect(existsSync(resolve(__dirname, `../public${m.image}`)), m.image).toBe(true);
+  });
+
+  it("every preview picture is the 1200 x 630 JPEG the head promises", () => {
+    for (const m of Object.values(SITE_META)) {
+      expect(jpegSize(readFileSync(resolve(__dirname, `../public${m.image}`))), m.image).toEqual([1200, 630]);
+    }
+    expect(meta(head(INDEX), "og:image:width")).toBe("1200");
+    expect(meta(head(INDEX), "og:image:height")).toBe("630");
   });
 
   it("fails the build when index.html no longer has a tag it must rewrite", () => {
