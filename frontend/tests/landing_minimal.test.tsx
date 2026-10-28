@@ -61,10 +61,21 @@ describe("minimal landing page (/minimal)", () => {
     // the practice-only note lives in the footer, not under the hero button
     expect(screen.getByTestId("minimal-hero")).not.toHaveTextContent("Practice only");
     const picture = screen.getByTestId("minimal-hero-visual");
-    expect(picture).toHaveAttribute("src", "/images/hero-coach-screen.webp");
+    expect(picture).toHaveAttribute("src", "/images/hero-app.webp");
     expect(picture).toHaveAttribute("width", "1602");
     expect(picture).toHaveAttribute("height", "982");
     expect(picture.getAttribute("alt")).toContain("ICM coach recommends a raise");
+  });
+
+  it("shows the Spanish hero picture when the page is in Spanish", async () => {
+    window.history.replaceState(null, "", "/?lang=es");
+    await openAt("#/");
+    const picture = screen.getByTestId("minimal-hero-visual");
+    expect(picture).toHaveAttribute("src", "/images/hero-app-es.webp");
+    expect(picture).toHaveAttribute("width", "1602");
+    expect(picture).toHaveAttribute("height", "982");
+    expect(picture.getAttribute("alt")).toContain("el coach ICM recomienda subir");
+    window.history.replaceState(null, "", "/");
   });
 
   it("has a top bar with Log in and Start free only, and no section menu", async () => {
