@@ -43,34 +43,36 @@ export function PokerSeat({ player, active, lastAction, status, revealCards, rev
           D
         </span>
       )}
-      {portrait && (
-        <img
-          className="seat-bot-portrait"
-          src={portrait.src}
-          alt={t("seat.botProfile", { name: portrait.alt })}
-          style={{ borderColor: portrait.color }}
-          draggable={false}
-        />
-      )}
-      {heroPortrait ? (
-        <img className="seat-bot-portrait seat-hero-portrait" src={heroPortrait} alt={t("portrait.alt")}
-          draggable={false} data-testid="seat-hero-portrait" />
-      ) : player.isHero && getToken() && (
-        // until a photo is approved, the initial keeps every seat alike; the letter
-        // comes from CSS so the seat's text stays the name and stack
-        <span className="seat-bot-portrait seat-hero-initial" data-initial={player.name.charAt(0).toUpperCase()}
-          aria-hidden="true" data-testid="seat-hero-initial" />
-      )}
       <div className="seat-position">
         {player.position} {player.position === "SB" || player.position === "BB" ? "•" : ""}
       </div>
-      <div className="seat-name">{player.name}</div>
+      <div className="seat-who">
+        {portrait && (
+          <img
+            className="seat-bot-portrait"
+            src={portrait.src}
+            alt={t("seat.botProfile", { name: portrait.alt })}
+            style={{ borderColor: portrait.color }}
+            draggable={false}
+          />
+        )}
+        {heroPortrait ? (
+          <img className="seat-bot-portrait seat-hero-portrait" src={heroPortrait} alt={t("portrait.alt")}
+            draggable={false} data-testid="seat-hero-portrait" />
+        ) : player.isHero && getToken() && (
+          // until a photo is approved, the initial keeps every seat alike; the letter
+          // comes from CSS so the seat's text stays the name and stack
+          <span className="seat-bot-portrait seat-hero-initial" data-initial={player.name.charAt(0).toUpperCase()}
+            aria-hidden="true" data-testid="seat-hero-initial" />
+        )}
+        <div className="seat-name">{player.name}</div>
+      </div>
       {player.sitsOut ? (
         <div className="seat-out-label">{t("seat.out")}</div>
       ) : (
         <>
           <div className="seat-stack">
-            {formatChips(player.stack)} <span className="seat-bb">({player.stackInBB} BB)</span>
+            {formatChips(player.stack)} · <span className="seat-bb">{player.stackInBB} BB</span>
           </div>
           <div className={`seat-cards ${player.isHero ? "hero-cards" : ""}`}>
             {shown

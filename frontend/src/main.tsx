@@ -32,6 +32,7 @@ import "./styles/table-landscape.css";
 import "./styles/table-phone.css";
 import "./styles/table-drawer.css";
 import "./styles/table-desktop.css";
+import "./styles/table-seats.css";
 import "./styles/table-history.css";
 import "./styles/analytics-consent.css";
 import "./styles/admin.css";
