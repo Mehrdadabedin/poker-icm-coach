@@ -27,6 +27,8 @@ export const home: Record<keyof typeof en, string> = {
   "home.appearance.text": "Oscuro, claro o igual que tu teléfono",
   "home.admin.title": "Admin",
   "home.admin.text": "Usuarios y moderación",
+  "home.leaderboard.title": "Clasificación",
+  "home.leaderboard.text": "El top 100 de la semana y tu puesto",
   "home.continue.title": "Seguir en la mesa {label}",
   "home.continue.text": "Sigue donde lo dejaste",
   "home.start.title": "Empezar a practicar",

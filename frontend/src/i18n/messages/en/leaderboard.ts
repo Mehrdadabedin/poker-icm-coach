@@ -16,10 +16,8 @@ export const leaderboard = {
   "leaderboard.points.one": "{n} point",
   "leaderboard.points.other": "{n} points",
   "leaderboard.you": "You, {name}",
-  "leaderboard.rankPoints": "{rank} · {points}",
   "leaderboard.noProfile": "Create your profile to appear",
   "leaderboard.empty.week": "No finished tournaments this week yet.",
   "leaderboard.empty.all": "No finished tournaments yet.",
   "leaderboard.error": "The leaderboard could not be loaded.",
-  "leaderboard.seeAll": "See top 100 ›",
 } as const;

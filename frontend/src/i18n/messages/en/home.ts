@@ -25,6 +25,8 @@ export const home = {
   "home.appearance.text": "Dark, light or the same as your phone",
   "home.admin.title": "Admin",
   "home.admin.text": "Users and moderation",
+  "home.leaderboard.title": "Leaderboard",
+  "home.leaderboard.text": "This week's top 100 and your place",
   "home.continue.title": "Continue table {label}",
   "home.continue.text": "Pick up where you left off",
   "home.start.title": "Start practice",

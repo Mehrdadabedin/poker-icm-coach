@@ -18,10 +18,8 @@ export const leaderboard: Record<keyof typeof en, string> = {
   "leaderboard.points.one": "{n} punto",
   "leaderboard.points.other": "{n} puntos",
   "leaderboard.you": "Tú, {name}",
-  "leaderboard.rankPoints": "{rank} · {points}",
   "leaderboard.noProfile": "Crea tu perfil para aparecer",
   "leaderboard.empty.week": "Aún no hay torneos terminados esta semana.",
   "leaderboard.empty.all": "Aún no hay torneos terminados.",
   "leaderboard.error": "No se pudo cargar la clasificación.",
-  "leaderboard.seeAll": "Ver top 100 ›",
 };

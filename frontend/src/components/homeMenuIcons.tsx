@@ -70,6 +70,13 @@ export const MENU_ICONS = {
       <path d="M6.5 18.5c1.2-2.3 3.2-3.5 5.5-3.5s4.3 1.2 5.5 3.5" />
     </>
   ),
+  leaderboard: (
+    <>
+      <path d="M8 4h8v5a4 4 0 0 1-8 0z" />
+      <path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4" />
+      <path d="M12 13v4M8 21h8M9 17h6" />
+    </>
+  ),
   appearance: (
     <>
       <circle cx="12" cy="12" r="8" />

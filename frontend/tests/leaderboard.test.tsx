@@ -1,10 +1,9 @@
-/* The leaderboard page and the Home card (plan 102). The API is mocked. */
+/* The leaderboard page (plan 102); Home links to it with a plain card. The API is mocked. */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { I18nProvider } from "../src/i18n/I18n";
 import type { Lang } from "../src/i18n/lang";
-import { LeaderboardHomeCard } from "../src/components/LeaderboardHomeCard";
 import { LeaderboardPage } from "../src/pages/LeaderboardPage";
 import type { Leaderboard, LeaderboardMe, LeaderboardRow, Period } from "../src/services/leaderboardApi";
 
@@ -19,14 +18,13 @@ const board = (period: Period, rows: LeaderboardRow[], me: LeaderboardMe | null 
 });
 const rows = (n: number) => Array.from({ length: n }, (_, i) => row(i + 1));
 
-function open(data: Record<Period, Leaderboard>, lang: Lang = "en", ui: "page" | "card" = "page") {
+function open(data: Record<Period, Leaderboard>, lang: Lang = "en") {
   request.mockImplementation(async (path: string) => data[path.endsWith("all") ? "all" : "week"]);
   return render(
     <I18nProvider initial={lang}>
-      <MemoryRouter initialEntries={[ui === "page" ? "/leaderboard" : "/"]}>
+      <MemoryRouter initialEntries={["/leaderboard"]}>
         <Routes>
           <Route path="/leaderboard" element={<LeaderboardPage />} />
-          <Route path="/" element={<><LeaderboardHomeCard /><div data-testid="start" /></>} />
         </Routes>
       </MemoryRouter>
     </I18nProvider>,
@@ -114,34 +112,5 @@ describe("the leaderboard page", () => {
     expect(screen.getByText("Actualizado hace 5 min")).toBeInTheDocument();
     expect(screen.getByText("Tú, Ana")).toBeInTheDocument();
     expect(screen.getByText("7.º")).toBeInTheDocument();
-  });
-});
-
-describe("the Home card", () => {
-  it("shows the top 3, the player's own row and opens the page", async () => {
-    const me = { state: "ranked" as const, ...row(12, { name: "Ana", points: 90 }) };
-    open({ week: board("week", rows(10), me), all: board("all", []) }, "en", "card");
-    await settle();
-    const card = screen.getByTestId("leaderboard-card");
-    expect(within(card).getAllByRole("listitem")).toHaveLength(3);
-    expect(within(card).getByText("Player 2")).toBeInTheDocument();
-    expect(within(card).queryByText("Player 4")).toBeNull();
-    expect(screen.getByTestId("leaderboard-card-me")).toHaveTextContent("You, Ana12th · 90 points");
-    fireEvent.click(screen.getByTestId("leaderboard-more"));
-    await settle();
-    expect(screen.getByTestId("lb-podium")).toBeInTheDocument();
-  });
-
-  it("is hidden on an error", async () => {
-    request.mockRejectedValue(new Error("API 500"));
-    render(<MemoryRouter><LeaderboardHomeCard /></MemoryRouter>);
-    await settle();
-    expect(screen.queryByTestId("leaderboard-card")).toBeNull();
-  });
-
-  it("is hidden while loading", () => {
-    request.mockReturnValue(new Promise(() => undefined));
-    render(<MemoryRouter><LeaderboardHomeCard /></MemoryRouter>);
-    expect(screen.queryByTestId("leaderboard-card")).toBeNull();
   });
 });

@@ -52,8 +52,11 @@ Design: Phase 2 canvas, https://claude.ai/artifact/3kjEBZMVYhwtXRQ8NbX9ic, scree
 - `GET /api/leaderboard?period=week|all` returns the top 100 and the
   caller's own row. One SQL query over `history_tournaments` joined with
   `user_profiles`; cached for 60 s, with "Updated N min ago" on the page.
-- Place: a Leaderboard card on Home (the top 3 and "See top 100"), page
-  `#/leaderboard`.
+- Place: page `#/leaderboard`. Home has a plain Leaderboard card next to
+  Start practice that only opens the page (the owner, 28 Oct, after it went
+  live: the board itself does not belong in the menu). The first version's
+  Home card with the top 3 and the player's row is gone, and Home no longer
+  loads the board.
 - Admin accounts and the demo account (`demoplayer`) are left out.
 
 # Owner's answers (28 Oct)
