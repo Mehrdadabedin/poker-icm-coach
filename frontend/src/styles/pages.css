@@ -22,8 +22,8 @@
 }
 
 .btn-primary {
-  background: #1565c0;
-  color: #fff;
+  background: var(--review-primary-bg);
+  color: var(--review-primary-ink);
 }
 
 .top-bar {
@@ -53,9 +53,9 @@
 .toolbar input {
   min-height: 40px;
   border-radius: 8px;
-  border: 1px solid #444;
-  background: #0f1318;
-  color: var(--text);
+  border: 1px solid var(--review-field-border);
+  background: var(--review-field-bg);
+  color: var(--body-text);
   padding: 4px 8px;
 }
 
@@ -78,7 +78,7 @@
   width: 34px;
   height: 30px;
   text-align: center;
-  border: 1px solid #333;
+  border: 1px solid var(--review-grid-border);
   padding: 2px;
 }
 
@@ -86,10 +86,10 @@
   color: var(--accent);
 }
 
-.cell-open-raise { background: #1b5e20; color: #c8e6c9; font-weight: 700; }
-.cell-call { background: #4a148c; color: #e1bee7; }
-.cell-3-bet { background: #b71c1c; color: #ffcdd2; font-weight: 700; }
-.cell-open-jam { background: #e65100; color: #ffe0b2; font-weight: 700; }
+.cell-open-raise { background: var(--range-raise-bg); color: var(--range-raise-ink); font-weight: 700; }
+.cell-call { background: var(--range-call-bg); color: var(--range-call-ink); }
+.cell-3-bet { background: var(--range-3bet-bg); color: var(--range-3bet-ink); font-weight: 700; }
+.cell-open-jam { background: var(--range-jam-bg); color: var(--range-jam-ink); font-weight: 700; }
 
 .legend {
   margin-top: 10px;
@@ -117,9 +117,9 @@
 .settings-grid select {
   min-height: 42px;
   border-radius: 8px;
-  border: 1px solid #444;
-  background: #0f1318;
-  color: var(--text);
+  border: 1px solid var(--review-field-border);
+  background: var(--review-field-bg);
+  color: var(--body-text);
   padding: 6px 10px;
   font-size: 1rem;
 }
@@ -129,7 +129,7 @@
   align-items: center;
   gap: 8px;
   font-weight: 700;
-  color: var(--text);
+  color: var(--body-text);
   min-height: 42px;
 }
 
@@ -165,7 +165,7 @@
 .app-footer {
   margin-top: 18px;
   padding-top: 10px;
-  border-top: 1px solid rgba(21, 101, 192, 0.25);
+  border-top: 1px solid var(--review-primary-line);
   text-align: right;
   font-size: 0.72rem;
   color: var(--accent); /* existing gold/yellow accent used by the buttons */
@@ -187,4 +187,4 @@
 }
 
 /* the hand a Report leak linked to (plan 078) */
-.history-focus td { background: rgba(242, 193, 78, 0.16); }
+.history-focus td { background: var(--review-focus-row); }

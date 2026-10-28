@@ -1,5 +1,5 @@
 .icm-form {
-  background: #1d242c;
+  background: var(--surface);
   border-radius: 10px;
   padding: 16px;
   margin: 12px 0;
@@ -37,9 +37,9 @@
 .icm-input {
   min-height: 36px;
   border-radius: 6px;
-  border: 1px solid #444;
-  background: #0f1318;
-  color: var(--text);
+  border: 1px solid var(--review-field-border);
+  background: var(--review-field-bg);
+  color: var(--body-text);
   padding: 6px 10px;
   font-size: 0.9rem;
 }
@@ -52,9 +52,9 @@
 .icm-btn {
   min-height: 36px;
   border-radius: 6px;
-  border: 1px solid #444;
-  background: #243040;
-  color: var(--text);
+  border: 1px solid var(--review-field-border);
+  background: var(--icm-input-bg);
+  color: var(--body-text);
   padding: 6px 12px;
   font-size: 0.75rem;
   font-weight: 600;
@@ -63,7 +63,7 @@
 }
 
 .icm-btn:hover:not(:disabled) {
-  background: #2c3540;
+  background: var(--line);
   border-color: var(--accent);
 }
 
@@ -81,21 +81,21 @@
 .icm-btn-primary {
   width: 100%;
   margin-top: 12px;
-  background: #1565c0;
-  color: #fff;
+  background: var(--review-primary-bg);
+  color: var(--review-primary-ink);
   border: none;
   font-weight: 700;
   letter-spacing: 0.5px;
 }
 
 .icm-btn-primary:hover:not(:disabled) {
-  background: #1976d2;
+  background: var(--review-primary-hover);
 }
 
 .icm-error {
-  color: #ff6b6b;
-  background: rgba(255, 107, 107, 0.1);
-  border: 1px solid rgba(255, 107, 107, 0.3);
+  color: var(--icm-error-text);
+  background: var(--icm-error-bg);
+  border: 1px solid var(--icm-error-border);
   padding: 10px 12px;
   border-radius: 6px;
   font-size: 0.85rem;
@@ -103,7 +103,7 @@
 }
 
 .icm-results {
-  background: #1d242c;
+  background: var(--surface);
   border-radius: 10px;
   padding: 16px;
   margin: 20px 0;
@@ -118,29 +118,29 @@
 
 .icm-table th,
 .icm-table td {
-  border: 1px solid #2c3540;
+  border: 1px solid var(--line);
   padding: 8px 10px;
   text-align: left;
 }
 
 .icm-table th {
-  background: #0f1318;
+  background: var(--review-field-bg);
   color: var(--accent);
   font-weight: 700;
   letter-spacing: 0.3px;
 }
 
 .icm-table tbody tr:hover {
-  background: rgba(242, 193, 78, 0.05);
+  background: var(--icm-highlight-bg);
 }
 
 .icm-table .pos {
-  color: #81c784;
+  color: var(--review-good-label);
   font-weight: 600;
 }
 
 .icm-table .neg {
-  color: #e57373;
+  color: var(--icm-bad-label);
   font-weight: 600;
 }
 

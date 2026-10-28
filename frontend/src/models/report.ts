@@ -67,10 +67,11 @@ export function statVerdict(s: PlayerStat, t: T = EN): { text: string; tone: "ok
 export const leakText = (l: Leak, t: T = EN): string => t("report.leak", {
   pos: l.position, street: l.street, hero: actionWord(l.heroAction, t), coach: actionWord(l.coachAction, t) });
 
-/** Green at no mistakes, red from one decision in four. */
+/** Green at no mistakes, red from one decision in four. The lightness is a token:
+ * dark cells in the dark theme, pale cells in the light one. */
 export function heatColour(rate: number): string {
   const hue = Math.round(130 * (1 - Math.min(rate / 0.25, 1)));
-  return `hsl(${hue} 35% 27%)`;
+  return `hsl(${hue} 35% var(--heat-lightness))`;
 }
 
 export const chips = (n: number): string =>
