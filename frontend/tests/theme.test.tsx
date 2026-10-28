@@ -176,7 +176,7 @@ const PAIRS: [string, string, string?][] = [
   ["--signin-submit-ink", "--signin-submit-bg"], ["--signin-provider-dark-ink", "--signin-provider-dark-bg"],
   ["--signin-provider-light-ink", "--signin-provider-light-bg"], ["--dealer-ink", "--dealer-bg"],
   ["--explain-note-ink", "--explain-note-bg"], ["--lock-title", "--surface"], ["--lock-text", "--surface"], ["--lock-open-ink", "--surface"], ["--text", "--upgrade-bg"],
-  ["--accent", "--upgrade-bg"], ["--sheet-soon-ink", "--sheet-soon-bg"], ["--landing-text", "--landing-bg"], ["--landing-muted", "--landing-bg"], ["--landing-muted", "--landing-card"],
+  ["--accent", "--upgrade-bg"], ["--sheet-soon-ink", "--sheet-soon-bg"], ["--landing-text", "--landing-bg"], ["--landing-muted", "--landing-bg"], ["--landing-muted", "--landing-card"], ["--lb-points", "--surface"], ["--lb-points", "--bg"], ["--accent-ink", "--lb-silver"], ["--accent-ink", "--lb-bronze"],
 ];
 
 describe("contrast", () => {

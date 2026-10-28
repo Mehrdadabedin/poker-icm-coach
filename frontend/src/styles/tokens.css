@@ -13,6 +13,7 @@
 @import "./tokens/signin.css";
 @import "./tokens/landing.css";
 @import "./tokens/plans.css";
+@import "./tokens/leaderboard.css";
 
 :root,
 :root[data-theme="dark"],

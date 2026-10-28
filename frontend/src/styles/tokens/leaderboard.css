@@ -1,0 +1,14 @@
+:root,
+:root[data-theme="dark"],
+.keep-dark {
+  /* the leaderboard (plan 102): silver and bronze badges, and the green of points */
+  --lb-silver: #c3cad2;
+  --lb-bronze: #d0915f;
+  --lb-points: #6fd69a;
+}
+
+:root[data-theme="light"] {
+  --lb-silver: #9aa3ad;
+  --lb-bronze: #b8733f;
+  --lb-points: #176b3a;
+}
