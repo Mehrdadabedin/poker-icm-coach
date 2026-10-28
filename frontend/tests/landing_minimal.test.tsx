@@ -108,12 +108,12 @@ describe("minimal landing page (/minimal)", () => {
     const { readFileSync } = await import("fs");
     const css = readFileSync("src/styles/landing-minimal.css", "utf8");
     // Light page: icons use the deeper amber, gold stays on the main button.
-    expect(css).toContain("--lm-accent: #8a5a00");
+    expect(css).toContain("--lm-accent: var(--landing-min-accent)");
     const cards = readFileSync("src/styles/landing-minimal-cards.css", "utf8");
     expect(cards).toMatch(/\.lm-card-icon \{[^}]*color: var\(--lm-accent\)/);
     // white rounded cards that gain a dark grey shadow under the mouse
-    expect(cards).toMatch(/\.lm-card \{[^}]*border-radius: 16px;[^}]*background: #fff;/);
-    expect(cards).toMatch(/\.lm-card:hover \{[^}]*box-shadow: [^;]*rgba\(51, 51, 51, /);
+    expect(cards).toMatch(/\.lm-card \{[^}]*border-radius: 16px;[^}]*background: var\(--landing-min-card-bg\);/);
+    expect(cards).toMatch(/\.lm-card:hover \{[^}]*box-shadow: [^;]*var\(--landing-min-card-hover-shadow\)/);
   });
 
   it("shows How it works as three ordered step cards with an icon each, not a number", async () => {

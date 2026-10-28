@@ -103,7 +103,7 @@
   margin-top: 20px;
   border: 1px solid var(--lp-gold);
   border-radius: 12px;
-  background: #0f1218;
+  background: var(--landing-quiz-answer-bg);
   padding: 16px 18px;
   text-align: center;
 }
