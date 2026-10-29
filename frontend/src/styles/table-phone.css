@@ -8,6 +8,14 @@
   .table-page { min-height: 100dvh; }
   /* a tall screen's empty space goes to the felt: its rows spread out and the buttons stay at the bottom (plan 106) */
   .table-wrap > .table-felt { border-width: 6px; gap: 4px; flex: 1 1 auto; align-content: space-evenly; }
+  /* the owner (29 Oct): bigger backs where the felt has room. The lower rows grow only on
+     a tall phone (38 px up to 860 px tall, then up to 46 px), so five live seats still clear
+     the bet buttons on a small one. The top row is as tall as the hero's seat with its two
+     big cards, so the two seats beside the hero take backs up to 52 px at no cost in height,
+     never wider than their box. Folded players show none. */
+  .table-felt .seat .seat-cards .playing-card.seat-card-back { width: clamp(38px, calc(38px + (100dvh - 860px) / 2.8), 46px); }
+  .table-felt .seat.seat-hero + .seat .seat-cards .playing-card.seat-card-back,
+  .table-felt .seat.seat-hero + .seat + .seat .seat-cards .playing-card.seat-card-back { width: min(52px, calc((100vw - 64px) / 6)); }
   .table-wrap > .table-header { margin-bottom: 4px; gap: 4px 6px; padding-left: 8px; padding-right: 8px; }
   .hero-controls { padding: 4px 6px; margin-top: 0; }
 

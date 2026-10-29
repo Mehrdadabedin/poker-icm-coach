@@ -71,6 +71,11 @@ otherwise. The upright phone layout of plan 101 stays, except point 7.
   (`--table-label` #2f2e2b at weight 700, `--panel-title` #6b4500); dark is
   unchanged. Both pairs are in the contrast test.
 - The history tabs stay on one line, with the close button, on a 360 px phone.
+- Upright phone, second pass the same day: the two seats beside the hero
+  share the hero's tall row, so their backs grow up to 52 px (never wider
+  than their box); the lower rows grow only on a tall phone (38 px up to
+  860 px tall, then up to 46 px). Known, unchanged: on a 360 x 780 phone a
+  live bottom-row seat sits partly behind the bet buttons.
 
 # Tests
 
