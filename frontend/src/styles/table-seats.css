@@ -9,15 +9,15 @@
   .table-felt .seat .seat-stack { font-size: 0.92em; }
   .table-felt .seat .seat-cards { margin-top: 1px; }
   .table-felt .seat .seat-cards .playing-card { width: 3.2em; }
-  .table-felt .seat .seat-cards .playing-card.seat-card-back { width: 2.5em; }
+  .table-felt .seat .seat-cards .playing-card.seat-card-back { width: 3.3em; }
   .table-felt .seat .seat-cards.hero-cards .playing-card { width: 4.33em; }
   .seat[data-seat="0"] { left: 50%; top: 18%; }
   .seat[data-seat="1"] { left: 73%; top: 24%; }
-  .seat[data-seat="2"] { left: 92%; top: 37%; }
-  .seat[data-seat="3"] { left: 88%; top: 70%; }
+  .seat[data-seat="2"] { left: 92%; top: 35%; }
+  .seat[data-seat="3"] { left: 88%; top: 72%; }
   .seat[data-seat="4"] { left: 66%; top: 83%; }
   .seat[data-seat="5"] { left: 34%; top: 83%; }
-  .seat[data-seat="6"] { left: 12%; top: 70%; }
-  .seat[data-seat="7"] { left: 8%; top: 37%; }
+  .seat[data-seat="6"] { left: 12%; top: 72%; }
+  .seat[data-seat="7"] { left: 8%; top: 35%; }
   .seat[data-seat="8"] { left: 27%; top: 24%; }
 }
