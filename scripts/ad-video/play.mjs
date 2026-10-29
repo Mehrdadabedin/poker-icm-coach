@@ -47,7 +47,7 @@ export const wants = (a) => {
 export async function tapRaiseSize(t) {
   for (const k of ENTER_RAISE) {
     const size = t.tid(`size-${k}`);
-    if (await size.isVisible().catch(() => false)) { await t.tap(size); break; }
+    if (await size.isVisible().catch(() => false)) { await t.tap(size).catch(() => undefined); break; }
   }
 }
 
@@ -60,7 +60,7 @@ export async function act(t, choice) {
   return t.tap((await call.isEnabled()) ? call : allin);
 }
 
-// follow the coach (or fold and check when passive) until `stop(advice)` is true at a hero turn; returns that advice
+// follow the coach (or fold and check when passive; a function picks the choice) until `stop(advice)` is true at a hero turn; returns that advice
 export async function playUntil(t, stop, maxHands = 60, passive = false) {
   for (let hands = 0; hands < maxHands;) {
     await nextHand(t);
@@ -69,7 +69,7 @@ export async function playUntil(t, stop, maxHands = 60, passive = false) {
     if (state === "over") { hands += 1; continue; }
     const a = await advice(t);
     if (await stop(a)) return a;
-    const choice = passive ? "FOLD" : wants(a);
+    const choice = typeof passive === "function" ? passive(a) : passive ? "FOLD" : wants(a);
     if (choice === "RAISE") await tapRaiseSize(t);
     // a button that stays disabled means the turn moved on: look again
     await act(t, choice).catch((error) => console.error(`act ${choice}: ${String(error).split("\n")[0]}`));

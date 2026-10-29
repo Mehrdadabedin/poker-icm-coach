@@ -23,5 +23,7 @@ the real app, silent until a licensed music track is chosen. Script approved 27 
 
 # Status
 
-Paused 28 Oct: record after the Phase 2 design (plans 099, 101, 103). Four takes work, the champion
-take and the final assembly are left. See `scripts/ad-video/NOTES.md`.
+29 Oct: rebased on Phase 2 and recorded again (432x768 at 2.5x, Pro account, dark), Free and Pro in the
+ad (PRO tags, end card "Free practice. ICM coach with Pro."), Meta Reels safe area, music from the Meta
+Sound Collection, champion take won on a retry. Video and contact sheet are in `~/Videos/icmbot-ads/`.
+Left: the owner watches it; then the Spanish version. Not pushed. See `scripts/ad-video/NOTES.md`.

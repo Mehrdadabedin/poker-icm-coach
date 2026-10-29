@@ -10,9 +10,24 @@ const { chromium, request } = require("@playwright/test");
 const SITE = process.env.SITE ?? "http://localhost:5175";
 const API = process.env.API ?? "http://localhost:8766";
 const USER = process.env.DEMO_USER ?? "demoplayer";
-// CSS 390x693 at 2.7692x is exactly 1080x1920
-const VIEW = { width: 390, height: 693 };
-const SCALE = 1080 / 390;
+// CSS 432x768 at 2.5x is exactly 1080x1920 and is still the upright phone layout. Under 700 px
+// tall the felt shrinks (useFeltFit, plan 106 follow-ups), so the old 390x693 is a short phone.
+const VIEW = { width: 432, height: 768 };
+const SCALE = 2.5;
+
+// What must never be in a shot: a lock, an Upgrade card or sheet, the locked coach chip (the
+// account is Pro, not admin), and a seat behind the bet buttons.
+const LOCKS = ".coach-chip, .locked-line, .hm-lock-pro, .ico-lock, .hm-card-upgrade, .pro-locked-page, .coach-chip-unlock, [data-testid=upgrade-sheet]";
+const flaws = () => {
+  const found = [...document.querySelectorAll(LOCKS_SELECTOR)].filter((n) => n.offsetParent).map((n) => `visible ${n.className || n.dataset.testid}`);
+  const controls = document.querySelector(".hero-controls");
+  if (controls) {
+    const top = controls.getBoundingClientRect().top;
+    const low = Math.max(...[...document.querySelectorAll(".seat")].map((s) => s.getBoundingClientRect().bottom));
+    if (low > top + 1) found.push(`a seat sits ${Math.round(low - top)}px behind the bet buttons`);
+  }
+  return found;
+};
 
 // a ring where a finger touches, so a viewer sees the tap (recording only)
 const TAP_DOT = () => document.addEventListener("pointerdown", (e) => {
@@ -41,6 +56,8 @@ export async function openTake(out, passFile) {
   const t0 = Date.now();
   const stamps = [];
   const marks = [];
+  const problems = [];
+  const checks = [];
   let running = false;
   let grab = Promise.resolve();
   const shot = async () => {
@@ -74,7 +91,11 @@ export async function openTake(out, passFile) {
     page, api, token, startCapture, user: USER, out, password,
     pause: (ms) => page.waitForTimeout(ms),
     tid: (id) => page.locator(`[data-testid="${id}"]`),
-    mark: (name) => { marks.push({ name, t: (Date.now() - t0) / 1000 }); console.log(marks.at(-1)); },
+    mark: (name) => {
+      marks.push({ name, t: (Date.now() - t0) / 1000 }); console.log(marks.at(-1));
+      checks.push(page.evaluate(`(${flaws.toString().replace("LOCKS_SELECTOR", JSON.stringify(LOCKS))})()`)
+        .then((found) => found.forEach((f) => problems.push(`${name}: ${f}`)), () => undefined));
+    },
     tap: async (loc) => { await loc.scrollIntoViewIfNeeded({ timeout: 5000 }); await loc.tap({ timeout: 5000 }); },
     async server(path, method = "GET") {
       const tableId = page.url().split("/table/")[1]?.split(/[?#/]/)[0];
@@ -89,7 +110,10 @@ export async function openTake(out, passFile) {
     async finish() {
       running = false;
       await Promise.race([grab, new Promise((done) => setTimeout(done, 10000))]);
+      await Promise.all(checks);
       writeFileSync(`${out}/marks.json`, JSON.stringify(marks, null, 2));
+      for (const p of problems) console.error(`PROBLEM ${p}`);
+      if (problems.length) process.exitCode = 1;
       writeFileSync(`${out}/frames.json`, JSON.stringify(stamps));
       await browser.close();
       await api.dispose();
@@ -98,9 +122,9 @@ export async function openTake(out, passFile) {
   return t;
 }
 
-export async function signIn(t) {
+export async function signIn(t, capture = true) {
   await t.page.goto(`${SITE}/?lang=en#/`);
-  t.startCapture();
+  if (capture) t.startCapture();
   await t.page.evaluate(([tok, user]) => { localStorage.setItem("icm_auth_token", tok); localStorage.setItem("icm_username", user); }, [t.token, t.user]);
   await t.page.goto(`${SITE}/?lang=en#/login`);
   await t.tid("start-practice").waitFor();

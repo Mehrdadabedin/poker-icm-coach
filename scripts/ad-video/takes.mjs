@@ -14,10 +14,12 @@ const TAKES = {
   async co() {
     await t.settings(DEFAULTS);
     await signIn(t); await startTable(t); await heroTurnOrOver(t);
-    await t.tid("mobile-coach").waitFor({ timeout: 10000 });
+    await t.tid("strip-action").waitFor({ timeout: 10000 });
     t.mark("dealt"); await t.pause(1500);
-    t.mark("coach"); await t.pause(900);
-    await t.tap(t.tid("mobile-coach").locator('[data-testid="gl-term-CO"]')); t.mark("gloss"); await t.pause(1900);
+    t.mark("coach"); await t.pause(700);
+    await t.tap(t.tid("strip-why")); t.mark("sheet"); await t.pause(1500);
+    await t.page.keyboard.press("Escape"); await t.pause(400);
+    await t.tap(t.tid("coach-strip").locator('[data-testid="gl-term-CO"]')); t.mark("gloss"); await t.pause(1900);
     await t.page.keyboard.press("Escape");
     await t.pause(300);
     t.mark("fold"); await act(t, "FOLD");
@@ -58,7 +60,13 @@ const TAKES = {
   },
   // the review pages on the demo player's saved history
   async study() {
-    await signIn(t);
+    await t.settings(DEFAULTS);
+    // My Mistakes lists the active table: play against the coach there first, off camera
+    await signIn(t, false); await startTable(t);
+    let decisions = 0;
+    await playUntil(t, () => ++decisions > 16, 60, (a) => (wants(a) === "FOLD" ? "CALL" : "FOLD"));
+    t.startCapture();
+    await t.page.evaluate(() => { location.hash = "#/login"; });
     const go = async (hash, id) => { await t.page.evaluate((h) => { location.hash = h; }, hash); await t.tid(id).waitFor({ timeout: 20000 }); };
     await go("#/mistakes", "mistakes-page").catch(() => t.page.waitForTimeout(1500));
     t.mark("mistakes"); await t.pause(2600);
@@ -81,7 +89,12 @@ async function spot(prefix, label) {
   const deep = (x) => Number(x.reasonParams?.depth ?? 99) >= 6;
   const a = await playUntil(t, (x) => String(x.reasonCode).startsWith(prefix) && deep(x), 30, true);
   if (!a) throw new Error(`no ${prefix} spot`);
-  t.mark(`${label}-turn`); await t.pause(2200);
+  t.mark(`${label}-turn`);
+  if (label === "icm") {
+    // the strip cuts the prize-pool line: the sheet shows it
+    await t.pause(900); await t.tap(t.tid("strip-why")); t.mark("icm-sheet"); await t.pause(1900);
+    await t.page.keyboard.press("Escape"); await t.pause(300);
+  } else await t.pause(2200);
   await act(t, wants(a)); t.mark(`${label}-done`); await t.pause(1800);
 }
 

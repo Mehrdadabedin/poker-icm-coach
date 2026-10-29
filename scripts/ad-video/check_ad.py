@@ -42,7 +42,7 @@ def main() -> None:
         f"length {length:.1f} s (28 to 32)": 28 <= length <= 32,
         f"frame rate {video[4]} fps (30)": abs(float(video[4]) - 30) < 0.5,
         f"codecs {video[1]} + {audio[1]} (h264 + aac)": (video[1], audio[1]) == ("h264", "aac"),
-        "audio " + ("silent track (no music chosen yet)" if silent else f"{lufs} LUFS (-17 to -15)"):
+        "audio " + ("silent track" if silent else f"{lufs} LUFS (-17 to -15)"):
             silent or -17 <= float(lufs or 0) <= -15,
     }
     for text, ok in checks.items():
