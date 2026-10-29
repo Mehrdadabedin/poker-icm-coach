@@ -75,7 +75,7 @@ own buttons: the shots read without them.
 | 8-10 | Raise with the size buttons | SIZES IN BB | yes (the coach strip is on screen) |
 | 10-12 | SB shove at 8.5 BB, coach OPEN JAM | PUSH/FOLD RANGES | yes |
 | 12-15 | ICM all-in call spot, Why sheet with prize pool shares | ICM ON ALL-IN CALLS | yes |
-| 15-17 | Bubble (level 6, 7 players left) | BUBBLE. FINAL TABLE. | no |
+| 15-17 | Bubble (level 6, 7 players left) | SURVIVE THE BUBBLE | no |
 | 17-19 | Leaderboard, All time, five local players | CLIMB THE LEADERBOARD | no |
 | 19-21 | My Mistakes | FIX YOUR MISTAKES | yes |
 | 21-23 | Report: leaks, VPIP and PFR | FIND YOUR LEAKS | yes |
@@ -84,7 +84,7 @@ own buttons: the shots read without them.
 
 The opening hook shot has no tag. No champion screen: the hero won the tournament in 1 of about 16 tries over
 two sessions, and the owner stopped the retries. The fallback of the brief is used: the bubble comes from a
-short take (no final-table frame was reached, so "BUBBLE. FINAL TABLE." is on the bubble frame), and the
+short take (no final-table frame was reached, so the overlay says "SURVIVE THE BUBBLE", not "BUBBLE. FINAL TABLE."), and the
 leaderboard replaces the champion screen. Every frame is real app output on the local backend. The
 leaderboard needs other players: `seed_history.py` ran for `adlocal1` to `adlocal5` (the real engine; the
 finish places were then set by SQL so the points differ) with profile rows "Local Ace", "Local King",
