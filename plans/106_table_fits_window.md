@@ -60,6 +60,18 @@ otherwise. The upright phone layout of plan 101 stays, except point 7.
 9. Colours only as tokens (plan 103), in both themes; the see-through panel
    gets its own token for dark and light.
 
+# Follow-up (the owner, 29 Oct, after it went live)
+
+- Opponents still in the hand show bigger card backs (38 px on a phone,
+  3.3em on wide screens, up from 30 px and 2.5em); folded players show none,
+  so their seats stay short. The side seats moved apart a little (35% and
+  72%) so a bet chip never sits on the next seat.
+- Light theme: the status lines, the coach's row names, the ICM COACH and
+  HAND HISTORY titles and the chosen history tab are darker and bolder
+  (`--table-label` #2f2e2b at weight 700, `--panel-title` #6b4500); dark is
+  unchanged. Both pairs are in the contrast test.
+- The history tabs stay on one line, with the close button, on a 360 px phone.
+
 # Tests
 
 - At 1280 x 650, 1366 x 768 and 1440 x 900, dark and light: the page does not

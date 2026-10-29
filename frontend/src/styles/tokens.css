@@ -31,6 +31,10 @@
   /* older pages: the body text and muted grey they had before the tokens */
   --body-text: #e8e6e1;
   --muted: #9aa0a6;
+  /* the table's labels: the status line, the coach's row names, panel titles */
+  --table-label: #9aa0a6;
+  --table-label-weight: 600;
+  --panel-title: #f2c14e;
   /* fixed: the header band, gold buttons and their ink are the same in both themes */
   --band: #07080a;
   --accent-fill: #f2c14e;
@@ -50,6 +54,10 @@
   --tab-idle: #5f5e5a;
   --body-text: #141414;
   --muted: #5f5e5a;
+  /* the owner (29 Oct): on white the grey and gold labels read too faint */
+  --table-label: #2f2e2b;
+  --table-label-weight: 700;
+  --panel-title: #6b4500;
 }
 
 /* text inside a keep-dark element is light again: `color` is inherited, not re-resolved */

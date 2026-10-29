@@ -10,7 +10,8 @@
 
 .history-title {
   margin: 0 0 6px;
-  color: var(--accent);
+  color: var(--panel-title);
+  font-weight: 800;
   font-size: 0.8rem;
   letter-spacing: 1px;
 }

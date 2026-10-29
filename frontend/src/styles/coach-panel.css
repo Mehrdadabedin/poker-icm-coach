@@ -45,7 +45,8 @@
 
 .coach-panel h3 {
   margin: 0 0 6px;
-  color: var(--accent);
+  color: var(--panel-title);
+  font-weight: 800;
 }
 
 .coach-recommendation {
@@ -73,7 +74,8 @@
 }
 
 .coach-row dt {
-  color: var(--muted);
+  color: var(--table-label);
+  font-weight: var(--table-label-weight);
 }
 
 .coach-row dd {
