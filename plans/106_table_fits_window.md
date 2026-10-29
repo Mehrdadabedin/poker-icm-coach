@@ -74,8 +74,15 @@ otherwise. The upright phone layout of plan 101 stays, except point 7.
 - Upright phone, second pass the same day: the two seats beside the hero
   share the hero's tall row, so their backs grow up to 52 px (never wider
   than their box); the lower rows grow only on a tall phone (38 px up to
-  860 px tall, then up to 46 px). Known, unchanged: on a 360 x 780 phone a
-  live bottom-row seat sits partly behind the bet buttons.
+  860 px tall, then up to 46 px).
+- No seat behind the bet buttons on an upright phone (the owner, 29 Oct):
+  measured in the worst case (every opponent live, a flop out), a live
+  bottom-row seat sat 41 to 81 px behind them at 360 x 780 and up to 221 px
+  at 360 x 640. The felt now measures the page and shrinks just enough to
+  fit (`hooks/useFeltFit.ts`, CSS `zoom`, down to 60%), and grows back when
+  there is room. At 360 x 640 the 60% floor leaves a few pixels: the page
+  scrolls there. `scripts/table-fit/phone.mjs` checks six phone sizes and is
+  part of `check.mjs`.
 
 # Tests
 
