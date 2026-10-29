@@ -1,4 +1,7 @@
+import { useRef } from "react";
 import { Card, TableState, formatChips } from "../models/game";
+import { useFeltFit } from "../hooks/useFeltFit";
+import { useUprightPhone } from "../hooks/useUprightPhone";
 import { CardView } from "./CardView";
 import { PokerSeat } from "./PokerSeat";
 import { useT } from "../i18n/I18n";
@@ -33,6 +36,10 @@ export function PokerTable({ state, children, overlay, cover, top, trail, detail
     .sort((a, b) => a.seat - b.seat);
   const isReview = state.phase === "handOver" && !!state.review;
   const review = state.review ?? null;
+  // a short phone shrinks the felt so no seat sits behind the bet controls
+  const felt = useRef<HTMLDivElement>(null);
+  const live = sorted.filter((p) => !p.folded).length;
+  useFeltFit(felt, useUprightPhone(), `${sorted.length}:${live}:${state.communityCards.length}:${state.phase}`);
 
   // last action per seat from the live action log
   const lastActionBySeat = new Map<number, string>();
@@ -93,7 +100,7 @@ export function PokerTable({ state, children, overlay, cover, top, trail, detail
         <span className="tbl-info">{t(isReview ? "status.handComplete" : "status.liveHand")}</span>
       </div>
       {top}
-      <div className="table-felt keep-dark">
+      <div className="table-felt keep-dark" ref={felt}>
         {sorted.map((p) => {
           const reveal = revealBySeat.get(p.seat);
           return (

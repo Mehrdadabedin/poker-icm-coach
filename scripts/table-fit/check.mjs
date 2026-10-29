@@ -1,6 +1,7 @@
 // Fails (exit 1) when the table does not fit its window (plan 106).
 // Needs the backend and the dev server: see scripts/table-fit/README in the plan. Run: node scripts/table-fit/check.mjs
 import { account, chromium, openTable } from "./lib.mjs";
+import { checkPhones } from "./phone.mjs";
 
 const WINDOWS = [[1280, 650], [1366, 768], [1440, 900]];
 const WIDTHS = [360, 390, 768, 1024, 1280, 1600];
@@ -72,6 +73,8 @@ for (const width of WIDTHS) {
 }
 await context.close();
 }
+// phones held upright: no seat behind the bet controls, in the worst case
+failures.push(...await checkPhones(browser, auth));
 await browser.close();
 
 if (failures.length) {
