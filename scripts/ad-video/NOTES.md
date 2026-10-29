@@ -16,7 +16,9 @@ first. Output goes to `~/Videos/icmbot-ads/` (never `frontend/public/videos/`):
   with `ADMIN_BOOTSTRAP_PASSWORD` from a scratch file; sign in as Admin once, change its password, then
   `PUT /api/admin/users/demoplayer/plan {"plan":"pro"}` (same as Admin, Users, Free/Pro switch). Backend
   state is in memory, so repeat this after every restart. Passwords only in `/tmp` scratch files.
-- Theme: dark (default). The info line and the history drawer stay closed in the table shots.
+- Theme: dark. Headless Chromium reports a light scheme and the app follows it by default, so the context
+  sets `colorScheme: "dark"` and `icmbot.theme` = dark before the first paint; the guard fails a take whose
+  `data-theme` is not dark. The info line and the history drawer stay closed in the table shots.
 - `DEAL_SEED` (`backend/app/core/deal_seed.py`): fixed deals, never set on Render
   (`backend/tests/test_deal_seed.py`). Each seeded take needs a fresh backend:
   ```
@@ -31,10 +33,13 @@ first. Output goes to `~/Videos/icmbot-ads/` (never `frontend/public/videos/`):
 - Takes: `co` (strip, Why sheet, glossary tap on CO, fold, hand review grade, raise sizes), `shove`,
   `icm` (opens the Why sheet: the strip cuts the prize-pool line), `study` (plays 16 decisions against
   the coach off camera so My Mistakes has content, then My Mistakes, Report, Ranges, ICM calculator),
-  `champion` (2 min levels, 10 BB stacks, up to 12 tries; it won on the 4th try of the second run).
+  `stages` (2 min levels, 10 BB stacks: stops 2.6 s after the coach shows the bubble stage) and `leaderboard`
+  (All time tab). `champion` (same setup, plays to the end; keeps only its last try, `t.reset()`) is still in
+  `takes.mjs`, but a win by the hero is rare: about 1 in 16 tries, and the winner screen also shows when a bot
+  wins, so the take only accepts "WON THE TOURNAMENT".
 - `overlays.mjs` makes the text layers as PNGs and exits 1 when one is outside the safe area.
-  `assemble_ad.py` cuts the takes by mark, moves the footage down 100 px (so the tags fit above the coach
-  strip), overlays, adds music or a silent track. `check_ad.py` checks the file.
+  `assemble_ad.py` cuts the takes by mark, overlays, adds music or a silent track. The footage fills the whole
+  frame (no shift). `check_ad.py` checks the file.
   ```
   node scripts/ad-video/overlays.mjs scripts/ad-video/shots.json /tmp/ad/ov
   uv run --with imageio-ffmpeg python scripts/ad-video/assemble_ad.py scripts/ad-video/shots.json /tmp/ad /tmp/ad/ov ~/Videos/icmbot-ads/ICMBOT_ad_9x16.mp4 ~/Videos/icmbot-ads/music/rise.m4a 16.0
@@ -52,10 +57,12 @@ Reels numbers are the stricter, so they are used. Meta's overview
 (https://www.facebook.com/business/help/980593475366490) adds that with disclaimers on Reels the bottom
 40% stays free (this ad has none), and that 9:16 video ads in Instagram Feed use the same zone.
 
-On 1080x1920: x 65 to 1015, y 269 to 1248. The address tag (top left, y 280), the PRO tag (top right,
-y 280), the big words (y 940 to 980, two lines at most) and the end card (logo, START FREE, line, button)
-all sit inside; `overlays.mjs` fails otherwise. The app's own footage fills the whole frame, so the
-bet buttons (bottom) are under Instagram's own buttons: the shots read without them.
+On 1080x1920: x 65 to 1015, y 269 to 1248. Each shot has one dark panel (x 85 to 995, from y 936 or 940 to about y 1240): the PRO pill above the words, the
+words (two lines at most), `icmbot.one` small below. It starts below the coach strip and the hero's seat (the
+seat ends near y 925) and ends above the bottom zone, so it covers no app text that matters, no coach strip, no
+hero cards and no bet buttons. The end card (logo, START FREE, line, button) is inside too; `overlays.mjs`
+fails otherwise. The app's own footage fills the whole frame, so the bet buttons (bottom) are under Instagram's
+own buttons: the shots read without them.
 
 ## Script
 
@@ -65,20 +72,24 @@ bet buttons (bottom) are under Instagram's own buttons: the shots read without t
 | 2-4 | Coach strip FOLD, then the Why sheet | THE COACH SAYS WHY | yes |
 | 4-6 | Tap CO in the strip: short definition | LEARN EVERY TERM | no |
 | 6-8 | Hero folds, hand review: PREFERRED | PLAY. GET GRADED. | yes |
-| 8-10 | Raise with the size buttons | SIZES IN BB | no |
+| 8-10 | Raise with the size buttons | SIZES IN BB | yes (the coach strip is on screen) |
 | 10-12 | SB shove at 8.5 BB, coach OPEN JAM | PUSH/FOLD RANGES | yes |
 | 12-15 | ICM all-in call spot, Why sheet with prize pool shares | ICM ON ALL-IN CALLS | yes |
 | 15-17 | Bubble (level 6, 7 players left) | BUBBLE. FINAL TABLE. | no |
-| 17-19 | Champion screen (real, from a played tournament) | PLAY TO THE FINAL TABLE | no |
+| 17-19 | Leaderboard, All time, five local players | CLIMB THE LEADERBOARD | no |
 | 19-21 | My Mistakes | FIX YOUR MISTAKES | yes |
 | 21-23 | Report: leaks, VPIP and PFR | FIND YOUR LEAKS | yes |
 | 23-25 | Ranges grid, ICM calculator | STUDY TOOLS | yes |
 | 25-30 | End card: logo, "Free practice. ICM coach with Pro.", button icmbot.one | START FREE | no |
 
-The "SIZES IN BB" shot has no PRO tag: sizes are free, but the coach strip above is visible in it.
-The same holds for the first and third shots (the owner's list: no tag on the deal and the glossary
-tap). The champion shot is a real champion screen, so no fallback was needed (leaderboard shot not used).
-The text follows the repo rules (plain English, no em dashes).
+The opening hook shot has no tag. No champion screen: the hero won the tournament in 1 of about 16 tries over
+two sessions, and the owner stopped the retries. The fallback of the brief is used: the bubble comes from a
+short take (no final-table frame was reached, so "BUBBLE. FINAL TABLE." is on the bubble frame), and the
+leaderboard replaces the champion screen. Every frame is real app output on the local backend. The
+leaderboard needs other players: `seed_history.py` ran for `adlocal1` to `adlocal5` (the real engine; the
+finish places were then set by SQL so the points differ) with profile rows "Local Ace", "Local King",
+"Local Queen", "Local Jack", "Local Ten" in the local PostgreSQL only. Those rows were deleted after the
+recording; no real player's name is on screen.
 
 ## Music
 

@@ -56,7 +56,11 @@ export async function act(t, choice) {
   const fold = c.locator(".btn-fold"), call = c.locator(".btn-call"), allin = c.locator(".btn-allin");
   if (choice === "FOLD") return t.tap((await fold.isEnabled()) ? fold : call);
   if (choice === "ALL-IN") return t.tap(allin);
-  if (choice === "RAISE") return t.tap(t.tid("size-play"));
+  if (choice === "RAISE") {
+    // no raise button (a short stack facing a bet): the coach's aggression is the all-in, else the call
+    if (await t.tid("size-play").isVisible().catch(() => false)) return t.tap(t.tid("size-play"));
+    return t.tap((await allin.isEnabled().catch(() => false)) ? allin : call);
+  }
   return t.tap((await call.isEnabled()) ? call : allin);
 }
 

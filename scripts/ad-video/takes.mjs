@@ -26,7 +26,8 @@ const TAKES = {
     await t.tap(t.tid("review-hand-btn"));
     const preferred = t.page.getByText("PREFERRED").first();
     await preferred.waitFor({ timeout: 10000 });
-    await preferred.evaluate((e) => e.scrollIntoView({ block: "center" }));
+    // near the top of the screen: the text panel covers the lower half
+    await preferred.evaluate((e) => { e.scrollIntoView({ block: "start" }); window.scrollBy(0, -170); });
     t.mark("grade"); await t.pause(1700);
     await t.tap(t.page.getByRole("button", { name: "BACK TO TABLE" }));
     const a = await playUntil(t, (x) => wants(x) === "RAISE" && x.street === "preflop");
@@ -46,17 +47,50 @@ const TAKES = {
       if (stage && !seen.has(stage)) { seen.add(stage); t.mark(`${stage}-turn`); await t.pause(2200); }
       return false;
     };
-    for (let attempt = 1; attempt <= 12; attempt += 1) {
+    for (let attempt = 1; attempt <= 30; attempt += 1) {
       console.log("attempt", attempt);
+      t.reset();
       await startTable(t);
       await playUntil(t, note, 500);
+      // the winner screen also shows when a bot wins: only the hero's own win is the ad's champion shot
       if (await t.tid("tournament-winner").waitFor({ timeout: 5000 }).then(() => true, () => false)) {
-        t.mark("champion"); await t.pause(3500); return;
+        if ((await t.tid("tournament-winner").innerText()).toUpperCase().includes("WON THE TOURNAMENT")) {
+          t.mark("champion"); await t.pause(3500); return;
+        }
+        console.log("a bot won this one");
       }
       seen.clear();
       await t.page.goto(`${t.page.url().split("#")[0]}#/login`);
     }
-    throw new Error("no champion in 12 attempts");
+    throw new Error("no champion in 30 attempts");
+  },
+  // the bubble, as short as the champion tries: fast blinds, 10 BB stacks, stop a few hands after the bubble shows
+  async stages() {
+    await t.settings({ ...SHORT, blindLevelMinutes: 2 });
+    await signIn(t);
+    for (let attempt = 1; attempt <= 12; attempt += 1) {
+      console.log("attempt", attempt);
+      t.reset();
+      await startTable(t);
+      let marked = false;
+      await playUntil(t, async (a) => {
+        const stage = { BUBBLE: "bubble", "FINAL TABLE": "final" }[String(a.detail?.BUBBLE)];
+        if (stage && !marked) { marked = true; t.mark(`${stage}-turn`); await t.pause(2600); return true; }
+        return false;
+      }, 500);
+      if (marked) return;
+      await t.page.goto(`${t.page.url().split("#")[0]}#/login`);
+    }
+    throw new Error("no bubble in 12 attempts");
+  },
+  // the leaderboard of the local players (the demo player is not on it)
+  async leaderboard() {
+    await signIn(t);
+    await t.page.evaluate(() => { location.hash = "#/leaderboard"; });
+    await t.tid("leaderboard-page").waitFor({ timeout: 20000 });
+    await t.tap(t.tid("lb-all"));
+    await t.tid("lb-list").waitFor({ timeout: 20000 });
+    t.mark("leaderboard"); await t.pause(2600);
   },
   // the review pages on the demo player's saved history
   async study() {

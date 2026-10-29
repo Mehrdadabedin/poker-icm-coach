@@ -15,11 +15,12 @@ const USER = process.env.DEMO_USER ?? "demoplayer";
 const VIEW = { width: 432, height: 768 };
 const SCALE = 2.5;
 
-// What must never be in a shot: a lock, an Upgrade card or sheet, the locked coach chip (the
+// What must never be in a shot: the light theme, a lock, an Upgrade card or sheet, the locked coach chip (the
 // account is Pro, not admin), and a seat behind the bet buttons.
 const LOCKS = ".coach-chip, .locked-line, .hm-lock-pro, .ico-lock, .hm-card-upgrade, .pro-locked-page, .coach-chip-unlock, [data-testid=upgrade-sheet]";
 const flaws = () => {
-  const found = [...document.querySelectorAll(LOCKS_SELECTOR)].filter((n) => n.offsetParent).map((n) => `visible ${n.className || n.dataset.testid}`);
+  const found = document.documentElement.dataset.theme === "dark" ? [] : [`theme is ${document.documentElement.dataset.theme}, not dark`];
+  found.push(...[...document.querySelectorAll(LOCKS_SELECTOR)].filter((n) => n.offsetParent).map((n) => `visible ${n.className || n.dataset.testid}`));
   const controls = document.querySelector(".hero-controls");
   if (controls) {
     const top = controls.getBoundingClientRect().top;
@@ -48,7 +49,9 @@ export async function openTake(out, passFile) {
   if (!res.ok()) throw new Error(`auth failed: ${res.status()}`);
   const token = (await res.json()).token;
   const browser = await chromium.launch();
-  const context = await browser.newContext({ viewport: VIEW, deviceScaleFactor: SCALE, isMobile: true, hasTouch: true });
+  // headless Chromium reports a light colour scheme, and the app follows it by default (icmbot.theme "system")
+  const context = await browser.newContext({ viewport: VIEW, deviceScaleFactor: SCALE, isMobile: true, hasTouch: true, colorScheme: "dark" });
+  await context.addInitScript(() => localStorage.setItem("icmbot.theme", "dark"));
   await context.addInitScript(() => localStorage.setItem("icmbot.analytics.consent", "denied"));
   await context.addInitScript(TAP_DOT);
   const page = await context.newPage();
@@ -106,6 +109,12 @@ export async function openTake(out, passFile) {
     async settings(data) {
       const r = await api.put("/api/settings", { data, headers: { Authorization: `Bearer ${token}` } });
       if (!r.ok()) throw new Error(`settings failed: ${r.status()}`);
+    },
+    // drops the frames and marks so far: a retried take keeps only its last try (the disk would fill otherwise)
+    reset() {
+      stamps.length = 0; marks.length = 0;
+      rmSync(`${out}/frames`, { recursive: true, force: true });
+      mkdirSync(`${out}/frames`, { recursive: true });
     },
     async finish() {
       running = false;

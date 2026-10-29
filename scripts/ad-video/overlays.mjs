@@ -1,5 +1,5 @@
 // Renders the text layers of the vertical ad as transparent 1080x1920 PNGs
-// (this ffmpeg build has no drawtext): one per shot, the address tag, the end card.
+// (this ffmpeg build has no drawtext): one per shot (words, PRO pill, address) and the end card.
 // Usage: node scripts/ad-video/overlays.mjs SHOTS_JSON OUT_DIR
 // Safe area (Meta, Instagram Reels ads, see NOTES.md): 14% clear at the top, 35% at the bottom and 6%
 // on each side of 1080x1920. Everything drawn here must sit inside x 65..1015, y 269..1248; the script
@@ -17,16 +17,16 @@ const logo = readFileSync(resolve("frontend/public/Logo/logo.png")).toString("ba
 const FONT = "'Liberation Sans', 'DejaVu Sans', sans-serif";
 const SAFE = { left: 65, right: 1015, top: 269, bottom: 1248 };
 
-// y is the top of the text: below the coach strip by default, so the strip stays readable
-const pop = (text, hook, y = hook ? 940 : 980) => `<div style="position:absolute;left:0;right:0;top:${y - 30}px;height:${hook ? 330 : 300}px;background:linear-gradient(transparent,rgba(0,0,0,.5) 30%,rgba(0,0,0,.5) 70%,transparent)"></div>
-  <div data-safe style="position:absolute;left:65px;right:65px;top:${y}px;text-align:center;
-  font:900 ${hook ? 120 : 108}px/1.04 ${FONT};color:#fff;letter-spacing:1px;text-transform:uppercase;
-  -webkit-text-stroke:14px #0a0c10;paint-order:stroke fill;text-shadow:0 8px 28px rgba(0,0,0,.7)">${text}</div>`;
-// the tags sit in the band under the top zone, above the coach strip (assemble_ad.py moves the footage down 100 px)
-const tag = (url) => `<div data-safe style="position:absolute;left:65px;top:280px;font:700 34px ${FONT};color:#fff;
-  background:rgba(8,10,14,.62);padding:6px 16px;border-radius:12px">${url}</div>`;
-const pro = () => `<div data-safe style="position:absolute;right:65px;top:280px;font:900 34px ${FONT};color:#241c05;letter-spacing:2px;
-  background:#ffd54a;padding:6px 18px;border-radius:12px">PRO</div>`;
+// One dark panel inside the safe area, below the coach strip and the hero's seat (a seat ends about y 925): the PRO pill above
+// the words, the address under them, all centred. y is the top of the panel.
+const pop = (text, { hook, pro, y = hook ? 936 : 940 }, url) => `<div data-safe style="position:absolute;left:65px;right:65px;top:${y}px;
+  padding:18px 20px 18px;box-sizing:border-box;border-radius:30px;background:rgba(6,8,12,.62);
+  display:flex;flex-direction:column;align-items:center;gap:8px">
+  <div style="font:900 30px/1.2 ${FONT};color:#241c05;letter-spacing:2px;background:#ffd54a;padding:3px 18px;
+    border-radius:12px;visibility:${pro ? "visible" : "hidden"}">PRO</div>
+  <div style="text-align:center;font:900 ${hook ? 80 : 78}px/1.04 ${FONT};color:#fff;letter-spacing:1px;text-transform:uppercase;
+    -webkit-text-stroke:10px #0a0c10;paint-order:stroke fill;text-shadow:0 8px 28px rgba(0,0,0,.7)">${text}</div>
+  <div style="font:700 34px/1.2 ${FONT};color:#fff;opacity:.9">${url}</div></div>`;
 const endCard = ({ line, tag: head, button }) => `<div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 38%,#1b2230,#07080a 70%)">
   <img src="data:image/png;base64,${logo}" style="position:absolute;left:90px;width:900px;top:430px">
   <div data-safe style="position:absolute;left:65px;right:65px;top:790px;text-align:center;font:900 96px ${FONT};color:#ffd54a">${head}</div>
@@ -50,8 +50,7 @@ async function render(name, body, transparent = true) {
   }
   await page.screenshot({ path: `${out}/${name}.png`, omitBackground: transparent });
 }
-for (const [i, shot] of spec.shots.entries()) await render(`pop${String(i).padStart(2, "0")}`, pop(shot.text, shot.hook, shot.y) + (shot.pro ? pro() : ""));
-await render("url", tag(spec.url));
+for (const [i, shot] of spec.shots.entries()) await render(`pop${String(i).padStart(2, "0")}`, pop(shot.text, shot, spec.url));
 await render("end", endCard(spec.end), false);
 await browser.close();
 if (outside) process.exit(1);

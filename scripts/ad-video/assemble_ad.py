@@ -5,10 +5,9 @@ Usage (from the repo root):
       SHOTS_JSON TAKES_DIR OVERLAY_DIR OUT_MP4 [MUSIC_FILE MUSIC_START_SECONDS]
 
 TAKES_DIR holds one folder per take (frames/, frames.json, marks.json from
-takes.mjs); OVERLAY_DIR holds popNN.png, url.png and end.png from overlays.mjs.
+takes.mjs); OVERLAY_DIR holds popNN.png and end.png from overlays.mjs.
 A mark that appears more than once (a retried champion run) uses its last
-occurrence. The footage is moved down 100 px (the bottom 100 px are cut) so the address and PRO tags
-fit between the top zone and the coach strip. OUT_MP4 gets the music (from MUSIC_START_SECONDS, faded
+occurrence. The footage fills the whole frame. OUT_MP4 gets the music (from MUSIC_START_SECONDS, faded
 out over the last 1.5 s, loudness -16 LUFS); OUT_MP4 with _silent before .mp4 is always written with
 a silent AAC track, for platforms that need their own music. Without a music file OUT_MP4 is silent too.
 """
@@ -26,7 +25,6 @@ import imageio_ffmpeg
 FF = imageio_ffmpeg.get_ffmpeg_exe()
 FPS = 30
 POP_FADE = 0.15
-SHIFT = 100  # px of footage moved down; see overlays.mjs tags
 FADE_OUT = 1.5
 LUFS = -16
 X264 = ["-c:v", "libx264", "-preset", "medium", "-crf", "20", "-pix_fmt", "yuv420p", "-r", str(FPS)]
@@ -65,13 +63,11 @@ def encode_shot(root: Path, ov: Path, shot: dict, i: int, work: Path) -> Path:
     frame_list(root, shot["take"], start, length, listing)
     out = work / f"s{i:02d}.mp4"
     graph = (
-        f"[0:v]scale=1080:1920:flags=lanczos,pad=1080:{1920 + SHIFT}:0:{SHIFT}:color=0x14181d,crop=1080:1920:0:0,fps={FPS},tpad=stop_mode=clone:stop_duration={length}[b];"
-        f"[1:v]format=rgba,fade=in:st=0:d={POP_FADE}:alpha=1[p];[b][p]overlay=0:0[c];"
-        "[c][2:v]overlay=0:0,format=yuv420p[v]"
+        f"[0:v]scale=1080:1920:flags=lanczos,fps={FPS},tpad=stop_mode=clone:stop_duration={length}[b];"
+        f"[1:v]format=rgba,fade=in:st=0:d={POP_FADE}:alpha=1[p];[b][p]overlay=0:0,format=yuv420p[v]"
     )
     ff("-f", "concat", "-safe", "0", "-i", str(listing),
        "-loop", "1", "-framerate", str(FPS), "-i", str(ov / f"pop{i:02d}.png"),
-       "-loop", "1", "-framerate", str(FPS), "-i", str(ov / "url.png"),
        "-filter_complex", graph, "-map", "[v]", "-t", f"{length:.3f}", *X264, str(out))
     return out
 

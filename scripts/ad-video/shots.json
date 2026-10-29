@@ -54,7 +54,7 @@
    ],
    "dur": 2.0,
    "text": "SIZES IN BB",
-   "y": 450
+   "pro": true
   },
   {
    "take": "shove",
@@ -77,7 +77,7 @@
    "pro": true
   },
   {
-   "take": "champion",
+   "take": "stages",
    "from": [
     "bubble-turn",
     0.0
@@ -86,13 +86,13 @@
    "text": "BUBBLE. FINAL TABLE."
   },
   {
-   "take": "champion",
+   "take": "leaderboard",
    "from": [
-    "champion",
-    0.3
+    "leaderboard",
+    0.0
    ],
    "dur": 2.0,
-   "text": "PLAY TO THE FINAL TABLE"
+   "text": "CLIMB THE LEADERBOARD"
   },
   {
    "take": "study",
