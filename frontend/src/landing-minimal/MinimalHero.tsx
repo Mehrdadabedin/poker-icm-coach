@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useI18n } from "../i18n/I18n";
+import { HeroPictures } from "./HeroPictures";
 
 interface MinimalHeroProps {
   demoOpen: boolean;
@@ -8,9 +9,9 @@ interface MinimalHeroProps {
 
 /** Hero of the minimal landing: a very large headline, one sentence, ONE
  * primary button and a rounded outline button that opens the demo video, then the
- * picture of the ICM coach screen. */
+ * pictures of the app, taking turns. */
 export function MinimalHero({ demoOpen, onWatchDemo }: MinimalHeroProps) {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   return (
     <section className="lm-hero" aria-labelledby="lm-hero-title" data-testid="minimal-hero">
       <h1 className="lm-title" id="lm-hero-title">
@@ -32,14 +33,7 @@ export function MinimalHero({ demoOpen, onWatchDemo }: MinimalHeroProps) {
         </button>
       </div>
       <p className="lm-tagline" data-testid="minimal-tagline">{t("landing.tagline")}</p>
-      <img
-        className="lm-hero-img"
-        src={lang === "es" ? "/images/hero-app-es.webp" : "/images/hero-app.webp"}
-        alt={t("landing.hero.alt")}
-        width={1602}
-        height={982}
-        data-testid="minimal-hero-visual"
-      />
+      <HeroPictures />
     </section>
   );
 }
