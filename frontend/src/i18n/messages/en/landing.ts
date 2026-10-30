@@ -11,6 +11,7 @@ export const landing = {
   "landing.watchDemo": "Watch the demo",
   "landing.tagline": "PRACTICE · IMPROVE · WIN",
   "landing.hero.alt": "ICMBOT on a laptop and a phone: the ICM coach recommends a raise and says why, next to a table with 9 players and the action buttons",
+  "landing.hero.altGlow": "ICMBOT on a glowing screen: the ICM coach recommends a raise, next to a poker table and stacks of chips",
   "landing.demo": "Demo video",
   "landing.how": "How it works",
   "landing.how.signup.title": "Sign up",

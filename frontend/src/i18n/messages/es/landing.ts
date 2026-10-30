@@ -13,6 +13,7 @@ export const landing: Record<keyof typeof en, string> = {
   "landing.watchDemo": "Ver la demo",
   "landing.tagline": "PRACTICA · MEJORA · GANA",
   "landing.hero.alt": "ICMBOT en un portátil y un móvil: el coach ICM recomienda subir y dice por qué, junto a una mesa con 9 jugadores y los botones de acción",
+  "landing.hero.altGlow": "ICMBOT en una pantalla luminosa: el coach ICM recomienda subir, junto a una mesa de póker y pilas de fichas",
   "landing.demo": "Vídeo de demostración",
   "landing.how": "Cómo funciona",
   "landing.how.signup.title": "Regístrate",
