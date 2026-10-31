@@ -174,8 +174,8 @@ describe("minimal landing page (/minimal)", () => {
     expect(screen.getByTestId("minimal-closing")).toHaveTextContent("Your next tournament starts here.");
     const footer = screen.getByTestId("minimal-footer");
     const [left, right] = Array.from(footer.querySelector(".lm-footer-inner")?.children ?? []);
-    expect(left).toHaveTextContent(/^© 2026 ICMBOT$/);
-    expect(right).toHaveTextContent("Practice only, no real money.Cookie settings");
+    expect(left).toHaveTextContent(/^© 2026 ICMBOT\. All rights reserved\.$/);
+    expect(right).toHaveTextContent("Practice only, no real money.Terms and ConditionsPrivacy PolicyCookie settings");
     const { readFileSync } = await import("fs");
     const sections = readFileSync("src/styles/landing-minimal-sections.css", "utf8");
     expect(sections).toMatch(/\.lm-footer-inner \{[^}]*justify-content: space-between;/);

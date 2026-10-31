@@ -93,3 +93,7 @@
   background: var(--signin-notice-bg); color: var(--accent);
   font-size: 0.9rem; line-height: 1.4;
 }
+
+/* the Terms and the Privacy Policy, under the form */
+.auth-accept { margin: 10px 0 0; text-align: center; font-size: 0.78rem; line-height: 1.45; opacity: 0.8; }
+.auth-accept a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
