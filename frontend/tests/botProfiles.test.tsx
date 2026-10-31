@@ -163,6 +163,6 @@ describe("footer (A26 preserved)", () => {
   it("renders the new copyright without NEXORA", async () => {
     const { Copyright } = await import("../src/components/Copyright");
     render(<Copyright />);
-    expect(screen.getByTestId("app-footer")).toHaveTextContent("© 2026 — Created by Mehrdad Abedin");
+    expect(screen.getByTestId("app-footer")).toHaveTextContent("© 2026 ICMBOT. All rights reserved.");
   });
 });

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 import { AdminChangePasswordPage } from "./pages/AdminChangePasswordPage";
+import { LegalPage } from "./pages/LegalPage";
 import { AdminPage } from "./pages/AdminPage";
 import { AppLinkListener } from "./components/AppLinkListener";
 import { I18nProvider } from "./i18n/I18n";
@@ -92,6 +93,8 @@ export function App() {
           <Route path="/learn" element={<LearnPage />} />
           <Route path="/review" element={<ReviewPage />} />
           <Route path="/setup" element={<SetupPage />} />
+          <Route path="/terms" element={<LegalPage doc="terms" />} />
+          <Route path="/privacy" element={<LegalPage doc="privacy" />} />
         </Routes>
         <TabBarHost />
         <UpgradeSheet />

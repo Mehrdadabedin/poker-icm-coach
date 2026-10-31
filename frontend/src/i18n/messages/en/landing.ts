@@ -35,5 +35,5 @@ export const landing = {
   "consent.text": "We use Google Analytics cookies to understand how visitors use ICMBOT. Analytics stays off unless you accept. You can change your choice any time with Cookie settings at the bottom of the home page.",
   "consent.reject": "Reject analytics",
   "consent.accept": "Accept analytics",
-  "app.copyright": "© 2026 — Created by Mehrdad Abedin",
+  "app.copyright": "© 2026 ICMBOT. All rights reserved.",
 } as const;
