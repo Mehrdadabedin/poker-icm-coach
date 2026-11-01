@@ -20,4 +20,7 @@ export const auth = {
   "auth.google": "Continue with Google",
   "auth.googleUnavailable": "Google sign-in isn't available yet. For now, you can sign in with your username and password.",
   "auth.or": "or",
+  "auth.accept.before": "By continuing, you accept the ",
+  "auth.accept.and": " and the ",
+  "auth.accept.after": ".",
 } as const;

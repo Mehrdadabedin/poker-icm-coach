@@ -16,7 +16,7 @@ describe("footer copyright", () => {
   it("shows the author copyright line and no version", () => {
     render(<Copyright />);
     const footer = screen.getByTestId("app-footer");
-    expect(footer).toHaveTextContent("© 2026 — Created by Mehrdad Abedin");
+    expect(footer).toHaveTextContent("© 2026 ICMBOT. All rights reserved.");
     expect(footer).not.toHaveTextContent("NEXORA");
     expect(screen.queryByTestId("app-version")).toBeNull();
     expect(footer).not.toHaveTextContent("v0.");

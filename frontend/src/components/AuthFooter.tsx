@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { useT } from "../i18n/I18n";
 
 export type AuthMode = "signin" | "signup";
@@ -36,6 +37,21 @@ export function AuthSwitch({ mode, onSwitch }: AuthSwitchProps) {
       >
         {t("auth.signUp")}
       </button>
+    </p>
+  );
+}
+
+/** The Terms and the Privacy Policy, in a new tab so a half-filled form stays.
+ * Shown for signing in too: Continue with Google creates the account from there. */
+export function AuthAccept() {
+  const t = useT();
+  return (
+    <p className="auth-accept" data-testid="auth-accept">
+      {t("auth.accept.before")}
+      <Link to="/terms" target="_blank" rel="noopener" data-testid="auth-terms">{t("legal.terms")}</Link>
+      {t("auth.accept.and")}
+      <Link to="/privacy" target="_blank" rel="noopener" data-testid="auth-privacy">{t("legal.privacy")}</Link>
+      {t("auth.accept.after")}
     </p>
   );
 }

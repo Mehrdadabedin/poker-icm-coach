@@ -22,4 +22,7 @@ export const auth: Record<keyof typeof en, string> = {
   "auth.google": "Continuar con Google",
   "auth.googleUnavailable": "El inicio de sesión con Google aún no está disponible. Por ahora, entra con tu usuario y contraseña.",
   "auth.or": "o",
+  "auth.accept.before": "Al continuar, aceptas los ",
+  "auth.accept.and": " y la ",
+  "auth.accept.after": ".",
 };

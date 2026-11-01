@@ -37,5 +37,5 @@ export const landing: Record<keyof typeof en, string> = {
   "consent.text": "Usamos cookies de Google Analytics para entender cómo usan ICMBOT los visitantes. La analítica está desactivada salvo que la aceptes. Puedes cambiar tu elección cuando quieras en Configuración de cookies, al pie de la página de inicio.",
   "consent.reject": "Rechazar analítica",
   "consent.accept": "Aceptar analítica",
-  "app.copyright": "© 2026 — Creado por Mehrdad Abedin",
+  "app.copyright": "© 2026 ICMBOT. Todos los derechos reservados.",
 };

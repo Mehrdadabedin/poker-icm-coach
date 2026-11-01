@@ -75,3 +75,10 @@
   .lm-footer-inner { flex-direction: column; text-align: center; }
   .lm-footer-right { justify-content: center; }
 }
+
+/* the Terms and the Privacy Policy */
+.lm-legal { max-width: 720px; margin: 0 auto; padding: 32px var(--lm-gutter) 64px; line-height: 1.6; }
+.lm-legal h1 { margin: 20px 0 4px; font-size: clamp(1.8rem, 5vw, 2.6rem); line-height: 1.15; }
+.lm-legal h2 { margin: 28px 0 6px; font-size: 1.1rem; }
+.lm-legal p { margin: 0; }
+.lm-legal-date { color: var(--lm-muted); font-size: 0.85rem; }
