@@ -111,7 +111,7 @@ POKER ICM COACH — 9-player Texas Hold'em tournament practice & ICM coaching sy
 | 107 | Two Hero Pictures in Turn | 8 | complete | PASS (4 FE new) | the landing page changes between the real app and the owner's glowing picture every 5 s, with a soft fade; reduced motion stays on the first; landing page only |
 | 108 | Terms, Privacy and the Copyright Line | 8 | complete | PASS (7 FE new) | landing footer and sign-in panel link to /terms and /privacy, open without an account; "© 2026 ICMBOT. All rights reserved." on every page; no lawyer review yet |
 | 109 | Rate Limits for Sign-in, Sign-up and the Coach | 8 | in-progress | - | steps 1 to 5 built, limits off by default; steps 6 and 7 (host value, turning on) are next. Per IP, username + IP or user; in-memory counters (single worker); client IP from TRUSTED_PROXY_HOPS; coach limits log first |
-| 110 | Quiz under Learn, Two Face-down Cards per Question | 8 | planned | - | plan only, no code: Pro quiz at #/quiz; spots from the engine and answers from the coach, no AI model; answer kept on the server until answered; red or blue robot back at random, tap turns both cards over; daily totals per player; depends on 109 |
+| 110 | Quiz under Learn, Two Face-down Cards per Question | 8 | in-progress | PASS (45 BE new, 10 FE new; BE 895 with a database, FE 642) | steps 1 to 7 built, not pushed; preflop only; answers come from `Coach.recommend`, no AI model; question response never holds the answer; own rate limit bucket `RATE_LIMIT_QUIZ` 60/60; daily totals in `quiz_daily`; owner has not yet reviewed in a browser |
 
 ## Current Phase
 

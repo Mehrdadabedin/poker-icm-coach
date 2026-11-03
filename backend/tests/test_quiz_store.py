@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import pytest
 
-from app.services.quiz_store import MAX_OPEN, OPEN_SECONDS, QuizStore
+from app.services.quiz_store import OPEN_SECONDS, QuizStore
 
 KEY = ("AKs", "bubble", "BTN", 2)
 
@@ -58,7 +58,7 @@ def test_a_question_closes_once_and_only_for_its_owner() -> None:
 
 def test_the_sixth_open_question_pushes_out_the_oldest() -> None:
     store = QuizStore()
-    questions = [store.open("a", n, "bubble", KEY) for n in range(MAX_OPEN + 1)]
+    questions = [store.open("a", n, "bubble", KEY) for n in range(6)]
     assert store.close("a", questions[0].id) is None
     assert store.close("a", questions[1].id) is not None
 

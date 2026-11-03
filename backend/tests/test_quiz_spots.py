@@ -14,7 +14,6 @@ from app.services.quiz_spots import (
     FOLDED_TO_HERO,
     LEVEL_TEMPLATES,
     LEVELS,
-    TRIES_PER_TEMPLATE,
     Template,
     build_spot,
     evaluate,
@@ -92,7 +91,7 @@ def test_it_gives_up_after_twenty_tries_per_template(monkeypatch: pytest.MonkeyP
     real = quiz_spots.build_spot
     monkeypatch.setattr(quiz_spots, "build_spot", lambda t, s: calls.append(t) or real(t, s))
     assert find_question("easy", random.Random(1), set()) is None
-    assert len(calls) == TRIES_PER_TEMPLATE * len(LEVEL_TEMPLATES["easy"])
+    assert len(calls) == 20 * len(LEVEL_TEMPLATES["easy"]), "plan 110: 20 tries per template"
 
 
 def test_a_spot_in_the_repeat_window_is_not_served_again() -> None:

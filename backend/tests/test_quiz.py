@@ -84,14 +84,14 @@ def test_free_players_get_402() -> None:
 
 def test_totals_add_up_in_memory_mode() -> None:
     client = pro_client("qz_totals")
-    for right in (True, True, False, True, True, True):
+    for right in (True, True, True, False, True):
         body = play(client, "qz_totals", right)
     today = body["today"]
-    assert (today["answered"], today["correct"]) == (6, 5)
-    assert today["bestStreak"] == 3 and today["streak"] == 3
+    assert (today["answered"], today["correct"]) == (5, 4)
+    assert today["bestStreak"] == 3 and today["streak"] == 1
     assert today["goal"] == settings.quiz_daily_goal == 20
-    assert quiz_totals.totals.get("qz_totals", quiz_totals.today()).answered == 6
-    assert client.post(QUESTION).json()["today"]["answered"] == 6
+    assert quiz_totals.totals.get("qz_totals", quiz_totals.today()).answered == 5
+    assert client.post(QUESTION).json()["today"]["answered"] == 5
 
 
 def test_the_level_follows_the_answers() -> None:
@@ -107,6 +107,7 @@ def test_the_quiz_limit_blocks_in_enforce_mode(
 ) -> None:
     monkeypatch.setattr(settings, "rate_limit_coach_mode", "enforce")
     monkeypatch.setattr(settings, "rate_limit_quiz", "3/60")
+    monkeypatch.setattr(settings, "rate_limit_coach_page_minute", "3/60")  # same size, so a shared count shows
     client = from_ip("6.6.6.1", pro_token("qz_rl"))
     codes = [client.post(QUESTION).status_code for _ in range(4)]
     assert codes == [200, 200, 200, 429]
@@ -131,6 +132,7 @@ def test_the_coach_limit_does_not_use_up_the_quiz(
 ) -> None:
     monkeypatch.setattr(settings, "rate_limit_coach_mode", "enforce")
     monkeypatch.setattr(settings, "rate_limit_coach_page_minute", "2/60")
+    monkeypatch.setattr(settings, "rate_limit_quiz", "2/60")
     client = from_ip("6.6.6.3", pro_token("qz_sep"))
     codes = [client.post("/api/coach/advice", json=ADVICE).status_code for _ in range(3)]
     assert codes == [200, 200, 429]
