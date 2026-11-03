@@ -145,3 +145,14 @@ def test_erasing_an_account_removes_its_quiz_totals() -> None:
     play(client, "qz_erase", True)
     assert erase_account("qz_erase")["quiz_days_deleted"] == 1
     assert quiz_totals.totals.get("qz_erase", quiz_totals.today()).answered == 0
+
+
+def test_the_export_holds_the_players_own_quiz_days_only() -> None:
+    mine, other = pro_client("qz_export"), pro_client("qz_export_other")
+    for right in (True, False):
+        play(mine, "qz_export", right)
+    play(other, "qz_export_other", True)
+    data = mine.get("/api/account/export").json()
+    assert data["quiz"] == [{"day": quiz_totals.today().isoformat(), "answered": 2,
+                             "correct": 1, "bestStreak": 1}]
+    assert pro_client("qz_export_none").get("/api/account/export").json()["quiz"] == []

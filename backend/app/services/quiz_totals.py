@@ -45,6 +45,11 @@ class MemoryQuizTotals:
             self._days[(owner, day)] = new
             return new
 
+    def days(self, owner: str) -> list[tuple[date, DayTotals]]:
+        with self._lock:
+            return sorted((key[1], value) for key, value in self._days.items()
+                          if key[0] == owner)
+
     def delete_owner(self, owner: str) -> int:
         with self._lock:
             gone = [key for key in self._days if key[0] == owner]
@@ -82,6 +87,13 @@ class DatabaseQuizTotals(MemoryQuizTotals):
             logger.error("could not save quiz totals (%s)", type(exc).__name__)
             raise
         return self.get(owner, day)
+
+    def days(self, owner: str) -> list[tuple[date, DayTotals]]:
+        query = select(quiz_daily).where(quiz_daily.c.owner == owner).order_by(quiz_daily.c.day)
+        with self._engine.connect() as connection:
+            rows = connection.execute(query).mappings().all()
+        return [(row["day"], DayTotals(row["answered"], row["correct"], row["best_streak"]))
+                for row in rows]
 
     def delete_owner(self, owner: str) -> int:
         with self._engine.begin() as connection:

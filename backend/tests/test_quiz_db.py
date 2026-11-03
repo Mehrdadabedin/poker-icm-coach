@@ -61,3 +61,12 @@ def test_a_restart_keeps_the_totals_and_delete_removes_them(db: Engine) -> None:
     again = quiz_totals.bind_quiz_totals(db, True)
     assert again.get("Dbq", DAY).answered == 1
     assert again.delete_owner("Dbq") == 1 and again.get("Dbq", DAY).answered == 0
+
+
+def test_days_lists_one_players_rows_in_date_order(db: Engine) -> None:
+    totals = quiz_totals.bind_quiz_totals(db, True)
+    totals.add("Dbq", date(2026, 11, 4), True, 1)
+    totals.add("Dbq", DAY, False, 0)
+    totals.add("Other", DAY, True, 1)
+    assert totals.days("Dbq") == [(DAY, quiz_totals.DayTotals(1, 0, 0)),
+                                  (date(2026, 11, 4), quiz_totals.DayTotals(1, 1, 1))]

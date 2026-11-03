@@ -11,7 +11,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from app.core.tournament_settings import settings as tournament_settings
-from app.services import history_archive, plans, portraits, profiles
+from app.services import history_archive, plans, portraits, profiles, quiz_totals
 from app.services.profiles import Profile
 from app.services.user_registry import auth_registry
 
@@ -54,4 +54,6 @@ def export_account(username: str) -> dict[str, Any]:
         "portrait": _portrait(username),
         "settings": tournament_settings.for_user(username).to_dict(),
         "history": {"tournaments": tournaments, "hands": hands},
+        "quiz": [{"day": day.isoformat(), "answered": row.answered, "correct": row.correct,
+                  "bestStreak": row.best_streak} for day, row in quiz_totals.totals.days(username)],
     }
