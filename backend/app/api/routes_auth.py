@@ -3,10 +3,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, Header, HTTPException
+from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from app.api.deps import bearer_token, require_user
+from app.api.rate_limit_deps import begin_login, begin_signup
 from app.core.config import settings
 from app.database.session import engine
 from app.services.auth import auth_store, normalize_username
@@ -63,25 +64,29 @@ bind_auth_storage()
 
 
 @router.post("/register")
-def register(request: RegisterRequest) -> dict:
+def register(request: RegisterRequest, http: Request) -> dict:
     """Register a new user and authorize them immediately (A18).
     Passwords are hashed, never stored/logged in plaintext. The returned token
     is a valid session for the new account, so the user can enter the private
     table right away without a second sign-in."""
+    attempt = begin_signup(http)
     try:
         username = auth_registry.register(request.username, request.password)
     except ValueError as exc:
+        attempt.refused()
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     token = auth_store.login(username)
     return {"username": username, "registered": True, "token": token}
 
 
 @router.post("/login")
-def login(request: LoginRequest) -> dict:
+def login(request: LoginRequest, http: Request) -> dict:
     """Sign in with registered credentials; issue a bearer token on success.
     Invalid/unknown credentials yield a single generic 401 (no account hint)."""
+    attempt = begin_login(http, request.username)
     if not auth_registry.verify(request.username, request.password):
         raise HTTPException(status_code=401, detail="invalid username or password")
+    attempt.succeeded()
     username = normalize_username(request.username)
     # Checked after the password, so it reveals nothing to a caller without it.
     if auth_registry.is_suspended(username):

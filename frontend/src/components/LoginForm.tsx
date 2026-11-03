@@ -13,6 +13,7 @@ import { AuthField } from "./AuthField";
 import { AuthAccept, AuthSwitch, SignedInNote, type AuthMode } from "./AuthFooter";
 import { AuthMessages } from "./AuthMessages";
 import { ProviderButtons } from "./ProviderButtons";
+import { minutesToWait, RateLimitError } from "../services/rateLimit";
 import { useT } from "../i18n/I18n";
 
 interface LoginFormProps {
@@ -106,7 +107,9 @@ export function LoginForm({ onLogin }: LoginFormProps) {
         onLogin(auth.username);
       }
     } catch (e) {
-      setError((e as Error).message);
+      setError(e instanceof RateLimitError
+        ? t("auth.tooManyAttempts", { minutes: minutesToWait(e) })
+        : (e as Error).message);
     } finally {
       setBusy(false);
     }

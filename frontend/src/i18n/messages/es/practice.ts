@@ -3,6 +3,7 @@ import type { practice as en } from "../en/practice";
 
 export const practice: Record<keyof typeof en, string> = {
   "coachPage.title": "COACH ICM",
+  "coachPage.tooMany": "Has consultado al coach demasiadas veces. Vuelve a intentarlo en {minutes} min.",
   "coachPage.mode.hand": "MANO INICIAL",
   "coachPage.mode.exact": "CARTAS EXACTAS",
   "coachPage.handClass": "MANO INICIAL (169 CLASES)",

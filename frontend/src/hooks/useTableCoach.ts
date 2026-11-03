@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { ActionKind, CoachAdvice, TableState } from "../models/game";
 import { coachAdvice, coachCompare } from "../services/api";
+import { RateLimitError } from "../services/rateLimit";
 import type { Plan } from "../services/plan";
 
 /** The coach's advice and the grade of the hero's last action. A Free table
@@ -28,7 +29,8 @@ export function useTableCoach(
     if (state?.waitingForHero) {
       coachAdvice(tableId)
         .then((data) => setCoach(data))
-        .catch(() => undefined);
+        // Without this the panel keeps showing the previous decision's numbers.
+        .catch((e: unknown) => { if (e instanceof RateLimitError) setCoach(null); });
     } else if (state?.phase !== "handOver") {
       setCoach(null);
     }

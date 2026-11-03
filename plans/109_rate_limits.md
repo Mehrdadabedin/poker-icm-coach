@@ -2,10 +2,10 @@
 id: 109
 title: Rate Limits for Sign-in, Sign-up and the Coach
 phase: 8
-status: planned
+status: in-progress
 depends_on: []
 test_file: backend/tests/test_rate_limits.py
-implementation_files: [backend/app/services/rate_limit.py, backend/app/api/client_ip.py, backend/app/api/rate_limit_deps.py, backend/app/api/routes_auth.py, backend/app/api/routes_oauth.py, backend/app/api/routes_game.py, backend/app/core/config.py, frontend/src/services/rateLimit.ts, frontend/src/services/api.ts, frontend/src/hooks/useTableCoach.ts, frontend/src/pages/CoachPage.tsx, frontend/src/i18n/messages/en/auth.ts, frontend/src/i18n/messages/es/auth.ts]
+implementation_files: [backend/app/services/rate_limit.py, backend/app/api/client_ip.py, backend/app/api/rate_limit_deps.py, backend/app/api/routes_auth.py, backend/app/api/routes_oauth.py, backend/app/api/routes_game.py, backend/app/core/config.py, backend/app/main.py, frontend/src/services/rateLimit.ts, frontend/src/services/api.ts, frontend/src/components/LoginForm.tsx, frontend/src/hooks/useTableCoach.ts, frontend/src/pages/CoachPage.tsx, frontend/src/i18n/messages/en/auth.ts, frontend/src/i18n/messages/es/auth.ts, frontend/src/i18n/messages/en/practice.ts, frontend/src/i18n/messages/es/practice.ts]
 ---
 
 # Objective
@@ -67,7 +67,13 @@ change without a deploy of new code.
 - A blocked request gets `429`, `detail: "too_many_requests"` and a `Retry-After` header in seconds.
 - Coach limits count by user, because many players can share one IP on mobile networks.
 - Logs hold no password and no full IP or username: a short hash is enough to compare attempts.
-- `RATE_LIMITS_ENABLED` turns every limit off without a deploy.
+- `RATE_LIMITS_ENABLED` turns every limit off without a deploy. It defaults to off, so merging cannot
+  lock anyone out before step 6 has set `TRUSTED_PROXY_HOPS`.
+- `Retry-After` is listed in the CORS `expose_headers`: the frontend is on another origin and could not
+  read it otherwise.
+- Attempts count before the password check and a success takes them back, so parallel guesses cannot
+  all pass while the first is still hashing.
+- `RATE_LIMIT_LOG_CLIENT_IP` logs the header's shape in hashes for step 6.
 - `RATE_LIMIT_COACH_MODE` is `log` or `enforce`, and starts as `log`.
 
 # Steps
@@ -93,7 +99,8 @@ change without a deploy of new code.
 
 # Tests
 
-`backend/tests/test_rate_limits.py`, `frontend/tests/rate_limit.test.tsx`.
+`backend/tests/test_rate_limits.py`, `test_rate_limits_coach.py`, `test_rate_limiter.py`,
+`frontend/tests/rate_limit.test.tsx`.
 
 - The sixth failed sign-in from one IP gets `429` with `Retry-After`. A success clears the count.
 - Another IP can still sign in to the same account while the first is blocked.
