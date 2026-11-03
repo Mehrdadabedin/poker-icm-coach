@@ -35,6 +35,12 @@ export const MENU_ICONS = {
       <path d="M9 8h6M9 11.5h4" />
     </>
   ),
+  quiz: (
+    <>
+      <rect x="3.5" y="6" width="9" height="13" rx="1.5" transform="rotate(-8 8 12.5)" />
+      <rect x="11.5" y="5" width="9" height="13" rx="1.5" transform="rotate(8 16 11.5)" />
+    </>
+  ),
   mistakes: (
     <>
       <circle cx="10.5" cy="10.5" r="6.5" />
