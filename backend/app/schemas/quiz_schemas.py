@@ -26,6 +26,7 @@ class SituationModel(BaseModel):
     ante: int
     allInBb: float | None = None
     allInPosition: str | None = None
+    bigBlindStackBb: float | None = None  # folded to the small blind: what the big blind holds
 
 
 class TodayModel(BaseModel):

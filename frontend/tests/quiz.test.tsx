@@ -131,3 +131,19 @@ describe("the words", () => {
     }
   });
 });
+
+const translator = (messages: Record<string, string>) => (key: string, p?: Record<string, unknown>) =>
+  Object.entries(p ?? {}).reduce((text, [k, v]) => text.replace(`{${k}}`, String(v)), messages[key]);
+const tEn = translator(en as Record<string, string>);
+const tEs = translator(es as Record<string, string>);
+
+describe("the situation text", () => {
+  it("names the big blind's stack when it is folded to the small blind", async () => {
+    const { situationText } = await import("../src/components/quizText");
+    const sb = { ...question("q").situation, template: "push_fold" as const, position: "SB", bigBlindStackBb: 12 };
+    expect(situationText(sb, tEn as never)).toContain("The big blind has 12 big blinds.");
+    expect(situationText(sb, tEs as never)).toContain("La ciega grande tiene 12 ciegas grandes.");
+    expect(situationText({ ...sb, bigBlindStackBb: null }, tEn as never)).toContain("Folded to you.");
+    expect(situationText({ ...sb, bigBlindStackBb: null }, tEn as never)).not.toContain("big blind has");
+  });
+});

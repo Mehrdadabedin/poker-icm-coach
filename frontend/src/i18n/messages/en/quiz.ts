@@ -14,6 +14,7 @@ export const quiz = {
   "quiz.ante": "ante {ante}",
   "quiz.noAnte": "no ante",
   "quiz.facing.none": "Folded to you.",
+  "quiz.facing.noneBb": "Folded to you. The big blind has {bb} big blinds.",
   "quiz.facing.allin": "A player in {who} is all in for {bb} big blinds.",
   "quiz.choice.fold": "Fold",
   "quiz.choice.call": "Call",

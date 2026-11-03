@@ -21,9 +21,11 @@ export const TERMS_FOR: Record<Template, string[]> = {
 
 export function situationText(s: Situation, t: T): string {
   const where = POSITIONS.includes(s.position) ? t(`quiz.at.${s.position}` as MessageKey) : s.position;
-  const facing = s.allInBb === null
-    ? t("quiz.facing.none")
-    : t("quiz.facing.allin", { who: s.allInPosition ?? "", bb: number(s.allInBb) });
+  const facing = s.allInBb !== null
+    ? t("quiz.facing.allin", { who: s.allInPosition ?? "", bb: number(s.allInBb) })
+    : s.bigBlindStackBb != null
+      ? t("quiz.facing.noneBb", { bb: number(s.bigBlindStackBb) })
+      : t("quiz.facing.none");
   return t(`quiz.sit.${s.template}` as MessageKey, {
     players: s.playersLeft, paid: s.paidPlaces, where, stack: number(s.stackBb),
     sb: formatChips(s.smallBlind), bb: formatChips(s.bigBlind),

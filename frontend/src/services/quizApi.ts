@@ -18,6 +18,7 @@ export interface Situation {
   ante: number;
   allInBb: number | null;
   allInPosition: string | null;
+  bigBlindStackBb?: number | null;
 }
 
 export interface Today {

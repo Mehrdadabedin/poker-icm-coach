@@ -16,6 +16,7 @@ export const quiz: Record<keyof typeof en, string> = {
   "quiz.ante": "ante {ante}",
   "quiz.noAnte": "sin ante",
   "quiz.facing.none": "Todos se retiraron antes que tú.",
+  "quiz.facing.noneBb": "Todos se retiraron antes que tú. La ciega grande tiene {bb} ciegas grandes.",
   "quiz.facing.allin": "Un jugador en {who} está all-in por {bb} ciegas grandes.",
   "quiz.choice.fold": "Retirarse",
   "quiz.choice.call": "Igualar",

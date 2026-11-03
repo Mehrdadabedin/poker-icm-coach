@@ -101,3 +101,39 @@ def test_a_spot_in_the_repeat_window_is_not_served_again() -> None:
         assert found
         assert found[2].key not in seen, "served a spot from the repeat window"
         seen.add(found[2].key)
+
+
+def test_short_stacks_are_only_the_small_blind_against_the_big_blind() -> None:
+    """The coach's open ranges do not widen as stacks shrink, so the quiz asks short
+    stacks only where it plays the shove table: folded to the small blind, or the big
+    blind facing the small blind's shove, at 20 BB or less."""
+    for seed in range(200):
+        spot = build_spot("push_fold", seed)
+        assert spot and spot.request.position == "SB" and len(spot.opponents) == 1, seed
+        assert spot.request.stack / spot.request.bigBlind < 20, seed
+        deep = build_spot("open_position", seed)
+        assert deep and deep.request.stack / deep.request.bigBlind >= 30, seed
+
+
+@pytest.mark.parametrize("template", ["call_allin", "bubble", "pay_jump"])
+def test_all_in_questions_use_the_all_in_maths(template: Template) -> None:
+    for seed in range(120):
+        spot = build_spot(template, seed)
+        assert spot is not None
+        req = spot.request
+        assert (req.position, spot.villain_position, spot.opponents) == ("BB", "SB", (0,)), seed
+        # the shove already holds the small blind: counted once
+        assert req.pot == req.bigBlind + req.ante * req.playersRemaining + spot.villain_stack, seed
+        verdict = evaluate(spot)
+        if verdict:  # was call_clears / call_below: pot odds plus 6%, with no ICM
+            assert verdict.advice["reasonCode"].startswith("allin_"), (seed, verdict.advice["reasonCode"])
+
+
+def test_the_question_shows_the_big_blinds_stack_only_when_folded_to_the_small_blind() -> None:
+    from app.api.routes_quiz import _situation
+    sb = build_spot("push_fold", 1)
+    assert sb is not None
+    expected = round((sb.opponents[0] + sb.request.bigBlind) / sb.request.bigBlind, 1)
+    assert _situation(sb)["bigBlindStackBb"] == expected
+    for template in ("open_position", "call_allin"):
+        assert _situation(build_spot(template, 1))["bigBlindStackBb"] is None

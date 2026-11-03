@@ -33,6 +33,9 @@ def _situation(spot: Spot) -> dict:
         "smallBlind": req.smallBlind, "ante": req.ante,
         "allInBb": None if spot.villain_stack is None else round(spot.villain_stack / req.bigBlind, 1),
         "allInPosition": spot.villain_position or None,
+        # The coach plays the smaller of the two stacks, so the player needs both.
+        "bigBlindStackBb": round((spot.opponents[0] + req.bigBlind) / req.bigBlind, 1)
+        if req.position == "SB" and spot.villain_stack is None and len(spot.opponents) == 1 else None,
     }
 
 
