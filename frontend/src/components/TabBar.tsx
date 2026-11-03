@@ -15,7 +15,7 @@ interface Tab {
 
 const TABS: Tab[] = [
   { to: "/", id: "home", label: "tabs.home", icon: "home", pages: ["/", "/login", "/bot-profiles", "/leaderboard"] },
-  { to: "/learn", id: "learn", label: "tabs.learn", icon: "learn", pages: ["/learn", "/coach", "/ranges", "/icm-calculator", "/glossary"] },
+  { to: "/learn", id: "learn", label: "tabs.learn", icon: "learn", pages: ["/learn", "/coach", "/ranges", "/icm-calculator", "/quiz", "/glossary"] },
   { to: "/review", id: "review", label: "tabs.review", icon: "review", pages: ["/review", "/mistakes", "/history", "/report", "/statistics"] },
   { to: "/setup", id: "setup", label: "tabs.setup", icon: "setup", pages: ["/setup", "/settings", "/appearance", "/admin"] },
   { to: "/profile", id: "profile", label: "tabs.profile", pages: ["/profile", "/portrait"] },

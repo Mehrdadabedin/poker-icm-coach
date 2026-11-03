@@ -24,5 +24,6 @@ import { plans } from "./es/plans";
 import { leaderboard } from "./es/leaderboard";
 import { tableStrip } from "./es/tableStrip";
 import { legal } from "./es/legal";
+import { quiz } from "./es/quiz";
 
-export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools, ...practice, ...portrait, ...portraitPrompt, ...profile, ...glossary, ...glossaryTerms, ...tabs, ...theme, ...plans, ...tableStrip, ...legal, ...leaderboard };
+export const es: Messages = { ...auth, ...landing, ...table, ...review, ...home, ...coach, ...hands, ...mistakes, ...handHistory, ...report, ...tools, ...practice, ...portrait, ...portraitPrompt, ...profile, ...glossary, ...glossaryTerms, ...tabs, ...theme, ...plans, ...tableStrip, ...legal, ...leaderboard, ...quiz };

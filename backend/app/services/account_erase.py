@@ -6,7 +6,7 @@ photo and its profile.
 """
 from __future__ import annotations
 
-from app.services import history_archive, plans, portraits, profiles
+from app.services import history_archive, plans, portraits, profiles, quiz_totals
 from app.services.auth import auth_store
 from app.services.session_store import session_store
 from app.services.user_registry import auth_registry
@@ -23,4 +23,5 @@ def erase_account(username: str) -> dict[str, int]:
         "portrait_deleted": int(portraits.store.delete(username)),
         "profile_deleted": int(profiles.store.delete(username)),
         "plan_deleted": int(plans.store.delete(username)),
+        "quiz_days_deleted": quiz_totals.totals.delete_owner(username),
     }

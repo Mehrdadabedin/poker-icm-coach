@@ -24,6 +24,7 @@ import { GlossaryPage } from "./pages/GlossaryPage";
 import { AppearancePage } from "./pages/AppearancePage";
 import { LeaderboardPage } from "./pages/LeaderboardPage";
 import { LearnPage } from "./pages/LearnPage";
+import { QuizPage } from "./pages/QuizPage";
 import { ReviewPage } from "./pages/ReviewPage";
 import { SetupPage } from "./pages/SetupPage";
 import { TabBarHost } from "./components/TabBarHost";
@@ -87,6 +88,7 @@ export function App() {
           <Route path="/statistics" element={<ProOnly><StatisticsPage /></ProOnly>} />
           <Route path="/mistakes" element={<ProOnly><MistakesPage /></ProOnly>} />
           <Route path="/icm-calculator" element={<ProOnly><IcmCalculatorPage /></ProOnly>} />
+          <Route path="/quiz" element={<ProOnly><QuizPage /></ProOnly>} />
           <Route path="/glossary" element={<GlossaryPage />} />
           <Route path="/appearance" element={<AppearancePage />} />
           <Route path="/leaderboard" element={<LeaderboardPage />} />

@@ -19,6 +19,7 @@ ASSET_DIR = Path(__file__).resolve().parents[2] / "frontend" / "public" / "cards
 RANKS = {"A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"}
 BACKS = ("back", "back-red")  # branded backs: blue (default) and red
 SUITS = {"s", "h", "d", "c"}
+QUIZ_BACKS = ("quiz-back-red", "quiz-back-blue")  # the quiz only, 250x375 (plan 110)
 
 
 def _expected_faces() -> set[str]:
@@ -27,7 +28,7 @@ def _expected_faces() -> set[str]:
 
 def test_exactly_52_png_card_faces_exist() -> None:
     files = {p.stem for p in ASSET_DIR.glob("*.png")}
-    cards = files - set(BACKS)
+    cards = files - set(BACKS) - set(QUIZ_BACKS)
     assert len(cards) == 52, f"expected 52 png card faces, found {len(cards)}"
     assert cards == _expected_faces(), f"missing/extra png faces: {_expected_faces() ^ cards}"
 
@@ -60,6 +61,15 @@ def test_card_back_exists_and_is_optimized(name: str) -> None:
     height = int.from_bytes(data[20:24], "big")
     assert (width, height) == (300, 420), f"{name}.png size {(width, height)} != 300x420"
     assert path.stat().st_size <= 300 * 1024, f"{name}.png too large"
+
+
+@pytest.mark.parametrize("name", QUIZ_BACKS)
+def test_quiz_back_is_a_250x375_png(name: str) -> None:
+    data = (ASSET_DIR / f"{name}.png").read_bytes()
+    assert data.startswith(b"\x89PNG\r\n\x1a\n")
+    size = (int.from_bytes(data[16:20], "big"), int.from_bytes(data[20:24], "big"))
+    assert size == (250, 375), f"{name}.png size {size} != 250x375"
+    assert len(data) <= 300 * 1024, f"{name}.png too large"
 
 
 def test_no_unused_vector_duplicates_ship_in_the_bundle() -> None:

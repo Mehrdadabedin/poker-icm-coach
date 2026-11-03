@@ -99,6 +99,8 @@ def _optimize_pngs(directory: Path) -> None:
         print("Pillow not installed; PNGs left at original resolution")
         return
     for path in directory.glob("*.png"):
+        if path.stem.startswith("quiz-back"):
+            continue  # 250x375, made from the owner's artwork (plan 110)
         with Image.open(path) as im:
             if im.size != (300, 420):
                 im = im.resize((300, 420), Image.LANCZOS).convert("RGBA")

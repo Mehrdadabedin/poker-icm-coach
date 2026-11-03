@@ -30,7 +30,7 @@ def _note_once(bucket: str, identity: str, rule: Rule, wait: int) -> None:
     if limiter.hit(f"noted:{bucket}:{identity}", Rule(1, rule.seconds)) == 0:
         logger.warning("rate limit reached: %s key=%s retry_after=%ss mode=%s", bucket,
                        short_hash(identity), wait,
-                       settings.rate_limit_coach_mode if bucket.startswith("coach") else "enforce")
+                       settings.rate_limit_coach_mode if bucket.startswith(("coach", "quiz")) else "enforce")
 
 
 def _take(bucket: str, identity: str, setting: str) -> int:
@@ -133,3 +133,10 @@ def limit_coach_page(user: str = Depends(require_pro)) -> None:
     if settings.rate_limits_enabled:
         _limit_coach("coach_page_minute", user, settings.rate_limit_coach_page_minute)
         _limit_coach("coach_page_day", user, settings.rate_limit_coach_page_day)
+
+
+def limit_quiz(user: str = Depends(require_pro)) -> None:
+    """Its own count, apart from the table coach: a quick quiz player is never
+    blocked from the coach at a table. Log or enforce like the coach."""
+    if settings.rate_limits_enabled:
+        _limit_coach("quiz", user, settings.rate_limit_quiz)

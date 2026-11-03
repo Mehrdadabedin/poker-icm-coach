@@ -29,7 +29,7 @@ vi.mock("../src/services/api", async (importOriginal) => ({
   adminSummary: vi.fn(async () => { throw new Error("API 403"); }),
 }));
 
-const PRO_TESTIDS = ["menu-coach", "menu-ranges", "menu-icm-calculator", "menu-mistakes", "menu-history", "menu-report"];
+const PRO_TESTIDS = ["menu-coach", "menu-ranges", "menu-icm-calculator", "menu-quiz", "menu-mistakes", "menu-history", "menu-report"];
 
 function open(ui: React.ReactNode, lang: Lang = "en", path = "/") {
   return render(
@@ -95,7 +95,7 @@ describe("a Free player", () => {
     }
   });
 
-  it("shows the six Pro cards locked on the wide home", async () => {
+  it("shows the seven Pro cards locked on the wide home", async () => {
     open(<HomeMenu isAdmin={false} />);
     await settle();
     expect(screen.getAllByTestId("lock-closed")).toHaveLength(PRO_TESTIDS.length);
@@ -120,7 +120,7 @@ describe("an admin", () => {
   it("sees open locks with PRO, opens the pages, and has no Upgrade entry", async () => {
     who = { admin: true, plan: "free" };
     await learn();
-    expect(screen.getAllByTestId("lock-open")).toHaveLength(3);
+    expect(screen.getAllByTestId("lock-open")).toHaveLength(4);
     expect(screen.queryByTestId("lock-closed")).toBeNull();
     expect(within(screen.getByTestId("menu-ranges")).getByText("PRO")).toBeInTheDocument();
     expect(screen.queryByTestId("upgrade-entry")).toBeNull();

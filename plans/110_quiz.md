@@ -2,7 +2,7 @@
 id: 110
 title: Quiz under Learn, Two Face-down Cards per Question
 phase: 8
-status: planned
+status: in-progress
 depends_on: [097, 100, 109]
 test_file: backend/tests/test_quiz.py
 implementation_files: [backend/app/services/quiz_spots.py, backend/app/services/quiz_store.py, backend/app/services/quiz_totals.py, backend/app/models/orm_quiz.py, backend/app/api/routes_quiz.py, backend/app/schemas/quiz_schemas.py, backend/app/main.py, backend/app/core/config.py, frontend/src/pages/QuizPage.tsx, frontend/src/components/QuizCards.tsx, frontend/src/components/QuizAnswer.tsx, frontend/src/services/quizApi.ts, frontend/src/components/menuEntries.ts, frontend/src/App.tsx, frontend/src/styles/quiz.css, frontend/src/i18n/messages/en/quiz.ts, frontend/src/i18n/messages/es/quiz.ts, frontend/public/cards/quiz-back-red.png, frontend/public/cards/quiz-back-blue.png]

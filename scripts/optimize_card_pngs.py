@@ -23,6 +23,8 @@ def optimize() -> int:
     total_before = 0
     total_after = 0
     for path in sorted(CARDS_DIR.glob("*.png")):
+        if path.stem.startswith("quiz-back"):
+            continue  # 250x375 on purpose (plan 110)
         with Image.open(path) as im:
             total_before += path.stat().st_size
             if im.size != (TARGET_W, TARGET_H):

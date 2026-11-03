@@ -17,6 +17,7 @@ export const STUDY: Entry[] = [
   { to: "/coach", icon: "coach", title: "home.coach.title", text: "home.coach.text", testId: "menu-coach", pro: true },
   { to: "/ranges", icon: "ranges", title: "home.ranges.title", text: "home.ranges.text", testId: "menu-ranges", pro: true },
   { to: "/icm-calculator", icon: "calculator", title: "home.calculator.title", text: "home.calculator.text", testId: "menu-icm-calculator", pro: true },
+  { to: "/quiz", icon: "quiz", title: "home.quiz.title", text: "home.quiz.text", testId: "menu-quiz", pro: true },
   { to: "/glossary", icon: "glossary", title: "home.glossary.title", text: "home.glossary.text", testId: "menu-glossary" },
 ];
 
