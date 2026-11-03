@@ -1,6 +1,7 @@
 /* English: the ICM Coach tool and the tournament settings (plan 093). */
 export const practice = {
   "coachPage.title": "ICM COACH",
+  "coachPage.tooMany": "You have asked the coach too many times. Please try again in {minutes} min.",
   "coachPage.mode.hand": "STARTING HAND",
   "coachPage.mode.exact": "EXACT CARDS",
   "coachPage.handClass": "STARTING HAND (169 CLASSES)",

@@ -2,6 +2,7 @@
 import { ActionKind, TableState } from "../models/game";
 import { announceAuth } from "./authEvent";
 import { announceProRequired, ProRequiredError } from "./proRequired";
+import { limitedFetch } from "./rateLimit";
 
 export { ProRequiredError };
 
@@ -32,7 +33,7 @@ export async function request<T>(path: string, options?: RequestInit): Promise<T
   const token = getToken();
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   if (token) headers.Authorization = `Bearer ${token}`;
-  const response = await fetch(`${API_BASE}${path}`, { ...options, headers });
+  const response = await limitedFetch(`${API_BASE}${path}`, { ...options, headers });
   if (!response.ok) {
     const body = await response.text();
     if (response.status === 401) {
@@ -50,7 +51,7 @@ export async function request<T>(path: string, options?: RequestInit): Promise<T
 // Auth requests surface the server's detail (e.g. "invalid username or
 // password") as a clear, user-facing message instead of the generic 401 text.
 async function authRequest<T>(path: string, body: unknown): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, {
+  const response = await limitedFetch(`${API_BASE}${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),

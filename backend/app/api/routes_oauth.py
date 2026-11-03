@@ -6,10 +6,11 @@ free (the same rule the websocket handler follows with run_in_threadpool).
 """
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, Field
 
+from app.api.rate_limit_deps import limit_google
 from app.core.config import settings
 from app.services import google_app_auth, google_config, google_oauth
 from app.services.auth import auth_store
@@ -44,7 +45,7 @@ def providers() -> dict[str, object]:
     }
 
 
-@router.get("/google/start")
+@router.get("/google/start", dependencies=[Depends(limit_google)])
 def google_start(request: Request, redirect_uri: str = Query(default=""),
                  app_challenge: str = Query(default="", max_length=64)) -> RedirectResponse:
     """Begin the flow: trust-check the caller's origin, then hand off to Google.
@@ -68,7 +69,7 @@ def google_start(request: Request, redirect_uri: str = Query(default=""),
     return RedirectResponse(authorize, status_code=302)
 
 
-@router.get("/google/callback")
+@router.get("/google/callback", dependencies=[Depends(limit_google)])
 def google_callback(
     request: Request, code: str = Query(default=""), state: str = Query(default="")
 ) -> RedirectResponse:
@@ -102,7 +103,7 @@ def google_callback(
     )
 
 
-@router.post("/google/app-exchange")
+@router.post("/google/app-exchange", dependencies=[Depends(limit_google)])
 def google_app_exchange(body: AppExchangeRequest) -> dict[str, str]:
     """The Android app trades its one-time code and verifier for a session."""
     username = google_app_auth.redeem(body.code, body.verifier)

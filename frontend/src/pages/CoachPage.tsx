@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { request } from "../services/api";
+import { minutesToWait, RateLimitError } from "../services/rateLimit";
 import { Copyright } from "../components/Copyright";
 import { PageHeader } from "../components/PageHeader";
 import { Card, POSITIONS_9MAX } from "../models/game";
@@ -31,6 +32,7 @@ export function CoachPage() {
   const [smallBlind, setSmallBlind] = useState(500);
   const [advice, setAdvice] = useState<Advice | null>(null);
   const [running, setRunning] = useState(false);
+  const [waitMinutes, setWaitMinutes] = useState<number | null>(null);
 
   useEffect(() => {
     request<{ hands: HandClass[] }>("/api/coach/hands").then((d) => setHands169(d.hands)).catch(() => undefined);
@@ -69,6 +71,7 @@ export function CoachPage() {
   const run = async () => {
     if (hero.some((c) => !c?.rank) || !boardReady) return;
     setRunning(true);
+    setWaitMinutes(null);
     try {
       const data = await request<Advice>("/api/coach/advice", {
         method: "POST",
@@ -84,6 +87,10 @@ export function CoachPage() {
         }),
       });
       setAdvice(data);
+    } catch (e) {
+      if (!(e instanceof RateLimitError)) throw e;
+      setAdvice(null);
+      setWaitMinutes(minutesToWait(e));
     } finally {
       setRunning(false);
     }
@@ -153,6 +160,7 @@ export function CoachPage() {
         </div>
       </div>
 
+      {waitMinutes !== null && <p className="note" role="alert">{t("coachPage.tooMany", { minutes: waitMinutes })}</p>}
       {advice && <CoachAdvicePanel advice={advice} />}
       <Copyright />
     </div>

@@ -4,6 +4,7 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.api.deps import require_pro, require_user
+from app.api.rate_limit_deps import limit_coach_page, limit_table_coach
 from app.core.config import settings
 from app.core.tournament_settings import settings as tournament_settings
 from app.poker.card import Card, parse_rank, parse_suit
@@ -121,7 +122,8 @@ def next_hand(table_id: str, user: str = Depends(require_user)) -> dict:
     return session.state()
 
 
-@router.post("/game/{table_id}/coach", response_model=CoachResponseModel)
+@router.post("/game/{table_id}/coach", response_model=CoachResponseModel,
+             dependencies=[Depends(limit_table_coach)])
 def coach_advice(table_id: str, user: str = Depends(require_pro)) -> dict:
     session = get_session(table_id, user)
     try:
@@ -130,7 +132,7 @@ def coach_advice(table_id: str, user: str = Depends(require_pro)) -> dict:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
-@router.post("/game/{table_id}/coach/compare")
+@router.post("/game/{table_id}/coach/compare", dependencies=[Depends(limit_table_coach)])
 def coach_compare(table_id: str, user: str = Depends(require_pro)) -> dict:
     result = get_session(table_id, user).grade_hero()
     if result is None:
@@ -138,7 +140,8 @@ def coach_compare(table_id: str, user: str = Depends(require_pro)) -> dict:
     return result
 
 
-@router.post("/coach/advice", response_model=CoachResponseModel)
+@router.post("/coach/advice", response_model=CoachResponseModel,
+             dependencies=[Depends(limit_coach_page)])
 def standalone_coach_advice(request: CoachAdviceRequest,
                             _: str = Depends(require_pro)) -> dict:
     """Coach advice from a caller-supplied decision point (validated input)."""

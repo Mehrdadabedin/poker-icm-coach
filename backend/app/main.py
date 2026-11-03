@@ -52,6 +52,8 @@ app.add_middleware(
     allow_origins=settings.cors_origin_list,
     allow_methods=["*"],
     allow_headers=["*"],
+    # The frontend is on another origin and reads how long to wait (plan 109).
+    expose_headers=["Retry-After"],
 )
 app.include_router(admin_router)
 app.include_router(auth_router)

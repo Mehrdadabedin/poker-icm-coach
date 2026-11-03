@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import pytest
 
+from app.api.rate_limit_deps import limiter
 from app.core.config import settings
 from app.poker.card import card_from_str
 from app.services import plans
@@ -10,6 +11,13 @@ from app.services.auth import auth_store
 from app.services.user_registry import auth_registry
 
 H = card_from_str  # shorthand for a Card from a two-char face, e.g. H("As")
+
+
+@pytest.fixture
+def limits_on(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Plan 109's limits, with clients behind one proxy."""
+    monkeypatch.setattr(settings, "rate_limits_enabled", True)
+    monkeypatch.setattr(settings, "trusted_proxy_hops", 1)
 
 
 @pytest.fixture(autouse=True)
@@ -28,4 +36,5 @@ def _disable_runtime_files_for_tests() -> None:
     # Plan 100: existing tests use the coach with fresh users, so tests start
     # on Pro; test_plans.py sets "free" for itself.
     plans.bind_plans(None, False).default_plan = "pro"
+    limiter.reset()
     yield
