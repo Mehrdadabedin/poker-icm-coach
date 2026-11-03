@@ -76,6 +76,11 @@ class Settings(BaseSettings):
     rate_limit_coach_table: RateText = "120/60"
     rate_limit_coach_page_minute: RateText = "30/60"
     rate_limit_coach_page_day: RateText = "1000/86400"
+    rate_limit_quiz: RateText = "60/60"
+
+    # Quiz (plan 110). Below this confidence two answers are nearly as good.
+    quiz_min_confidence: float = Field(default=0.60, ge=0, le=1)
+    quiz_daily_goal: int = Field(default=20, ge=1)
 
     @property
     def cors_origin_list(self) -> list[str]:
