@@ -13,7 +13,6 @@ from typing import TYPE_CHECKING
 from app.icm.icm_engine import icm_equities
 from app.strategy import allin_preflop as nash
 from app.strategy.reasons import Reason
-from app.strategy.stack_analysis import SHORT_BB
 from app.strategy.villain_range import preflop_cells
 
 if TYPE_CHECKING:  # pragma: no cover - import cycle guard
@@ -34,7 +33,10 @@ def sb_shove(req: CoachRequest, a: Analyses) -> Decision | None:
     if req.position != "SB" or villain is None or req.facing_raise or req.board:
         return None
     stack = min(req.stack + req.small_blind, villain + req.big_blind) / max(req.big_blind, 1)
-    if stack > SHORT_BB:
+    # The whole table, 2 to 20 BB. Stopping at 10 left 11 to 20 BB to the open
+    # ranges, and its effective stack (blind included) is half a big blind deeper
+    # than the stack the fallback reads, so A4o shoved at 9 BB and folded at 10.
+    if round(stack) > nash.MAX_BB:
         return None
     shoves = nash.shove_range(stack)
     where = {"hand": a.hand_name, "depth": nash.depth(stack), "share": f"{nash.share(shoves):.0%}"}
