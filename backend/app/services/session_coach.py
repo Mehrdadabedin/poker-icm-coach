@@ -10,6 +10,8 @@ from typing import TYPE_CHECKING
 
 from app.game.hand_setup import in_hand_seats
 from app.game.positions import position_labels
+from app.poker.card import Card, parse_rank, parse_suit
+from app.schemas.coach_schemas import CoachAdviceRequest
 from app.strategy.coach import Coach, CoachRecommendation, CoachRequest
 from app.strategy.test_mode import compare_decisions
 from app.strategy.villain_range import read_villain
@@ -50,6 +52,25 @@ def coach_request(session: GameSession) -> CoachRequest:
         villain=read_villain(engine._log, session.hero_seat, in_hand, positions, engine.street),
         opponents=tuple(p.stack for p in tournament.players
                         if p.seat in in_hand and p.seat != session.hero_seat),
+    )
+
+
+def request_from_advice(request: CoachAdviceRequest) -> CoachRequest:
+    """A validated caller-supplied decision point, as the coach expects it."""
+
+    def to_card(model) -> Card:
+        return Card(parse_rank(model.rank), parse_suit(model.suit))
+
+    return CoachRequest(
+        hero=[to_card(c) for c in request.heroCards],
+        position=request.position, stack=request.stack, big_blind=request.bigBlind,
+        small_blind=request.smallBlind, ante=request.ante, pot=request.pot,
+        to_call=request.toCall, board=[to_card(c) for c in request.board],
+        street=request.street, players_remaining=request.playersRemaining,
+        paid_positions=request.paidPositions, stacks=request.stacks,
+        payout=request.payout, facing_raise=request.facingRaise,
+        hero_seat=request.heroSeat, mode=request.mode,
+        exact_cards=request.exactCards,
     )
 
 

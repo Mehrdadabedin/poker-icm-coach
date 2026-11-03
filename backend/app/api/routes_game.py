@@ -7,7 +7,6 @@ from app.api.deps import require_pro, require_user
 from app.api.rate_limit_deps import limit_coach_page, limit_table_coach
 from app.core.config import settings
 from app.core.tournament_settings import settings as tournament_settings
-from app.poker.card import Card, parse_rank, parse_suit
 from app.schemas.coach_schemas import (
     CoachAdviceRequest,
     CoachResponseModel,
@@ -21,10 +20,10 @@ from app.schemas.game_schemas import (
 )
 from app.services.bot_lineup import resolve_bots
 from app.services.game_session import GameSession
-from app.services.session_coach import advice_dict
+from app.services.session_coach import advice_dict, request_from_advice
 from app.services.session_store import session_store
 from app.strategy.baseline_ranges import matrix_for_position
-from app.strategy.coach import Coach, CoachRequest
+from app.strategy.coach import Coach
 
 router = APIRouter(prefix="/api")
 _coach = Coach()
@@ -146,20 +145,7 @@ def standalone_coach_advice(request: CoachAdviceRequest,
                             _: str = Depends(require_pro)) -> dict:
     """Coach advice from a caller-supplied decision point (validated input)."""
 
-    def to_card(model) -> Card:
-        return Card(parse_rank(model.rank), parse_suit(model.suit))
-
-    req = CoachRequest(
-        hero=[to_card(c) for c in request.heroCards],
-        position=request.position, stack=request.stack, big_blind=request.bigBlind,
-        small_blind=request.smallBlind, ante=request.ante, pot=request.pot,
-        to_call=request.toCall, board=[to_card(c) for c in request.board],
-        street=request.street, players_remaining=request.playersRemaining,
-        paid_positions=request.paidPositions, stacks=request.stacks,
-        payout=request.payout, facing_raise=request.facingRaise,
-        hero_seat=request.heroSeat, mode=request.mode,
-        exact_cards=request.exactCards,
-    )
+    req = request_from_advice(request)
     return advice_dict(_coach.recommend(req))
 
 
