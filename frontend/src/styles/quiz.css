@@ -1,0 +1,37 @@
+/* The quiz (plan 110). Two cards turn over together on a tap or a click. */
+.quiz-page { display: flex; flex-direction: column; gap: 12px; }
+.quiz-progress { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 0.9rem; color: var(--text-muted); }
+.quiz-goal { color: var(--accent); }
+.quiz-question { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+
+.quiz-cards {
+  display: flex; gap: 14px; padding: 6px; background: none; border: 0; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.quiz-cards:disabled { cursor: default; }
+.quiz-cards:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 10px; }
+.quiz-card { width: clamp(96px, 28vw, 150px); aspect-ratio: 5 / 7; perspective: 800px; }
+.quiz-card-inner {
+  position: relative; display: block; width: 100%; height: 100%;
+  transform-style: preserve-3d; transition: transform 0.5s, translate 0.15s;
+}
+.quiz-up .quiz-card-inner { transform: rotateY(180deg); }
+.quiz-instant .quiz-card-inner { transition: none; }
+.quiz-face { position: absolute; inset: 0; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 8px; }
+.quiz-back { object-fit: cover; }
+.quiz-front { transform: rotateY(180deg); }
+.quiz-front-img { width: 100%; height: 100%; display: block; }
+
+@media (hover: hover) {
+  .quiz-cards:not(.quiz-up):hover .quiz-card-inner { translate: 0 -6px; }
+}
+
+.quiz-situation { max-width: 40rem; text-align: center; line-height: 1.5; }
+.quiz-choices { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.quiz-choice { min-width: 7rem; }
+.quiz-result { max-width: 40rem; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.quiz-verdict { margin: 0; }
+.quiz-right .quiz-verdict { color: var(--review-good-text); }
+.quiz-wrong .quiz-verdict { color: var(--review-bad-text); }
+.quiz-reason { margin: 0; line-height: 1.5; }
+.quiz-term + .quiz-term::before { content: " · "; }
