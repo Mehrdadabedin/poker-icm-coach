@@ -68,7 +68,24 @@ def test_a_short_big_blind_sets_the_depth() -> None:
 
 def test_a_limper_or_a_deep_stack_keeps_the_old_ranges() -> None:
     assert "push/fold" not in _sb("7s 6h", 8, 7, 7).reasoning  # a limper is still in the hand
-    assert "push/fold" not in _sb("7s 6h", 15, 15).reasoning  # 15 BB is past push/fold
+    assert "push/fold" not in _sb("7s 6h", 21, 21).reasoning  # the table ends at 20 BB
+
+
+def test_the_table_covers_11_to_20_bb() -> None:
+    for depth in range(11, 21):  # was the open ranges: "A9o is not in the CO open range"
+        assert f"at {depth} BB (push/fold" in _sb("As 4h", depth, 40).reasoning, depth
+
+
+def test_the_advice_follows_the_table_at_every_depth() -> None:
+    """No cliff: at 10 BB the stack with the blind is 10.5, which used to skip the
+    table and fold A4o by the 18% jam range, one big blind after shoving it."""
+    for hand, cards in (("A4o", "As 4h"), ("K2o", "Ks 2h"), ("J6s", "Js 6s"), ("94o", "9s 4h")):
+        for depth in range(3, 21):
+            shoves = hand in ap.shove_range(depth)
+            action = _sb(cards, depth, 40).recommended_action
+            assert action == ("OPEN JAM" if shoves else "FOLD"), (hand, depth, action)
+    # 10 BB behind after posting: 10.5 with the blind, the stack that hit the cliff
+    assert _sb("As 4h", 10.5, 40).recommended_action == "OPEN JAM"
 
 
 def test_the_big_blind_calls_a_shove_at_the_pot_odds() -> None:
