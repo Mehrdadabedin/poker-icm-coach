@@ -21,15 +21,16 @@
     width: 100%; max-width: none; margin: 0; min-height: 0; container-type: size;
   }
   /* the clock in the middle of the bar (the owner, 4 Nov): the level and the ante end just left of it,
-     the pot and the round buttons share the right half, so an ante never pushes the clock off centre */
+     the pot and the round buttons share the right half, so an ante never pushes the clock off centre.
+     The gaps grow with the table: 50px either side of the clock at 1300px, 40px at 1024px. */
   .table-wrap > .table-header {
     flex: 0 0 36px; height: 36px; margin: 0 0 6px; padding: 0 10px; align-items: center;
     display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-    column-gap: 22px; font-size: 0.875rem; white-space: nowrap;
+    column-gap: clamp(22px, 5cqw, 56px); font-size: 0.875rem; white-space: nowrap;
   }
-  .table-wrap > .table-header > :is(.tbl-lead, .tbl-side) { display: flex; align-items: center; gap: 22px; }
+  .table-wrap > .table-header > :is(.tbl-lead, .tbl-side) { display: flex; align-items: center; gap: clamp(18px, 3.5cqw, 40px); }
   .table-wrap > .table-header > .tbl-lead { justify-self: end; }
-  /* the longest line (Spanish, level 21 with ante) needs 740px with the clock centred; a narrower table keeps it on the left */
+  /* the longest line (Spanish, level 21 with ante) needs 755px with the clock centred; a narrower table keeps it on the left */
   @container (max-width: 760px) {
     .table-wrap > .table-header { display: flex; gap: 18px; font-size: 0.75rem; }
     .table-wrap > .table-header > :is(.tbl-lead, .tbl-side) { display: contents; }
