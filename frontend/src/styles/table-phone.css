@@ -3,7 +3,10 @@
    layouts; none of this is rendered there. */
 @media (max-width: 767px) and (max-aspect-ratio: 4/3) {
   /* the second line floats over the strip, so showing it never pushes the buttons off the screen */
-  .table-wrap > .table-status { position: absolute; top: 49px; left: 0; right: 0; z-index: 30; margin: 0; border: 1px solid var(--line); background: var(--surface); }
+  .table-wrap > .table-status {
+    position: absolute; top: 49px; left: 0; right: 0; z-index: 30; margin: 0;
+    border: 1px solid var(--line); background: var(--history-panel-bg); backdrop-filter: blur(8px);
+  }
   .table-status[hidden] { display: none; }
   .table-page { min-height: 100dvh; }
   /* a tall screen's empty space goes to the felt: its rows spread out and the buttons stay at the bottom (plan 106) */
@@ -17,6 +20,11 @@
   .table-felt .seat.seat-hero + .seat .seat-cards .playing-card.seat-card-back,
   .table-felt .seat.seat-hero + .seat + .seat .seat-cards .playing-card.seat-card-back { width: min(52px, calc((100vw - 64px) / 6)); }
   .table-wrap > .table-header { margin-bottom: 4px; gap: 4px 6px; padding-left: 8px; padding-right: 8px; }
+  /* the owner (4 Nov): bigger at rest for weaker eyes, since a phone has no hover */
+  .table-wrap > :is(.table-header, .table-status) { font-size: 0.72rem; }
+  .table-felt .seat .seat-stack { font-size: 0.6rem; }
+  .table-felt .seat .seat-bb { font-size: 0.95em; }
+  .table-felt .seat .seat-status-action { font-size: 0.6rem; }
   .hero-controls { padding: 4px 6px; margin-top: 0; }
 
   .coach-strip-wrap { position: relative; margin: 0 0 4px; }

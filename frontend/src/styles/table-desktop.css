@@ -20,19 +20,35 @@
     grid-area: table; position: relative; display: flex; flex-direction: column;
     width: 100%; max-width: none; margin: 0; min-height: 0; container-type: size;
   }
+  /* level, time and pot centred on the bar (the owner, 4 Nov): the two side columns are equal and
+     each holds the round buttons' width, so the buttons stay at the right and never cover the text */
   .table-wrap > .table-header {
-    flex: 0 0 36px; height: 36px; margin: 0 0 6px; padding: 0 10px; align-items: center; justify-content: flex-start;
-    gap: 6px 18px; font-size: 0.75rem; white-space: nowrap;
+    flex: 0 0 36px; height: 36px; margin: 0 0 6px; padding: 0 10px; align-items: center;
+    display: grid; grid-template-columns: minmax(64px, 1fr) repeat(3, auto) minmax(64px, 1fr);
+    column-gap: 22px; font-size: 0.875rem; white-space: nowrap;
+  }
+  .table-wrap > .table-header > .tbl-info:first-child { grid-column: 2; }
+  .table-wrap > .table-header > .tbl-chips { grid-column: 5; justify-self: end; }
+  /* the longest line (Spanish, level 21 with ante) is 694px centred; a narrower table keeps it on the left */
+  @container (max-width: 700px) {
+    .table-wrap > .table-header { grid-template-columns: repeat(3, auto) minmax(64px, 1fr); column-gap: 18px; font-size: 0.75rem; }
+    .table-wrap > .table-header > .tbl-info:first-child { grid-column: auto; }
+    .table-wrap > .table-header > .tbl-chips { grid-column: 4; }
   }
   .table-wrap > .table-header .tbl-chip { width: 30px; height: 30px; }
   .table-wrap > .table-header .tbl-chip-i[aria-expanded="true"],
   .table-wrap > .table-header .tbl-chip[aria-expanded="true"] { background: var(--accent-fill); color: var(--accent-ink); border-color: var(--accent-fill); }
+  /* see-through like the history panel, since it lies over the top of the felt */
   .table-wrap > .table-status {
-    position: absolute; top: 36px; left: 0; right: 0; z-index: 30; height: 32px; margin: 0; padding: 0 10px;
-    flex-wrap: nowrap; overflow: hidden; white-space: nowrap; font-size: 0.75rem;
-    border: 1px solid var(--line); background: var(--surface);
+    position: absolute; top: 36px; left: 0; right: 0; z-index: 30; height: 30px; margin: 0; padding: 0 10px;
+    flex-wrap: nowrap; overflow: hidden; white-space: nowrap; font-size: 0.8125rem;
+    border: 1px solid var(--line); background: var(--history-panel-bg); backdrop-filter: blur(8px);
   }
   .table-status[hidden] { display: none; }
+  /* a table this narrow is on an upright window, with room above the felt for a second line */
+  @container (max-width: 700px) {
+    .table-wrap > .table-status { height: auto; min-height: 30px; padding: 4px 10px; flex-wrap: wrap; row-gap: 2px; }
+  }
 
   /* the felt is as wide as the height left allows: 100cqh less the status line, the controls and the gaps */
   .table-wrap > .table-felt {
