@@ -30,11 +30,17 @@ No code is written until the owner approves this plan.
 
 | Template | Spot | Level |
 |---|---|---|
-| Open push or fold | Folded to the hero, 5 to 15 big blinds, late position | Easy |
-| Call an all-in | One player is all in, hero has 8 to 25 big blinds | Medium |
-| Bubble | Players left = places paid + 1, stacks of different sizes | Medium |
-| Final table pay jump | 3 to 6 left, 2 or more paid | Hard |
-| Open from position | 20 to 40 big blinds, any seat, folded to the hero | Easy |
+| Open push or fold | Folded to the small blind, 5 to 19 big blinds behind, the big blind's stack shown | Easy |
+| Call an all-in | Big blind facing the small blind's shove of 5 to 19 big blinds | Medium |
+| Bubble | The same call, players left = places paid + 1 | Medium |
+| Final table pay jump | The same call, 3 to 6 left, 2 or more paid | Hard |
+| Open from position | 30 to 40 big blinds, any seat, folded to the hero | Easy |
+
+Short stacks only where the coach plays the shove table (the owner, 3 Nov). Its other short-stack
+answers come from open ranges that do not widen as stacks shrink (button, cutoff, 11 to 20 big blinds),
+and the quiz must not teach those. The all-in player has no chips behind, so the coach uses its all-in
+maths and ICM, and the pot counts the small blind once. Other seats come back with proper short-stack
+ranges.
 
 Every spot passes `CoachAdviceRequest` validation before it is used, so the quiz can only build spots the
 coach accepts.

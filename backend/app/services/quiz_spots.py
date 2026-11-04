@@ -116,20 +116,22 @@ def _spot(rng: random.Random, template: Template, *, players: int, paid: int,
     order = _acting_order(players)
     behind = len(order) - 1 - order.index(position)
     villain_position = ""
+    opponents: tuple[int, ...]
     if villain is not None:
-        others[0] = villain
-        villain_position = rng.choice(order[:order.index(position)])
-        opponents = (villain, *others[1:behind + 1])
+        # Only the small blind shoves into the big blind: its range is the one the
+        # coach knows (the shove table), and an all-in player has no chips behind.
+        others[0], villain_position, opponents = villain, "SB", (0,)
     else:
         opponents = tuple(others[:behind])
     blind_in = {"SB": sb, "BB": bb}.get(position, 0)
     bet = villain if villain is not None else bb
+    shover_blind = sb if villain is not None else 0  # already inside the shove
     hand = rng.choices(_HANDS, [_weight(h["name"], favour_strong) for h in _HANDS])[0]
     try:
         request = CoachAdviceRequest.model_validate({
             "heroCards": _hero_cards(rng, hand), "position": position, "stack": hero,
             "bigBlind": bb, "smallBlind": sb, "ante": ante,
-            "pot": sb + bb + ante * players + (villain or 0),
+            "pot": sb + bb + ante * players + (villain or 0) - shover_blind,
             "toCall": max(0, bet - blind_in), "playersRemaining": players,
             "paidPositions": paid, "stacks": [hero, *others], "payout": _payout(paid),
             "facingRaise": villain is not None})
@@ -142,27 +144,28 @@ def _spot(rng: random.Random, template: Template, *, players: int, paid: int,
 
 def build_spot(template: Template, seed: int) -> Spot | None:
     rng = random.Random(seed)
+    # Short stacks only where the coach knows the maths: folded to the small blind,
+    # or the big blind facing the small blind's shove, up to 20 BB. Other seats at
+    # these depths still use the open ranges, which do not widen as stacks shrink.
     if template == "push_fold":
         players = rng.randint(6, 9)
         return _spot(rng, template, players=players, paid=rng.randint(2, 3),
-                     positions=["CO", "BTN", "SB"], hero_bb=(5, 15), others_bb=(8, 40))
+                     positions=["SB"], hero_bb=(5, 19), others_bb=(5, 40))
     if template == "open_position":
         players = rng.randint(6, 9)
         return _spot(rng, template, players=players, paid=rng.randint(2, 3),
-                     positions=_acting_order(players)[:-1], hero_bb=(20, 40), others_bb=(10, 50))
+                     positions=_acting_order(players)[:-1], hero_bb=(30, 40), others_bb=(10, 50))
     if template == "call_allin":
         players = rng.randint(3, 9)
-        return _spot(rng, template, players=players, paid=rng.randint(2, 3),
-                     positions=["BB"], hero_bb=(8, 25), others_bb=(5, 40), villain_bb=(5, 25),
-                     favour_strong=True)
-    if template == "bubble":
+        paid = rng.randint(2, 3)
+    elif template == "bubble":
         paid = rng.randint(2, 5)
-        return _spot(rng, template, players=paid + 1, paid=paid,
-                     positions=_acting_order(paid + 1)[:-1], hero_bb=(6, 30), others_bb=(3, 40))
-    players = rng.randint(3, 6)
-    paid = rng.choice([p for p in range(2, players + 1) if p != players - 1])
-    return _spot(rng, template, players=players, paid=paid,
-                 positions=_acting_order(players)[:-1], hero_bb=(6, 40), others_bb=(3, 40))
+        players = paid + 1
+    else:
+        players = rng.randint(3, 6)
+        paid = rng.choice([p for p in range(2, players + 1) if p != players - 1])
+    return _spot(rng, template, players=players, paid=paid, positions=["BB"], hero_bb=(6, 30),
+                 others_bb=(3, 40), villain_bb=(5, 19), favour_strong=True)
 
 
 def evaluate(spot: Spot) -> Verdict | None:
