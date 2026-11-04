@@ -8,7 +8,8 @@
 .lb-tab { padding: 10px; border: 0; border-radius: 9px; background: none; color: var(--text-muted); font: inherit; font-weight: 700; cursor: pointer; }
 .lb-tab-on { background: var(--accent-fill); color: var(--accent-ink); }
 .lb-meta { display: flex; justify-content: space-between; gap: 8px; margin: 12px 0; color: var(--text-muted); font-size: 0.85rem; }
-.lb-updated { display: flex; align-items: center; gap: 6px; }
+/* margin-left keeps it on the right when All time has no dates beside it */
+.lb-updated { display: flex; align-items: center; gap: 6px; margin-left: auto; }
 .lb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--lb-points); }
 .lb-empty { margin: 28px 0; text-align: center; color: var(--text-muted); }
 
