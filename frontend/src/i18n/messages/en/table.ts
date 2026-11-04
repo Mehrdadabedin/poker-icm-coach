@@ -40,7 +40,7 @@ export const table = {
   "menu.resumeNext": "RESUME NEXT HAND",
   "status.level": "LEVEL {level} — {sb}/{bb}",
   "status.break": "BREAK · ",
-  "status.ante": "ANTE {n} · ",
+  "status.ante": "ANTE {n}",
   "status.time": "TIME {clock}",
   "status.pot": "POT {n}",
   "status.hand": "HAND #{n}",

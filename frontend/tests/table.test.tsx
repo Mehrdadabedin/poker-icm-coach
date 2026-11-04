@@ -25,6 +25,13 @@ describe("PokerTable", () => {
     expect(screen.getByTestId("pot-amount")).toHaveTextContent("POT 3,400");
   });
 
+  it("puts the ante on the right of the clock, beside the pot, so the clock can stay in the middle", () => {
+    const { container } = render(<PokerTable state={{ ...sampleTableState(), ante: 40000, secondsLeft: 110 }} />);
+    const head = container.querySelector(".table-header")!;
+    expect(head.querySelector(".tbl-clock")).toHaveTextContent(/^TIME 1:50$/);
+    expect([...head.querySelectorAll(".tbl-side > .tbl-info")].map((n) => n.textContent)).toEqual(["ANTE 40,000", "POT 3,400"]);
+  });
+
   it("marks the dealer seat", () => {
     render(<PokerTable state={sampleTableState(0, 8)} />);
     expect(screen.getByTestId("dealer-8")).toBeInTheDocument();

@@ -42,7 +42,7 @@ export const table: Record<keyof typeof en, string> = {
   "menu.resumeNext": "REANUDAR SIGUIENTE MANO",
   "status.level": "NIVEL {level} — {sb}/{bb}",
   "status.break": "DESCANSO · ",
-  "status.ante": "ANTE {n} · ",
+  "status.ante": "ANTE {n}",
   "status.time": "TIEMPO {clock}",
   "status.pot": "BOTE {n}",
   "status.hand": "MANO #{n}",

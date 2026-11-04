@@ -14,15 +14,15 @@ describe("the lines over the table", () => {
     }
   });
 
-  it("centres level, time and pot between two equal columns, the round buttons in the right one", () => {
-    expect(desktop).toContain("grid-template-columns: minmax(64px, 1fr) repeat(3, auto) minmax(64px, 1fr);");
-    expect(desktop).toContain(".table-wrap > .table-header > .tbl-info:first-child { grid-column: 2; }");
-    expect(desktop).toContain(".table-wrap > .table-header > .tbl-chips { grid-column: 5; justify-self: end; }");
+  it("keeps the clock in the middle, the level on its left, the ante, the pot and the buttons on its right", () => {
+    expect(desktop).toContain("grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);");
+    expect(desktop).toContain(".table-wrap > .table-header > .tbl-level { justify-self: end; }");
+    expect(desktop).toContain(".table-wrap > .table-header > .tbl-side { display: flex; align-items: center; gap: 22px; }");
     expect(desktop).toMatch(/font-size: 0\.875rem; white-space: nowrap;/);
   });
 
   it("keeps the line on the left on a table too narrow for the longest level", () => {
-    expect(desktop).toMatch(/@container \(max-width: 700px\) \{\n\s*\.table-wrap > \.table-header \{ grid-template-columns: repeat\(3, auto\) minmax\(64px, 1fr\);/);
+    expect(desktop).toMatch(/@container \(max-width: 760px\) \{\n\s*\.table-wrap > \.table-header \{ display: flex;/);
   });
 });
 

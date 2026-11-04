@@ -20,20 +20,19 @@
     grid-area: table; position: relative; display: flex; flex-direction: column;
     width: 100%; max-width: none; margin: 0; min-height: 0; container-type: size;
   }
-  /* level, time and pot centred on the bar (the owner, 4 Nov): the two side columns are equal and
-     each holds the round buttons' width, so the buttons stay at the right and never cover the text */
+  /* the clock in the middle of the bar (the owner, 4 Nov): the level ends just left of it, and the ante,
+     the pot and the round buttons share the right half, so an ante never pushes the clock off centre */
   .table-wrap > .table-header {
     flex: 0 0 36px; height: 36px; margin: 0 0 6px; padding: 0 10px; align-items: center;
-    display: grid; grid-template-columns: minmax(64px, 1fr) repeat(3, auto) minmax(64px, 1fr);
+    display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
     column-gap: 22px; font-size: 0.875rem; white-space: nowrap;
   }
-  .table-wrap > .table-header > .tbl-info:first-child { grid-column: 2; }
-  .table-wrap > .table-header > .tbl-chips { grid-column: 5; justify-self: end; }
-  /* the longest line (Spanish, level 21 with ante) is 694px centred; a narrower table keeps it on the left */
-  @container (max-width: 700px) {
-    .table-wrap > .table-header { grid-template-columns: repeat(3, auto) minmax(64px, 1fr); column-gap: 18px; font-size: 0.75rem; }
-    .table-wrap > .table-header > .tbl-info:first-child { grid-column: auto; }
-    .table-wrap > .table-header > .tbl-chips { grid-column: 4; }
+  .table-wrap > .table-header > .tbl-level { justify-self: end; }
+  .table-wrap > .table-header > .tbl-side { display: flex; align-items: center; gap: 22px; }
+  /* the longest line (Spanish, level 21 with ante) needs 740px with the clock centred; a narrower table keeps it on the left */
+  @container (max-width: 760px) {
+    .table-wrap > .table-header { display: flex; gap: 18px; font-size: 0.75rem; }
+    .table-wrap > .table-header > .tbl-side { display: contents; }
   }
   .table-wrap > .table-header .tbl-chip { width: 30px; height: 30px; }
   .table-wrap > .table-header .tbl-chip-i[aria-expanded="true"],

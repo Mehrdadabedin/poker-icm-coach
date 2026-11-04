@@ -9,6 +9,8 @@
 
 /* the round buttons at the right end of the first status line */
 .table-header .tbl-chips { margin-left: auto; display: flex; align-items: center; gap: 4px; }
+/* the ante, the pot and the buttons are a group only on wide screens (table-desktop.css) */
+.table-header .tbl-side { display: contents; }
 .tbl-chip {
   position: relative; display: grid; place-items: center; flex: 0 0 auto; width: 36px; height: 36px; padding: 0;
   border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--accent); font: inherit; cursor: pointer;
