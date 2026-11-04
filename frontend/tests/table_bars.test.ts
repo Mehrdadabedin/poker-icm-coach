@@ -14,10 +14,10 @@ describe("the lines over the table", () => {
     }
   });
 
-  it("keeps the clock in the middle, the level on its left, the ante, the pot and the buttons on its right", () => {
+  it("keeps the clock in the middle, the level and the ante on its left, the pot and the buttons on its right", () => {
     expect(desktop).toContain("grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);");
-    expect(desktop).toContain(".table-wrap > .table-header > .tbl-level { justify-self: end; }");
-    expect(desktop).toContain(".table-wrap > .table-header > .tbl-side { display: flex; align-items: center; gap: 22px; }");
+    expect(desktop).toContain(".table-wrap > .table-header > :is(.tbl-lead, .tbl-side) { display: flex; align-items: center; gap: 22px; }");
+    expect(desktop).toContain(".table-wrap > .table-header > .tbl-lead { justify-self: end; }");
     expect(desktop).toMatch(/font-size: 0\.875rem; white-space: nowrap;/);
   });
 

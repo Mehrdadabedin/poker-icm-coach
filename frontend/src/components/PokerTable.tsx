@@ -66,16 +66,18 @@ export function PokerTable({ state, children, overlay, cover, top, trail, detail
   return (
     <div className="table-wrap" data-testid="poker-table">
       <div className="table-header">
-        <span className="tbl-info tbl-level">
-          {t("status.level", { level: state.level, sb: state.smallBlind, bb: state.bigBlind })}
+        {/* the clock stays in the middle of a wide screen: the level and the ante on its left, the pot on its right */}
+        <span className="tbl-lead">
+          <span className="tbl-info">
+            {t("status.level", { level: state.level, sb: state.smallBlind, bb: state.bigBlind })}
+          </span>
+          {state.ante > 0 && <span className="tbl-info">{t("status.ante", { n: formatChips(state.ante) })}</span>}
         </span>
         <span className="tbl-info tbl-clock">
           {state.inBreak ? t("status.break") : ""}
           {t("status.time", { clock: formatClock(state.secondsLeft) })}
         </span>
-        {/* the clock stays in the middle of a wide screen; the ante and the pot take the room on its right */}
         <span className="tbl-side">
-          {state.ante > 0 && <span className="tbl-info">{t("status.ante", { n: formatChips(state.ante) })}</span>}
           <span className="tbl-info" data-testid="pot-amount">
             {t("status.pot", { n: formatChips(state.pot) })}
           </span>
