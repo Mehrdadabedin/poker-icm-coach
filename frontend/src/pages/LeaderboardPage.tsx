@@ -38,7 +38,7 @@ export function LeaderboardPage() {
       {board && (
         <>
           <p className="lb-meta">
-            <span data-testid="lb-dates">{weekDates(board, lang, t)}</span>
+            {board.period === "week" && <span data-testid="lb-dates">{weekDates(board, lang, t)}</span>}
             <span className="lb-updated"><i className="lb-dot" />{minutes < 1 ? t("leaderboard.updatedNow") : t("leaderboard.updated", { n: String(minutes) })}</span>
           </p>
           {board.rows.length === 0

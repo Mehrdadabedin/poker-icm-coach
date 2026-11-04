@@ -101,6 +101,15 @@ describe("the leaderboard page", () => {
     expect(screen.getByText("Updated 5 min ago")).toBeInTheDocument();
   });
 
+  it("shows no week dates on All time", async () => {
+    open({ week: board("week", rows(3)), all: board("all", rows(3)) });
+    await settle();
+    fireEvent.click(screen.getByTestId("lb-all"));
+    await settle();
+    expect(screen.queryByTestId("lb-dates")).toBeNull();
+    expect(screen.getByText("Updated 5 min ago")).toBeInTheDocument();
+  });
+
   it("speaks Spanish", async () => {
     const me = { state: "ranked" as const, ...row(7, { name: "Ana" }) };
     open({ week: board("week", rows(3), me), all: board("all", []) }, "es");
