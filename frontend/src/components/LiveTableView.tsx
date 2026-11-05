@@ -8,6 +8,7 @@ import { MobileCoachCard } from "./MobileCoachCard";
 import { BotKey } from "./BotKey";
 import { CoachStrip } from "./CoachStrip";
 import { HistoryDrawer } from "./HistoryDrawer";
+import { TableAnnouncer } from "./TableAnnouncer";
 import { TableChips } from "./TableChips";
 import { usePhoneTable } from "../hooks/usePhoneTable";
 import { useUprightPhone } from "../hooks/useUprightPhone";
@@ -67,6 +68,7 @@ export function LiveTableView(props: LiveTableViewProps) {
 
   return (
     <div className="table-page" data-testid="table-page">
+      <TableAnnouncer state={state} coach={free ? null : coachNow} />
       <TableHeader
         state={state}
         username={username}
