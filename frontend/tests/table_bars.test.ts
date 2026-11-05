@@ -26,6 +26,14 @@ describe("the lines over the table", () => {
   });
 });
 
+describe("the level line on an upright phone", () => {
+  it("puts the clock in the middle, big and in the text colour, each label a caption over its value", () => {
+    expect(phone).toContain(".table-wrap > .table-header { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);");
+    expect(phone).toContain(".table-wrap > .table-header .tbl-stat { display: flex; flex-direction: column;");
+    expect(phone).toContain(".table-wrap > .table-header .tbl-clock .tbl-val { font-size: 1.15rem; font-weight: 800; color: var(--text); }");
+  });
+});
+
 describe("seat labels for weaker eyes", () => {
   it("are bigger at rest, not on hover", () => {
     expect(seats).toContain("font-size: clamp(8px, 1.5cqw, 13px);");
