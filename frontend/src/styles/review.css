@@ -83,7 +83,36 @@
   align-items: center;
 }
 
+/* Cards shrink together to fit their tile. The 26px floor of .card-small cut
+   the fifth board card off on a phone and on desktop (hand #72, 5 Nov). */
+.result-cards-cell .playing-card,
+.result-board-cell .playing-card { flex: 0 1 auto; min-width: 0; }
+
 .board-na { color: var(--muted); }
+
+/* Upright phone: the card tiles share a row and the long values (hand names,
+   stack) share a row, so a short value like the pot is never stretched to the
+   height of cards or of wrapped text. */
+@media (max-width: 767px) and (max-aspect-ratio: 4/3) {
+  .result-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-areas:
+      "win   win   you   you   stack stack"
+      "hero  hero  board board board board"
+      "pot   pot   chip  chip  pos   pos"
+      "rank  rank  rank  icm   icm   icm";
+  }
+  .fact-win { grid-area: win; }
+  .fact-you { grid-area: you; }
+  .fact-pot { grid-area: pot; }
+  .fact-hero { grid-area: hero; }
+  .fact-board { grid-area: board; }
+  .fact-stack { grid-area: stack; }
+  .fact-chip { grid-area: chip; }
+  .fact-pos { grid-area: pos; }
+  .fact-rank { grid-area: rank; }
+  .fact-icm { grid-area: icm; }
+}
 
 /* ---- showdown reveals ---- */
 .reveal-section { margin-bottom: 12px; }
