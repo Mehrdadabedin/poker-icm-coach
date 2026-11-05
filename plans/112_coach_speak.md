@@ -211,7 +211,7 @@ New `frontend/tests/coach_speech.test.tsx` and `coach_speech_text.test.ts`. jsdo
 
 # Overlap with plan 111 (screen-reader names and live updates)
 
-Plan 111 (branch `docs/aria-labels-plan`, not on `main` yet) adds a `TableAnnouncer` whose assertive
+Plan 111 (on `main` since PR #128, not built yet) adds a `TableAnnouncer` whose assertive
 message on the hero's turn ends with "Coach: Raise" for Pro. A screen-reader player with Coach Speak on
 would hear the advice twice, in two voices at once.
 
