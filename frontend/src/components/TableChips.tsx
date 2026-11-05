@@ -1,6 +1,7 @@
 import { MENU_ICONS } from "./homeMenuIcons";
 import { useT } from "../i18n/I18n";
 import { gradeLine } from "../i18n/coach";
+import { SpeakerChip } from "./SpeakerChip";
 
 interface TableChipsProps {
   detailsOpen: boolean;
@@ -9,6 +10,8 @@ interface TableChipsProps {
   onHistory: () => void;
   /** Pro with the coach strip folded: the Coach button (a ring in the grade's colour shows the grade for a few seconds) */
   coachChip: { grade: Record<string, string> | null; onClick: () => void } | null;
+  /** The coach voice switch (plan 112) */
+  voice: { on: boolean; onChange: (on: boolean) => void };
 }
 
 const Icon = ({ name }: { name: "coach" | "history" }) => (
@@ -17,10 +20,11 @@ const Icon = ({ name }: { name: "coach" | "history" }) => (
 
 /** The right end of the first status line (plan 101; on wide screens too, plan 106): round icon buttons,
  * so LEVEL, TIME and POT keep their row at 360 px. */
-export function TableChips({ detailsOpen, historyOpen, onDetails, onHistory, coachChip }: TableChipsProps) {
+export function TableChips({ detailsOpen, historyOpen, onDetails, onHistory, coachChip, voice }: TableChipsProps) {
   const t = useT();
   return (
     <span className="tbl-chips">
+      <SpeakerChip on={voice.on} onChange={voice.onChange} />
       {coachChip && (
         <button type="button" className={coachChip.grade ? `tbl-chip tbl-chip-grade-${coachChip.grade.grade}` : "tbl-chip"}
           aria-label={t("strip.coachLabel")} title={t("strip.unfold")} onClick={coachChip.onClick} data-testid="coach-chip-folded">

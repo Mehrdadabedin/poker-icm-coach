@@ -31,6 +31,7 @@ import "./styles/table-menu.css";
 import "./styles/table-landscape.css";
 import "./styles/table-phone.css";
 import "./styles/table-drawer.css";
+import "./styles/table-chips-speak.css";
 import "./styles/table-desktop.css";
 import "./styles/table-seats.css";
 import "./styles/table-history.css";
