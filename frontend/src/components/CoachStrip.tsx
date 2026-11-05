@@ -32,7 +32,7 @@ export function CoachStrip({ coach, heroCards, grade, sheetOpen, onSheet, onFold
   return (
     <div className={open ? "coach-strip-wrap strip-open" : "coach-strip-wrap"}>
       {open && coach && <CoachSheet coach={coach} heroCards={heroCards} onClose={() => onSheet(false)} />}
-      <div className="coach-strip" onClick={tap} role="status" data-testid="coach-strip">
+      <div className="coach-strip" onClick={tap} data-testid="coach-strip">
         <span className="strip-text">
           {line ? (
             <>

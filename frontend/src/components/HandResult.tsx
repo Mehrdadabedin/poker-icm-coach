@@ -24,7 +24,7 @@ export function HandResult({ review, onReview, onNext, countdown, paused, showRe
 
   return (
     <div className={`hand-result ${RESULT_CLASS[kind]}`} data-testid="hand-result"
-      role="status" aria-label={`${title}, ${subtitle}`}>
+      role="group" aria-label={`${title}, ${subtitle}`}>
       <div className="result-summary">
         <span className="result-title" data-testid="hand-result-title">{showResultLabels ? title : glyph}</span>
         <span className="result-subtitle" data-testid="hand-result-subtitle">{subtitle}</span>
