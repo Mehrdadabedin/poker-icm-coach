@@ -5,7 +5,7 @@ phase: 8
 status: planned
 depends_on: [093, 111]
 test_file: frontend/tests/i18n.test.tsx
-implementation_files: [frontend/src/i18n/lang.ts, frontend/src/i18n/I18n.tsx, frontend/src/i18n/translate.ts, frontend/src/i18n/siteMeta.ts, frontend/src/i18n/messages/zh.ts, frontend/src/i18n/messages/fa.ts, frontend/src/components/LanguageMenu.tsx, frontend/src/styles/lang-menu.css, frontend/src/styles/base.css, frontend/vite.config.ts, frontend/tests/i18n.test.tsx, frontend/tests/i18n_rtl.test.tsx, scripts/table-fit/check.mjs]
+implementation_files: [frontend/src/i18n/lang.ts, frontend/src/i18n/I18n.tsx, frontend/src/i18n/translate.ts, frontend/src/i18n/siteMeta.ts, frontend/src/i18n/messages/zh.ts, frontend/src/i18n/messages/fa.ts, frontend/src/components/LanguageMenu.tsx, frontend/src/styles/lang-menu.css, frontend/src/landing-minimal/MinimalLanguages.tsx, frontend/src/landing-minimal/MinimalFooter.tsx, frontend/src/pages/MinimalLandingPage.tsx, frontend/src/styles/base.css, frontend/vite.config.ts, frontend/tests/i18n.test.tsx, frontend/tests/i18n_rtl.test.tsx, scripts/table-fit/check.mjs]
 ---
 
 # Objective
@@ -151,6 +151,16 @@ the site, the Android app and Pro are the same as for anyone there.
 8. **Legal and link previews**: legal, the `/zh/` and `/fa/` heads, og images, hero pictures.
 9. **Chinese on**, after its native review: the reviewer's fixes, `zh` in READY and APP_READY.
 10. **Persian on**, the same, plus a check on a real Android phone set to Persian.
+11. **Show the languages on the landing page** (the owner, 5 Nov), after Persian is on. At the top, the
+    language menu already offers all four (step 1's `<select>` on a phone). Near the bottom, a new
+    section `MinimalLanguages.tsx` before `MinimalClosing`: "Play in your language" with one tile per
+    READY language, each tile written in its own language and script ("English", "Español", "中文",
+    "فارسی", plus one short line, for example "用中文练习锦标赛"). A tile switches the page to that language,
+    as the menu does. In the footer, a line "English · Español · 中文 · فارسی" that does the same. Both
+    show only READY languages, so nothing points at an unfinished language. Every tile and footer item
+    carries its own `lang`, and the Persian one `dir="rtl"`, so each renders right whatever the page
+    language is. Same on icmbot.one, icmbot.es and in the app (the app has no landing page, plan 085,
+    so there it is the menu only). The section title in en, es, zh and fa, checked by the reviewers.
 
 The prime-agent prompt is `prime-agent-spec/PLAN_113_CHINESE_PERSIAN_PROMPT.md`.
 
@@ -172,6 +182,9 @@ New `frontend/tests/i18n_rtl.test.tsx`; additions to `i18n.test.tsx` and `site_m
 - **Browser**: `scripts/table-fit/check.mjs` loops over en, es, zh, fa at 360, 390 and 1280 px: no
   sideways scroll, the table fits, the seat positions under fa equal those under en, and the tab bar
   and header are mirrored. Screenshots of each go in the PR.
+- **Languages section**: the section and the footer line list exactly the READY languages, in their
+  own words; a click on 中文 sets `<html lang="zh-Hans">`, on فارسی `dir="rtl"`; each item has its own
+  `lang`; screenshots at 360, 390 and 1280 px in all four languages.
 - **Turn-on**: no READY zh or fa value equals the English outside the short list.
 - Both suites green, counts in `progress.md`; each regression test proven by reverting its fix.
 
