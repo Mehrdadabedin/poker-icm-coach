@@ -62,20 +62,14 @@ describe("PokerTable", () => {
     expect(screen.getByTestId("seat-0").querySelector("img.seat-bot-portrait")).toBeNull();
     // each BOT seat shows its profile portrait
     const expected = [
-      ["seat-1", "alex.png", "Alex bot profile"],
-      ["seat-2", "alex.png", "Alex bot profile"],
-      ["seat-3", "sarah.png", "Sarah bot profile"],
-      ["seat-4", "sarah.png", "Sarah bot profile"],
-      ["seat-5", "david.png", "David bot profile"],
-      ["seat-6", "david.png", "David bot profile"],
-      ["seat-7", "emma.png", "Emma bot profile"],
-      ["seat-8", "emma.png", "Emma bot profile"],
+      ["seat-1", "alex.png"], ["seat-2", "alex.png"], ["seat-3", "sarah.png"], ["seat-4", "sarah.png"],
+      ["seat-5", "david.png"], ["seat-6", "david.png"], ["seat-7", "emma.png"], ["seat-8", "emma.png"],
     ];
-    for (const [seat, file, alt] of expected) {
+    for (const [seat, file] of expected) {
       const img = screen.getByTestId(seat).querySelector(".seat-bot-portrait");
       expect(img).not.toBeNull();
       expect((img as HTMLImageElement).getAttribute("src")).toBe(`/images/bot-profiles/${file}`);
-      expect((img as HTMLImageElement).getAttribute("alt")).toBe(alt);
+      expect((img as HTMLImageElement).getAttribute("alt")).toBe(""); // the seat's name already says who it is (plan 111)
     }
     // names are unchanged by the portraits
     expect(screen.getByTestId("seat-1").textContent).toContain("Bot 1");

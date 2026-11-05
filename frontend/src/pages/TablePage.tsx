@@ -100,7 +100,7 @@ export function TablePage() {
   if (!authed) {
     return (
       <div className="page" data-testid="auth-gate">
-        <h1 className="screen-title">ICM MASTER</h1>
+        <h1 className="screen-title">ICMBOT</h1>
         <LoginForm
           onLogin={() => {
             setAuthed(true);

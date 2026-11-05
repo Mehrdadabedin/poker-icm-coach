@@ -1,5 +1,7 @@
 // Typed game state mirrored from the backend API (part 034 keeps them in sync).
 import { numberLocale } from "../i18n/lang";
+import type { MessageKey } from "../i18n/messages/en";
+import type { Params } from "../i18n/translate";
 
 type Suit = "c" | "d" | "h" | "s";
 
@@ -141,18 +143,14 @@ export interface LegalAction {
   maxAmount?: number;
 }
 
-// Semantic full-word names for accessibility (A17 professional cards).
-// 8 + h => "8 of Hearts"; A + s => "Ace of Spades"; T + d => "10 of Diamonds".
-const RANK_WORD: Record<string, string> = { A: "Ace", K: "King", Q: "Queen", J: "Jack", T: "10", "9": "9", "8": "8", "7": "7", "6": "6", "5": "5", "4": "4", "3": "3", "2": "2" };
-export const SUIT_WORD: Record<Suit, string> = { s: "Spades", h: "Hearts", d: "Diamonds", c: "Clubs" };
-
 // Fixed 9-max seat order, shared by the sample state and the practice tools.
 export const POSITIONS_9MAX = ["UTG", "UTG+1", "MP", "LJ", "HJ", "CO", "BTN", "SB", "BB"];
 
 // Shared by ActionHistory and BotExplanations; PokerTable uses its own
 // upper-case, past-tense labels for the in-seat badge and stays separate.
-export const cardAlt = (card: Card): string =>
-  `${RANK_WORD[card.rank] ?? card.rank} of ${SUIT_WORD[card.suit]}`;
+/** "Ace of Spades", "As de picas": the card's name for a screen reader (plan 111). */
+export const cardAlt = (card: Card, t: (key: MessageKey, params?: Params) => string): string =>
+  t("a11y.card", { rank: t(`a11y.rank.${card.rank}` as MessageKey), suit: t(`a11y.suit.${card.suit}` as MessageKey) });
 
 export function formatChips(value: number): string {
   return value.toLocaleString(numberLocale());
