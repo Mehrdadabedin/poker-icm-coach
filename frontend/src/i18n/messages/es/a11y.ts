@@ -1,4 +1,4 @@
-/* Spanish: names a screen reader says for cards and seats (plan 111). */
+/* Spanish: names a screen reader says at the table and on the Coach page (plan 111). */
 import type { a11y as en } from "../en/a11y";
 
 export const a11y: Record<keyof typeof en, string> = {
@@ -66,4 +66,9 @@ export const a11y: Record<keyof typeof en, string> = {
   "a11y.clock": "Tiempo restante del nivel {level}: {time}",
   "a11y.clockBreak": "Descanso, tiempo restante: {time}",
   "a11y.many": "{n} acciones",
+  "a11y.actions": "Tus acciones",
+  "a11y.actionsWaiting": "Tus acciones, esperando",
+  "a11y.sizePreset": "{size}, {n} fichas",
+  "a11y.sizeValue": "{n} fichas, {bb} ciegas grandes",
+  "a11y.removeCard": "Quitar {card}",
 };

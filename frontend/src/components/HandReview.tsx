@@ -120,7 +120,7 @@ export function HandReview({ review, coach, comparison, totalPlayers, nameBySeat
 
       {(coach || comparison) && (
         <div className="review-coach" data-testid="review-coach">
-          <button className="coach-toggle" onClick={() => setShowCoach((v) => !v)}>
+          <button className="coach-toggle" onClick={() => setShowCoach((v) => !v)} aria-expanded={showCoach}>
             {t(showCoach ? "review.hideCoaching" : "review.showCoaching")}
           </button>
           {showCoach && (

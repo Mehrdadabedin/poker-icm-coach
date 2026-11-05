@@ -3,7 +3,7 @@ import { ActionKind, LegalAction, TableAction, formatChips } from "../models/gam
 import {
   defaultKey, preflopRaises, presets as sizePresets, sizeNote, stepSize, type Preset, type SizingInput,
 } from "../models/betSizing";
-import { useHeroKeys } from "../hooks/useHeroKeys";
+import { HERO_SHORTCUTS as KEY, useHeroKeys } from "../hooks/useHeroKeys";
 import { BetSizer } from "./BetSizer";
 import { useT } from "../i18n/I18n";
 import { numberLocale } from "../i18n/lang";
@@ -94,6 +94,8 @@ export function HeroControls({
     bb: (n) => t("size.bb", { n }), pot: t("size.pot"),
     share: (share) => t("size.share", { share }), percent: (n) => t("size.percent", { n }),
   }, numberLocale()) : "";
+  // the name holds the visible note too (WCAG 2.5.3); the Enter hint is aria-keyshortcuts
+  const sizeName = note ? `${sizeLabel}, ${note}` : sizeLabel;
 
   return (
     <div className="hero-controls" data-testid="hero-controls">
@@ -105,20 +107,22 @@ export function HeroControls({
           <span className="raise-hint">{t("controls.minRaise", { n: formatChips(meta("raise")?.minAmount ?? 0) })}</span>
         )}
       </div>
-      <div className="controls-row">
+      <div className="controls-row" role="group" aria-label={t(acting ? "a11y.actionsWaiting" : "a11y.actions")}>
         <button className="btn btn-fold" disabled={acting || toCall === 0} aria-label={t("controls.foldTitle")}
+          aria-keyshortcuts={KEY.fold}
           title={toCall === 0 ? t("controls.checkFree") : t("controls.foldTitle")} onClick={fold}>
           {showLabels ? t("controls.fold") : GLYPH.fold}
         </button>
         <button className="btn btn-call" disabled={acting || !has(callKind)}
           aria-label={callKind === "call" ? t("controls.callTitle", { n: formatChips(toCall) }) : t("controls.checkTitle")}
           title={callKind === "call" ? t("controls.callTitle", { n: formatChips(toCall) }) : t("controls.checkTitle")}
+          aria-keyshortcuts={KEY[callKind === "call" ? "call" : "check"]}
           onClick={() => callOrCheck(callKind)}>
           {showLabels ? callLabel : GLYPH[callKind]}
         </button>
         {sizeKind && (
-          <button className="btn btn-size" disabled={acting} aria-label={sizeLabel} title={sizeLabel}
-            data-testid="size-play" onClick={playSize}>
+          <button className="btn btn-size" disabled={acting} aria-label={sizeName} title={sizeLabel}
+            aria-keyshortcuts={KEY.enter} data-testid="size-play" onClick={playSize}>
             {showLabels ? <>{sizeLabel}<small>{note}<span className="key-hint"> · Enter</span></small></> : GLYPH[sizeKind]}
           </button>
         )}
@@ -131,7 +135,7 @@ export function HeroControls({
       </div>
       {input && (
         <BetSizer presets={list} selected={current.selected} amount={amount} min={input.min} max={input.max}
-          step={stepSize(input)} note={note} disabled={acting}
+          step={stepSize(input)} bigBlind={bigBlind} note={note} disabled={acting}
           onPreset={(p) => setAmount(p.amount, p.key)} onAmount={(n) => setAmount(n)} />
       )}
     </div>

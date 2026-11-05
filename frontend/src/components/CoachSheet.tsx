@@ -1,7 +1,9 @@
+import { useRef } from "react";
 import type { Card, CoachAdvice } from "../models/game";
 import { CoachReason } from "./CoachReason";
 import { RowLabel } from "./GlossaryTerm";
 import { useDismiss } from "../hooks/useDismiss";
+import { useFocusReturn } from "../hooks/useFocusReturn";
 import { useT } from "../i18n/I18n";
 import { actionWord, coachReason, factorRow } from "../i18n/coach";
 import { actionClass } from "./CoachStrip";
@@ -14,11 +16,13 @@ const STREET: Record<string, string> = { preflop: "PREFLOP", flop: "FLOP", turn:
  * button, a tap outside, Escape and the Android back button. */
 export function CoachSheet({ coach, heroCards, onClose }: { coach: CoachAdvice; heroCards?: Card[] | null; onClose: () => void }) {
   const t = useT();
+  const sheet = useRef<HTMLDivElement>(null);
   useDismiss(true, onClose);
+  useFocusReturn(true, sheet);
   return (
     <>
       <div className="strip-scrim" onClick={onClose} data-testid="coach-sheet-scrim" />
-      <div className="coach-sheet" role="dialog" aria-modal="true" aria-label={t("coach.title")} data-testid="coach-sheet">
+      <div ref={sheet} className="coach-sheet" role="dialog" aria-modal="true" aria-label={t("coach.title")} data-testid="coach-sheet">
         <div className="coach-sheet-head">
           <span className="coach-sheet-tag">{t("coach.title")}{coach.street && STREET[coach.street] ? ` · ${STREET[coach.street]}` : ""}</span>
           <b className={`strip-action ${actionClass(coach)}`}>{actionWord(coach.recommendedAction, t)}</b>

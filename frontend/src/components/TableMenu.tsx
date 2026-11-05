@@ -1,4 +1,5 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { useFocusReturn } from "../hooks/useFocusReturn";
 import { useT } from "../i18n/I18n";
 
 export function MenuIcon() {
@@ -29,6 +30,8 @@ export function TableMenu({ username, paused, canPause, onHome, onMistakes, onLo
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
   const t = useT();
+  const box = useRef<HTMLElement>(null);
+  useFocusReturn(true, box);
   const pick = (action: () => void) => () => {
     onClose();
     action();
@@ -36,7 +39,7 @@ export function TableMenu({ username, paused, canPause, onHome, onMistakes, onLo
   return (
     <>
       <div className="table-menu-backdrop" onClick={onClose} data-testid="table-menu-backdrop" />
-      <nav className="table-menu" id="table-menu" aria-label={t("menu.table")} data-testid="table-menu">
+      <nav ref={box} className="table-menu" id="table-menu" aria-label={t("menu.table")} data-testid="table-menu">
         {username && <p className="table-menu-user">{t("menu.playingAs")} <b>{username}</b></p>}
         <button type="button" onClick={pick(onHome)} data-testid="menu-home">{t("table.home")}</button>
         <button type="button" onClick={pick(onMistakes)} data-testid="menu-mistakes">{t("table.mistakes")}</button>

@@ -1,6 +1,7 @@
 import { Fragment, useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
+import { useFocusReturn } from "../hooks/useFocusReturn";
 import { useT } from "../i18n/I18n";
 import { en } from "../i18n/messages/en";
 import { ROW_TERM, TOKEN_PATTERN, defKey, exKey, nameKey, termById, termHref, tokenTerm } from "../glossary/terms";
@@ -31,6 +32,7 @@ export function GlossaryTerm({ id, children }: { id: string; children: ReactNode
   const pop = useRef<HTMLSpanElement>(null);
   const [place, setPlace] = useState<Place | null>(null);
   const close = useCallback(() => setPlace(null), []);
+  useFocusReturn(!!place, pop);
 
   useEffect(() => {
     if (!place) return undefined;
