@@ -19,15 +19,23 @@ export interface AnnounceOptions {
 
 const NO_NEWS: Announcements = { polite: null, assertive: null };
 
+/** More new actions than this in one poll (the hand ran on while the hero was out of it) are
+ * counted, and only the last few are said. */
+export const MAX_ACTIONS = 8;
+const LAST_ACTIONS = 3;
+
 function botActions(prev: TableState | null, next: TableState, t: T): string[] {
   const log = next.actionLog ?? [];
   const seen = prev && prev.handNumber === next.handNumber ? (prev.actionLog ?? []).length : 0;
-  return log.slice(seen).filter((a) => a.seat !== next.heroSeat).map((a) => {
+  const fresh = log.slice(seen).filter((a) => a.seat !== next.heroSeat);
+  const said = fresh.length > MAX_ACTIONS ? fresh.slice(-LAST_ACTIONS) : fresh;
+  const sentences = said.map((a) => {
     const name = next.players.find((p) => p.seat === a.seat)?.name ?? "";
     const base = `a11y.act.${a.action}`;
     const key = a.amount ? `${base}N` : base;
     return t(key as MessageKey, { name, n: formatChips(a.amount ?? 0) });
   });
+  return said.length < fresh.length ? [t("a11y.many", { n: fresh.length }), ...sentences] : sentences;
 }
 
 function newCards(prev: TableState | null, next: TableState, t: T): string[] {

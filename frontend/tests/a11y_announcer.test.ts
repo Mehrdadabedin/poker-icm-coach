@@ -37,9 +37,26 @@ describe("bot actions", () => {
     expect(say(prev, next).polite).toBe("Bot 4 goes all-in for 5,100");
   });
 
+  it("counts a long run of actions and says only the last three", () => {
+    const run = (n: number) => Array.from({ length: n }, (_, i) => act(2 + (i % 5), "call", 100 + i));
+    const eight = say(withState({}), withState({ actionLog: run(8) })).polite ?? "";
+    expect(eight.split(". ")).toHaveLength(8);
+    expect(eight).not.toContain("actions");
+    const nine = say(withState({}), withState({ actionLog: run(9) })).polite;
+    expect(nine).toBe("9 actions. Bot 3 calls 106. Bot 4 calls 107. Bot 5 calls 108");
+  });
+
+  it("counts only the actions that are new, and not the hero's own", () => {
+    const old = [act(2, "bet", 300)];
+    const log = [...old, ...Array.from({ length: 13 }, (_, i) => act(i % 4 === 3 ? 0 : 3, "call", 300))];
+    expect(say(withState({ actionLog: old }), withState({ actionLog: log })).polite).toMatch(/^10 actions\. /);
+  });
+
   it("speaks Spanish when the page does", () => {
     const next = withState({ actionLog: [act(2, "raise", 2400)] });
     expect(say(withState({}), next, NONE, es).polite).toMatch(/^Bot 2 sube a 2[.,]400$/);
+    const many = withState({ actionLog: Array.from({ length: 9 }, () => act(2, "check", null)) });
+    expect(say(withState({}), many, NONE, es).polite).toMatch(/^9 acciones\. Bot 2 pasa/);
   });
 });
 

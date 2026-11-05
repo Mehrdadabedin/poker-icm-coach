@@ -63,4 +63,5 @@ export const a11y = {
   "a11y.breakOver": "Break over",
   "a11y.clock": "Time left in level {level}: {time}",
   "a11y.clockBreak": "Break, time left: {time}",
+  "a11y.many": "{n} actions",
 };

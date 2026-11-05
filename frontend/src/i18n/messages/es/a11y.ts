@@ -65,4 +65,5 @@ export const a11y: Record<keyof typeof en, string> = {
   "a11y.breakOver": "Fin del descanso",
   "a11y.clock": "Tiempo restante del nivel {level}: {time}",
   "a11y.clockBreak": "Descanso, tiempo restante: {time}",
+  "a11y.many": "{n} acciones",
 };
