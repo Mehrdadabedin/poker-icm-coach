@@ -25,6 +25,17 @@
   .table-felt .seat .seat-stack { font-size: 0.6rem; }
   .table-felt .seat .seat-bb { font-size: 0.95em; }
   .table-felt .seat .seat-status-action { font-size: 0.6rem; }
+  /* the owner (5 Nov): level and ante, the clock, the pot, each a caption over its value, so even
+     level 21 with an ante stays one row. The clock is in the middle, big and in the text colour. */
+  .table-wrap > .table-header { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 0 8px; }
+  .table-wrap > .table-header > :is(.tbl-lead, .tbl-side) { display: flex; align-items: center; gap: 8px; min-width: 0; }
+  /* level and ante spread over the left half, the pot in the middle of the room left of the buttons */
+  .table-wrap > .table-header > .tbl-lead { justify-content: space-evenly; }
+  .table-wrap > .table-header > .tbl-side > .tbl-stat { margin-inline: auto; }
+  .table-wrap > .table-header .tbl-stat { display: flex; flex-direction: column; align-items: center; line-height: 1.15; }
+  .table-wrap > .table-header .tbl-sep { display: none; }
+  .table-wrap > .table-header .tbl-cap { font-size: 0.62rem; }
+  .table-wrap > .table-header .tbl-clock .tbl-val { font-size: 1.15rem; font-weight: 800; color: var(--text); }
   .hero-controls { padding: 4px 6px; margin-top: 0; }
 
   .coach-strip-wrap { position: relative; margin: 0 0 4px; }

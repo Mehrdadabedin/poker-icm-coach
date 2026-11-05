@@ -129,6 +129,6 @@ describe("champion screen on the live table", () => {
     await act(async () => fireEvent.click(screen.getByRole("button", { name: "START NEW SESSION" })));
     expect(createTournament).toHaveBeenCalledWith(10, undefined, PROFILES);
     expect(screen.queryByTestId("tournament-winner")).toBeNull();
-    expect(screen.getByText(/LEVEL 1 — 100\/100/)).toBeInTheDocument();
+    expect(document.querySelector(".tbl-lead .tbl-stat")).toHaveTextContent("LEVEL 1 — 100/100");
   });
 });
