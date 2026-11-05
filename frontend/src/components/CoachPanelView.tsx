@@ -33,7 +33,7 @@ export function CoachPanelView({ coach, className = "coach-panel", testId, colla
       <div className="panel-head">
         <h3>{t("coach.title")}</h3>
         {onToggle && (
-          <button className="coach-toggle" onClick={onToggle} data-testid="coach-toggle">
+          <button className="coach-toggle" onClick={onToggle} aria-expanded={!collapsed} data-testid="coach-toggle">
             {t(collapsed ? "coach.show" : "coach.hide")}
           </button>
         )}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useT } from "../i18n/I18n";
-import { Card } from "../models/game";
+import { Card, cardAlt } from "../models/game";
 
 const RANKS = ["A", "K", "Q", "J", "T", "9", "8", "7", "6", "5", "4", "3", "2"];
 const SUITS = ["s", "h", "d", "c"] as const;
@@ -70,7 +70,8 @@ export function CardPicker({ value, label, id, used, onChange, resetAfterPick = 
         })}
       </select>
       {value && (
-        <button className="btn btn-small picker-clear" onClick={() => onChange(null)} title={t("picker.remove")}>✕</button>
+        <button className="btn btn-small picker-clear" onClick={() => onChange(null)} title={t("picker.remove")}
+          aria-label={t("a11y.removeCard", { card: cardAlt(value, t) })}>✕</button>
       )}
     </div>
   );

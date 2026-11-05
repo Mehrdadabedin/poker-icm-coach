@@ -3,7 +3,7 @@ import { request } from "../services/api";
 import { minutesToWait, RateLimitError } from "../services/rateLimit";
 import { Copyright } from "../components/Copyright";
 import { PageHeader } from "../components/PageHeader";
-import { Card, POSITIONS_9MAX } from "../models/game";
+import { Card, POSITIONS_9MAX, cardAlt } from "../models/game";
 import { CardPicker, SUIT_SYMBOL, cardKey } from "../components/CoachCardPicker";
 import { CoachAdvicePanel, type Advice } from "../components/CoachAdvicePanel";
 import { useT } from "../i18n/I18n";
@@ -151,7 +151,8 @@ export function CoachPage() {
         <div className="board-cards">
           {board.map((c, i) => (
             <span key={i} className="board-chip">{c.rank}{SUIT_SYMBOL[c.suit]}
-              <button className="chip-remove" onClick={() => { setBoard(board.filter((_, j) => j !== i)); setAdvice(null); }}>✕</button>
+              <button className="chip-remove" aria-label={t("a11y.removeCard", { card: cardAlt(c, t) })}
+                onClick={() => { setBoard(board.filter((_, j) => j !== i)); setAdvice(null); }}>✕</button>
             </span>
           ))}
           {board.length < 5 && (

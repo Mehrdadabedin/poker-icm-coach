@@ -1,4 +1,4 @@
-/* English: names a screen reader says for cards and seats (plan 111). */
+/* English: names a screen reader says at the table and on the Coach page (plan 111). */
 export const a11y = {
   "a11y.rank.A": "Ace",
   "a11y.rank.K": "King",
@@ -64,4 +64,9 @@ export const a11y = {
   "a11y.clock": "Time left in level {level}: {time}",
   "a11y.clockBreak": "Break, time left: {time}",
   "a11y.many": "{n} actions",
+  "a11y.actions": "Your actions",
+  "a11y.actionsWaiting": "Your actions, waiting",
+  "a11y.sizePreset": "{size}, {n} chips",
+  "a11y.sizeValue": "{n} chips, {bb} big blinds",
+  "a11y.removeCard": "Remove {card}",
 };
