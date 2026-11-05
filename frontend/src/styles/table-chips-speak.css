@@ -1,0 +1,3 @@
+/* The coach's speaker chip (plan 112): on is filled like the other pressed chips. */
+.tbl-chip-speak[aria-pressed="true"] { background: var(--accent-fill); color: var(--accent-ink); border-color: var(--accent-fill); }
+.tbl-chip-speak[aria-pressed="false"] { color: var(--text-muted); }
