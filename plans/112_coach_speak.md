@@ -2,7 +2,7 @@
 id: 112
 title: Coach Speak, the Coach Says Its Advice Aloud
 phase: 8
-status: planned
+status: in-progress
 depends_on: [093, 100, 101, 106]
 test_file: frontend/tests/coach_speech.test.tsx
 implementation_files: [frontend/src/services/speech.ts, frontend/src/models/coachSpeech.ts, frontend/src/hooks/useCoachSpeech.ts, frontend/src/components/SpeakerChip.tsx, frontend/src/components/TableChips.tsx, frontend/src/components/LiveTableView.tsx, frontend/src/pages/SettingsPage.tsx, frontend/src/styles/table-chips-speak.css, frontend/src/i18n/messages/en/speak.ts, frontend/src/i18n/messages/es/speak.ts, frontend/src/i18n/messages/en.ts, frontend/src/i18n/messages/es.ts, frontend/package.json, frontend/android/app/capacitor.build.gradle, frontend/android/capacitor.settings.gradle]

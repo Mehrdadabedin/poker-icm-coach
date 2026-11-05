@@ -9,6 +9,8 @@ import { BotKey } from "./BotKey";
 import { CoachStrip } from "./CoachStrip";
 import { HistoryDrawer } from "./HistoryDrawer";
 import { TableChips } from "./TableChips";
+import { useCoachSpeech } from "../hooks/useCoachSpeech";
+import { useStoredFlag } from "../hooks/useStoredFlag";
 import { usePhoneTable } from "../hooks/usePhoneTable";
 import { useUprightPhone } from "../hooks/useUprightPhone";
 import { PokerTable } from "./PokerTable";
@@ -64,6 +66,8 @@ export function LiveTableView(props: LiveTableViewProps) {
   // the hero's turn, with advice for this street: older advice never shows
   const coachNow = coach && state.waitingForHero && !acting && !handOver
     && (!coach.street || coach.street === state.street) ? coach : null;
+  const [voice, setVoice] = useStoredFlag("icmbot.coachVoice", false);
+  const stopVoice = useCoachSpeech(free ? null : coachNow, state, voice);
 
   return (
     <div className="table-page" data-testid="table-page">
@@ -95,7 +99,7 @@ export function LiveTableView(props: LiveTableViewProps) {
                 onSheet={phone.setSheetOpen} onFold={() => phone.setStripOpen(false)} />
             )) : free ? <LockedCoachChip place="top" /> : coachNow ? <MobileCoachCard coach={coachNow} heroCards={hero?.holeCards} /> : null}
             trail={(
-              <TableChips detailsOpen={phone.details} historyOpen={phone.drawerOpen}
+              <TableChips voice={{ on: voice, onChange: setVoice }} detailsOpen={phone.details} historyOpen={phone.drawerOpen}
                 onDetails={() => phone.setDetails(!phone.details)} onHistory={toggleHistory}
                 coachChip={upright && !free && !phone.stripOpen ? { grade: phone.grade, onClick: () => phone.setStripOpen(true) } : null} />
             )}
@@ -123,7 +127,7 @@ export function LiveTableView(props: LiveTableViewProps) {
                 street={state.street}
                 heroBet={hero?.bet ?? 0}
                 actionLog={state.actionLog}
-                onAction={(kind: ActionKind, amount?: number) => onAction(kind, amount)}
+                onAction={(kind: ActionKind, amount?: number) => { stopVoice(); onAction(kind, amount); }}
               />
             )}
             {comparison && !handOver && !upright && (
