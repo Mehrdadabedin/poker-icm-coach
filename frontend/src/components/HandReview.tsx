@@ -44,15 +44,15 @@ export function HandReview({ review, coach, comparison, totalPlayers, nameBySeat
       </div>
 
       <div className="result-grid" data-testid="result-grid">
-        <div className="result-cell">
+        <div className="result-cell fact-win">
           <dt>{t("review.winningHand")}</dt>
           <dd>{review.winningHandName ? handName(review.winningHandName, t) : t("review.uncontested")}</dd>
         </div>
-        <div className="result-cell">
+        <div className="result-cell fact-you">
           <dt>{t("review.yourHand")}</dt>
           <dd>{review.heroHandName ? handName(review.heroHandName, t) : t("review.foldedHidden")}</dd>
         </div>
-        <div className="result-cell result-cards-cell">
+        <div className="result-cell result-cards-cell fact-hero">
           <dt>{t("review.heroCards")}</dt>
           <dd>
             {review.heroCards.length === 2 ? (
@@ -62,7 +62,7 @@ export function HandReview({ review, coach, comparison, totalPlayers, nameBySeat
             )}
           </dd>
         </div>
-        <div className="result-cell result-board-cell">
+        <div className="result-cell result-board-cell fact-board">
           <dt>{t("review.finalBoard")}</dt>
           <dd>
             {review.board.length === 0 ? (
@@ -72,33 +72,33 @@ export function HandReview({ review, coach, comparison, totalPlayers, nameBySeat
             )}
           </dd>
         </div>
-        <div className="result-cell">
+        <div className="result-cell fact-pot">
           <dt>{t("review.pot")}</dt>
           <dd>{formatChips(review.pot)}</dd>
         </div>
-        <div className="result-cell">
+        <div className="result-cell fact-stack">
           <dt>{t("review.yourStack")}</dt>
           <dd>
             {formatChips(review.heroStart)} → {formatChips(review.heroEnd)}
           </dd>
         </div>
-        <div className="result-cell">
+        <div className="result-cell fact-chip">
           <dt>{t("review.chipChange")}</dt>
           <dd className={net > 0 ? "pos" : net < 0 ? "neg" : ""}>
             {net > 0 ? `+${formatChips(net)}` : net < 0 ? `-${formatChips(-net)}` : "±0"}
           </dd>
         </div>
-        <div className="result-cell">
+        <div className="result-cell fact-pos">
           <dt>{t("review.yourPosition")}</dt>
           <dd>{review.heroPosition}</dd>
         </div>
-        <div className="result-cell">
+        <div className="result-cell fact-rank">
           <dt>{t("review.stackRank")}</dt>
           <dd>
             {review.heroRankBefore}/{totalPlayers} → {review.heroRankAfter}/{totalPlayers}
           </dd>
         </div>
-        <div className="result-cell">
+        <div className="result-cell fact-icm">
           <dt>{t("review.icmPressure")}</dt>
           <dd>{pressure ? t(pressure) : review.pressure}</dd>
         </div>

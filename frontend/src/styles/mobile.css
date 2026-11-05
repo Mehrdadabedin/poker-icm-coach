@@ -100,7 +100,6 @@ coach card and the buttons: table-landscape.css (plan 089).
 
   .result-actions .btn { min-height: 38px; font-size: 0.8rem; }
   .hand-review { padding: 8px; }
-  .result-grid { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); }
 }
 
 /* ---- tablets PORTRAIT (768-959): slightly compact, still roomy ---- */
