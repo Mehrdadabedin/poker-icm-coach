@@ -14,15 +14,23 @@ describe("the lines over the table", () => {
     }
   });
 
-  it("centres level, time and pot between two equal columns, the round buttons in the right one", () => {
-    expect(desktop).toContain("grid-template-columns: minmax(64px, 1fr) repeat(3, auto) minmax(64px, 1fr);");
-    expect(desktop).toContain(".table-wrap > .table-header > .tbl-info:first-child { grid-column: 2; }");
-    expect(desktop).toContain(".table-wrap > .table-header > .tbl-chips { grid-column: 5; justify-self: end; }");
-    expect(desktop).toMatch(/font-size: 0\.875rem; white-space: nowrap;/);
+  it("keeps the clock in the middle, the level and the ante on its left, the pot and the buttons on its right", () => {
+    expect(desktop).toContain("grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);");
+    expect(desktop).toContain(".table-wrap > .table-header > :is(.tbl-lead, .tbl-side) { display: flex; align-items: center; gap: clamp(18px, 3.5cqw, 40px); }");
+    expect(desktop).toContain("column-gap: clamp(22px, 5cqw, 56px); font-size: 0.875rem; white-space: nowrap;");
+    expect(desktop).toContain(".table-wrap > .table-header > .tbl-lead { justify-self: end; }");
   });
 
   it("keeps the line on the left on a table too narrow for the longest level", () => {
-    expect(desktop).toMatch(/@container \(max-width: 700px\) \{\n\s*\.table-wrap > \.table-header \{ grid-template-columns: repeat\(3, auto\) minmax\(64px, 1fr\);/);
+    expect(desktop).toMatch(/@container \(max-width: 760px\) \{\n\s*\.table-wrap > \.table-header \{ display: flex;/);
+  });
+});
+
+describe("the level line on an upright phone", () => {
+  it("puts the clock in the middle, big and in the text colour, each label a caption over its value", () => {
+    expect(phone).toContain(".table-wrap > .table-header { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);");
+    expect(phone).toContain(".table-wrap > .table-header .tbl-stat { display: flex; flex-direction: column;");
+    expect(phone).toContain(".table-wrap > .table-header .tbl-clock .tbl-val { font-size: 1.15rem; font-weight: 800; color: var(--text); }");
   });
 });
 

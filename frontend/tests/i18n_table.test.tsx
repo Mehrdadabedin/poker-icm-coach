@@ -50,7 +50,7 @@ describe("the table in Spanish", () => {
     const state = { ...sampleTableState(), playersRemaining: 9, inHand: 4, totalChips: 405000,
       actionLog: [{ seat: 3, action: "call", amount: 100, street: "flop" }] };
     es(<PokerTable state={state} />);
-    expect(screen.getByText("NIVEL 1 — 50/100")).toBeInTheDocument();
+    expect(document.querySelector(".tbl-lead .tbl-stat")).toHaveTextContent(/^NIVEL 1 — 50\/100$/);
     expect(screen.getByText("MANO #7")).toBeInTheDocument();
     expect(screen.getByText("FICHAS TOTALES 405.000")).toBeInTheDocument();
     expect(screen.getByTestId("seat-3")).toHaveTextContent("IGUALA");

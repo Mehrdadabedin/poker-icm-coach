@@ -66,18 +66,16 @@ export function PokerTable({ state, children, overlay, cover, top, trail, detail
   return (
     <div className="table-wrap" data-testid="poker-table">
       <div className="table-header">
-        <span className="tbl-info">
-          {t("status.level", { level: state.level, sb: state.smallBlind, bb: state.bigBlind })}
+        {/* the clock stays in the middle of a wide screen: the level and the ante on its left, the pot on its right */}
+        <span className="tbl-lead">
+          <Stat cap={t("status.level", { level: state.level })} sep=" — " value={`${state.smallBlind}/${state.bigBlind}`} />
+          {state.ante > 0 && <Stat cap={t("status.ante")} value={formatChips(state.ante)} />}
         </span>
-        <span className="tbl-info">
-          {state.inBreak ? t("status.break") : ""}
-          {state.ante > 0 ? t("status.ante", { n: formatChips(state.ante) }) : ""}
-          {t("status.time", { clock: formatClock(state.secondsLeft) })}
+        <Stat className="tbl-clock" cap={t(state.inBreak ? "status.break" : "status.time")} value={formatClock(state.secondsLeft)} />
+        <span className="tbl-side">
+          <Stat cap={t("status.pot")} value={formatChips(state.pot)} testId="pot-amount" />
+          {trail}
         </span>
-        <span className="tbl-info" data-testid="pot-amount">
-          {t("status.pot", { n: formatChips(state.pot) })}
-        </span>
-        {trail}
       </div>
       <div className="table-status" id="table-details" hidden={detailsHidden} data-testid="table-status">
         <span className="tbl-info">{t("status.hand", { n: state.handNumber })}</span>
@@ -129,6 +127,15 @@ export function PokerTable({ state, children, overlay, cover, top, trail, detail
       {children}
       {cover}
     </div>
+  );
+}
+
+/** A caption and its value: one line on a wide screen, the caption over the value on an upright phone. */
+function Stat({ cap, sep = " ", value, className = "", testId }: { cap: string; sep?: string; value: string; className?: string; testId?: string }) {
+  return (
+    <span className={`tbl-info tbl-stat ${className}`} data-testid={testId}>
+      <span className="tbl-cap">{cap}</span><span className="tbl-sep">{sep}</span><span className="tbl-val">{value}</span>
+    </span>
   );
 }
 
