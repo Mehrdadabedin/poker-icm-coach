@@ -58,6 +58,11 @@ lists the camera app under `<queries>` in `AndroidManifest.xml`. Without that
 entry, Android 11+ hides the camera app and "Take a photo" opens the gallery.
 The app asks for no CAMERA permission, because the camera app takes the photo.
 
+The coach voice (plan 112) needs an app built with the
+`@capacitor-community/text-to-speech` plugin: the app's web view has no
+`speechSynthesis`, so the plugin speaks with Android's own text-to-speech
+engine. An older app has no plugin and hides the speaker chip.
+
 ## Install on a phone
 
 Either:
