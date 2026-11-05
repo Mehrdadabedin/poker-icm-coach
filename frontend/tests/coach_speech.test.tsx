@@ -61,8 +61,17 @@ describe("once per decision", () => {
 
   it("says it again when the betting is reopened on the same street", () => {
     const { next } = table();
-    next(turn({ actionLog: [...RAISE_LOG, { seat: 4, action: "raise", amount: 900, street: "preflop" }] }));
+    next(turn({ actionLog: [...RAISE_LOG, { seat: 4, action: "raise", amount: 900, street: "preflop" }] }), { ...advice });
     expect(texts()).toEqual(["Raise.", "Raise."]);
+  });
+
+  it("facing a bet after checking, says the new advice, not the old check", () => {
+    const check = { ...advice, recommendedAction: "CHECK" };
+    const { rerenderWith } = view(turn({ toCall: 0, actionLog: [] }), { coach: check });
+    const bet = turn({ actionLog: [{ seat: 3, action: "bet", amount: 300, street: "preflop" }] });
+    rerenderWith({ state: bet, coach: check }); // the poll shows the turn before the new advice arrives
+    rerenderWith({ state: bet, coach: { ...advice, recommendedAction: "CALL" } });
+    expect(texts()).toEqual(["Check.", "Call 300."]);
   });
 });
 
