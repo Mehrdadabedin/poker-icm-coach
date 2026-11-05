@@ -15,7 +15,8 @@ offered on icmbot.one, on icmbot.es, in the Android app and in the phone layout.
 Chinese and Persian speakers in Europe, the US and elsewhere. Persian is the first right-to-left (RTL)
 language, so most of the new work is layout, not words.
 
-No code is written until the owner approves this plan.
+No code is written until the owner approves this plan. The owner answered its open questions on
+5 Nov; see "Owner's decisions" at the end.
 
 # How languages work today (`main` at d38071d)
 
@@ -45,7 +46,7 @@ No code is written until the owner approves this plan.
 
 - `LANGS = ["en", "es", "zh", "fa"]`; `LANG_NAMES`: `zh` "简体中文", `fa` "فارسی".
 - `?lang=zh` and `?lang=fa` work from step 1 (preview, as `?lang=es` did). Browser tags: every `zh-*`
-  (zh-CN, zh-Hans-CN, zh-SG, also zh-TW and zh-HK until Traditional exists, see open questions)
+  (zh-CN, zh-Hans-CN, zh-SG, also zh-TW and zh-HK until Traditional exists, the owner's choice)
   gives `zh`; `fa-*` gives `fa`. They count only once the language is in READY (website) or
   APP_READY (app).
 - Turning a language on adds it to READY and APP_READY together. From then on the menu offers it on
@@ -80,10 +81,15 @@ No code is written until the owner approves this plan.
 - **Arrows**: the ‹ back button (`LeaderboardPage`) and the 3 → in `MistakeCard` and `HandReview`
   flip in RTL; ▶ and ⏸ on the clock do not.
 - **Digits**: `fa-IR` writes ۴۵٬۰۰۰ (Persian digits) by default; `fa-IR-u-nu-latn` writes Latin
-  digits. One choice for the whole site (open question). Number inputs (bet amount, ICM calculator,
+  digits. Persian digits on the whole site (the owner, 5 Nov). Number inputs (bet amount, ICM calculator,
   birthday) accept ۰ to ۹ and ٠ to ٩ and turn them into Latin digits before parsing.
-- **Dates**: `fa-IR` defaults to the Solar Hijri calendar. The plan uses `fa-IR-u-ca-gregory`
-  (Gregorian with Persian month names) so the birthday picker and every date stay one calendar.
+- **Dates**: Solar Hijri, the calendar of Iran (the owner, 5 Nov). `fa-IR` already formats in it
+  (۱۴ آبان ۱۴۰۵), so `ReportPage`, `LegalPage`, `leaderboardDates` and `history.ts` only need the
+  locale. `Intl` formats Solar Hijri but cannot turn a Solar Hijri date back into a Gregorian one, and
+  `BirthdayPicker` builds 12 Gregorian months from `Date.UTC(2000, i, 1)`. So a small tested converter,
+  `i18n/jalali.ts` (no package), lets the picker show Solar Hijri years, months and days under `fa`,
+  weeks from Saturday, and save the same Gregorian date as before. The leaderboard week is set by the
+  server and does not change; only its labels do.
 - **Font**: Vazirmatn (SIL Open Font License), served from `public/fonts` as woff2 with a
   `unicode-range` for Arabic script, so only pages with Persian glyphs download it. A font file, not
   a package. Its weight is measured in step 3.
@@ -118,8 +124,8 @@ No code is written until the owner approves this plan.
   Persian screenshot, as `hero-app-es.webp` and `og-app-1200x630-es.jpg` did.
 - `zh.ts` and `fa.ts` start as `{ ...en }` and each area PR spreads its translated file over it, so
   plan 111's new `a11y` keys never block either plan.
-- A language enters READY only after a native speaker who plays poker has read every screen (the
-  owner's translator, open question) and their fixes are in. A new test then fails if any zh or fa
+- A language enters READY only after a native speaker who plays poker has read every screen (a poker
+  player from the community, one per language, found by the owner) and their fixes are in. A new test then fails if any zh or fa
   value is still the English one, apart from a short list (ICMBOT, BB, ICM, numbers only).
 
 # Where players can use it
@@ -137,7 +143,7 @@ the site, the Android app and Pro are the same as for anyone there.
 
 1. **Language plumbing.** `zh`, `fa` in LANGS and LANG_NAMES; `zh.ts`, `fa.ts` as `{ ...en }`;
    `htmlLang`, `htmlDir`, `dir` on `<html>`; locales, one `placeOrdinal` used by `history.ts` and
-   `LeaderboardParts`; digit input normalising; the `<select>` menu; browser tags; `SITE_META`
+   `LeaderboardParts`; `jalali.ts` and the Solar Hijri birthday picker; digit input normalising; the `<select>` menu; browser tags; `SITE_META`
    typed per site. READY and APP_READY unchanged, so the live site looks the same.
 2. **RTL base.** Logical properties across `styles/`, the LTR islands, the arrow flips,
    isolate marks in `translate()`, `<bdi>` names, a CSS guard test. English is unchanged.
@@ -149,8 +155,9 @@ the site, the Android app and Pro are the same as for anyone there.
    `i18n_coach` and `i18n_hands` server-code tests.
 7. **Learn** (about 360): glossary, glossaryTerms, quiz, practice, tools, leaderboard.
 8. **Legal and link previews**: legal, the `/zh/` and `/fa/` heads, og images, hero pictures.
-9. **Chinese on**, after its native review: the reviewer's fixes, `zh` in READY and APP_READY.
-10. **Persian on**, the same, plus a check on a real Android phone set to Persian.
+9. **Persian on** (first, the owner's choice), after its native review: the reviewer's fixes, `fa`
+   in READY and APP_READY, and a check on a real Android phone set to Persian.
+10. **Chinese on**, the same, when its reviewer is done.
 11. **Show the languages on the landing page** (the owner, 5 Nov), after Persian is on. At the top, the
     language menu already offers all four (step 1's `<select>` on a phone). Near the bottom, a new
     section `MinimalLanguages.tsx` before `MinimalClosing`: "Play in your language" with one tile per
@@ -176,7 +183,9 @@ New `frontend/tests/i18n_rtl.test.tsx`; additions to `i18n.test.tsx` and `site_m
   `lang="zh-Hans"`. Under `fa` the felt, the cards and the charts have `dir="ltr"` and the seats are
   in the same DOM order as in English.
 - **Text**: `translate("fa", ...)` isolates params, en and zh do not; numbers, ordinals and dates in
-  zh and fa; Persian digits typed in the bet box give the right amount.
+  zh and fa, Persian dates in Solar Hijri; Persian digits typed in the bet box give the right amount.
+- **Calendar**: `jalali.ts` turns every day of the birthday picker's year range into Gregorian and
+  back to the same day, and agrees with `Intl` (`fa-IR`) on each one.
 - **CSS guard**: no physical left or right in `styles/` outside the LTR files (felt, seats, cards,
   placement, charts).
 - **Browser**: `scripts/table-fit/check.mjs` loops over en, es, zh, fa at 360, 390 and 1280 px: no
@@ -196,13 +205,13 @@ New `frontend/tests/i18n_rtl.test.tsx`; additions to `i18n.test.tsx` and `site_m
 - Admin pages (English only), the demo and ad videos, Coach Speak voices in zh and fa (plan 112).
 - Server sentences that still have no code (the coach tool's teaching paragraph) stay English.
 
-# Open for the owner
+# Owner's decisions (5 Nov)
 
-- Who reviews each language: a paid translator who plays poker, or a player from the community.
-- Persian digits (۴۵٬۰۰۰) or Latin digits (45,000) on the whole site. The plan assumes Persian.
-- Gregorian dates in Persian (as planned) or the Solar Hijri calendar.
-- Traditional Chinese later. Until then zh-TW and zh-HK browsers get Simplified (as planned) or
-  English.
-- A domain of their own (for example a .cn or a Persian-named domain) or the `/zh/` and `/fa/`
-  paths on icmbot.one (as planned). A .cn domain needs a Chinese ICP filing.
-- Which language turns on first. The plan does Chinese first because it needs no RTL check.
+- Review: a poker player from the community for each language, not a paid translator. The owner
+  finds them. A language turns on only after its reviewer is done.
+- Persian digits (۴۵٬۰۰۰) on the whole site.
+- Persian dates in the Solar Hijri calendar (the plan had Gregorian). See "Dates" above.
+- Traditional Chinese later. Until then zh-TW and zh-HK browsers get Simplified.
+- The `/zh/` and `/fa/` paths on icmbot.one, no domain of their own.
+- Persian turns on first (the plan had Chinese). Steps 1 to 8 stay in the same order, since the
+  RTL work (steps 2 and 3) comes before any translation step either way.
