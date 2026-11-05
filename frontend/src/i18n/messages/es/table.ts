@@ -58,7 +58,6 @@ export const table: Record<keyof typeof en, string> = {
   "seat.allIn": "ALL-IN",
   "seat.folded": "NO VA",
   "seat.you": "TÚ",
-  "seat.botProfile": "Perfil del bot {name}",
   "tag.fold": "NO VA",
   "tag.check": "PASA",
   "tag.call": "IGUALA",

@@ -56,7 +56,6 @@ export const table = {
   "seat.allIn": "ALL-IN",
   "seat.folded": "FOLDED",
   "seat.you": "YOU",
-  "seat.botProfile": "{name} bot profile",
   "tag.fold": "FOLDED",
   "tag.check": "CHECK",
   "tag.call": "CALL",

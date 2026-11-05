@@ -2,7 +2,7 @@
 id: 111
 title: Screen-reader Names and Live Updates
 phase: 8
-status: planned
+status: in-progress
 depends_on: [093, 101, 106]
 test_file: frontend/tests/a11y_table.test.tsx
 implementation_files: [frontend/src/components/TableAnnouncer.tsx, frontend/src/models/tableAnnouncements.ts, frontend/src/models/seatLabel.ts, frontend/src/components/PlayingCard.tsx, frontend/src/components/PokerSeat.tsx, frontend/src/components/PokerTable.tsx, frontend/src/components/LiveTableView.tsx, frontend/src/components/HandResult.tsx, frontend/src/components/CoachStrip.tsx, frontend/src/components/MobileCoachCard.tsx, frontend/src/components/CoachPanelView.tsx, frontend/src/components/HeroControls.tsx, frontend/src/components/BetSizer.tsx, frontend/src/components/HistoryDrawer.tsx, frontend/src/components/TableMenu.tsx, frontend/src/components/MenuCard.tsx, frontend/src/components/LeaderboardParts.tsx, frontend/src/components/LeaderboardPodium.tsx, frontend/src/components/AuthField.tsx, frontend/src/components/LoginForm.tsx, frontend/src/models/game.ts, frontend/src/i18n/messages/en/a11y.ts, frontend/src/i18n/messages/es/a11y.ts]

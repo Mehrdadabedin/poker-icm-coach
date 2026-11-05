@@ -1,10 +1,13 @@
 import { Card, cardAlt } from "../models/game";
 import { useDisplayPreferences } from "../services/preferences";
+import { useT } from "../i18n/I18n";
 
 interface PlayingCardProps {
   card?: Card | null;
   faceDown?: boolean;
   className?: string;
+  /** The seat or the board already says what this card is (plan 111). */
+  decorative?: boolean;
 }
 
 /** Renders a real playing-card image asset (A17, OpenDecks CC0). The full
@@ -20,12 +23,14 @@ function cardAssetUrl(card: Card): string {
 const BACK_FILE = { blue: "back.png", red: "back-red.png" } as const;
 
 /** A face-down card in the player's chosen back (Settings: Card back). */
-function CardBackImage({ className }: { className: string }) {
+function CardBackImage({ className, decorative }: { className: string; decorative: boolean }) {
   const { cardBack } = useDisplayPreferences();
+  const t = useT();
   return (
     <img
       src={`${import.meta.env.BASE_URL}cards/${BACK_FILE[cardBack]}`}
-      alt="face down card"
+      alt={decorative ? "" : t("a11y.cardBack")}
+      aria-hidden={decorative || undefined}
       className={`playing-card ${className}`.trim()}
       data-testid="card-back"
       data-back={cardBack}
@@ -34,12 +39,13 @@ function CardBackImage({ className }: { className: string }) {
   );
 }
 
-export function PlayingCard({ card, faceDown = false, className = "" }: PlayingCardProps) {
-  if (faceDown || !card) return <CardBackImage className={className} />;
+export function PlayingCard({ card, faceDown = false, className = "", decorative = false }: PlayingCardProps) {
+  const t = useT();
+  if (faceDown || !card) return <CardBackImage className={className} decorative={decorative} />;
   return (
     <img
       src={cardAssetUrl(card)}
-      alt={cardAlt(card)}
+      alt={cardAlt(card, t)}
       className={`playing-card ${className}`.trim()}
       data-testid={`card-${card.rank}${card.suit}`}
       draggable={false}

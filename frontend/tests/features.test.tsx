@@ -8,7 +8,7 @@ import { HandResult } from "../src/components/HandResult";
 import { HandReview } from "../src/components/HandReview";
 import { sampleReview } from "../src/sampleState";
 import { RANKS as ALL_RANKS, SUITS as ALL_SUITS } from "../src/components/CoachCardPicker";
-import { SUIT_WORD } from "../src/models/game";
+import { en } from "../src/i18n/messages/en";
 
 const review = sampleReview();
 
@@ -19,7 +19,7 @@ describe("A08/A17 real card assets", () => {
         const { container } = render(<PlayingCard card={{ rank, suit } as never} />);
         const img = container.querySelector("img");
         expect(img?.getAttribute("src")).toMatch(new RegExp(`cards/${rank}${suit}[.]png$`));
-        expect(img?.getAttribute("alt")).toContain(SUIT_WORD[suit]);
+        expect(img?.getAttribute("alt")).toContain(en[`a11y.suit.${suit}` as const]);
         expect(img?.getAttribute("alt")).toBeTruthy();
       }
     }

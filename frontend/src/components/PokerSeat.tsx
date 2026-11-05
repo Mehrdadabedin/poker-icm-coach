@@ -1,4 +1,5 @@
 import { Card, PlayerView, formatChips } from "../models/game";
+import { seatLabel } from "../models/seatLabel";
 import { botProfilePortrait } from "../models/botProfiles";
 import { CardView } from "./CardView";
 import { PlayingCard } from "./PlayingCard";
@@ -37,13 +38,13 @@ export function PokerSeat({ player, active, lastAction, status, revealCards, rev
     .join(" ");
 
   return (
-    <div className={classes} data-testid={`seat-${player.seat}`} data-seat={player.seat} data-active={active} data-status={status ?? ""}>
+    <div className={classes} role="group" aria-label={seatLabel(player, active, lastAction, t)} data-testid={`seat-${player.seat}`} data-seat={player.seat} data-active={active} data-status={status ?? ""}>
       {player.isDealer && (
-        <span className="dealer-button" data-testid={`dealer-${player.seat}`}>
+        <span className="dealer-button" aria-hidden="true" data-testid={`dealer-${player.seat}`}>
           D
         </span>
       )}
-      <div className="seat-position">
+      <div className="seat-position" aria-hidden="true">
         {player.position} {player.position === "SB" || player.position === "BB" ? "•" : ""}
       </div>
       <div className="seat-who">
@@ -51,7 +52,7 @@ export function PokerSeat({ player, active, lastAction, status, revealCards, rev
           <img
             className="seat-bot-portrait"
             src={portrait.src}
-            alt={t("seat.botProfile", { name: portrait.alt })}
+            alt=""
             style={{ borderColor: portrait.color }}
             draggable={false}
           />
@@ -72,15 +73,15 @@ export function PokerSeat({ player, active, lastAction, status, revealCards, rev
       ) : (
         <>
           <div className="seat-stack">
-            {formatChips(player.stack)} · <span className="seat-bb">{player.stackInBB} BB</span>
+            {formatChips(player.stack)} · <span className="seat-bb" aria-hidden="true">{player.stackInBB} BB</span>
           </div>
           <div className={`seat-cards ${player.isHero ? "hero-cards" : ""}`}>
             {shown
               ? shown.map((c, i) => <CardView key={i} card={c} />)
               : !player.isHero && !player.folded && (
                 <>
-                  <PlayingCard faceDown className="seat-card-back" />
-                  <PlayingCard faceDown className="seat-card-back" />
+                  <PlayingCard faceDown decorative className="seat-card-back" />
+                  <PlayingCard faceDown decorative className="seat-card-back" />
                 </>
               )}
           </div>

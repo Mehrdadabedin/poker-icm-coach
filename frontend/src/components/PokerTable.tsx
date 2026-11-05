@@ -113,11 +113,12 @@ export function PokerTable({ state, children, overlay, cover, top, trail, detail
             />
           );
         })}
-        <div className={state.communityCards.length === 0 ? "board board-is-empty" : "board"}>
+        <div className={state.communityCards.length === 0 ? "board board-is-empty" : "board"} role="group" aria-label={t("a11y.board")}>
           {/* no cards yet: the logo printed on the cloth (plan 090) */}
           {state.communityCards.length === 0 && (
             <img className="felt-logo" src="/Logo/logo-felt.png" alt="" aria-hidden="true" data-testid="felt-logo" />
           )}
+          {state.communityCards.length === 0 && <span className="sr-only">{t("a11y.boardEmpty")}</span>}
           {state.communityCards.map((c, i) => (
             <CardView key={i} card={c} />
           ))}
