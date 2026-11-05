@@ -2,7 +2,7 @@
 id: 112
 title: Coach Speak, the Coach Says Its Advice Aloud
 phase: 8
-status: in-progress
+status: complete
 depends_on: [093, 100, 101, 106]
 test_file: frontend/tests/coach_speech.test.tsx
 implementation_files: [frontend/src/services/speech.ts, frontend/src/models/coachSpeech.ts, frontend/src/hooks/useCoachSpeech.ts, frontend/src/components/SpeakerChip.tsx, frontend/src/components/TableChips.tsx, frontend/src/components/LiveTableView.tsx, frontend/src/pages/SettingsPage.tsx, frontend/src/styles/table-chips-speak.css, frontend/src/i18n/messages/en/speak.ts, frontend/src/i18n/messages/es/speak.ts, frontend/src/i18n/messages/en.ts, frontend/src/i18n/messages/es.ts, frontend/package.json, frontend/android/app/capacitor.build.gradle, frontend/android/capacitor.settings.gradle]
@@ -258,4 +258,8 @@ would hear the advice twice, in two voices at once.
   real iPhone and Android phone, English and Spanish, before they are called complete.
 - Whether iOS mutes `speechSynthesis` with the ring/silent switch. If it does, the chip's title should
   say so.
-- How the plugin behaves when the app goes to the background mid-sentence.
+- How the plugin behaves when the app goes to the background mid-sentence. The plugin does not stop on
+  its own when the app pauses; the voice stops through the page's `visibilitychange`, which the
+  Android web view should send when the app leaves the screen. Not yet checked on a phone.
+- PR 2 reaches players only with a new Play Store release (`versionCode` +1, AAB). Until then the
+  installed app has no plugin and hides the chip.
