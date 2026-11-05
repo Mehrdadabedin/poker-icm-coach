@@ -129,12 +129,24 @@ English, outside a short list (ICMBOT, BB, ICM, numbers only). Extend
 `scripts/table-fit/check.mjs` to the language and run it. For Persian, check
 the Android app on a phone set to Persian, or say you did not.
 
+## PR 11: the languages on the landing page (`feat/landing-languages`)
+
+After PR 10 is merged. Plan 113 step 11: `landing-minimal/MinimalLanguages.tsx`
+("Play in your language", one tile per READY language in its own words and
+script, a tap switches the page language like `LanguageMenu`), placed before
+`MinimalClosing` in `pages/MinimalLandingPage.tsx`; a footer line in
+`MinimalFooter.tsx` with the same languages. Only READY languages show. Each
+item gets its own `lang`, the Persian one `dir="rtl"`. New keys in en, es, zh
+and fa; ask the owner for the reviewers to check the zh and fa lines. Tests as
+in the plan, and screenshots at 360, 390 and 1280 px in all four languages,
+dark and light.
+
 ## Git and checks, every PR
 
 - `npm run lint`, the full `npx vitest run` and all pre-push gates pass.
   Report the test counts before and after.
 - Plan 113 `in-progress` from PR 1 with its `progress.md` row updated each PR;
-  `complete` after PR 10.
+  `complete` after PR 11.
 - PR body with "## What changed" and "## Tests" sections, as recent PRs.
 - Push and open the PR to `main`. Do not merge.
 

@@ -7,6 +7,11 @@ const KEYS: Record<string, HeroKey> = {
   ArrowLeft: "smaller", "-": "smaller", ArrowRight: "bigger", "+": "bigger", "=": "bigger",
 };
 
+/** What the buttons tell a screen reader in aria-keyshortcuts (plan 111): one of the keys above for each. */
+export const HERO_SHORTCUTS: Record<HeroKey, string> = {
+  enter: "Enter", fold: "F", call: "C", check: "K", smaller: "ArrowLeft", bigger: "ArrowRight",
+};
+
 /** Keyboard play while it is the hero's turn: Enter plays the size shown on
  * the raise button, F folds, C calls, K checks, arrows or - and + change the
  * size. Keys typed into a field stay with the field, except Enter in the
@@ -18,7 +23,8 @@ export function useHeroKeys(active: boolean, handlers: Partial<Record<HeroKey, (
   useEffect(() => {
     if (!active) return undefined;
     const onKey = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      // a key already used, such as an arrow between the history drawer's tabs
+      if (e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
       const key = KEYS[e.key];
       const target = e.target instanceof HTMLElement ? e.target : null;
       const tag = target?.tagName ?? "";

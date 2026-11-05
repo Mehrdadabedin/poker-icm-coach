@@ -2,6 +2,7 @@ import { formatChips } from "../models/game";
 import type { Preset } from "../models/betSizing";
 import { useT } from "../i18n/I18n";
 import { numberLocale } from "../i18n/lang";
+import { HERO_SHORTCUTS as KEY } from "../hooks/useHeroKeys";
 
 interface BetSizerProps {
   presets: Preset[];
@@ -10,6 +11,7 @@ interface BetSizerProps {
   min: number;
   max: number;
   step: number;
+  bigBlind: number;
   note: string;
   disabled: boolean;
   onPreset: (p: Preset) => void;
@@ -18,12 +20,13 @@ interface BetSizerProps {
 
 /** The size row under the action buttons: one tap on a preset, or - and +,
  * or the slider; typing in the box is optional. */
-export function BetSizer({ presets, selected, amount, min, max, step, note, disabled, onPreset, onAmount }: BetSizerProps) {
+export function BetSizer({ presets, selected, amount, min, max, step, bigBlind, note, disabled, onPreset, onAmount }: BetSizerProps) {
   const t = useT();
   // 2.5x reads 2,5x in Spanish; All-in and Pot are words
   const presetLabel = (key: string, label: string) => key === "allin" ? t("size.allin")
     : key === "Pot" ? t("size.potPreset")
       : label.endsWith("x") ? `${Number(label.slice(0, -1)).toLocaleString(numberLocale())}x` : label;
+  const bb = bigBlind > 0 ? Math.round((amount / bigBlind) * 10) / 10 : 0;
   const set = (n: number) => onAmount(Math.min(max, Math.max(min, Math.round(n))));
   return (
     <div className="bet-sizer" data-testid="bet-sizer" data-bet-sizer>
@@ -31,6 +34,7 @@ export function BetSizer({ presets, selected, amount, min, max, step, note, disa
         {presets.map((p) => (
           <button key={p.key} type="button" disabled={disabled} data-testid={`size-${p.key}`}
             className={p.key === selected ? "size-preset active" : "size-preset"} aria-pressed={p.key === selected}
+            aria-label={t("a11y.sizePreset", { size: presetLabel(p.key, p.label), n: formatChips(p.amount) })}
             onClick={() => onPreset(p)}>
             <b>{presetLabel(p.key, p.label)}</b>
             <span>{formatChips(p.amount)}</span>
@@ -39,11 +43,13 @@ export function BetSizer({ presets, selected, amount, min, max, step, note, disa
       </div>
       <div className="size-slider">
         <button type="button" className="size-step" disabled={disabled || amount <= min}
-          aria-label={t("size.smaller")} data-testid="size-minus" onClick={() => set(amount - step)}>−</button>
+          aria-label={t("size.smaller")} aria-keyshortcuts={KEY.smaller} data-testid="size-minus" onClick={() => set(amount - step)}>−</button>
         <input type="range" min={min} max={max} step={step} value={amount} disabled={disabled}
-          aria-label={t("size.range")} data-testid="size-range" onChange={(e) => set(Number(e.target.value))} />
+          aria-label={t("size.range")}
+          aria-valuetext={t("a11y.sizeValue", { n: formatChips(amount), bb: bb.toLocaleString(numberLocale()) })}
+          data-testid="size-range" onChange={(e) => set(Number(e.target.value))} />
         <button type="button" className="size-step" disabled={disabled || amount >= max}
-          aria-label={t("size.bigger")} data-testid="size-plus" onClick={() => set(amount + step)}>+</button>
+          aria-label={t("size.bigger")} aria-keyshortcuts={KEY.bigger} data-testid="size-plus" onClick={() => set(amount + step)}>+</button>
         <label className="size-amount">
           <input type="number" min={min} max={max} value={amount} disabled={disabled} aria-label={t("size.amount")}
             data-testid="bet-amount" onChange={(e) => onAmount(Number(e.target.value) || min)}
