@@ -20,6 +20,7 @@
     "record:promo": "node ../scripts/record-promo/record.mjs"
   },
   "dependencies": {
+    "@capacitor-community/text-to-speech": "^8.0.2",
     "@capacitor/android": "^8.5.0",
     "@capacitor/app": "^8.1.2",
     "@capacitor/browser": "^8.0.5",
