@@ -73,6 +73,16 @@ describe("once per decision", () => {
     rerenderWith({ state: bet, coach: { ...advice, recommendedAction: "CALL" } });
     expect(texts()).toEqual(["Check.", "Call 300."]);
   });
+
+  it("on the next hand, says the new advice, not last hand's fold", () => {
+    const fold = { ...advice, recommendedAction: "FOLD" };
+    const { rerenderWith } = view(turn(), { coach: fold });
+    rerenderWith({ state: turn({ waitingForHero: false }), coach: fold }); // kept through the end of the hand
+    const nextHand = turn({ handNumber: turn().handNumber + 1 });
+    rerenderWith({ state: nextHand, coach: fold });
+    rerenderWith({ state: nextHand, coach: { ...advice, recommendedAction: "OPEN JAM" } });
+    expect(texts()).toEqual(["Fold.", "All-in."]);
+  });
 });
 
 describe("it stops", () => {

@@ -19,10 +19,11 @@ export function useCoachSpeech(coach: CoachAdvice | null, state: TableState, on:
   useEffect(() => {
     const justTurnedOn = on && !wasOn.current;
     wasOn.current = on;
-    // The poll can show the hero's next turn on the same street before the new advice arrives.
-    // The advice still on screen then is the last decision's: it said "Check." facing a bet.
+    // The poll can show the hero's next turn before the new advice arrives. The advice still set
+    // then is the last decision's: "Check." facing a bet, or last hand's "Fold." on an open jam
+    // (the advice is kept through the end of a hand for the review).
     if (decision.current.key !== key) decision.current = { key, stale: seen.current };
-    seen.current = coach;
+    if (coach) seen.current = coach;
     if (!on || !coach) {
       // only when something was said for this turn: polls with no advice must not cut off
       // "Coach voice on." said by the chip
