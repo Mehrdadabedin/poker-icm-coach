@@ -17,7 +17,7 @@ export function MobileCoachCard({ coach, heroCards }: { coach: CoachAdvice; hero
   const [open, setOpen] = useState(false);
   const kind = coach.recommendedAction.split(" ")[0].toLowerCase();
   return (
-    <div className="mobile-coach" data-testid="mobile-coach" role="status">
+    <div className="mobile-coach" data-testid="mobile-coach">
       <div className="mobile-coach-head">
         <span className="mobile-coach-tag">{t("coach.title")}{coach.street && STREET[coach.street] ? ` · ${STREET[coach.street]}` : ""}</span>
         <b className={`mobile-coach-action act-${kind}`} data-testid="mobile-coach-action">{actionWord(coach.recommendedAction, t)}</b>

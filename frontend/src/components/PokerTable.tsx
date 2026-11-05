@@ -71,7 +71,8 @@ export function PokerTable({ state, children, overlay, cover, top, trail, detail
           <Stat cap={t("status.level", { level: state.level })} sep=" — " value={`${state.smallBlind}/${state.bigBlind}`} />
           {state.ante > 0 && <Stat cap={t("status.ante")} value={formatChips(state.ante)} />}
         </span>
-        <Stat className="tbl-clock" cap={t(state.inBreak ? "status.break" : "status.time")} value={formatClock(state.secondsLeft)} />
+        <Stat className="tbl-clock" cap={t(state.inBreak ? "status.break" : "status.time")} value={formatClock(state.secondsLeft)}
+          timer={t(state.inBreak ? "a11y.clockBreak" : "a11y.clock", { level: state.level, time: formatClock(state.secondsLeft) })} />
         <span className="tbl-side">
           <Stat cap={t("status.pot")} value={formatChips(state.pot)} testId="pot-amount" />
           {trail}
@@ -132,10 +133,14 @@ export function PokerTable({ state, children, overlay, cover, top, trail, detail
 }
 
 /** A caption and its value: one line on a wide screen, the caption over the value on an upright phone. */
-function Stat({ cap, sep = " ", value, className = "", testId }: { cap: string; sep?: string; value: string; className?: string; testId?: string }) {
+function Stat({ cap, sep = " ", value, className = "", testId, timer }: { cap: string; sep?: string; value: string; className?: string; testId?: string; timer?: string }) {
+  // a timer has a name and says nothing by itself: a ticking live region would talk every second (plan 111)
+  const timerProps = timer ? { role: "timer", "aria-label": timer } : {};
   return (
-    <span className={`tbl-info tbl-stat ${className}`} data-testid={testId}>
-      <span className="tbl-cap">{cap}</span><span className="tbl-sep">{sep}</span><span className="tbl-val">{value}</span>
+    <span className={`tbl-info tbl-stat ${className}`} data-testid={testId} {...timerProps}>
+      <span className="tbl-cap" aria-hidden={timer ? "true" : undefined}>{cap}</span>
+      <span className="tbl-sep" aria-hidden="true">{sep}</span>
+      <span className="tbl-val" aria-hidden={timer ? "true" : undefined}>{value}</span>
     </span>
   );
 }

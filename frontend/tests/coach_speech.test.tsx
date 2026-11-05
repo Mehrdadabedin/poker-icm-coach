@@ -159,3 +159,21 @@ describe("the chip", () => {
     expect(texts()).toEqual([""]);
   });
 });
+
+const turnText = () => screen.getByTestId("announce-assertive").textContent;
+
+describe("the screen-reader announcer", () => {
+  it("says the coach's advice when the voice is off", () => {
+    const { next } = table({ waitingForHero: false });
+    next(turn(), advice);
+    expect(turnText()).toBe("Your turn. 300 to call. Pot 3,400. Coach: RAISE");
+  });
+
+  it("leaves the advice out while the coach voice is on, so it is not said twice", () => {
+    localStorage.setItem(KEY, "1");
+    const { next } = table({ waitingForHero: false });
+    next(turn(), advice);
+    expect(turnText()).toBe("Your turn. 300 to call. Pot 3,400.");
+    expect(texts()).toEqual(["Raise."]);
+  });
+});
