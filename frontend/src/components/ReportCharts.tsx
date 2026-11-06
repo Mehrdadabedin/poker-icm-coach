@@ -19,7 +19,7 @@ function Plot({ max, lines, dots, ticks, bands, overlay, xLabels, label, testId 
 }) {
   const y = (v: number) => 100 - (v * 100) / max;
   return (
-    <div className="chart" role="img" aria-label={label} data-testid={testId}>
+    <div className="chart" dir="ltr" role="img" aria-label={label} data-testid={testId}>
       <div className="chart-plot">
         <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
           {bands}

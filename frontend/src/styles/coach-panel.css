@@ -80,7 +80,7 @@
 
 .coach-row dd {
   margin: 0;
-  text-align: right;
+  text-align: end;
   font-weight: 600;
 }
 
@@ -118,7 +118,7 @@
 .data-table th {
   border: 1px solid var(--line);
   padding: 6px 8px;
-  text-align: left;
+  text-align: start;
 }
 
 .pos { color: var(--coach-pos); }
@@ -183,5 +183,5 @@
 
 /* The hero's cards in the coach's reason (CoachReason): the My Mistakes card
    chips, sized to sit inside a line of text. */
-.reason-cards { display: inline-flex; gap: 3px; margin: 0 3px 0 0; vertical-align: 1px; }
+.reason-cards { display: inline-flex; gap: 3px; margin-block: 0; margin-inline: 0 3px; vertical-align: 1px; }
 .reason-cards .mistake-card { min-width: 0; padding: 0 5px; font-size: 0.9em; line-height: 1.45; }

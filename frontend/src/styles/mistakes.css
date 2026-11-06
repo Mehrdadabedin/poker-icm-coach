@@ -19,13 +19,13 @@
 .mistake {
   padding: 14px 16px;
   border: 1px solid var(--review-card-border);
-  border-left: 4px solid var(--review-miss);
+  border-inline-start: 4px solid var(--review-miss);
   border-radius: 10px;
   background: var(--surface);
 }
 
 /* a mistake in a hand the hero won (plan 070): still listed, softer edge */
-.mistake-won { border-left-color: var(--review-won-accent); }
+.mistake-won { border-inline-start-color: var(--review-won-accent); }
 .mistake-won-tag {
   padding: 1px 8px; border-radius: 12px; background: var(--review-good-badge-bg);
   color: var(--review-good-text); font-weight: 700; font-size: 0.7rem; letter-spacing: 1px;
@@ -54,7 +54,7 @@
 
 .mistake-card-red { color: var(--review-mini-card-red); }
 
-.mistake-board-label { margin-left: 10px; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; }
+.mistake-board-label { margin-inline-start: 10px; color: var(--muted); font-size: 0.75rem; text-transform: uppercase; }
 
 .mistake-spot { margin: 4px 0; color: var(--muted); font-size: 0.85rem; }
 

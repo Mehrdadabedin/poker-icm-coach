@@ -8,8 +8,8 @@
 .lb-tab { padding: 10px; border: 0; border-radius: 9px; background: none; color: var(--text-muted); font: inherit; font-weight: 700; cursor: pointer; }
 .lb-tab-on { background: var(--accent-fill); color: var(--accent-ink); }
 .lb-meta { display: flex; justify-content: space-between; gap: 8px; margin: 12px 0; color: var(--text-muted); font-size: 0.85rem; }
-/* margin-left keeps it on the right when All time has no dates beside it */
-.lb-updated { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+/* margin-inline-start keeps it at the end of the row when All time has no dates beside it */
+.lb-updated { display: flex; align-items: center; gap: 6px; margin-inline-start: auto; }
 .lb-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--lb-points); }
 .lb-empty { margin: 28px 0; text-align: center; color: var(--text-muted); }
 
@@ -22,7 +22,7 @@
 .lb-place-1 .lb-ring { border-color: var(--accent-fill); }
 .lb-place-3 .lb-ring { border-color: var(--lb-bronze); }
 .lb-badge { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--lb-silver); color: var(--accent-ink); font-size: 0.8rem; font-weight: 800; }
-.lb-ring .lb-badge { position: absolute; left: 50%; bottom: -12px; transform: translateX(-50%); }
+.lb-ring .lb-badge { position: absolute; left: 50%; bottom: -12px; transform: translateX(-50%); } /* physical: centred */
 .lb-place-1 .lb-badge, .lb-badge-1 { background: var(--accent-fill); }
 .lb-place-3 .lb-badge, .lb-badge-3 { background: var(--lb-bronze); }
 .lb-place { padding-bottom: 12px; }

@@ -120,7 +120,7 @@
 .icm-table td {
   border: 1px solid var(--line);
   padding: 8px 10px;
-  text-align: left;
+  text-align: start;
 }
 
 .icm-table th {

@@ -63,7 +63,7 @@
    size are unchanged. */
 .home-page.auth-page .app-footer {
   position: absolute;
-  right: calc(16 * var(--k));
+  inset-inline-end: calc(16 * var(--k));
   bottom: calc(30 * var(--k));
   width: auto;
   margin-top: 0;
@@ -72,7 +72,7 @@
   color: var(--auth-gold);
   font-size: calc(17 * var(--k));
   letter-spacing: calc(1 * var(--k));
-  text-align: right;
+  text-align: end;
 }
 
 /* Very short viewports (landscape phones): top-align so nothing is clipped.

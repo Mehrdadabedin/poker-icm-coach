@@ -6,7 +6,8 @@ import { BotExplanations } from "./BotExplanations";
 import { CardView } from "./CardView";
 import { CoachPanelView } from "./CoachPanelView";
 import { ShowdownHands } from "./ShowdownHands";
-import { useT } from "../i18n/I18n";
+import { useI18n } from "../i18n/I18n";
+import { forwardArrow } from "../i18n/lang";
 import { PRESSURE_KEY } from "../i18n/poker";
 import { gradeLine } from "../i18n/coach";
 import { handName } from "../i18n/review";
@@ -25,7 +26,7 @@ interface HandReviewProps {
  * read-only — never mutates game state. Back to Table returns to the live
  * table without advancing the hand. */
 export function HandReview({ review, coach, comparison, totalPlayers, nameBySeat, onBack }: HandReviewProps) {
-  const t = useT();
+  const { t, lang } = useI18n();
   const [showCoach, setShowCoach] = useState(true);
   const net = review.heroNet;
   const { kind, title, subtitle } = reviewResultMeta(review, t);
@@ -54,7 +55,7 @@ export function HandReview({ review, coach, comparison, totalPlayers, nameBySeat
         </div>
         <div className="result-cell result-cards-cell fact-hero">
           <dt>{t("review.heroCards")}</dt>
-          <dd>
+          <dd dir="ltr">
             {review.heroCards.length === 2 ? (
               review.heroCards.map((c, i) => <CardView key={i} card={c} small />)
             ) : (
@@ -64,7 +65,7 @@ export function HandReview({ review, coach, comparison, totalPlayers, nameBySeat
         </div>
         <div className="result-cell result-board-cell fact-board">
           <dt>{t("review.finalBoard")}</dt>
-          <dd>
+          <dd dir="ltr">
             {review.board.length === 0 ? (
               <span className="board-na">—</span>
             ) : (
@@ -79,7 +80,7 @@ export function HandReview({ review, coach, comparison, totalPlayers, nameBySeat
         <div className="result-cell fact-stack">
           <dt>{t("review.yourStack")}</dt>
           <dd>
-            {formatChips(review.heroStart)} → {formatChips(review.heroEnd)}
+            {formatChips(review.heroStart)} {forwardArrow(lang)} {formatChips(review.heroEnd)}
           </dd>
         </div>
         <div className="result-cell fact-chip">
@@ -95,7 +96,7 @@ export function HandReview({ review, coach, comparison, totalPlayers, nameBySeat
         <div className="result-cell fact-rank">
           <dt>{t("review.stackRank")}</dt>
           <dd>
-            {review.heroRankBefore}/{totalPlayers} → {review.heroRankAfter}/{totalPlayers}
+            {review.heroRankBefore}/{totalPlayers} {forwardArrow(lang)} {review.heroRankAfter}/{totalPlayers}
           </dd>
         </div>
         <div className="result-cell fact-icm">

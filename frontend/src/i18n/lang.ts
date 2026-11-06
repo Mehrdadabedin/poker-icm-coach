@@ -94,6 +94,10 @@ export const htmlLang = (lang: Lang): string => (lang === "zh" ? "zh-Hans" : lan
 /** The value for <html dir>: Persian reads right to left. */
 export const htmlDir = (lang: Lang): "ltr" | "rtl" => (lang === "fa" ? "rtl" : "ltr");
 
+/** "before → after" reads the other way in Persian; → is not one of the
+ * characters the browser mirrors by itself (‹ and › are). */
+export const forwardArrow = (lang: Lang): string => (htmlDir(lang) === "rtl" ? "←" : "→");
+
 /** fa-IR writes Persian digits (۴۵٬۰۰۰) and Solar Hijri dates, both the
  * owner's choice (5 Nov); zh-CN writes 45,000 and 6.5 like English. */
 const LOCALES: Record<Lang, string> = { en: "en-US", es: "es-ES", zh: "zh-CN", fa: "fa-IR" };

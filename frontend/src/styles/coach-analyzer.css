@@ -171,7 +171,7 @@
 
 .coach-education {
   background: var(--coach-good-bg);
-  border-left: 3px solid var(--accent);
+  border-inline-start: 3px solid var(--accent);
   border-radius: 6px;
   padding: 8px 10px;
   font-size: 0.85rem;

@@ -4,7 +4,7 @@
 @media (max-width: 767px) and (max-aspect-ratio: 4/3) {
   /* the second line floats over the strip, so showing it never pushes the buttons off the screen */
   .table-wrap > .table-status {
-    position: absolute; top: 49px; left: 0; right: 0; z-index: 30; margin: 0;
+    position: absolute; top: 49px; inset-inline-start: 0; inset-inline-end: 0; z-index: 30; margin: 0;
     border: 1px solid var(--line); background: var(--history-panel-bg); backdrop-filter: blur(8px);
   }
   .table-status[hidden] { display: none; }
@@ -19,7 +19,7 @@
   .table-felt .seat .seat-cards .playing-card.seat-card-back { width: clamp(38px, calc(38px + (100dvh - 860px) / 2.8), 46px); }
   .table-felt .seat.seat-hero + .seat .seat-cards .playing-card.seat-card-back,
   .table-felt .seat.seat-hero + .seat + .seat .seat-cards .playing-card.seat-card-back { width: min(52px, calc((100vw - 64px) / 6)); }
-  .table-wrap > .table-header { margin-bottom: 4px; gap: 4px 6px; padding-left: 8px; padding-right: 8px; }
+  .table-wrap > .table-header { margin-bottom: 4px; gap: 4px 6px; padding-inline-start: 8px; padding-inline-end: 8px; }
   /* the owner (4 Nov): bigger at rest for weaker eyes, since a phone has no hover */
   .table-wrap > :is(.table-header, .table-status) { font-size: 0.72rem; }
   .table-felt .seat .seat-stack { font-size: 0.6rem; }
@@ -41,7 +41,7 @@
   .coach-strip-wrap { position: relative; margin: 0 0 4px; }
   .coach-strip-wrap.strip-open { z-index: 60; }
   .coach-strip {
-    display: flex; align-items: center; gap: 6px; min-height: 52px; padding: 0 4px 0 12px;
+    display: flex; align-items: center; gap: 6px; min-height: 52px; padding-block: 0; padding-inline: 12px 4px;
     border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--text-muted);
     position: relative; z-index: 1; cursor: pointer;
   }
@@ -63,7 +63,7 @@
 
   .strip-scrim { position: fixed; inset: 0; background: var(--sheet-scrim); }
   .coach-sheet {
-    position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 2; max-height: calc(100dvh - 190px); overflow-y: auto;
+    position: absolute; top: calc(100% + 6px); inset-inline-start: 0; inset-inline-end: 0; z-index: 2; max-height: calc(100dvh - 190px); overflow-y: auto;
     padding: 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); color: var(--text);
   }
   .coach-sheet-tag { flex: 1 1 auto; color: var(--coach-raise-soft); font-size: 0.7rem; font-weight: 700; letter-spacing: 1px; }
@@ -71,7 +71,7 @@
   .coach-sheet-rows { display: grid; gap: 2px; margin: 0; font-size: 0.78rem; }
   .coach-sheet-rows div { display: flex; justify-content: space-between; gap: 8px; padding: 5px 0; border-top: 1px solid var(--line); }
   .coach-sheet-rows dt { color: var(--text-muted); }
-  .coach-sheet-rows dd { margin: 0; text-align: right; }
+  .coach-sheet-rows dd { margin: 0; text-align: end; }
 
   .drawer-scrim { position: fixed; inset: 0; z-index: 50; display: flex; align-items: flex-end; background: var(--sheet-scrim); }
   .drawer {

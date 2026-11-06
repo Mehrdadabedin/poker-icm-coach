@@ -64,7 +64,7 @@ coach card and the buttons: table-landscape.css (plan 089).
 
   .table-felt .seat {
     position: relative;
-    left: auto; right: auto; top: auto; bottom: auto;
+    inset-inline-start: auto; inset-inline-end: auto; top: auto; bottom: auto;
     transform: none;
     flex: 0 1 calc(33.333% - 8px);
     min-width: 0;
@@ -78,7 +78,7 @@ coach card and the buttons: table-landscape.css (plan 089).
      card's corner (rank and suit) stays in view */
   .table-felt .seat.seat-hero .seat-cards { gap: 0; }
   .table-felt .seat.seat-hero .seat-cards .playing-card { width: 60px; }
-  .table-felt .seat.seat-hero .seat-cards .playing-card + .playing-card { margin-left: -26px; }
+  .table-felt .seat.seat-hero .seat-cards .playing-card + .playing-card { margin-inline-start: -26px; }
   .table-felt .seat .seat-stack { font-size: 0.58rem; }
   .table-felt .seat .dealer-button { width: 16px; height: 16px; font-size: 0.55rem; }
 

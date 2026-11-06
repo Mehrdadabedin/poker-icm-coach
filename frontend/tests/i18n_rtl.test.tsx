@@ -113,10 +113,10 @@ describe("numbers, places and dates", () => {
 
   it("writes a place from each language's key", () => {
     expect(placeOrdinal("zh", 5)).toBe("第5名");
-    expect(placeOrdinal("fa", 5)).toBe("رتبه ۵");
+    expect(placeOrdinal("fa", 5)).toBe("رتبه \u2068۵\u2069"); // the number isolated, plan 113 step 2
     expect(placeOrdinal("es", 5)).toBe("5.º");
     expect([placeOrdinal("en", 1), placeOrdinal("en", 12), placeOrdinal("en", 22, false)]).toEqual(["1ST", "12TH", "22nd"]);
-    expect(tournamentState({ tableId: "a", status: "finished", finishPlace: 3 }, null, words("fa"))).toContain("رتبه ۳");
+    expect(tournamentState({ tableId: "a", status: "finished", finishPlace: 3 }, null, words("fa"))).toContain("رتبه \u2068۳\u2069");
     expect(tournamentState({ tableId: "a", status: "finished", finishPlace: 3 }, null, words("zh"))).toContain("第3名");
   });
 

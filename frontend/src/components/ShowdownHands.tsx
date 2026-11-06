@@ -32,11 +32,11 @@ export function ShowdownHands({ showdown, foldedSeats, nameBySeat, heroSeat }: S
         {showdown.map((s) => (
           <div key={s.seat} className={`reveal-player ${s.isHero ? "reveal-hero" : ""} ${s.won ? "reveal-won" : ""}`}>
             <div className="reveal-name">
-              {s.name}
+              <bdi>{s.name}</bdi>
               {s.isHero ? t("showdown.you") : ""}
             </div>
             {s.cards.length === 2 ? (
-              <div className="reveal-cards">
+              <div className="reveal-cards" dir="ltr">
                 {s.cards.map((c, i) => (
                   <CardView key={i} card={c} small />
                 ))}

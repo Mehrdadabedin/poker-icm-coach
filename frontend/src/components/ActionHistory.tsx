@@ -83,12 +83,12 @@ export function ActionHistory({ actions, heroSeat, nameBySeat, collapsed = false
       {!collapsed && onViewChange && locked && <LockedLine />}
       {!collapsed && onViewChange && !locked && <OverallPerformance hands={hands ?? []} loading={hands === null} />}
       {!collapsed && blindPosts.length > 0 && (
-        <div className="history-line history-blind">
+        <div className="history-line history-blind" dir="ltr">
           <span className="history-street-dot">·</span>
           <span>
             {blindPosts.map((b) => (
               <span key={b.seat}>
-                <b>{seatName(b)}</b> {BLIND_LABEL[b.action] ? t(BLIND_LABEL[b.action]) : b.action} {b.amount != null ? formatChips(b.amount) : ""}
+                <b><bdi>{seatName(b)}</bdi></b> {BLIND_LABEL[b.action] ? t(BLIND_LABEL[b.action]) : b.action} {b.amount != null ? formatChips(b.amount) : ""}
                 {b.seat !== blindPosts[blindPosts.length - 1].seat ? "  " : ""}
               </span>
             ))}
@@ -99,13 +99,13 @@ export function ActionHistory({ actions, heroSeat, nameBySeat, collapsed = false
       {!collapsed && groups.map(
         (g) =>
           g.entries.length > 0 && (
-            <div key={g.street} className="history-street">
+            <div key={g.street} className="history-street" dir="ltr">
               <div className="history-street-title">{g.street === "preflop" ? t("history.preflop") : STREET_TITLE[g.street]}</div>
               {g.entries.map((a, i) => (
                 <div key={i} className="history-line" data-testid={`history-${g.street}-${i}`}>
                   <span className="history-street-dot" />
                   <span className="history-actor">
-                    {a.seat === heroSeat ? <b className="history-hero">{nameBySeat.get(heroSeat) ?? "Hero"}</b> : <b>{seatName(a)}</b>}
+                    {a.seat === heroSeat ? <b className="history-hero"><bdi>{nameBySeat.get(heroSeat) ?? "Hero"}</bdi></b> : <b><bdi>{seatName(a)}</bdi></b>}
                     {" — "}
                     <span className={`history-action history-action-${a.action}`}>
                       {ACTION_KEY[a.action] ? t(ACTION_KEY[a.action]) : a.action}

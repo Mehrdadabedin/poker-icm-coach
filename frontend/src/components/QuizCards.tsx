@@ -13,7 +13,7 @@ export function QuizCards({ cards, back, faceUp, onFlip }: { cards: Card[]; back
   const [instant] = useState(() => window.matchMedia?.(REDUCED).matches ?? false);
   const classes = ["quiz-cards", faceUp && "quiz-up", instant && "quiz-instant"].filter(Boolean).join(" ");
   return (
-    <button type="button" className={classes} onClick={onFlip} disabled={faceUp} data-testid="quiz-cards"
+    <button type="button" className={classes} dir="ltr" onClick={onFlip} disabled={faceUp} data-testid="quiz-cards"
       data-back={back} data-face-up={faceUp} aria-label={faceUp ? t("quiz.cards") : t("quiz.show")}>
       {cards.map((card, i) => (
         <span key={i} className="quiz-card">

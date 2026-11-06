@@ -40,7 +40,8 @@ describe("the hand review in Spanish", () => {
   it("shows the showdown in Spanish", () => {
     es(<ShowdownHands showdown={sampleReview().showdown} foldedSeats={[4, 6]} nameBySeat={names} heroSeat={0} />);
     expect(screen.getByText("MANOS EN EL SHOWDOWN")).toBeInTheDocument();
-    expect(screen.getByText(/Alice\s*\(Tú\)/)).toBeInTheDocument();
+    // the name sits in its own <bdi> (plan 113), so the line is read whole
+    expect(document.querySelector(".reveal-name")?.textContent).toMatch(/Alice\s*\(Tú\)/);
     expect(screen.getByText("GANA")).toBeInTheDocument();
     expect(screen.getByText("Asiento 6")).toBeInTheDocument();
     expect(screen.getAllByText("NO VA")).toHaveLength(2);

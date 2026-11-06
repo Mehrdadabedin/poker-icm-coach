@@ -12,7 +12,7 @@
   position: fixed; z-index: 1000; display: flex; flex-direction: column; gap: 6px;
   padding: 10px 12px; border: 1px solid var(--review-blue); border-radius: 10px;
   background: var(--glossary-pop-bg); color: var(--body-text); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
-  font-size: 0.85rem; line-height: 1.4; text-align: left; letter-spacing: normal; text-transform: none;
+  font-size: 0.85rem; line-height: 1.4; text-align: start; letter-spacing: normal; text-transform: none;
 }
 .gl-pop-name { color: var(--glossary-gold); font-size: 0.9rem; }
 .gl-pop-ex { color: var(--glossary-pop-ex); font-style: italic; }
@@ -33,7 +33,7 @@
 .glossary-entry dd { margin: 4px 0 0; color: var(--glossary-def); line-height: 1.45; }
 .glossary-entry .glossary-ex { color: var(--glossary-ex); }
 .glossary-abbr {
-  display: inline-block; margin-right: 8px; padding: 0 6px; border-radius: 5px;
+  display: inline-block; margin-inline-end: 8px; padding: 0 6px; border-radius: 5px;
   background: var(--glossary-badge-bg); color: var(--glossary-mark-ink); font-size: 0.85rem;
 }
 .glossary-focus { border-color: var(--glossary-gold); box-shadow: 0 0 0 2px var(--glossary-focus-ring); }

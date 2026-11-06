@@ -40,7 +40,7 @@
   .table-wrap > .table-header .tbl-chip[aria-expanded="true"] { background: var(--accent-fill); color: var(--accent-ink); border-color: var(--accent-fill); }
   /* see-through like the history panel, since it lies over the top of the felt */
   .table-wrap > .table-status {
-    position: absolute; top: 36px; left: 0; right: 0; z-index: 30; height: 30px; margin: 0; padding: 0 10px;
+    position: absolute; top: 36px; inset-inline-start: 0; inset-inline-end: 0; z-index: 30; height: 30px; margin: 0; padding: 0 10px;
     flex-wrap: nowrap; overflow: hidden; white-space: nowrap; font-size: 0.8125rem;
     border: 1px solid var(--line); background: var(--history-panel-bg); backdrop-filter: blur(8px);
   }
@@ -72,7 +72,7 @@
   .hero-controls .size-step { min-height: 30px; height: 30px; }
   .hero-controls .size-amount input { min-height: 40px; height: 40px; }
   .hero-controls .size-amount small { display: none; }
-  .table-wrap > .comparison-box { position: absolute; left: 50%; bottom: 124px; z-index: 5; transform: translateX(-50%); max-width: 70%; margin: 0; }
+  .table-wrap > .comparison-box { position: absolute; left: 50%; bottom: 124px; z-index: 5; transform: translateX(-50%); max-width: 70%; margin: 0; } /* physical: centred */
 
   .table-page > .table-cols { display: contents; }
   .table-page > .table-cols > :is(.coach-panel, .coach-chip-side) {
