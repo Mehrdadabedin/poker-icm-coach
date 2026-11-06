@@ -166,7 +166,7 @@
   margin-top: 18px;
   padding-top: 10px;
   border-top: 1px solid var(--review-primary-line);
-  text-align: right;
+  text-align: end;
   font-size: 0.72rem;
   color: var(--accent); /* existing gold/yellow accent used by the buttons */
   letter-spacing: 0.3px;

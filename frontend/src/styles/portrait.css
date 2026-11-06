@@ -85,7 +85,7 @@
   background: var(--surface);
   border: 1px solid var(--portrait-prompt-border);
   border-radius: 12px;
-  text-align: left;
+  text-align: start;
 }
 .portrait-prompt-icon {
   width: 44px; height: 44px; flex: none;

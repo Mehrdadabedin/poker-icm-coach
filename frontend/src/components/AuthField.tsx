@@ -35,8 +35,10 @@ export function AuthField({
   return (
     <div className="auth-field">
       <span className="auth-field-mark">{kind === "mail" ? <MailIcon /> : <LockIcon />}</span>
+      {/* a username, an email or a password: Latin, left to right even in Persian */}
       <input
         className="auth-input"
+        dir="ltr"
         type={type}
         value={value}
         placeholder={placeholder}

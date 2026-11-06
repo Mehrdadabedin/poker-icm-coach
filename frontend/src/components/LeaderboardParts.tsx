@@ -30,7 +30,7 @@ export function Row({ row }: { row: LeaderboardRow }) {
     <li className="lb-row" data-testid={`lb-row-${row.rank}`}>
       <span className="lb-rank">{row.rank}</span>
       <Avatar row={row} size={36} />
-      <span className="lb-who"><b className="lb-name">{row.name}</b><Stats row={row} /></span>
+      <span className="lb-who"><b className="lb-name"><bdi>{row.name}</bdi></b><Stats row={row} /></span>
       <span className="lb-points" aria-label={plural("points", row.points)}>{formatChips(row.points)}</span>
     </li>
   );

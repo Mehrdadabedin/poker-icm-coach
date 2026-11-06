@@ -29,7 +29,7 @@
 .report-scroll { overflow-x: auto; }
 
 /* charts: the SVG stretches, labels and dots are HTML so text keeps its size */
-.chart { padding-left: 38px; }
+.chart { padding-inline-start: 38px; }
 .chart-plot { position: relative; height: 180px; }
 .chart-plot svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .chart-grid { stroke: var(--review-border-strong); stroke-width: 1; stroke-dasharray: 4 4; }
@@ -39,10 +39,10 @@
 .line-stack, .line-agree { stroke: var(--accent); }
 .line-miss { stroke: var(--review-miss); }
 .chart-tick {
-  position: absolute; right: calc(100% + 6px); transform: translateY(-50%);
+  position: absolute; inset-inline-end: calc(100% + 6px); transform: translateY(-50%);
   font-size: 0.66rem; color: var(--report-axis-text); white-space: nowrap;
 }
-.chart-band { position: absolute; top: 3px; padding-left: 4px; font-size: 0.66rem; color: var(--report-axis-text); }
+.chart-band { position: absolute; top: 3px; padding-inline-start: 4px; font-size: 0.66rem; color: var(--report-axis-text); }
 .chart-dot {
   position: absolute; width: 9px; height: 9px; border-radius: 50%; transform: translate(-50%, -50%);
 }
@@ -55,10 +55,10 @@
 .report-heat td { text-align: center; font-weight: 700; padding: 7px 4px; border-radius: 4px; color: var(--text); }
 .report-heat td.heat-empty { background: var(--review-panel-alt); color: var(--report-axis-text); font-weight: 400; }
 
-.report-leaks { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+.report-leaks { margin: 0; padding-inline-start: 20px; display: grid; gap: 4px; }
 .report-leaks li { padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 0.85rem; }
 .report-leaks li::marker { color: var(--review-bad-text); font-weight: 700; }
-.leak-count { margin-left: 8px; color: var(--review-bad-text); font-size: 0.75rem; white-space: nowrap; }
+.leak-count { margin-inline-start: 8px; color: var(--review-bad-text); font-size: 0.75rem; white-space: nowrap; }
 .leak-hands { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
 .leak-hands a {
   padding: 1px 8px; border: 1px solid var(--line); border-radius: 12px;
@@ -103,4 +103,4 @@
 .size-under25 { background: var(--review-blue); } .size-third { background: var(--report-size-third); } .size-half { background: var(--report-good); }
 .size-twoThirds { background: var(--accent-fill); } .size-pot { background: var(--report-bar-fold); } .size-over { background: var(--review-miss); }
 .size-label { font-size: 0.7rem; color: var(--muted); text-align: center; }
-.report-insight { margin: 12px 0 0; padding: 8px 12px; border-left: 4px solid var(--accent); border-radius: 0 8px 8px 0; background: var(--report-insight-bg); font-size: 0.82rem; }
+.report-insight { margin: 12px 0 0; padding: 8px 12px; border-inline-start: 4px solid var(--accent); border-radius: 0; border-start-end-radius: 8px; border-end-end-radius: 8px; background: var(--report-insight-bg); font-size: 0.82rem; }

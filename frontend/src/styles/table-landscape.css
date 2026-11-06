@@ -34,7 +34,7 @@
     aspect-ratio: auto; margin: 0; padding: 0;
   }
 
-  .table-felt .board { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+  .table-felt .board { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); } /* physical: centred */
   .table-felt .board .playing-card { width: 42px; }
 
   /* data-seat positions are percentages of the felt; only the boxes shrink */
@@ -51,7 +51,7 @@
   .table-felt .seat.seat-hero { width: 17%; }
   .table-felt .seat.seat-hero .seat-cards { gap: 0; }
   .table-felt .seat.seat-hero .seat-cards .playing-card { width: 44px; }
-  .table-felt .seat.seat-hero .seat-cards .playing-card + .playing-card { margin-left: -14px; }
+  .table-felt .seat.seat-hero .seat-cards .playing-card + .playing-card { margin-inline-start: -14px; }
 
   .hero-controls { padding: 6px; }
   .hero-controls .hero-info { font-size: 0.6rem; flex-wrap: wrap; gap: 2px 8px; margin-bottom: 4px; }

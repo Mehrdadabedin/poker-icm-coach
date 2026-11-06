@@ -71,7 +71,7 @@
 
 .auth-provider-end {
   position: absolute;
-  right: calc(38 * var(--k));
+  inset-inline-end: calc(38 * var(--k));
 }
 
 .ico-arrow {

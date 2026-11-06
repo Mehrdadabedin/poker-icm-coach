@@ -13,7 +13,8 @@ describe("cards on a phone held upright", () => {
 
   it("shows the hero's cards at 60px, overlapped so three seats still fit a row", () => {
     expect(portrait).toMatch(/\.seat\.seat-hero \.seat-cards \.playing-card \{ width: 60px; \}/);
-    expect(portrait).toMatch(/\.playing-card \+ \.playing-card \{ margin-left: -26px; \}/);
+    // margin-inline-start is margin-left here: the felt is dir="ltr" (plan 113)
+    expect(portrait).toMatch(/\.playing-card \+ \.playing-card \{ margin-inline-start: -26px; \}/);
     expect(portrait).toMatch(/\.table-felt \.seat\.seat-hero \{ width: 104px; \}/);
   });
 

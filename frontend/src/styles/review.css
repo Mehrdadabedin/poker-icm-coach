@@ -155,7 +155,7 @@
 
 .flow-countdown { font-size: 1rem; font-weight: 800; color: var(--accent); }
 .flow-paused { color: var(--review-paused-text); font-weight: 700; font-size: 0.9rem; }
-.flow-hint { color: var(--muted); font-size: 0.72rem; margin-left: auto; }
+.flow-hint { color: var(--muted); font-size: 0.72rem; margin-inline-start: auto; }
 .review-coach { margin-top: 12px; }
 
 .review-history-block { margin: 14px 0 12px; }

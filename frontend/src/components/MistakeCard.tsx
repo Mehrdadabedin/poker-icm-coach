@@ -2,8 +2,8 @@
  * A mistake in a hand the hero won is marked WON with a softer edge: the
  * decision was still worse than the coach's line (plan 070). */
 import { actionWord, coachReason } from "../i18n/coach";
-import { useT } from "../i18n/I18n";
-import { numberLocale } from "../i18n/lang";
+import { useI18n } from "../i18n/I18n";
+import { forwardArrow, numberLocale } from "../i18n/lang";
 import { PRESSURE_KEY } from "../i18n/poker";
 import { formatChips } from "../models/game";
 import { LinkedText } from "./GlossaryTerm";
@@ -30,7 +30,7 @@ function CardFace({ card }: { card: string }) {
 
 export function MistakeCard({ mistake }: { mistake: Mistake }) {
   const d = mistake.decision;
-  const t = useT();
+  const { t, lang } = useI18n();
   const pressure = PRESSURE_KEY[d.icmPressure] ? t(PRESSURE_KEY[d.icmPressure]) : d.icmPressure;
   return (
     <article className={mistake.won ? "mistake mistake-won" : "mistake"} data-testid={`mistake-${mistake.handNumber}-${d.street}`}>
@@ -55,7 +55,7 @@ export function MistakeCard({ mistake }: { mistake: Mistake }) {
       </p>
       <p className="mistake-line">
         {t("mistake.you")} <b className="mistake-you">{actionWord(d.heroAction, t)}</b>
-        <span aria-hidden="true">{" → "}</span>
+        <span aria-hidden="true">{` ${forwardArrow(lang)} `}</span>
         {t("mistake.coach")} <b className="mistake-coach">{actionWord(d.coachAction, t)}</b>
       </p>
       <p className="mistake-why"><LinkedText text={coachReason({ reasoning: d.explanation, ...d }, t)} /></p>

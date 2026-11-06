@@ -96,7 +96,7 @@ form .profile-error[role="alert"]:last-child { display: block; margin-top: 10px;
 }
 .birthday-open[aria-expanded="true"] { border-color: var(--account-focus); color: var(--account-title); }
 .birthday-pop {
-  position: absolute; top: calc(100% + 6px); left: 0; right: 0; z-index: 5;
+  position: absolute; top: calc(100% + 6px); inset-inline-start: 0; inset-inline-end: 0; z-index: 5;
   padding: 12px;
   background: var(--account-card-bg);
   border: 1px solid var(--account-popup-border); border-radius: 14px;

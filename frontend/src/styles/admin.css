@@ -20,7 +20,7 @@
 
 .admin-nav-btn {
   width: 100%;
-  text-align: left;
+  text-align: start;
   justify-content: flex-start;
   font-size: 0.82rem;
 }
@@ -122,7 +122,7 @@
 }
 
 .admin-table th, .admin-table td {
-  text-align: left;
+  text-align: start;
   padding: 10px 12px;
   border-bottom: 1px solid var(--admin-line);
 }

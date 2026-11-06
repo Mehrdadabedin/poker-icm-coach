@@ -148,7 +148,7 @@ export function CoachPage() {
       <div className="board-picker">
         <span className="board-street">{t("coachPage.board", { street: t(`coachPage.street.${street}` as MessageKey) })}</span>
         {!boardReady && <span className="note">{t("coachPage.boardHint")}</span>}
-        <div className="board-cards">
+        <div className="board-cards" dir="ltr">
           {board.map((c, i) => (
             <span key={i} className="board-chip">{c.rank}{SUIT_SYMBOL[c.suit]}
               <button className="chip-remove" aria-label={t("a11y.removeCard", { card: cardAlt(c, t) })}

@@ -31,7 +31,7 @@
 
 .size-amount { display: flex; flex-direction: column; align-items: flex-end; }
 .size-amount input {
-  width: 100%; min-height: 36px; text-align: right; font-size: 1rem; border-radius: 8px;
+  width: 100%; min-height: 36px; text-align: end; font-size: 1rem; border-radius: 8px;
   border: 1px solid var(--field-border); background: var(--field-bg); color: var(--body-text); padding: 2px 8px;
 }
 .size-amount small { font-size: 0.68rem; color: var(--muted); }

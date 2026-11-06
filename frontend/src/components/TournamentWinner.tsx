@@ -22,7 +22,7 @@ export function TournamentWinner({ username, place, heroIsChampion, onNewSession
   const { lang, t } = useI18n();
   const display = username?.trim() || "Champion";
   return (
-    <div className="tournament-winner" data-testid="tournament-winner" role="dialog" aria-label={t("winner.label")}>
+    <div className="tournament-winner" dir="ltr" data-testid="tournament-winner" role="dialog" aria-label={t("winner.label")}>
       <div className="tournament-winner-panel">
         <div className="tournament-winner-art" data-testid="tournament-winner-art">
           <img
