@@ -7,7 +7,8 @@ first, then into the files.
 ## Kept in Latin letters in both
 
 ICMBOT, Pro, Free (the plan names), ICM, BB, EV, SPR, VPIP, PFR, the positions (UTG, UTG+1, MP, LJ, HJ, CO, BTN,
-SB, BB), the card ranks and suits (A♠ K♦), Google, JPG, PNG, WebP, JSON, and the word DELETE that the account
+SB, BB), the card ranks and suits (A♠ K♦) and hand codes (K2o, JJ), the key name Enter in the raise
+button's hint, Google, JPG, PNG, WebP, JSON, and the word DELETE that the account
 page asks to be typed (the code compares it).
 
 ## Poker words

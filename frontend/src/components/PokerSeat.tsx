@@ -4,6 +4,7 @@ import { botProfilePortrait } from "../models/botProfiles";
 import { CardView } from "./CardView";
 import { PlayingCard } from "./PlayingCard";
 import { useT } from "../i18n/I18n";
+import { localDigits } from "../i18n/lang";
 import { getToken } from "../services/api";
 import { useApprovedPortrait } from "../services/portraitApi";
 
@@ -73,7 +74,7 @@ export function PokerSeat({ player, active, lastAction, status, revealCards, rev
       ) : (
         <>
           <div className="seat-stack">
-            {formatChips(player.stack)} · <span className="seat-bb" aria-hidden="true">{player.stackInBB} BB</span>
+            {formatChips(player.stack)} · <span className="seat-bb" aria-hidden="true">{localDigits(String(player.stackInBB))} BB</span>
           </div>
           <div className={`seat-cards ${player.isHero ? "hero-cards" : ""}`}>
             {shown

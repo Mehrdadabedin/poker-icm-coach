@@ -5,6 +5,7 @@ import { useUprightPhone } from "../hooks/useUprightPhone";
 import { CardView } from "./CardView";
 import { PokerSeat } from "./PokerSeat";
 import { useT } from "../i18n/I18n";
+import { localDigits } from "../i18n/lang";
 import { handName } from "../i18n/review";
 import type { MessageKey } from "../i18n/messages/en";
 
@@ -68,7 +69,7 @@ export function PokerTable({ state, children, overlay, cover, top, trail, detail
       <div className="table-header">
         {/* the clock stays in the middle of a wide screen: the level and the ante on its left, the pot on its right */}
         <span className="tbl-lead">
-          <Stat cap={t("status.level", { level: state.level })} sep=" — " value={`${state.smallBlind}/${state.bigBlind}`} />
+          <Stat cap={t("status.level", { level: state.level })} sep=" — " value={localDigits(`${state.smallBlind}/${state.bigBlind}`)} />
           {state.ante > 0 && <Stat cap={t("status.ante")} value={formatChips(state.ante)} />}
         </span>
         <Stat className="tbl-clock" cap={t(state.inBreak ? "status.break" : "status.time")} value={formatClock(state.secondsLeft)}
@@ -148,5 +149,5 @@ function Stat({ cap, sep = " ", value, className = "", testId, timer }: { cap: s
 function formatClock(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
-  return `${m}:${s.toString().padStart(2, "0")}`;
+  return localDigits(`${m}:${s.toString().padStart(2, "0")}`);
 }

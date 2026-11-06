@@ -104,6 +104,14 @@ const LOCALES: Record<Lang, string> = { en: "en-US", es: "es-ES", zh: "zh-CN", f
 
 /** The Intl locale for numbers and dates in a language. */
 export const localeOf = (lang: Lang): string => LOCALES[lang];
+
+/** Languages that write their own digits: Persian (the owner, 5 Nov). */
+export const ownDigits = (lang: Lang): boolean => lang === "fa";
+
+/** "100/200", "19:45", "25%" with the language's digits: ۱۰۰/۲۰۰ in Persian,
+ * unchanged elsewhere. For numbers that reach the screen as text. */
+export const localDigits = (text: string, lang: Lang = current): string =>
+  (ownDigits(lang) ? text.replace(/\d/g, (d) => Number(d).toLocaleString(LOCALES[lang])) : text);
 let current: Lang = "en";
 
 /** The language the I18nProvider is rendering in, for plain functions such as
