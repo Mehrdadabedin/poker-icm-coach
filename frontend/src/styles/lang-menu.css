@@ -14,12 +14,13 @@
 .app-header .lang-menu button { padding: 2px 8px; }
 /* more than two languages in a band: one list in place of the pills (plan 113) */
 .lang-menu .lang-pick { position: relative; display: inline-flex; align-items: center; color: var(--muted); }
-.lm-header-band .lang-menu .lang-pick { color: var(--band-text); }
+.lm-header-band .lang-menu .lang-pick { color: var(--lm-gold); }
 /* the globe sits inside the pill, on the reading side, and lets taps through to the list */
 .lang-menu .lang-globe { position: absolute; inset-inline-start: 8px; pointer-events: none; }
 .lang-menu .lang-select {
   max-width: 8.5em; padding: 2px 6px; padding-inline-start: 26px; border: 1px solid var(--lang-border); border-radius: 999px;
   background: transparent; color: var(--muted); font: inherit; font-size: 0.78rem; cursor: pointer;
 }
-.lm-header-band .lang-menu .lang-select { color: var(--band-text); border-color: var(--lang-band-border); }
+/* gold text and border in the landing header, like Start free beside it (the owner, 6 Nov) */
+.lm-header-band .lang-menu .lang-select { color: var(--lm-gold); border-color: var(--lm-gold); }
 .lang-menu .lang-select option { color: initial; background: initial; }
