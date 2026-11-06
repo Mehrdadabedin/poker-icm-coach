@@ -84,9 +84,9 @@ describe("the language buttons", () => {
     expect(offeredLangs("en", "icmbot.one", ["en", "es"])).toEqual(["en", "es"]);
   });
 
-  it("offer Spanish in the Android app, so app users can switch both ways", () => {
-    expect(offeredLangs("en", "icmbot.one", READY, true)).toEqual(["en", "es"]);
-    expect(offeredLangs("es", "icmbot.one", READY, true)).toEqual(["en", "es"]);
+  it("offer all four in the Android app, so app users can switch every way (the owner, 6 Nov)", () => {
+    expect(offeredLangs("en", "icmbot.one", READY, true)).toEqual(["en", "es", "zh", "fa"]);
+    expect(offeredLangs("es", "icmbot.one", READY, true)).toEqual(["en", "es", "zh", "fa"]);
     expect(offeredLangs("en", "icmbot.one", READY, false)).toEqual(["en"]);
   });
 });
