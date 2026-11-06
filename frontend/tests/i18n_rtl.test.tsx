@@ -79,7 +79,7 @@ describe("the page in Chinese and Persian", () => {
     vi.spyOn(navigator, "userAgent", "get").mockReturnValue(APP_UA);
     render(<I18nProvider initial="fa"><LanguageMenu short /></I18nProvider>);
     const list = screen.getByTestId("lang-select");
-    expect(list).toHaveAccessibleName("Language");
+    expect(list).toHaveAccessibleName("زبان"); // lang.label in Persian (plan 113 step 4)
     expect(list).toHaveValue("fa");
     expect([...(list as HTMLSelectElement).options].map((o) => [o.textContent, o.lang])).toEqual(
       [["English", "en"], ["Español", "es"], ["فارسی", "fa"]]);

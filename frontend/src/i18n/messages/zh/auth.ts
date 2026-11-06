@@ -1,0 +1,30 @@
+/* Simplified Chinese: the language menu and the sign-in screen (plan 113). */
+import type { auth as en } from "../en/auth";
+
+export const auth: Record<keyof typeof en, string> = {
+  "lang.label": "语言",
+  "place.ordinal": "第{n}名",
+  "auth.username": "邮箱或用户名",
+  "auth.password": "密码",
+  "auth.confirm": "确认密码",
+  "auth.showPassword": "显示密码",
+  "auth.hidePassword": "隐藏密码",
+  "auth.wait": "请稍候…",
+  "auth.signIn": "登录",
+  "auth.signUp": "注册",
+  "auth.usernameRequired": "请输入用户名。",
+  "auth.passwordRequired": "请输入密码。",
+  "auth.passwordShort": "密码至少需要 {min} 个字符。",
+  "auth.passwordMismatch": "两次输入的密码不一致。",
+  "auth.created": "账号“{name}”已创建，你已登录。",
+  "auth.haveAccount": "已有账号？",
+  "auth.noAccount": "还没有账号？",
+  "auth.signedInAs": "当前登录：",
+  "auth.google": "使用 Google 继续",
+  "auth.googleUnavailable": "暂时还不能用 Google 登录。请先用用户名和密码登录。",
+  "auth.or": "或",
+  "auth.tooManyAttempts": "尝试次数过多，请 {minutes} 分钟后再试。",
+  "auth.accept.before": "继续即表示你同意",
+  "auth.accept.and": "和",
+  "auth.accept.after": "。",
+};

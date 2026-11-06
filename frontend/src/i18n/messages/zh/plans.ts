@@ -1,0 +1,30 @@
+/* Simplified Chinese: Free and Pro, the locks and the Pro sheet (plan 113). */
+import type { plans as en } from "../en/plans";
+
+export const plans: Record<keyof typeof en, string> = {
+  "plans.pro": "PRO",
+  "plans.proOnly": "仅限 Pro",
+  "plans.lock.closed": "已锁定：仅限 Pro",
+  "plans.lock.open": "Pro 功能，对管理员开放",
+  "plans.upgrade.title": "升级到 Pro",
+  "plans.upgrade.text": "看看 Pro 多了什么",
+  "plans.unlock.title": "解锁 ICM 教练",
+  "plans.unlock.text": "每个决策都有教练",
+  "plans.start.text": "与 8 个随机机器人打一场锦标赛",
+  "plans.sheet.title": "ICMBOT PRO",
+  "plans.sheet.line": "Free 给你练习锦标赛，Pro 告诉你为什么。",
+  "plans.sheet.tick1": "每个决策都有 ICM 教练",
+  "plans.sheet.tick2": "每次行动后都有评分",
+  "plans.sheet.tick3": "自选 8 个机器人",
+  "plans.sheet.tick4": "我的错误、手牌记录和报告",
+  "plans.sheet.tick5": "范围和 ICM 计算器",
+  "plans.sheet.soon": "即将推出",
+  "plans.sheet.notNow": "以后再说",
+  "plans.sheet.close": "关闭",
+  "plans.locked.title": "这是 Pro 功能",
+  "plans.locked.text": "Free 给你练习锦标赛。Pro 增加教练、复盘工具、范围和 ICM 计算器。",
+  "plans.locked.button": "看看 Pro 多了什么",
+  "plans.chip.title": "ICM 教练",
+  "plans.chip.unlock": "解锁",
+  "plans.table.locked": "Pro 会显示你打完的手牌和统计数据。",
+};
