@@ -11,6 +11,7 @@
   --landing-min-band: var(--band); /* fixed */
   --landing-min-login: #c9cfd8;
   --landing-min-login-hover: #fff;
+  --landing-min-band-line: #fff; /* the outlines in the black header band (the owner, 6 Nov) */
   --landing-min-quiet-hover: rgba(245, 178, 26, 0.14);
   --landing-min-outline-bg: rgba(20, 20, 20, 0.05);
   --landing-min-outline-hover: rgba(20, 20, 20, 0.1);
@@ -32,6 +33,7 @@
   --landing-min-accent: #8a5a00;
   --landing-min-login: #c9cfd8;
   --landing-min-login-hover: #fff;
+  --landing-min-band-line: #fff; /* the outlines in the black header band (the owner, 6 Nov) */
   --landing-min-quiet-hover: rgba(245, 178, 26, 0.14);
   --landing-min-outline-bg: rgba(20, 20, 20, 0.05);
   --landing-min-outline-hover: rgba(20, 20, 20, 0.1);

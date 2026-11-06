@@ -31,7 +31,7 @@
 .lm-header-band { background: var(--landing-min-band); }
 .lm-header-band .lm-login { color: var(--landing-min-login); }
 .lm-header-band .lm-login:hover { color: var(--landing-min-login-hover); }
-.lm-header-band .lm-btn-quiet { border-color: var(--lm-gold); color: var(--lm-gold); }
+.lm-header-band .lm-btn-quiet { border-color: var(--landing-min-band-line); color: var(--lm-gold); }
 
 .lm-header {
   display: flex;
