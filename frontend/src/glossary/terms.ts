@@ -44,6 +44,7 @@ const TOKENS: Record<string, string> = {
   ICM: "icm", SPR: "spr", EV: "ev",
   // the coach's short-stack phrase, as each language writes it
   "push/fold equilibrium": "pushFold", "equilibrio push/fold": "pushFold", "تعادل پوش/فولد": "pushFold",
+  "推弃均衡": "pushFold",
 };
 
 // longest first, so UTG+1 wins over UTG; never inside a word or a number
