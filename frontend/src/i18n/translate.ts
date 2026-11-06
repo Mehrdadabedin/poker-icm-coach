@@ -1,8 +1,10 @@
 import type { Lang } from "./lang";
 import { en, type MessageKey, type Messages } from "./messages/en";
 import { es } from "./messages/es";
+import { fa } from "./messages/fa";
+import { zh } from "./messages/zh";
 
-export const MESSAGES: Record<Lang, Messages> = { en, es };
+export const MESSAGES: Record<Lang, Messages> = { en, es, zh, fa };
 
 export type Params = Record<string, string | number>;
 

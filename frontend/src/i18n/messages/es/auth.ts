@@ -3,6 +3,7 @@ import type { auth as en } from "../en/auth";
 
 export const auth: Record<keyof typeof en, string> = {
   "lang.label": "Idioma",
+  "place.ordinal": "{n}.º",
   "auth.username": "Correo o usuario",
   "auth.password": "Contraseña",
   "auth.confirm": "Confirmar contraseña",
