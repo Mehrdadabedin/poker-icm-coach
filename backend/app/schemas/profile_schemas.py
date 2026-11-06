@@ -14,6 +14,8 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 Gender = Literal["man", "woman", "non_binary", "self_described", "prefer_not_to_say"]
 MIN_AGE = 18
 _PUNCTUATION = set(" .'-")
+# Persian keyboards join compound names with the zero-width non-joiner: علی‌رضا (plan 113).
+_ZWNJ = "\u200c"
 
 
 def age_on(birthday: date, today: date) -> int:
@@ -24,7 +26,7 @@ def _clean(value: str, low: int, high: int, digits: bool) -> str:
     text = " ".join(value.split())
     if not low <= len(text) <= high:
         raise ValueError(f"use {low} to {high} characters")
-    if not all(c.isalpha() or c in _PUNCTUATION or (digits and c.isdigit()) for c in text):
+    if not all(c.isalpha() or c in _PUNCTUATION or c == _ZWNJ or (digits and c.isdigit()) for c in text):
         raise ValueError("use letters, spaces, dots, apostrophes and hyphens")
     if not text[0].isalnum():
         raise ValueError("start with a letter")
