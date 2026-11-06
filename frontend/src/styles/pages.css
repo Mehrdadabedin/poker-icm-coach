@@ -114,6 +114,7 @@
 }
 
 .settings-grid input[type="number"],
+.settings-grid input[inputmode="decimal"],
 .settings-grid select {
   min-height: 42px;
   border-radius: 8px;

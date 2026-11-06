@@ -52,9 +52,9 @@ describe("what stays left to right under Persian", () => {
 
 describe("text in a right-to-left language", () => {
   it("isolates each value in Persian only", () => {
-    expect(translate("fa", "mistake.stack", { bb: "۱۲" })).toBe("Stack \u2068۱۲\u2069 BB");
+    expect(translate("fa", "mistake.stack", { bb: "۱۲" })).toBe("استک \u2068۱۲\u2069 BB");
     expect(translate("en", "mistake.stack", { bb: "12" })).toBe("Stack 12 BB");
-    expect(translate("zh", "mistake.stack", { bb: "12" })).toBe("Stack 12 BB");
+    expect(translate("zh", "mistake.stack", { bb: "12" })).toBe("筹码 12 BB");
   });
 
   it("turns the before and after arrow round", () => {

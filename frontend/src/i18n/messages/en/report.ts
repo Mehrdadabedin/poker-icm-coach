@@ -89,4 +89,13 @@ export const report = {
   "report.insight.small": "Most of your {street} bets are under a quarter of the pot. A tiny bet gives opponents a cheap call; 1/3 to 2/3 of the pot usually works better.",
   "report.insight.over": "Most of your {street} bets are bigger than the pot. Overbets risk a lot of chips; keep them for your strongest hands.",
   "report.insight.common": "Your most common {street} bet is {phrase} ({pct}% of your bets).",
+  // a street as a tab or column label, and inside a sentence (plan 113: Persian and Chinese translate them)
+  "report.street.preflop": "Preflop",
+  "report.street.flop": "Flop",
+  "report.street.turn": "Turn",
+  "report.street.river": "River",
+  "report.streetWord.preflop": "preflop",
+  "report.streetWord.flop": "flop",
+  "report.streetWord.turn": "turn",
+  "report.streetWord.river": "river",
 } as const;

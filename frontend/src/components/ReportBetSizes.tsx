@@ -17,7 +17,7 @@ export function ReportBetSizes({ sizes }: { sizes: StreetSizes[] }) {
           <button key={s.street} type="button" aria-pressed={s.street === street}
             className={s.street === street ? "report-tab active" : "report-tab"}
             onClick={() => setStreet(s.street)} data-testid={`report-sizes-${s.street}`}>
-            {s.street.charAt(0).toUpperCase() + s.street.slice(1)} ({s.bets})
+            {t(`report.street.${s.street}`)} ({s.bets})
           </button>
         ))}
       </div>

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { request } from "../services/api";
 import { Copyright } from "../components/Copyright";
 import { PageHeader } from "../components/PageHeader";
+import { NumberBox } from "../components/NumberBox";
 import { useT } from "../i18n/I18n";
 import { invalidateDisplayPreferences } from "../services/preferences";
 import type { CardBack, SettingsPayload as Settings } from "../services/preferences";
@@ -43,23 +44,23 @@ export function SettingsPage() {
         <div className="settings-grid">
           <label>
             {t("settings.stack")}
-            <input type="number" min={100} value={settings.startingStack}
-              onChange={(e) => patch("startingStack", Number(e.target.value))} data-testid="settings-stack" />
+            <NumberBox min={100} value={settings.startingStack}
+              onValue={(n) => patch("startingStack", n)} data-testid="settings-stack" />
           </label>
           <label>
             {t("settings.sb")}
-            <input type="number" min={10} value={settings.startingSmallBlind}
-              onChange={(e) => patch("startingSmallBlind", Number(e.target.value))} data-testid="settings-sb" />
+            <NumberBox min={10} value={settings.startingSmallBlind}
+              onValue={(n) => patch("startingSmallBlind", n)} data-testid="settings-sb" />
           </label>
           <label>
             {t("settings.bb")}
-            <input type="number" min={10} value={settings.startingBigBlind}
-              onChange={(e) => patch("startingBigBlind", Number(e.target.value))} data-testid="settings-bb" />
+            <NumberBox min={10} value={settings.startingBigBlind}
+              onValue={(n) => patch("startingBigBlind", n)} data-testid="settings-bb" />
           </label>
           <label>
             {t("settings.minutes")}
-            <input type="number" min={1} value={settings.blindLevelMinutes}
-              onChange={(e) => patch("blindLevelMinutes", Number(e.target.value))} data-testid="settings-minutes" />
+            <NumberBox min={1} value={settings.blindLevelMinutes}
+              onValue={(n) => patch("blindLevelMinutes", n)} data-testid="settings-minutes" />
           </label>
           <label className="settings-check">
             <input type="checkbox" checked={settings.fastMode}
