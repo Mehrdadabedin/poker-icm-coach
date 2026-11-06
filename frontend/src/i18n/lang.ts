@@ -1,12 +1,14 @@
 /* Which language the site speaks (plan 093). */
 import { inAndroidApp } from "../services/platform";
+import { translate } from "./translate";
 
-// Chinese (Simplified, for mainland China) comes after Spanish: a zh.ts and "zh" here.
-export const LANGS = ["en", "es"] as const;
+/** Simplified Chinese and Persian (plan 113) are previewed with ?lang=zh and
+ * ?lang=fa until each is READY. */
+export const LANGS = ["en", "es", "zh", "fa"] as const;
 export type Lang = (typeof LANGS)[number];
 
 /** Each language in its own words, for the language menu. */
-export const LANG_NAMES: Record<Lang, string> = { en: "English", es: "Español" };
+export const LANG_NAMES: Record<Lang, string> = { en: "English", es: "Español", zh: "简体中文", fa: "فارسی" };
 
 /** Languages translated far enough to offer on icmbot.one by the browser's
  * language. Until then a visitor there meets Spanish only on purpose, with
@@ -46,6 +48,8 @@ export interface LangSources {
 
 /** ?lang= first, then the visitor's own choice, then the domain, then the
  * browser (only a READY language, or APP_READY in the app), then English.
+ * A browser tag counts by its language alone, so zh-TW and zh-HK get
+ * Simplified Chinese until Traditional exists (the owner, 5 Nov).
  * icmbot.es is the Spanish site: it speaks Spanish from the start and each
  * screen turns Spanish as it is translated (the owner, 20 Oct). */
 export function detectLang({ search, saved, host, browser, inApp }: LangSources, ready: readonly Lang[] = READY): Lang {
@@ -84,10 +88,18 @@ export function currentSources(): LangSources {
   };
 }
 
-/** The value for <html lang>. */
-export const htmlLang = (lang: Lang): string => lang;
+/** The value for <html lang>: zh-Hans makes the browser pick Simplified glyphs. */
+export const htmlLang = (lang: Lang): string => (lang === "zh" ? "zh-Hans" : lang);
 
-const NUMBER_LOCALES: Record<Lang, string> = { en: "en-US", es: "es-ES" };
+/** The value for <html dir>: Persian reads right to left. */
+export const htmlDir = (lang: Lang): "ltr" | "rtl" => (lang === "fa" ? "rtl" : "ltr");
+
+/** fa-IR writes Persian digits (۴۵٬۰۰۰) and Solar Hijri dates, both the
+ * owner's choice (5 Nov); zh-CN writes 45,000 and 6.5 like English. */
+const LOCALES: Record<Lang, string> = { en: "en-US", es: "es-ES", zh: "zh-CN", fa: "fa-IR" };
+
+/** The Intl locale for numbers and dates in a language. */
+export const localeOf = (lang: Lang): string => LOCALES[lang];
 let current: Lang = "en";
 
 /** The language the I18nProvider is rendering in, for plain functions such as
@@ -98,20 +110,25 @@ export function setCurrentLang(lang: Lang): void {
 
 /** formatChips follows the language: 45,000 in English, 45.000 in Spanish (a
  * Spanish reader takes 45,000 for forty-five). Spain leaves 4-digit numbers ungrouped. */
-export const numberLocale = (): string => NUMBER_LOCALES[current];
+export const numberLocale = (): string => LOCALES[current];
 
-/** A plain number in the language: English as written ("6.5"), Spanish 6,5. */
-export const localNumber = (n: number): string => (current === "en" ? String(n) : n.toLocaleString(NUMBER_LOCALES[current]));
+/** A plain number in the language: English as written ("6.5"), Spanish 6,5, Persian ۶٫۵. */
+export const localNumber = (n: number): string => (current === "en" ? String(n) : n.toLocaleString(LOCALES[current]));
 
 /** A number with fixed decimals in the language: 12.50 in English, 12,50 in Spanish. */
 export const localFixed = (n: number, digits: number): string => (current === "en" ? n.toFixed(digits)
-  : n.toLocaleString(NUMBER_LOCALES[current], { minimumFractionDigits: digits, maximumFractionDigits: digits }));
+  : n.toLocaleString(LOCALES[current], { minimumFractionDigits: digits, maximumFractionDigits: digits }));
 
-const SUFFIX: Record<number, string> = { 1: "ST", 2: "ND", 3: "RD" };
+const SUFFIX: Record<number, string> = { 1: "st", 2: "nd", 3: "rd" };
 
-/** A finishing place: 1ST, 2ND, 11TH in English; 1.º, 2.º in Spanish. */
-export function placeOrdinal(lang: Lang, n: number): string {
-  if (lang === "es") return `${n}.º`;
+/** A finishing place: 1ST (or 1st), 11TH in English; the other languages from
+ * the "place.ordinal" key: 1.º, 第1名, رتبه ۱. */
+export function placeOrdinal(lang: Lang, n: number, upper = true): string {
+  if (lang !== "en") {
+    const digits = n.toLocaleString(LOCALES[lang], { useGrouping: false });
+    return translate(lang, "place.ordinal", { n: digits });
+  }
   const teen = n % 100 >= 11 && n % 100 <= 13;
-  return `${n}${teen ? "TH" : (SUFFIX[n % 10] ?? "TH")}`;
+  const english = `${n}${teen ? "th" : (SUFFIX[n % 10] ?? "th")}`;
+  return upper ? english.toUpperCase() : english;
 }

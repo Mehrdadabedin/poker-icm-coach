@@ -1,30 +1,19 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useI18n } from "../i18n/I18n";
-
-const MIN_AGE = 18;
-const FIRST_YEAR = 1900;
-const pad = (n: number) => String(n).padStart(2, "0");
-const daysIn = (year: number, month: number) => new Date(Date.UTC(year, month, 0)).getUTCDate();
-/** Monday-first column of the 1st of the month. */
-const firstColumn = (year: number, month: number) => (new Date(Date.UTC(year, month - 1, 1)).getUTCDay() + 6) % 7;
+import { birthdayCalendar } from "./birthdayCalendar";
 
 /** A calendar for the birthday (plan 095): year and month are lists, so an
  * adult's birth year is one choice away instead of decades of scrolling.
- * Typing the date stays possible; this only fills the same field. */
+ * Typing the date stays possible; this only fills the same field. Under
+ * Persian it is Solar Hijri (plan 113) and still saves a Gregorian date. */
 export function BirthdayPicker({ value, onPick }: { value: string; onPick: (iso: string) => void }) {
   const { lang, t } = useI18n();
-  const newest = new Date().getFullYear() - MIN_AGE;
+  const cal = useMemo(() => birthdayCalendar(lang), [lang]);
   const [open, setOpen] = useState(false);
-  const [year, setYear] = useState(() => Number(value.slice(0, 4)) || newest - 12);
-  const [month, setMonth] = useState(() => Number(value.slice(5, 7)) || 1);
-  const months = Array.from({ length: 12 }, (_, i) =>
-    new Intl.DateTimeFormat(lang, { month: "long", timeZone: "UTC" }).format(new Date(Date.UTC(2000, i, 1))));
-  // 2024-01-01 was a Monday, so these are the seven names from Monday on.
-  const weekdays = Array.from({ length: 7 }, (_, i) =>
-    new Intl.DateTimeFormat(lang, { weekday: "narrow", timeZone: "UTC" }).format(new Date(Date.UTC(2024, 0, 1 + i))));
-  const years = Array.from({ length: newest - FIRST_YEAR + 1 }, (_, i) => newest - i);
+  const [year, setYear] = useState(() => cal.read(value)?.year ?? cal.years[12]);
+  const [month, setMonth] = useState(() => cal.read(value)?.month ?? 1);
   const pick = (day: number) => {
-    onPick(`${year}-${pad(month)}-${pad(day)}`);
+    onPick(cal.toIso(year, month, day));
     setOpen(false);
   };
 
@@ -41,20 +30,20 @@ export function BirthdayPicker({ value, onPick }: { value: string; onPick: (iso:
           <div className="birthday-selects">
             <select aria-label={t("profile.calendarYear")} value={year} data-testid="birthday-year"
               onChange={(e) => setYear(Number(e.target.value))}>
-              {years.map((y) => <option key={y} value={y}>{y}</option>)}
+              {cal.years.map((y) => <option key={y} value={y}>{cal.num(y)}</option>)}
             </select>
             <select aria-label={t("profile.calendarMonth")} value={month} data-testid="birthday-month"
               onChange={(e) => setMonth(Number(e.target.value))}>
-              {months.map((name, i) => <option key={name} value={i + 1}>{name}</option>)}
+              {cal.months.map((name, i) => <option key={name} value={i + 1}>{name}</option>)}
             </select>
           </div>
           <div className="birthday-days">
-            {weekdays.map((name, i) => <span key={`day-name-${i}`} className="birthday-weekday" aria-hidden="true">{name}</span>)}
-            {Array.from({ length: firstColumn(year, month) }, (_, i) => <span key={`gap-${i}`} />)}
-            {Array.from({ length: daysIn(year, month) }, (_, i) => (
+            {cal.weekdays.map((name, i) => <span key={`day-name-${i}`} className="birthday-weekday" aria-hidden="true">{name}</span>)}
+            {Array.from({ length: cal.firstColumn(year, month) }, (_, i) => <span key={`gap-${i}`} />)}
+            {Array.from({ length: cal.daysIn(year, month) }, (_, i) => (
               <button type="button" key={i + 1} onClick={() => pick(i + 1)} data-testid={`birthday-day-${i + 1}`}
-                className={value === `${year}-${pad(month)}-${pad(i + 1)}` ? "birthday-day is-picked" : "birthday-day"}>
-                {i + 1}
+                className={value === cal.toIso(year, month, i + 1) ? "birthday-day is-picked" : "birthday-day"}>
+                {cal.num(i + 1)}
               </button>
             ))}
           </div>

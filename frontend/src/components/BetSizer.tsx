@@ -3,6 +3,7 @@ import type { Preset } from "../models/betSizing";
 import { useT } from "../i18n/I18n";
 import { numberLocale } from "../i18n/lang";
 import { HERO_SHORTCUTS as KEY } from "../hooks/useHeroKeys";
+import { NumberBox } from "./NumberBox";
 
 interface BetSizerProps {
   presets: Preset[];
@@ -51,8 +52,8 @@ export function BetSizer({ presets, selected, amount, min, max, step, bigBlind, 
         <button type="button" className="size-step" disabled={disabled || amount >= max}
           aria-label={t("size.bigger")} aria-keyshortcuts={KEY.bigger} data-testid="size-plus" onClick={() => set(amount + step)}>+</button>
         <label className="size-amount">
-          <input type="number" min={min} max={max} value={amount} disabled={disabled} aria-label={t("size.amount")}
-            data-testid="bet-amount" onChange={(e) => onAmount(Number(e.target.value) || min)}
+          <NumberBox min={min} max={max} value={amount} disabled={disabled} aria-label={t("size.amount")}
+            data-testid="bet-amount" onValue={(n) => onAmount(n || min)}
             onBlur={() => set(amount)} />
           <small>{note}</small>
         </label>

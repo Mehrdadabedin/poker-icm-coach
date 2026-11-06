@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { HistoryPage } from "../src/pages/HistoryPage";
-import { ordinal } from "../src/models/history";
+import { placeOrdinal } from "../src/i18n/lang";
 
 const { request } = vi.hoisted(() => ({ request: vi.fn() }));
 vi.mock("../src/services/api", async (importOriginal) => ({
@@ -119,7 +119,7 @@ describe("Hand History", () => {
   });
 
   it("writes places as 1st, 2nd, 3rd, 11th, 22nd", () => {
-    expect([1, 2, 3, 4, 11, 12, 13, 21, 22].map(ordinal)).toEqual(
+    expect([1, 2, 3, 4, 11, 12, 13, 21, 22].map((n) => placeOrdinal("en", n, false))).toEqual(
       ["1st", "2nd", "3rd", "4th", "11th", "12th", "13th", "21st", "22nd"]);
   });
 });
