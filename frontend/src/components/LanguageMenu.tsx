@@ -1,16 +1,13 @@
 import { useI18n } from "../i18n/I18n";
-import { isLang, LANG_NAMES, offeredLangs, READY } from "../i18n/lang";
-import { inAndroidApp } from "../services/platform";
+import { isLang, LANG_NAMES, offeredLangs } from "../i18n/lang";
 
-/** Language buttons, each language in its own words (plan 093). Always there
- * on icmbot.es and in the Android app; on icmbot.one once Spanish is READY
- * (or while previewing it). In the narrow bands (`short`) more than two
- * pills do not fit beside Log in at 360 px, so there it becomes one list,
- * which Android opens in its own picker (plan 113). */
+/** Language buttons, each language in its own words (plan 093), on every site
+ * and in the app (the owner, 6 Nov). In the narrow bands (`short`) four pills
+ * do not fit beside Log in at 360 px, so there it is one list, which Android
+ * opens in its own picker (plan 113). */
 export function LanguageMenu({ short = false }: { short?: boolean }) {
   const { lang, setLang, t } = useI18n();
-  const offered = offeredLangs(lang, window.location.hostname, READY, inAndroidApp());
-  if (offered.length < 2) return null;
+  const offered = offeredLangs();
   if (short && offered.length > 2) {
     return (
       <nav className="lang-menu" data-testid="lang-menu">

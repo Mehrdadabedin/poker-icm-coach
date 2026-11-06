@@ -50,7 +50,9 @@ describe("the signed-in pages in Spanish", () => {
     expect(screen.getByText("REPASAR")).toBeInTheDocument();
     expect(screen.getByTestId("session-bar")).toHaveTextContent("Jugando como Admin");
     expect(screen.getByTestId("logout-btn")).toHaveTextContent("CERRAR SESIÓN");
-    expect(screen.getByTestId("session-bar")).toContainElement(screen.getByTestId("lang-es"));
+    // the band offers the four as one list (the owner, 6 Nov)
+    expect(screen.getByTestId("session-bar")).toContainElement(screen.getByTestId("lang-select"));
+    expect(screen.getByTestId("lang-select")).toHaveValue("es");
   });
 
   it("offers Continue table with its label", async () => {

@@ -27,17 +27,11 @@ export const APP_READY: readonly Lang[] = ["en", "es"];
 const readyFor = (inApp: boolean, ready: readonly Lang[]): readonly Lang[] =>
   (inApp ? [...ready, ...APP_READY] : ready);
 
-/** The languages the menu offers: every READY one, the one in use, and Spanish
- * on icmbot.es, so a visitor there who picks English can always come back
- * (the owner, 20 Oct: the buttons vanished after clicking English). The app
- * offers all four (the owner, 6 Nov), as the website's footer does: it has no
- * landing page, so its menu is the only way to them. The phone's language still
- * picks only an APP_READY one. */
-export function offeredLangs(lang: Lang, host: string, ready: readonly Lang[] = READY, inApp = false): Lang[] {
-  if (inApp) return [...LANGS];
-  const shown = readyFor(inApp, ready);
-  return LANGS.filter((l) => shown.includes(l) || l === lang || (l === "es" && SPANISH_HOST.test(host)));
-}
+/** The languages the menu offers: all four, on icmbot.one, on icmbot.es and in
+ * the app (the owner, 6 Nov: in the header, not only in the footer). Detection
+ * still picks only a READY language (APP_READY in the app), so nobody lands in
+ * a language before its review without choosing it. */
+export const offeredLangs = (): Lang[] => [...LANGS];
 
 export const isLang = (value: string | null | undefined): value is Lang =>
   !!value && (LANGS as readonly string[]).includes(value);

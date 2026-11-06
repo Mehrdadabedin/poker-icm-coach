@@ -8,7 +8,7 @@ import { LanguageMenu } from "../src/components/LanguageMenu";
 import { weekDates } from "../src/components/leaderboardDates";
 import { I18nProvider, useI18n } from "../src/i18n/I18n";
 import { parseDigits } from "../src/i18n/digits";
-import { APP_READY, detectLang, localNumber, offeredLangs, placeOrdinal, READY, setCurrentLang, type LangSources } from "../src/i18n/lang";
+import { APP_READY, detectLang, localNumber, placeOrdinal, READY, setCurrentLang, type LangSources } from "../src/i18n/lang";
 import { formatChips } from "../src/models/game";
 import { tournamentState } from "../src/models/history";
 import { translate } from "../src/i18n/translate";
@@ -50,12 +50,6 @@ describe("finding Chinese and Persian", () => {
     expect(detectLang(src({ browser: ["fa-IR"], saved: "en" }), ["en", "fa"])).toBe("en");
   });
 
-  it("offers a previewed language beside the ready ones on every site", () => {
-    expect(offeredLangs("zh", "icmbot.one")).toEqual(["en", "zh"]);
-    expect(offeredLangs("fa", "icmbot.es")).toEqual(["en", "es", "fa"]);
-    expect(offeredLangs("fa", "icmbot.one", READY, true)).toEqual(["en", "es", "zh", "fa"]);
-    expect(offeredLangs("en", "icmbot.one", ["en", "zh", "fa"])).toEqual(["en", "zh", "fa"]);
-  });
 });
 
 function Switch() {
@@ -75,13 +69,12 @@ describe("the page in Chinese and Persian", () => {
     expect(document.documentElement).toHaveAttribute("dir", "ltr");
   });
 
-  it("shows one list in a band when more than two languages are offered, pills otherwise", () => {
+  it("shows one list of the four in a band, in the app and on the website (the owner, 6 Nov)", () => {
     vi.spyOn(navigator, "userAgent", "get").mockReturnValue(APP_UA);
     render(<I18nProvider initial="fa"><LanguageMenu short /></I18nProvider>);
     const list = screen.getByTestId("lang-select");
     expect(list).toHaveAccessibleName("زبان"); // lang.label in Persian (plan 113 step 4)
     expect(list).toHaveValue("fa");
-    // the app offers all four (the owner, 6 Nov)
     expect([...(list as HTMLSelectElement).options].map((o) => [o.textContent, o.lang])).toEqual(
       [["English", "en"], ["Español", "es"], ["简体中文", "zh"], ["فارسی", "fa"]]);
     expect(screen.queryByTestId("lang-en")).toBeNull();
@@ -90,9 +83,9 @@ describe("the page in Chinese and Persian", () => {
     expect(screen.getByTestId("lang-select")).toHaveValue("es");
     cleanup();
     vi.restoreAllMocks();
-    render(<I18nProvider initial="fa"><LanguageMenu short /></I18nProvider>); // the website: English and the one in use
-    expect(screen.queryByTestId("lang-select")).toBeNull();
-    expect(screen.getByTestId("lang-fa")).toHaveTextContent("FA");
+    render(<I18nProvider initial="en"><LanguageMenu short /></I18nProvider>); // the website, as on icmbot.one
+    expect(screen.getByTestId("lang-select")).toHaveValue("en");
+    expect(screen.getAllByRole("option")).toHaveLength(4);
   });
 
   it("keeps the full pills on Home whatever the number of languages", () => {
