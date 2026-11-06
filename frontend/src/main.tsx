@@ -56,6 +56,7 @@ import "./styles/profile.css";
 import "./styles/plans.css";
 import "./styles/leaderboard.css";
 import "./styles/quiz.css";
+import "./styles/scripts.css";
 
 initTheme();
 initializeGoogleAnalytics();

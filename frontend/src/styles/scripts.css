@@ -1,0 +1,54 @@
+/* Persian and Simplified Chinese (plan 113 step 3). Loaded last, so these
+   win over each sheet's own font-family.
+
+   Persian: Vazirmatn (SIL Open Font License, public/fonts/Vazirmatn-OFL.txt),
+   two weights of about 50 KB each. unicode-range keeps it to Arabic script,
+   so a page downloads it only when Persian letters or digits are on it, and
+   Latin text in the same line stays in the page's own font. */
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("/fonts/Vazirmatn-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200F, U+2066-2069, U+FB50-FDFF, U+FE70-FEFF;
+}
+@font-face {
+  font-family: "Vazirmatn";
+  src: url("/fonts/Vazirmatn-Bold.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+200C-200F, U+2066-2069, U+FB50-FDFF, U+FE70-FEFF;
+}
+
+/* Every font-family in styles/ gets Vazirmatn first under fa. */
+html:lang(fa) body { font-family: "Vazirmatn", "Segoe UI", system-ui, -apple-system, sans-serif; }
+html:lang(fa) .lm-page {
+  --lm-head: "Vazirmatn", "Archivo", system-ui, sans-serif;
+  --lm-body: "Vazirmatn", "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+html:lang(fa) :is(.lb-place-points, .lb-points, .lb-own-rank, .lb-own-points) { font-family: "Vazirmatn", Archivo, sans-serif; }
+html:lang(fa) :is(.portrait-title, .portrait-circle, .seat-hero-initial, .portrait-prompt-icon, .profile-card-title) {
+  font-family: "Vazirmatn", Georgia, "Times New Roman", serif;
+}
+
+/* Chinese: no web font (a full CJK font is several MB). The page's own fonts
+   keep Latin letters and digits; the Simplified Chinese system fonts follow. */
+html:lang(zh) body {
+  font-family: "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", system-ui, sans-serif;
+  /* keeps ， and 。 off the start of a line */
+  line-break: strict;
+}
+html:lang(zh) .lm-page {
+  --lm-head: "Archivo", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
+  --lm-body: "Instrument Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
+}
+html:lang(zh) :is(.lb-place-points, .lb-points, .lb-own-rank, .lb-own-points) {
+  font-family: Archivo, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+}
+html:lang(zh) :is(.portrait-title, .portrait-circle, .seat-hero-initial, .portrait-prompt-icon, .profile-card-title) {
+  font-family: Georgia, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", serif;
+}
+
+/* Letter-spacing pulls joined Persian letters apart and gaps Chinese
+   characters. !important because 59 rules across styles/ set it. */
+html:is(:lang(fa), :lang(zh)) * { letter-spacing: 0 !important; }
