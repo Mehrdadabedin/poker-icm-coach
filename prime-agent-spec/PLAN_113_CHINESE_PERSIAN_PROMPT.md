@@ -2,9 +2,11 @@
 
 You are working in the ICMBOT repository. Read `CLAUDE.md` first and follow it.
 Then read `plans/113_chinese_and_persian.md` and `plans/093_spanish.md` on
-`main`. Build it only after the owner has approved plan 113 and answered its
-"Open for the owner" list; use their answers where they differ from the plan
-(Persian digits, the calendar, zh-TW, paths or a domain, which language first).
+`main`. Build it only after the owner has approved plan 113. The owner
+answered its open questions on 5 Nov ("Owner's decisions" in the plan):
+Persian digits, Solar Hijri dates, zh-TW and zh-HK get Simplified, the `/zh/`
+and `/fa/` paths, Persian turns on first, a community player reviews each
+language.
 
 ## Where to work
 
@@ -23,7 +25,7 @@ Ten PRs, in order, one branch each, each from `origin/main` after the one
 before is merged: `feat/lang-zh-fa-plumbing`, `feat/rtl-base`,
 `feat/zh-fa-fonts`, `feat/zh-fa-entry`, `feat/zh-fa-table`,
 `feat/zh-fa-review`, `feat/zh-fa-learn`, `feat/zh-fa-legal-previews`,
-`feat/zh-on`, `feat/fa-on`. Steps 9 and 10 wait for the native reviewer.
+`feat/fa-on`, `feat/zh-on`. Steps 9 and 10 wait for each language's reviewer.
 
 ## What exists today (read these first)
 
@@ -49,15 +51,17 @@ before is merged: `feat/lang-zh-fa-plumbing`, `feat/rtl-base`,
    `MESSAGES`. Later PRs spread each translated area over it.
 3. `htmlLang`: `zh-Hans`, `fa`. New `htmlDir`. `I18nProvider` sets `lang` and
    `dir` on `<html>`.
-4. Locales: `zh-CN`; `fa-IR` (or `fa-IR-u-nu-latn` if the owner chose Latin
-   digits) with `-u-ca-gregory` for dates. `localNumber` and `localFixed` go
+4. Locales: `zh-CN`; `fa-IR` (its defaults: Persian digits, Solar Hijri
+   dates). `i18n/jalali.ts` converts Solar Hijri to Gregorian and back; under
+   `fa` `BirthdayPicker` shows Solar Hijri years, months and days, weeks from
+   Saturday, and saves the same Gregorian date. `localNumber` and `localFixed` go
    through `Intl` for every language but English. One `placeOrdinal` with a
    message key per language (`第{n}名`, `رتبه {n}`, `{n}.º`), used by
    `history.ts` and `LeaderboardParts`.
 5. A small `parseDigits` that turns ۰-۹ and ٠-٩ into 0-9, used by the bet
    amount box, the ICM calculator and the birthday input.
-6. `detectLang`: every `zh-*` tag gives `zh` (unless the owner said zh-TW and
-   zh-HK get English), `fa-*` gives `fa`, still only when READY or APP_READY.
+6. `detectLang`: every `zh-*` tag gives `zh` (zh-TW and zh-HK too, the
+   owner's choice), `fa-*` gives `fa`, still only when READY or APP_READY.
 7. `LanguageMenu`: in `short` mode with more than two offered languages, one
    `<select>` named by `lang.label`; pills otherwise.
 8. `SITE_META` stays English and Spanish for now: type it per site
@@ -121,8 +125,9 @@ First check on a Render preview or with the owner that `/zh/` serves
 `zh/index.html`. If it does not, write the rewrite rule the owner must add and
 stop for their answer.
 
-## PRs 9 and 10: turning each language on (`feat/zh-on`, `feat/fa-on`)
+## PRs 9 and 10: turning each language on (`feat/fa-on`, `feat/zh-on`)
 
+Persian first (PR 9), Chinese second (PR 10), each when its reviewer is done.
 Apply the native reviewer's fixes, then add the language to READY and
 APP_READY. Add the completeness test: no value of a READY zh or fa equals the
 English, outside a short list (ICMBOT, BB, ICM, numbers only). Extend
@@ -131,7 +136,7 @@ the Android app on a phone set to Persian, or say you did not.
 
 ## PR 11: the languages on the landing page (`feat/landing-languages`)
 
-After PR 10 is merged. Plan 113 step 11: `landing-minimal/MinimalLanguages.tsx`
+After PR 9 (Persian on) is merged. Plan 113 step 11: `landing-minimal/MinimalLanguages.tsx`
 ("Play in your language", one tile per READY language in its own words and
 script, a tap switches the page language like `LanguageMenu`), placed before
 `MinimalClosing` in `pages/MinimalLandingPage.tsx`; a footer line in
