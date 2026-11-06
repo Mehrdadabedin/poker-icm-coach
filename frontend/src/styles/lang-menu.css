@@ -21,6 +21,6 @@
   max-width: 8.5em; padding: 2px 6px; padding-inline-start: 26px; border: 1px solid var(--lang-border); border-radius: 999px;
   background: transparent; color: var(--muted); font: inherit; font-size: 0.78rem; cursor: pointer;
 }
-/* gold text and a white border in the landing header, like Start free beside it (the owner, 6 Nov) */
-.lm-header-band .lang-menu .lang-select { color: var(--lm-gold); border-color: var(--landing-min-band-line); }
+/* gold bold text and a white border in the landing header, like Start free beside it (the owner, 6 Nov) */
+.lm-header-band .lang-menu .lang-select { color: var(--lm-gold); border-color: var(--landing-min-band-line); font-weight: 700; }
 .lang-menu .lang-select option { color: initial; background: initial; }
