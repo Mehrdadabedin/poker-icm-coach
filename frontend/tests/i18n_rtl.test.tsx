@@ -86,6 +86,9 @@ describe("the page in Chinese and Persian", () => {
     render(<I18nProvider initial="en"><LanguageMenu short /></I18nProvider>); // the website, as on icmbot.one
     expect(screen.getByTestId("lang-select")).toHaveValue("en");
     expect(screen.getAllByRole("option")).toHaveLength(4);
+    // a globe beside it, not flags (the owner, 6 Nov), silent for a screen reader
+    expect(screen.getByTestId("lang-globe")).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByTestId("lang-select")).toHaveAccessibleName("Language");
   });
 
   it("keeps the full pills on Home whatever the number of languages", () => {
