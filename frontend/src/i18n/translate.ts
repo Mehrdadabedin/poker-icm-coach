@@ -1,4 +1,4 @@
-import { htmlDir, type Lang } from "./lang";
+import { htmlDir, localDigits, type Lang } from "./lang";
 import { en, type MessageKey, type Messages } from "./messages/en";
 import { es } from "./messages/es";
 import { fa } from "./messages/fa";
@@ -14,10 +14,12 @@ const PDI = "\u2069";
 
 /** The text for a key in a language, with {name} placeholders filled in. In a
  * right-to-left language each value is isolated, so a Latin name or "2,400"
- * inside a Persian sentence stays where the sentence puts it (plan 113). */
+ * inside a Persian sentence stays where the sentence puts it, and a number
+ * comes in the language's digits (plan 113). */
 export function translate(lang: Lang, key: MessageKey, params?: Params): string {
   const text = MESSAGES[lang][key] ?? en[key];
   if (!params) return text;
-  const fill = htmlDir(lang) === "rtl" ? (v: string) => `${FSI}${v}${PDI}` : (v: string) => v;
-  return text.replace(/\{(\w+)\}/g, (whole, name: string) => (name in params ? fill(String(params[name])) : whole));
+  const isolate = htmlDir(lang) === "rtl" ? (v: string) => `${FSI}${v}${PDI}` : (v: string) => v;
+  const fill = (v: string | number) => isolate(typeof v === "number" ? localDigits(String(v), lang) : v);
+  return text.replace(/\{(\w+)\}/g, (whole, name: string) => (name in params ? fill(params[name]) : whole));
 }

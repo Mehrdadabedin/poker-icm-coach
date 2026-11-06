@@ -3,7 +3,7 @@
  * action words, and factor rows whose values come from small fixed sets.
  * Anything unknown (an older server, a new sentence) shows as sent. */
 import { formatChips, type CoachAdvice } from "../models/game";
-import { numberLocale } from "./lang";
+import { localDigits, numberLocale } from "./lang";
 import { en, type MessageKey } from "./messages/en";
 import { PRESSURE_KEY } from "./poker";
 import type { Params } from "./translate";
@@ -65,7 +65,8 @@ function rowValue(label: string, value: string, coach: Advice, t: T): string {
   }
   m = ICM_FOLD.exec(value);
   if (m) return t("coach.value.icmFold", { fold: decimal(m[1]) });
-  return DECIMAL.test(value) ? decimal(value) : value;
+  // the rest (25%, a server word with a number) keeps its form, in the language's digits
+  return DECIMAL.test(value) ? decimal(value) : localDigits(value);
 }
 
 /** One factor row of the coach panel: its label and its value. */

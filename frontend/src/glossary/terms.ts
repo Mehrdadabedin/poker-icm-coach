@@ -43,7 +43,7 @@ const TOKENS: Record<string, string> = {
   ...Object.fromEntries(POSITIONS.map((p) => [p === "UTG1" ? "UTG+1" : p, p])),
   ICM: "icm", SPR: "spr", EV: "ev",
   // the coach's short-stack phrase, as each language writes it
-  "push/fold equilibrium": "pushFold", "equilibrio push/fold": "pushFold",
+  "push/fold equilibrium": "pushFold", "equilibrio push/fold": "pushFold", "تعادل پوش/فولد": "pushFold",
 };
 
 // longest first, so UTG+1 wins over UTG; never inside a word or a number

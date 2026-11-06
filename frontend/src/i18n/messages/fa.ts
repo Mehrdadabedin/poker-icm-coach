@@ -10,5 +10,13 @@ import { plans } from "./fa/plans";
 import { portrait } from "./fa/portrait";
 import { portraitPrompt } from "./fa/portraitPrompt";
 import { profile } from "./fa/profile";
+import { table } from "./fa/table";
+import { tableStrip } from "./fa/tableStrip";
+import { coach } from "./fa/coach";
+import { a11y } from "./fa/a11y";
+import { speak } from "./fa/speak";
+import { review } from "./fa/review";
+import { hands } from "./fa/hands";
 
-export const fa: Messages = { ...en, ...auth, ...landing, ...tabs, ...theme, ...home, ...plans, ...portrait, ...portraitPrompt, ...profile };
+export const fa: Messages = { ...en, ...auth, ...landing, ...tabs, ...theme, ...home, ...plans, ...portrait, ...portraitPrompt, ...profile,
+  ...table, ...tableStrip, ...coach, ...a11y, ...speak, ...review, ...hands };
