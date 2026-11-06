@@ -1,0 +1,30 @@
+/* Persian: the language menu and the sign-in screen (plan 113). */
+import type { auth as en } from "../en/auth";
+
+export const auth: Record<keyof typeof en, string> = {
+  "lang.label": "زبان",
+  "place.ordinal": "رتبه {n}",
+  "auth.username": "ایمیل یا نام کاربری",
+  "auth.password": "رمز عبور",
+  "auth.confirm": "تکرار رمز عبور",
+  "auth.showPassword": "نمایش رمز عبور",
+  "auth.hidePassword": "پنهان کردن رمز عبور",
+  "auth.wait": "لطفاً صبر کن…",
+  "auth.signIn": "ورود",
+  "auth.signUp": "ثبت‌نام",
+  "auth.usernameRequired": "نام کاربری لازم است.",
+  "auth.passwordRequired": "رمز عبور لازم است.",
+  "auth.passwordShort": "رمز عبور باید دست‌کم {min} نویسه باشد.",
+  "auth.passwordMismatch": "رمزهای عبور یکسان نیستند.",
+  "auth.created": "حساب «{name}» ساخته شد. اکنون وارد شده‌ای.",
+  "auth.haveAccount": "حساب داری؟",
+  "auth.noAccount": "حساب نداری؟",
+  "auth.signedInAs": "وارد شده با نام",
+  "auth.google": "ادامه با Google",
+  "auth.googleUnavailable": "ورود با Google هنوز در دسترس نیست. فعلاً با نام کاربری و رمز عبور وارد شو.",
+  "auth.or": "یا",
+  "auth.tooManyAttempts": "تلاش‌ها بیش از حد بود. {minutes} دقیقهٔ دیگر دوباره امتحان کن.",
+  "auth.accept.before": "با ادامه دادن، ",
+  "auth.accept.and": " و ",
+  "auth.accept.after": " را می‌پذیری.",
+};

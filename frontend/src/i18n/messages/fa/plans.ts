@@ -1,0 +1,30 @@
+/* Persian: Free and Pro, the locks and the Pro sheet (plan 113). */
+import type { plans as en } from "../en/plans";
+
+export const plans: Record<keyof typeof en, string> = {
+  "plans.pro": "PRO",
+  "plans.proOnly": "فقط Pro",
+  "plans.lock.closed": "قفل: فقط Pro",
+  "plans.lock.open": "امکان Pro، باز برای مدیران",
+  "plans.upgrade.title": "ارتقا به Pro",
+  "plans.upgrade.text": "ببین Pro چه چیزهایی اضافه می‌کند",
+  "plans.unlock.title": "باز کردن مربی ICM",
+  "plans.unlock.text": "یک مربی در هر تصمیم",
+  "plans.start.text": "یک تورنمنت در برابر ۸ ربات تصادفی بازی کن",
+  "plans.sheet.title": "ICMBOT PRO",
+  "plans.sheet.line": "Free به تو تورنمنت تمرینی می‌دهد. Pro نشانت می‌دهد چرا.",
+  "plans.sheet.tick1": "مربی ICM در هر تصمیم",
+  "plans.sheet.tick2": "یک نمره بعد از هر حرکت",
+  "plans.sheet.tick3": "۸ ربات را خودت انتخاب کن",
+  "plans.sheet.tick4": "اشتباه‌های من، تاریخچهٔ دست‌ها و گزارش",
+  "plans.sheet.tick5": "رنج‌ها و ماشین‌حساب ICM",
+  "plans.sheet.soon": "به‌زودی",
+  "plans.sheet.notNow": "الان نه",
+  "plans.sheet.close": "بستن",
+  "plans.locked.title": "این یک امکان Pro است",
+  "plans.locked.text": "Free به تو تورنمنت تمرینی می‌دهد. Pro مربی، ابزارهای مرور، رنج‌ها و ماشین‌حساب ICM را اضافه می‌کند.",
+  "plans.locked.button": "ببین Pro چه چیزهایی اضافه می‌کند",
+  "plans.chip.title": "مربی ICM",
+  "plans.chip.unlock": "باز کردن",
+  "plans.table.locked": "Pro دست‌های تمام‌شده و آمارت را نشان می‌دهد.",
+};
