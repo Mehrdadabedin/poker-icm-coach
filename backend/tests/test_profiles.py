@@ -48,6 +48,17 @@ def test_save_and_read_back_with_spaces_tidied() -> None:
     assert client.get("/api/profile").json() == expected
 
 
+@pytest.mark.parametrize(("first", "last", "display"), [
+    ("علی\u200cرضا", "محمدی", "علی\u200cرضا ۷"),  # Persian, joined with a ZWNJ, Persian digit
+    ("小龙", "李", "小龙 7"),
+])
+def test_persian_and_chinese_names_are_saved_as_typed(first: str, last: str, display: str) -> None:
+    client = login_client("ProfileScript")
+    saved = client.put("/api/profile", json=_body(firstName=first, lastName=last, displayName=display))
+    assert saved.status_code == 200, saved.text
+    assert [saved.json()[k] for k in ("firstName", "lastName", "displayName")] == [first, last, display]
+
+
 def test_a_second_save_replaces_the_first() -> None:
     client = login_client("ProfileTwice")
     client.put("/api/profile", json=_body())
@@ -78,6 +89,8 @@ def test_self_described_gender_keeps_its_text_and_others_drop_it() -> None:
     ({"firstName": "<script>"}, "markup"),
     ({"lastName": "Abedin2"}, "digit in a last name"),
     ({"lastName": "-Abedin"}, "starts with punctuation"),
+    ({"firstName": "\u200cعلی"}, "starts with a zero-width non-joiner"),
+    ({"firstName": "Ali\u200d"}, "zero-width joiner"),
     ({"firstName": "A" * 41}, "first name too long"),
     ({"displayName": "M"}, "display name too short"),
     ({"displayName": "M" * 25}, "display name too long"),
