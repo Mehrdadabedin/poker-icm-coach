@@ -1,6 +1,8 @@
 /* English: the language menu and the sign-in screen (plan 093). */
 export const auth = {
   "lang.label": "Language",
+  // a finishing place; English adds st, nd, rd or th in placeOrdinal instead
+  "place.ordinal": "{n}",
   "auth.username": "Email or username",
   "auth.password": "Password",
   "auth.confirm": "Confirm password",

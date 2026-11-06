@@ -2,7 +2,7 @@
 id: 113
 title: Simplified Chinese and Persian
 phase: 8
-status: planned
+status: in-progress
 depends_on: [093, 111]
 test_file: frontend/tests/i18n.test.tsx
 implementation_files: [frontend/src/i18n/lang.ts, frontend/src/i18n/I18n.tsx, frontend/src/i18n/translate.ts, frontend/src/i18n/siteMeta.ts, frontend/src/i18n/messages/zh.ts, frontend/src/i18n/messages/fa.ts, frontend/src/components/LanguageMenu.tsx, frontend/src/styles/lang-menu.css, frontend/src/landing-minimal/MinimalLanguages.tsx, frontend/src/landing-minimal/MinimalFooter.tsx, frontend/src/pages/MinimalLandingPage.tsx, frontend/src/styles/base.css, frontend/vite.config.ts, frontend/tests/i18n.test.tsx, frontend/tests/i18n_rtl.test.tsx, scripts/table-fit/check.mjs]

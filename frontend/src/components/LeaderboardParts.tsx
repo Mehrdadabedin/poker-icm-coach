@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { formatChips } from "../models/game";
 import { useI18n, useT } from "../i18n/I18n";
-import type { Lang } from "../i18n/lang";
+import { placeOrdinal } from "../i18n/lang";
 import type { LeaderboardMe, LeaderboardRow } from "../services/leaderboardApi";
 
 export function Avatar({ row, size }: { row: LeaderboardRow; size: number }) {
@@ -36,14 +36,6 @@ export function Row({ row }: { row: LeaderboardRow }) {
   );
 }
 
-/** 10th, 22nd; Spanish 10.º */
-export const ordinal = (rank: number, lang: Lang): string => {
-  if (lang === "es") return `${rank}.º`;
-  const tens = rank % 100;
-  const suffix = tens >= 11 && tens <= 13 ? "th" : ({ 1: "st", 2: "nd", 3: "rd" } as Record<number, string>)[rank % 10] ?? "th";
-  return `${rank}${suffix}`;
-};
-
 /** The player's own row, pinned above the tab bar. */
 export function OwnRow({ me }: { me: LeaderboardMe }) {
   const t = useT();
@@ -57,7 +49,7 @@ export function OwnRow({ me }: { me: LeaderboardMe }) {
   }
   return (
     <div className="lb-own" data-testid="lb-own">
-      <span className="lb-own-rank">{ordinal(me.rank, lang)}</span>
+      <span className="lb-own-rank">{placeOrdinal(lang, me.rank, false)}</span>
       <Avatar row={me} size={36} />
       <span className="lb-who"><b className="lb-name">{t("leaderboard.you", { name: me.name })}</b><Stats row={me} /></span>
       <span className="lb-own-points">{formatChips(me.points)}</span>

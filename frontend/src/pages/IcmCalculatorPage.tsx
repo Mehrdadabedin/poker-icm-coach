@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { icmEquities } from "../services/icmApi";
+import { NumberBox } from "../components/NumberBox";
 import { PageHeader } from "../components/PageHeader";
 import { Copyright } from "../components/Copyright";
 import { useT } from "../i18n/I18n";
@@ -76,7 +77,7 @@ export function IcmCalculatorPage() {
         <div className="icm-section">
           <label className="icm-label">
             {t("icm.prizePool")}
-            <input type="number" value={prizePool} onChange={(e) => setPrizePool(Number(e.target.value))} data-testid="prize-pool-input" className="icm-input" />
+            <NumberBox value={prizePool} onValue={setPrizePool} data-testid="prize-pool-input" className="icm-input" />
           </label>
         </div>
         <div className="icm-section">
@@ -85,7 +86,7 @@ export function IcmCalculatorPage() {
             <div key={i} className="icm-row">
               <label className="icm-label">
                 {t("icm.stack", { n: i + 1 })}
-                <input type="number" value={stack} onChange={(e) => setStacks(updateArray(stacks, i, Number(e.target.value)))} data-testid={`stack-input-${i}`} className="icm-input" />
+                <NumberBox value={stack} onValue={(n) => setStacks(updateArray(stacks, i, n))} data-testid={`stack-input-${i}`} className="icm-input" />
               </label>
               <button onClick={() => setStacks(stacks.filter((_, idx) => idx !== i))} disabled={stacks.length <= 2} className="icm-btn-small" data-testid={`remove-player-${i}`}>{t("icm.remove")}</button>
             </div>
@@ -98,7 +99,7 @@ export function IcmCalculatorPage() {
             <div key={i} className="icm-row">
               <label className="icm-label">
                 {t("icm.place", { n: i + 1 })}
-                <input type="number" value={pct} onChange={(e) => setPayoutPercents(updateArray(payoutPercents, i, Number(e.target.value)))} data-testid={`payout-input-${i}`} className="icm-input" />
+                <NumberBox value={pct} onValue={(n) => setPayoutPercents(updateArray(payoutPercents, i, n))} data-testid={`payout-input-${i}`} className="icm-input" />
               </label>
               <button onClick={() => setPayoutPercents(payoutPercents.filter((_, idx) => idx !== i))} disabled={payoutPercents.length <= 1} className="icm-btn-small" data-testid={`remove-payout-${i}`}>{t("icm.remove")}</button>
             </div>

@@ -4,7 +4,10 @@
  * site by path only, never by host, so icmbot.es is a second static site built
  * with VITE_SITE_LANG=es. index.html holds the English head; siteHtml rewrites
  * it for the other site. */
-import type { Lang } from "./lang";
+/** The languages with a head of their own; zh and fa get theirs in plan 113 step 8. */
+export type SiteLang = "en" | "es";
+
+export const isSiteLang = (value: string): value is SiteLang => value === "en" || value === "es";
 
 export interface SiteMeta {
   origin: string;
@@ -18,7 +21,7 @@ export interface SiteMeta {
   image: string;
 }
 
-export const SITE_META: Record<Lang, SiteMeta> = {
+export const SITE_META: Record<SiteLang, SiteMeta> = {
   en: {
     origin: "https://icmbot.one",
     title: "ICMBOT",
@@ -62,7 +65,7 @@ function replaceOnce(html: string, pattern: RegExp, value: string): string {
 
 /** index.html with the head of the site that speaks `lang`. The hreflang links
  * stay the same on both sites, so each names the other. */
-export function siteHtml(html: string, lang: Lang): string {
+export function siteHtml(html: string, lang: SiteLang): string {
   const m = SITE_META[lang];
   const image = `${m.origin}${m.image}`;
   const swaps: [RegExp, string][] = [

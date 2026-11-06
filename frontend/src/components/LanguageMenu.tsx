@@ -1,14 +1,26 @@
 import { useI18n } from "../i18n/I18n";
-import { LANG_NAMES, offeredLangs, READY } from "../i18n/lang";
+import { isLang, LANG_NAMES, offeredLangs, READY } from "../i18n/lang";
 import { inAndroidApp } from "../services/platform";
 
 /** Language buttons, each language in its own words (plan 093). Always there
  * on icmbot.es and in the Android app; on icmbot.one once Spanish is READY
- * (or while previewing it). */
+ * (or while previewing it). In the narrow bands (`short`) more than two
+ * pills do not fit beside Log in at 360 px, so there it becomes one list,
+ * which Android opens in its own picker (plan 113). */
 export function LanguageMenu({ short = false }: { short?: boolean }) {
   const { lang, setLang, t } = useI18n();
   const offered = offeredLangs(lang, window.location.hostname, READY, inAndroidApp());
   if (offered.length < 2) return null;
+  if (short && offered.length > 2) {
+    return (
+      <nav className="lang-menu" data-testid="lang-menu">
+        <select className="lang-select" aria-label={t("lang.label")} value={lang} data-testid="lang-select"
+          onChange={(e) => { if (isLang(e.target.value)) setLang(e.target.value); }}>
+          {offered.map((l) => <option key={l} value={l} lang={l}>{LANG_NAMES[l]}</option>)}
+        </select>
+      </nav>
+    );
+  }
   return (
     <nav className="lang-menu" aria-label={t("lang.label")} data-testid="lang-menu">
       {offered.map((l) => (

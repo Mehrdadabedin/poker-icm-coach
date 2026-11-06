@@ -1,7 +1,7 @@
 /* Hand History (plan 077): the user's saved tournaments, names for winners,
  * and the filters. Kept out of the page so the page stays a layout. */
 import type { I18nValue } from "../i18n/I18n";
-import { numberLocale } from "../i18n/lang";
+import { numberLocale, placeOrdinal } from "../i18n/lang";
 
 type Words = Pick<I18nValue, "t" | "lang">;
 
@@ -22,12 +22,6 @@ export const NO_FILTERS: HistoryFilters = { result: "all", mistakesOnly: false, 
 
 const HERO_SEAT = 0;
 
-export function ordinal(n: number): string {
-  const tens = n % 100;
-  const suffix = tens >= 11 && tens <= 13 ? "th" : ({ 1: "st", 2: "nd", 3: "rd" } as Record<number, string>)[n % 10] ?? "th";
-  return `${n}${suffix}`;
-}
-
 /** A tournament still marked active whose table is gone (a deploy or restart
  * ended it) is "unfinished"; the live one is "in progress". */
 export function tournamentState(t: Pick<TournamentRow, "tableId" | "status" | "finishPlace">,
@@ -35,7 +29,7 @@ export function tournamentState(t: Pick<TournamentRow, "tableId" | "status" | "f
   if (t.tableId === liveId) return tr("hh.state.live");
   if (t.status === "finished") {
     if (!t.finishPlace) return tr("hh.state.finished");
-    return tr("hh.state.finishedAt", { place: lang === "es" ? `${t.finishPlace}.º` : ordinal(t.finishPlace) });
+    return tr("hh.state.finishedAt", { place: placeOrdinal(lang, t.finishPlace, false) });
   }
   return tr(t.status === "abandoned" ? "hh.state.abandoned" : "hh.state.unfinished");
 }

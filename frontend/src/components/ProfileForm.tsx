@@ -1,9 +1,9 @@
 import { useState, type FormEvent, type ReactNode } from "react";
-import { useT } from "../i18n/I18n";
+import { useI18n } from "../i18n/I18n";
 import { BirthdayPicker } from "./BirthdayPicker";
 import type { MessageKey } from "../i18n/messages/en";
 import { getUsername } from "../services/api";
-import { fromIso, formatTyped, toIso } from "../services/birthdayInput";
+import { birthdayFormat } from "../services/birthdayInput";
 import { ageOn, ApiStatusError, GENDERS, saveProfile, type Profile, type ProfileField } from "../services/profileApi";
 
 const MIN_AGE = 18;
@@ -27,9 +27,10 @@ function Field({ id, label, error, children }: { id: string; label: string; erro
 /** PERSONAL DETAILS (plan 095): the server checks every field again; the age
  * is also checked here so a player under 18 gets a clear message at once. */
 export function ProfileForm({ initial, onSaved }: { initial: Profile | null; onSaved: (p: Profile) => void }) {
-  const t = useT();
+  const { t, lang } = useI18n();
+  const dates = birthdayFormat(lang);
   const [form, setForm] = useState<Profile>(initial ?? blank());
-  const [birthdayText, setBirthdayText] = useState(() => fromIso(initial?.birthday ?? ""));
+  const [birthdayText, setBirthdayText] = useState(() => dates.fromIso(initial?.birthday ?? ""));
   const [errors, setErrors] = useState<Errors>({});
   const [state, setState] = useState<"idle" | "saving" | "saved" | "failed">("idle");
 
@@ -41,7 +42,7 @@ export function ProfileForm({ initial, onSaved }: { initial: Profile | null; onS
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    if (birthdayText && !toIso(birthdayText)) {
+    if (birthdayText && !dates.toIso(birthdayText)) {
       setErrors({ birthday: "profile.error.birthday" });
       return;
     }
@@ -53,7 +54,7 @@ export function ProfileForm({ initial, onSaved }: { initial: Profile | null; onS
     try {
       const saved = await saveProfile({ ...form, genderText: form.gender === "self_described" ? form.genderText : null });
       setForm(saved);
-      setBirthdayText(fromIso(saved.birthday));
+      setBirthdayText(dates.fromIso(saved.birthday));
       onSaved(saved);
       setState("saved");
     } catch (error) {
@@ -89,11 +90,11 @@ export function ProfileForm({ initial, onSaved }: { initial: Profile | null; onS
             <input id="profile-birthday" type="text" inputMode="numeric" autoComplete="bday" required
               placeholder={t("profile.birthdayPlaceholder")} maxLength={10} value={birthdayText}
               onChange={(e) => {
-                const typed = formatTyped(e.target.value);
+                const typed = dates.format(e.target.value);
                 setBirthdayText(typed);
-                set("birthday", toIso(typed) ?? "");
+                set("birthday", dates.toIso(typed) ?? "");
               }} data-testid="profile-birthday" />
-            <BirthdayPicker value={form.birthday} onPick={(iso) => { setBirthdayText(fromIso(iso)); set("birthday", iso); }} />
+            <BirthdayPicker value={form.birthday} onPick={(iso) => { setBirthdayText(dates.fromIso(iso)); set("birthday", iso); }} />
           </div>
         </Field>
         <Field id="profile-gender" label={t("profile.gender")} error={err("gender")}>
