@@ -73,21 +73,8 @@ function signIn(lang: Lang) {
 }
 
 describe("the language buttons", () => {
-  it("always offer Spanish on icmbot.es, so English is never a dead end (the owner, 20 Oct)", () => {
-    expect(offeredLangs("en", "icmbot.es")).toEqual(["en", "es"]);
-    expect(offeredLangs("es", "www.icmbot.es")).toEqual(["en", "es"]);
-  });
-
-  it("wait on icmbot.one until Spanish is ready, except while previewing it", () => {
-    expect(offeredLangs("en", "icmbot.one")).toEqual(["en"]);
-    expect(offeredLangs("es", "icmbot.one")).toEqual(["en", "es"]);
-    expect(offeredLangs("en", "icmbot.one", ["en", "es"])).toEqual(["en", "es"]);
-  });
-
-  it("offer all four in the Android app, so app users can switch every way (the owner, 6 Nov)", () => {
-    expect(offeredLangs("en", "icmbot.one", READY, true)).toEqual(["en", "es", "zh", "fa"]);
-    expect(offeredLangs("es", "icmbot.one", READY, true)).toEqual(["en", "es", "zh", "fa"]);
-    expect(offeredLangs("en", "icmbot.one", READY, false)).toEqual(["en"]);
+  it("offer all four everywhere: icmbot.one, icmbot.es and the app (the owner, 6 Nov)", () => {
+    expect(offeredLangs()).toEqual(["en", "es", "zh", "fa"]);
   });
 });
 
@@ -105,10 +92,11 @@ describe("the landing page", () => {
     expect(screen.getByTestId("minimal-closing")).toHaveTextContent("Tu próximo torneo empieza aquí.");
     expect(screen.getByTestId("minimal-cookie-settings")).toHaveTextContent("Configuración de cookies");
     expect(screen.getByText("Tu privacidad importa")).toBeInTheDocument();
-    // at the top of the page, in the header band, as EN / ES
-    expect(screen.getByTestId("minimal-header")).toContainElement(screen.getByTestId("lang-en"));
-    expect(screen.getByTestId("lang-es")).toHaveTextContent("ES");
-    fireEvent.click(screen.getByTestId("lang-en"));
+    // at the top of the page, in the header band, as one list of the four (the owner, 6 Nov)
+    const list = screen.getByTestId("lang-select");
+    expect(screen.getByTestId("minimal-header")).toContainElement(list);
+    expect(list).toHaveValue("es");
+    fireEvent.change(list, { target: { value: "en" } });
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Master tournament decisions");
   });
 });
@@ -124,9 +112,10 @@ describe("the sign-in screen", () => {
     expect(document.documentElement.lang).toBe("es");
   });
 
-  it("hides the menu while English is the only language ready", () => {
+  it("offers all four languages on icmbot.one, before they are ready (the owner, 6 Nov)", () => {
     signIn("en");
-    expect(screen.queryByTestId("lang-menu")).toBeNull();
+    expect(["en", "es", "zh", "fa"].map((l) => screen.getByTestId(`lang-${l}`).textContent))
+      .toEqual(["English", "Español", "简体中文", "فارسی"]);
     expect(screen.getByTestId("auth-submit")).toHaveTextContent("Sign in");
   });
 
