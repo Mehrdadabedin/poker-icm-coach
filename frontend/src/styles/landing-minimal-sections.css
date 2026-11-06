@@ -70,6 +70,29 @@
 }
 .lm-footer-link:hover { color: var(--lm-text); }
 
+/* the languages, each in its own script, separated by dots (plan 113) */
+.lm-footer-langs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  max-width: 1120px;
+  margin: 0 auto 16px;
+  padding: 0 var(--lm-gutter);
+}
+.lm-footer-lang {
+  padding: 4px 6px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.lm-footer-dot { padding: 0 6px; color: var(--lm-muted); }
+.lm-footer-lang:hover { color: var(--lm-text); }
+.lm-footer-lang[aria-pressed="true"] { color: var(--lm-text); font-weight: 700; }
+
 /* phones: the two footer groups stacked and centred */
 @media (max-width: 639px) {
   .lm-footer-inner { flex-direction: column; text-align: center; }
