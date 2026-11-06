@@ -215,3 +215,6 @@ New `frontend/tests/i18n_rtl.test.tsx`; additions to `i18n.test.tsx` and `site_m
 - The `/zh/` and `/fa/` paths on icmbot.one, no domain of their own.
 - Persian turns on first (the plan had Chinese). Steps 1 to 8 stay in the same order, since the
   RTL work (steps 2 and 3) comes before any translation step either way.
+- 6 Nov: a language line in the landing footer now, "English · Español · 简体中文 · فارسی", each in its own
+  script and switching the page, with all four languages before Persian and Chinese are READY (step 11
+  had READY languages only). The "Play in your language" section stays in step 11.

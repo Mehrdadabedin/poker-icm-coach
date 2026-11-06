@@ -1,14 +1,16 @@
 import { Link } from "react-router-dom";
 import { useT } from "../i18n/I18n";
+import { FooterLanguages } from "./FooterLanguages";
 
-/** Footer: the copyright on the left, the practice-only note, Terms, Privacy
- * and Cookie settings on the right. The consent banner shows no floating button once a
+/** Footer: the languages on top, then the copyright on the left, the
+ * practice-only note, Terms, Privacy and Cookie settings on the right. The consent banner shows no floating button once a
  * choice is saved, so this link (the same window event the current landing
  * footer uses) is how a visitor changes their choice. */
 export function MinimalFooter() {
   const t = useT();
   return (
     <footer className="lm-footer" data-testid="minimal-footer">
+      <FooterLanguages />
       <div className="lm-footer-inner">
         <span data-testid="minimal-copyright">{t("app.copyright")}</span>
         <span className="lm-footer-right">
