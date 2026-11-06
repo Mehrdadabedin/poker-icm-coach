@@ -38,7 +38,10 @@ export function SummaryCards({ summary, period }: { summary: Summary; period: Pe
   );
 }
 
-const capital = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const STREETS = ["preflop", "flop", "turn", "river"];
+/** "Flop" in the language; a street the server adds later shows as sent, capitalised. */
+const streetLabel = (s: string, t: ReturnType<typeof useT>) =>
+  (STREETS.includes(s) ? t(`report.street.${s}` as MessageKey) : s.charAt(0).toUpperCase() + s.slice(1));
 
 export function MistakeMap({ heatmap }: { heatmap: Report["heatmap"] }) {
   const t = useT();
@@ -47,7 +50,7 @@ export function MistakeMap({ heatmap }: { heatmap: Report["heatmap"] }) {
   return (
     <div className="report-scroll">
       <table className="report-heat" data-testid="report-heatmap">
-        <thead><tr><th />{heatmap.streets.map((s) => <th key={s}>{capital(s)}</th>)}</tr></thead>
+        <thead><tr><th />{heatmap.streets.map((s) => <th key={s}>{streetLabel(s, t)}</th>)}</tr></thead>
         <tbody>
           {rows.map((p) => (
             <tr key={p} data-testid={`report-heat-${p}`}>

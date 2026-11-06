@@ -17,6 +17,16 @@ import { a11y } from "./fa/a11y";
 import { speak } from "./fa/speak";
 import { review } from "./fa/review";
 import { hands } from "./fa/hands";
+import { mistakes } from "./fa/mistakes";
+import { handHistory } from "./fa/handHistory";
+import { report } from "./fa/report";
+import { glossary } from "./fa/glossary";
+import { glossaryTerms } from "./fa/glossaryTerms";
+import { quiz } from "./fa/quiz";
+import { practice } from "./fa/practice";
+import { tools } from "./fa/tools";
+import { leaderboard } from "./fa/leaderboard";
 
 export const fa: Messages = { ...en, ...auth, ...landing, ...tabs, ...theme, ...home, ...plans, ...portrait, ...portraitPrompt, ...profile,
-  ...table, ...tableStrip, ...coach, ...a11y, ...speak, ...review, ...hands };
+  ...table, ...tableStrip, ...coach, ...a11y, ...speak, ...review, ...hands,
+  ...mistakes, ...handHistory, ...report, ...glossary, ...glossaryTerms, ...quiz, ...practice, ...tools, ...leaderboard };

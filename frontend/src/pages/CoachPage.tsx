@@ -3,6 +3,7 @@ import { request } from "../services/api";
 import { minutesToWait, RateLimitError } from "../services/rateLimit";
 import { Copyright } from "../components/Copyright";
 import { PageHeader } from "../components/PageHeader";
+import { NumberBox } from "../components/NumberBox";
 import { Card, POSITIONS_9MAX, cardAlt } from "../models/game";
 import { CardPicker, SUIT_SYMBOL, cardKey } from "../components/CoachCardPicker";
 import { CoachAdvicePanel, type Advice } from "../components/CoachAdvicePanel";
@@ -133,14 +134,14 @@ export function CoachPage() {
       <div className="train-grid">
         <div className="toolbar">
           <label>{t("coachPage.position")}<select value={position} onChange={(e) => setPosition(e.target.value)}>{POSITIONS_9MAX.map((p) => <option key={p}>{p}</option>)}</select></label>
-          <label>{t("coachPage.opponents")}<input type="number" min={1} max={8} value={opponents} onChange={(e) => setOpponents(Number(e.target.value))} /></label>
-          <label>{t("coachPage.stack")}<input type="number" min={0} value={stack} onChange={(e) => setStack(Number(e.target.value))} /></label>
-          <label>{t("coachPage.pot")}<input type="number" min={0} value={pot} onChange={(e) => setPot(Number(e.target.value))} /></label>
-          <label>{t("coachPage.toCall")}<input type="number" min={0} value={toCall} onChange={(e) => setToCall(Number(e.target.value))} /></label>
+          <label>{t("coachPage.opponents")}<NumberBox min={1} max={8} value={opponents} onValue={setOpponents} /></label>
+          <label>{t("coachPage.stack")}<NumberBox min={0} value={stack} onValue={setStack} /></label>
+          <label>{t("coachPage.pot")}<NumberBox min={0} value={pot} onValue={setPot} /></label>
+          <label>{t("coachPage.toCall")}<NumberBox min={0} value={toCall} onValue={setToCall} /></label>
         </div>
         <div className="toolbar">
-          <label>{t("coachPage.smallBlind")}<input type="number" min={0} value={smallBlind} onChange={(e) => setSmallBlind(Number(e.target.value))} /></label>
-          <label>{t("coachPage.bigBlind")}<input type="number" min={1} value={bigBlind} onChange={(e) => setBigBlind(Number(e.target.value))} /></label>
+          <label>{t("coachPage.smallBlind")}<NumberBox min={0} value={smallBlind} onValue={setSmallBlind} /></label>
+          <label>{t("coachPage.bigBlind")}<NumberBox min={1} value={bigBlind} onValue={setBigBlind} /></label>
           <button className="btn" onClick={run} disabled={running || !boardReady} data-testid="analyze-btn">{t("coachPage.analyze")}</button>
         </div>
       </div>

@@ -64,8 +64,12 @@ export function statVerdict(s: PlayerStat, t: T = EN): { text: string; tone: "ok
   return { text: t("report.verdict.in"), tone: "ok" };
 }
 
+/** "flop" in the language; a street the server adds later shows as sent. */
+const streetWord = (street: string, t: T): string =>
+  (["preflop", "flop", "turn", "river"].includes(street) ? t(`report.streetWord.${street}` as MessageKey) : street);
+
 export const leakText = (l: Leak, t: T = EN): string => t("report.leak", {
-  pos: l.position, street: l.street, hero: actionWord(l.heroAction, t), coach: actionWord(l.coachAction, t) });
+  pos: l.position, street: streetWord(l.street, t), hero: actionWord(l.heroAction, t), coach: actionWord(l.coachAction, t) });
 
 /** Green at no mistakes, red from one decision in four. The lightness is a token:
  * dark cells in the dark theme, pale cells in the light one. */
@@ -93,7 +97,7 @@ export const historyLink = (tableId: string, hand: number): string =>
 
 /** One line about the sizes on a street, or a note when there are too few. */
 export function sizingInsight(s: StreetSizes, t: T = EN): string {
-  const street = s.street;
+  const street = t(`report.streetWord.${s.street}`);
   if (s.bets < FEW_CHANCES) return t(s.bets === 1 ? "report.insight.few.one" : "report.insight.few.other", { n: s.bets, street });
   const share = (k: SizeKey) => (s.buckets.find((b) => b.size === k)?.count ?? 0) / s.bets;
   if (share("under25") >= 0.4) return t("report.insight.small", { street });

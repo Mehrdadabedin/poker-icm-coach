@@ -91,4 +91,12 @@ export const report: Record<keyof typeof en, string> = {
   "report.insight.small": "La mayoría de tus apuestas en el {street} son de menos de un cuarto del bote. Una apuesta tan pequeña deja igualar barato a los rivales; de 1/3 a 2/3 del bote suele funcionar mejor.",
   "report.insight.over": "La mayoría de tus apuestas en el {street} superan el bote. Las sobreapuestas arriesgan muchas fichas; resérvalas para tus manos más fuertes.",
   "report.insight.common": "Tu apuesta más habitual en el {street} es {phrase} ({pct}% de tus apuestas).",
+  "report.street.preflop": "Preflop",
+  "report.street.flop": "Flop",
+  "report.street.turn": "Turn",
+  "report.street.river": "River",
+  "report.streetWord.preflop": "preflop",
+  "report.streetWord.flop": "flop",
+  "report.streetWord.turn": "turn",
+  "report.streetWord.river": "river",
 };
