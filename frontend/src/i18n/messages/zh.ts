@@ -10,5 +10,13 @@ import { plans } from "./zh/plans";
 import { portrait } from "./zh/portrait";
 import { portraitPrompt } from "./zh/portraitPrompt";
 import { profile } from "./zh/profile";
+import { table } from "./zh/table";
+import { tableStrip } from "./zh/tableStrip";
+import { coach } from "./zh/coach";
+import { a11y } from "./zh/a11y";
+import { speak } from "./zh/speak";
+import { review } from "./zh/review";
+import { hands } from "./zh/hands";
 
-export const zh: Messages = { ...en, ...auth, ...landing, ...tabs, ...theme, ...home, ...plans, ...portrait, ...portraitPrompt, ...profile };
+export const zh: Messages = { ...en, ...auth, ...landing, ...tabs, ...theme, ...home, ...plans, ...portrait, ...portraitPrompt, ...profile,
+  ...table, ...tableStrip, ...coach, ...a11y, ...speak, ...review, ...hands };
