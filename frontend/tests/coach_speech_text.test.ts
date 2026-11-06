@@ -7,10 +7,21 @@ import { sampleTableState } from "../src/sampleState";
 import { setCurrentLang } from "../src/i18n/lang";
 
 const advice = (recommendedAction: string): CoachAdvice => ({ recommendedAction, reasoning: "", detail: {} });
-const say = (action: string, lang: "en" | "es", patch = {}) => {
+const say = (action: string, lang: "en" | "es" | "fa", patch = {}) => {
   setCurrentLang(lang);
   return spokenAdvice(advice(action), { ...sampleTableState(), toCall: 1200, ...patch }, (key, params) => translate(lang, key, params));
 };
+
+describe("the spoken words in Persian (the owner, 6 Nov)", () => {
+  it("says the amount without a full stop, which a Persian voice reads as a decimal point", () => {
+    expect(say("CALL", "fa", { toCall: 160 })).toBe("کال ۱۶۰");
+    expect(say("FOLD", "fa")).toBe("فولد");
+  });
+
+  it("gives the voice no direction marks, only the words", () => {
+    expect(say("CALL", "fa", { toCall: 1200 })).not.toMatch(/[\u2068\u2069.]/);
+  });
+});
 
 describe("the spoken action words", () => {
   it.each([
