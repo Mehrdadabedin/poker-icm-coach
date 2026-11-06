@@ -53,7 +53,7 @@ describe("finding Chinese and Persian", () => {
   it("offers a previewed language beside the ready ones on every site", () => {
     expect(offeredLangs("zh", "icmbot.one")).toEqual(["en", "zh"]);
     expect(offeredLangs("fa", "icmbot.es")).toEqual(["en", "es", "fa"]);
-    expect(offeredLangs("fa", "icmbot.one", READY, true)).toEqual(["en", "es", "fa"]);
+    expect(offeredLangs("fa", "icmbot.one", READY, true)).toEqual(["en", "es", "zh", "fa"]);
     expect(offeredLangs("en", "icmbot.one", ["en", "zh", "fa"])).toEqual(["en", "zh", "fa"]);
   });
 });
@@ -81,12 +81,18 @@ describe("the page in Chinese and Persian", () => {
     const list = screen.getByTestId("lang-select");
     expect(list).toHaveAccessibleName("زبان"); // lang.label in Persian (plan 113 step 4)
     expect(list).toHaveValue("fa");
+    // the app offers all four (the owner, 6 Nov)
     expect([...(list as HTMLSelectElement).options].map((o) => [o.textContent, o.lang])).toEqual(
-      [["English", "en"], ["Español", "es"], ["فارسی", "fa"]]);
+      [["English", "en"], ["Español", "es"], ["简体中文", "zh"], ["فارسی", "fa"]]);
     expect(screen.queryByTestId("lang-en")).toBeNull();
     fireEvent.change(list, { target: { value: "es" } });
     expect(document.documentElement).toHaveAttribute("lang", "es");
-    expect(screen.getByTestId("lang-es")).toHaveTextContent("ES"); // two languages: pills again
+    expect(screen.getByTestId("lang-select")).toHaveValue("es");
+    cleanup();
+    vi.restoreAllMocks();
+    render(<I18nProvider initial="fa"><LanguageMenu short /></I18nProvider>); // the website: English and the one in use
+    expect(screen.queryByTestId("lang-select")).toBeNull();
+    expect(screen.getByTestId("lang-fa")).toHaveTextContent("FA");
   });
 
   it("keeps the full pills on Home whatever the number of languages", () => {
